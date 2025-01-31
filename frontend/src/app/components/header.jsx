@@ -51,7 +51,7 @@ export default function ControlMenu() {
             // onMouseLeave={handleMouseLeave} // Salida del área
             >
             <Link href="/servicios" className="text-black hover:text-gray-700">
-              Servicios
+                Servicios
             </Link>
             {/* Submenú */}
             {isDropdownVisible && (
