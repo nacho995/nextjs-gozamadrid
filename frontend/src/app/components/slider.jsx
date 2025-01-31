@@ -74,7 +74,11 @@ export default function ImageSlider() {
       {/* Botón centrado en la imagen */}
       <div className="p-3 bg-white/40 rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
         <Link
+<<<<<<< HEAD
           className="rounded-full border border-transparent transition-colors flex items-center justify-center bg-black text-white gap-2 hover:bg-amarillo hover:text-black text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 font-bold"
+=======
+          className="rounded-full border border-transparent transition-colors flex items-center justify-center bg-black text-white gap-2 hover:bg-amber-400 hover:text-black text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 font-bold"
+>>>>>>> 33e1efe (guardando antes del pull locales)
           href="https://valuation.lystos.com?clientId=cd55b10c-5ba6-4f65-854e-5c8adaf88a34"
           target="_blank"
           rel="noopener noreferrer"

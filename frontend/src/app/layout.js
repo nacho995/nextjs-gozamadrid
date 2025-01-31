@@ -1,7 +1,10 @@
 // import localFont from "next/font/local";
 import ControlMenu from "./components/header";
 import FooterPage from "./components/footer";
+<<<<<<< HEAD
 import './globals.css';
+=======
+>>>>>>> 33e1efe (guardando antes del pull locales)
 
 // import { Roboto } from 'next/font/google';
 

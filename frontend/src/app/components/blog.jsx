@@ -20,7 +20,11 @@ return (
           <p className="md:text-md">{description}</p>
         </div>
         <div className="hidden flex-wrap items-center justify-end md:block">
+<<<<<<< HEAD
           <Button {...button} className="hover:bg-amarillo hover:font-bold">
+=======
+          <Button {...button} className="hover:bg-amber-300 hover:font-bold">
+>>>>>>> 33e1efe (guardando antes del pull locales)
             {button.title}
           </Button>
         </div>
@@ -30,7 +34,11 @@ return (
           <a
             key={index}
             href={post.url}
+<<<<<<< HEAD
             className="flex size-full flex-col items-center justify-start border border-border-primary hover:border-amarillo hover:border-2"
+=======
+            className="flex size-full flex-col items-center justify-start border border-border-primary hover:border-amber-300 hover:border-2"
+>>>>>>> 33e1efe (guardando antes del pull locales)
           >
             <div className="relative w-full overflow-hidden pt-[66%]">
               <img
@@ -52,7 +60,11 @@ return (
                 <p>{post.description}</p>
                 <Button
                   {...post.button}
+<<<<<<< HEAD
                   className="mt-6 flex items-center justify-center gap-x-1 hover:bg-amarillo hover:font-bold"
+=======
+                  className="mt-6 flex items-center justify-center gap-x-1 hover:bg-amber-300 hover:font-bold"
+>>>>>>> 33e1efe (guardando antes del pull locales)
                 >
                   {post.button.title}
                 </Button>
@@ -61,7 +73,11 @@ return (
           </a>
         ))}
       </div>
+<<<<<<< HEAD
       <Button {...button} className="mt-12 md:hidden hover:bg-amarillo hover:font-bold">
+=======
+      <Button {...button} className="mt-12 md:hidden hover:bg-amber-300 hover:font-bold">
+>>>>>>> 33e1efe (guardando antes del pull locales)
         {button.title}
       </Button>
     </div>

@@ -2,7 +2,10 @@
 import { useState, useEffect } from "react";
 import CountryPrefix from "./CountryPrefix";
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 33e1efe (guardando antes del pull locales)
 const Form = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -88,8 +91,13 @@ const validateForm = () => {
 
     return (
         <main>
+<<<<<<< HEAD
             <div className="grid justify-items-center grid-cols-2 mt-[-15%] ml-48 mb-[5%] min-h-fit">
                 <form className="rounded-lg space-y-6 border-2 p-14 border-gray-300 w-[60%]" onSubmit={onSubmit} style={{ paddingLeft: '10%', paddingRight: '10%' }}>
+=======
+            <div className="grid place-content-start mt-[-15%] ml-48 mb-[5%] min-h-fit">
+                <form className="rounded-lg space-y-6 border-2 p-14 border-gray-300" onSubmit={onSubmit} style={{ paddingLeft: '10%', paddingRight: '10%' }}>
+>>>>>>> 33e1efe (guardando antes del pull locales)
                     {errorMessage && <p className="text-red-500">{errorMessage}</p>}
                     <div className="text-left">
                         <h2 className="text-2xl font-bold">Contáctenos</h2>
@@ -99,13 +107,21 @@ const validateForm = () => {
                             <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nombre:</label>
                             <input type="text" id="name" name="name" value={name} onChange={e => setName(e.target.value)} placeholder="Nombre"
                                 className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none
+<<<<<<< HEAD
                                 focus:ring-amarillo focus:border-amarillo sm:text-sm" />
+=======
+                                focus:ring-amber-500 focus:border-amber-500 sm:text-sm" />
+>>>>>>> 33e1efe (guardando antes del pull locales)
                         </div>
                         <div className="w-1/3">
                             <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email:</label>
                             <input type="email" id="email" name="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email"
                                 className="mt-1 block w-full px-4 py-3 border border-gray-300
+<<<<<<< HEAD
                                 rounded-md shadow-sm focus:outline-none focus:ring-amarillo focus:border-amarillo sm:text-sm" />
+=======
+                                rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm" />
+>>>>>>> 33e1efe (guardando antes del pull locales)
                         </div>
                     </div>
                     <div>
@@ -118,7 +134,11 @@ const validateForm = () => {
                                 <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Número de teléfono:</label>
                                 <input type="tel" id="phone" name="phone" value={phone} onChange={e => setPhone(e.target.value)} placeholder="Teléfono"
                                     className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none
+<<<<<<< HEAD
                                     focus:ring-amarillo focus:border-amarillo sm:text-sm" />
+=======
+                                    focus:ring-amber-500 focus:border-amber-500 sm:text-sm" />
+>>>>>>> 33e1efe (guardando antes del pull locales)
                             </div>
                         </div>
                     </div>
@@ -128,18 +148,29 @@ const validateForm = () => {
                         </label>
                         <textarea name="asunto" id="asunto" value={asunto} onChange={e => setAsunto(e.target.value)} placeholder="Escríbenos..."
                             className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none
+<<<<<<< HEAD
                             focus:ring-amarillo focus:border-amarillo sm:text-sm"></textarea>
                         <div className="flex justify-center" style={{ marginTop: '10%' }}>
                             <button type="submit"
                                 className="mt-4 w-1/4 inline-flex justify-center py-1 px-2 border border-transparent 
                                 shadow-sm text-sm font-medium rounded-md text-black bg-amarillo hover:text-amarillo hover:bg-black transition-all
+=======
+                            focus:ring-amber-500 focus:border-amber-500 sm:text-sm"></textarea>
+                        <div className="flex justify-center" style={{ marginTop: '10%' }}>
+                            <button type="submit"
+                                className="mt-4 w-1/4 inline-flex justify-center py-1 px-2 border border-transparent 
+                                shadow-sm text-sm font-medium rounded-md text-black bg-amber-400 hover:text-white hover:bg-black transition-all
+>>>>>>> 33e1efe (guardando antes del pull locales)
                                 focus:outline-none focus:ring-2 focus:ring-offset-2">Send</button>
                         </div>
                     </div>
                 </form>
+<<<<<<< HEAD
                 <div className="flex justify-items-center mt-8">
                     <img src="/formFoto.jpeg" alt="Form Image" className="rounded-full shadow-md" />
                 </div>
+=======
+>>>>>>> 33e1efe (guardando antes del pull locales)
             </div>
         </main>
     );
