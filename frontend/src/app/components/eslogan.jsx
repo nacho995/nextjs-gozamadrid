@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 
 const Eslogan = () => {
-<<<<<<< HEAD
     return (
         <div className="mt-18 grid grid-cols-2 place-items-center relative bg-cover bg-center z-40 rounded-3xl" style={{ height: "100vh" }}>
             {/* Capa de color negro transparente */}
@@ -59,39 +58,6 @@ const Eslogan = () => {
                     className="object-cover"
                 />
                 <Link href="/contacto" className="hover:text-white hover:bg-black bg-amarillo text-black px-4 py-2 rounded mt-[15%]">
-=======
-
-    return (
-        <div className="mt-24 flex flex-col items-center relative">
-            <div className="max-w-md text-left mb-[15%] ml-[-50%] mt-[5%]">
-                <h2 className="text-4xl font-bold mt-[6%] mb-8">
-                    Somos tu asesor <br /> inmobiliario.
-                </h2>
-                <p className="leading-relaxed">
-                    ¡Aspiramos a generar una nueva cultura financiera en España a través de la
-                    inversión en bienes inmuebles, básicamente, queremos que generes riqueza!
-                </p>
-                <p className="leading-relaxed mt-8">
-                    Buscamos revolucionar la forma en como invertir en inmuebles,
-                    con una visión centrada en ti como inversionista
-                    y una gama de soluciones que busca hacerte la vida fácil,
-                    queremos ayudarte a desarrollar una estrategia de
-                    inversión inmobiliaria y ayudarte a ejecutarla, para
-                    que alcances tus objetivos financieros.
-                </p>
-            </div>
-            <div className="absolute mt-[5%] ml-[30%]">
-                <Image
-                    src="/gzmdinero.png"
-                    alt="Dinero"
-                    width={600}
-                    height={600}
-                    className="object-cover"
-                />
-            </div>
-            <div className="mt-[-10%] ml-[30%] mb-[10%]">
-                <Link href="/contacto" className="hover:text-white hover:bg-black bg-amber-300 text-black px-4 py-2 rounded">
->>>>>>> 33e1efe (guardando antes del pull locales)
                     Contáctenos
                 </Link>
             </div>

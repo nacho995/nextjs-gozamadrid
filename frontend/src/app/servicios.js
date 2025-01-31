@@ -1,5 +1,4 @@
 
-import { Form } from "@relume_io/relume-ui";
 import Form from "./components/form";
 import Image from "next/image";
 

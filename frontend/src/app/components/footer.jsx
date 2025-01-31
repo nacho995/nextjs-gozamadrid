@@ -29,11 +29,7 @@ export default function Footer3(props) {
   }
 
 return (
-<<<<<<< HEAD
     <footer id="relume" className="px-[5%] py-12 md:py-18 lg:py-20 bg-gradient-to-r from-amarillo to-black text-white">
-=======
-    <footer id="relume" className="px-[5%] py-12 md:py-18 lg:py-20 bg-black text-white">
->>>>>>> 33e1efe (guardando antes del pull locales)
         <div className="container">
             <div className="grid grid-cols-1 gap-x-[4vw] gap-y-12 pb-12 md:gap-y-16 md:pb-18 lg:grid-cols-[1fr_0.5fr] lg:gap-y-4 lg:pb-20">
                 <div>
@@ -100,11 +96,7 @@ return (
 export const Footer3Defaults = {
   logo: {
     url: "#",
-<<<<<<< HEAD
     src: "/logo.png",
-=======
-    src: "https://d22po4pjz3o32e.cloudfront.net/logo-image.svg",
->>>>>>> 33e1efe (guardando antes del pull locales)
     alt: "Logo image",
   },
   address: {

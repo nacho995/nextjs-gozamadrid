@@ -12,7 +12,6 @@ const Video = ({ videoId, title }) => {
   };
 
   return (
-<<<<<<< HEAD
     <div className="relative w-full flex justify-end">
       <hr className="absolute top-0 left-0 w-full  border-gray-500" />
       <div
@@ -34,20 +33,6 @@ const Video = ({ videoId, title }) => {
 
       <hr className="absolute bottom-0 left-0 w-full border-gray-500" />
       <div className="relative mr-15 w-1/2" style={{ aspectRatio: "16 / 9" }}>
-=======
-    <div className="relative w-full  flex justify-end">
-      <hr className="absolute top-0 left-0 w-full border-gray-500" />
-      <div className="absolute left-0 bg-gray-500 p-4 w-1/2 z-10 flex flex-col justify-center items-center h-full">
-        <h2 className="text-amber-300 text-3xl font-bold text-center">
-          ¿Por qué unirte a eXp España?
-        </h2>
-        <p className="text-white text-xl font-bold text-center mx-20 mt-1">
-          Rompe barreras con una de las agencias inmobiliarias de mayor crecimiento del mundo y descubre nuevas formas de facturar, aprender y hacer crecer tu negocio.
-        </p>
-      </div>
-      <hr className="absolute bottom-0 left-0 w-full border-gray-500" />
-      <div className="relative mr-15 w-1/2" style={{aspectRatio: "16 / 9" }}>
->>>>>>> 33e1efe (guardando antes del pull locales)
         <iframe
           ref={iframeRef}
           src={isPlaying ? youtubeUrl : `https://www.youtube.com/embed/${videoId}`}
@@ -63,8 +48,4 @@ const Video = ({ videoId, title }) => {
   );
 };
 
-<<<<<<< HEAD
 export default Video;
-=======
-export default Video;
->>>>>>> 33e1efe (guardando antes del pull locales)

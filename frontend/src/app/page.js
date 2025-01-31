@@ -8,10 +8,7 @@ import ImageSlider from "./components/slider";
 import Form from "./components/form";
 import BlogHome from "./components/blog";
 import YoutubeVideo from "./components/Youtube"
-<<<<<<< HEAD
 import CounterExp from "./components/countereXp";
-=======
->>>>>>> 33e1efe (guardando antes del pull locales)
 
 
 
@@ -20,34 +17,21 @@ import CounterExp from "./components/countereXp";
 export default function Home() {
   return (
     <>
-<<<<<<< HEAD
       <div className="absolute top-0 left-0 mb-[-15%] w-full h-full z-0">
-=======
-      <div className="absolute top-0 left-0 w-full h-full z-0">
->>>>>>> 33e1efe (guardando antes del pull locales)
         <Video />
       </div>
 
       <div className="relative z-10 flex flex-col m-0 p-0">
-<<<<<<< HEAD
         
           <Eslogan />
        
-=======
-        <div className="top-0 w-full mb-4">
-          <Eslogan />
-        </div>
->>>>>>> 33e1efe (guardando antes del pull locales)
         <div className="w-full mb-4">
           <ImageSlider />
         </div>
         <div className="mt-[-20%] w-full mb-4">
           <BlogHome />
         </div>
-<<<<<<< HEAD
         <CounterExp />
-=======
->>>>>>> 33e1efe (guardando antes del pull locales)
         <hr className="w-full border-t-1 border-b-1 border-amber-400 mb-4" />
         <hr className="w-full border-t-1 border-b-1 border-black mb-4" />
         <div className="w-full mb-4">
