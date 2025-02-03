@@ -136,7 +136,7 @@ const validateForm = () => {
                         </div>
                     </div>
                 </form>
-                <div className="flex justify-items-center mt-8">
+                <div className="flex justify-items-center mt-8 mr-48">
                     <img src="/formFoto.jpeg" alt="Form Image" className="rounded-full shadow-md" />
                 </div>
             </div>

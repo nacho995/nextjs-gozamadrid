@@ -21,7 +21,7 @@ export default function ControlMenu() {
   return (
     <div className="relative w-full h-[80vh]">
       {/* Contenido del encabezado */}
-        <header className="relative z-10 flex flex-col items-center pl-24 pr-24 p-4 bg-white bg-opacity-50 w-max mx-auto rounded-full shadow-2xl">
+        <header className="relative z-10 flex flex-col items-center pl-24 pr-24 p-4 bg-white bg-opacity-20 w-max mx-auto rounded-full shadow-2xl">
           {/* Íconos sociales */}
         <div className="absolute top-5 right-10 flex space-x-4 mt-4 mr-4">
           <Link href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
