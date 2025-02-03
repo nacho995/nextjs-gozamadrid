@@ -1,0 +1,23 @@
+__turbopack_load_page_chunks__("/api", [
+  "static/chunks/node_modules_next_37536c._.js",
+  "static/chunks/node_modules_react_1cad9b._.js",
+  "static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e07.js",
+  "static/chunks/node_modules_react-dom_f14d04._.js",
+  "static/chunks/node_modules_react-day-picker_dist_esm_bd73b3._.js",
+  "static/chunks/node_modules_luxon_src_a3f2b6._.js",
+  "static/chunks/node_modules_react-icons_cg_index_mjs_6cbc53._.js",
+  "static/chunks/node_modules_react-icons_rx_index_mjs_424fb2._.js",
+  "static/chunks/node_modules_react-icons_io5_index_mjs_e31071._.js",
+  "static/chunks/node_modules_react-icons_bi_index_mjs_41d22a._.js",
+  "static/chunks/node_modules_react-icons_lu_index_mjs_c31279._.js",
+  "static/chunks/node_modules_react-icons_lib_75a63d._.js",
+  "static/chunks/node_modules_framer-motion_dist_es_a0d43f._.js",
+  "static/chunks/node_modules_@relume_io_relume-ui_dist_index_mjs_7eea24._.js",
+  "static/chunks/node_modules_@radix-ui_7f3052._.js",
+  "static/chunks/node_modules_@floating-ui_056e3f._.js",
+  "static/chunks/node_modules_5a7310._.js",
+  "static/chunks/[root of the server]__3604e9._.js",
+  "static/chunks/node_modules_tailwindcss_tailwind_254820.css",
+  "static/chunks/src_pages_index_5771e1._.js",
+  "static/chunks/src_pages_index_855b9a._.js"
+])
