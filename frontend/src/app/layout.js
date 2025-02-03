@@ -2,6 +2,13 @@
 import ControlMenu from "./components/header";
 import FooterPage from "./components/footer";
 import './globals.css';
+import { Chakra_Petch as ChakraPetch } from "@next/font/google";
+
+const chakraPetch = ChakraPetch({ subsets: ["regular"],
+  weight: ["400","500", "600",  "700"]
+  
+ });
+
 
 // import { Roboto } from 'next/font/google';
 
@@ -32,7 +39,8 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html>
-      <body>
+      <body className={chakraPetch.className}>
+      {/* Header */}
       <ControlMenu />
       {/* Main Content */}
       <main className="min-h-screen">{children}</main>
