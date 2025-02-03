@@ -412,10 +412,11 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 var { r: __turbopack_require__, f: __turbopack_module_context__, i: __turbopack_import__, s: __turbopack_esm__, v: __turbopack_export_value__, n: __turbopack_export_namespace__, c: __turbopack_cache__, M: __turbopack_modules__, l: __turbopack_load__, j: __turbopack_dynamic__, P: __turbopack_resolve_absolute_path__, U: __turbopack_relative_url__, R: __turbopack_resolve_module_id_path__, b: __turbopack_worker_blob_url__, g: global, __dirname, k: __turbopack_refresh__, m: module, z: __turbopack_require_stub__ } = __turbopack_context__;
 {
 __turbopack_esm__({
+    "getBlogPosts": (()=>getBlogPosts),
     "getCountryPrefix": (()=>getCountryPrefix)
 });
 async function getCountryPrefix(data) {
-    const response = await fetch('http://localhost:3002/prefix', {
+    const response = await fetch('http://localhost:3000/prefix', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -424,6 +425,25 @@ async function getCountryPrefix(data) {
     });
     const countryPrefix = await response.json();
     return countryPrefix;
+}
+async function getBlogPosts() {
+    const response = await fetch('http://localhost:3000/blog', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    // Verifica si la respuesta fue exitosa
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    // Verifica que la respuesta sea JSON antes de llamar a response.json()
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+        return await response.json(); // Si es JSON, lo procesamos
+    } else {
+        throw new Error('Response is not JSON');
+    }
 }
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_refresh__.registerExports(module, globalThis.$RefreshHelpers$);
@@ -877,8 +897,11 @@ __turbopack_esm__({
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$pages$2f$api$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/src/app/pages/api.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$relume_io$2f$relume$2d$ui$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/@relume_io/relume-ui/dist/index.mjs [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$rx$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/react-icons/rx/index.mjs [app-client] (ecmascript)");
+;
+var _s = __turbopack_refresh__.signature();
 "use client";
 ;
 ;
@@ -886,10 +909,28 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$ico
 ;
 // Componente Blog44
 const BlogHome = (props)=>{
+    _s();
+    const [blogs, setBlogs] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
     const { tagline, heading, description, button, blogPosts } = {
         ...Blog44Defaults,
         ...props
     };
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "BlogHome.useEffect": ()=>{
+            const fetchBlogs = {
+                "BlogHome.useEffect.fetchBlogs": async ()=>{
+                    try {
+                        const response = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$pages$2f$api$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getBlogPosts"])();
+                        const data = await response.json();
+                        setBlogs(data);
+                    } catch (error) {
+                        console.error("Error fetching blog data:", error);
+                    }
+                }
+            }["BlogHome.useEffect.fetchBlogs"];
+            fetchBlogs();
+        }
+    }["BlogHome.useEffect"], []);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
         id: "relume",
         className: "px-[5%] py-16 md:py-24 lg:py-28",
@@ -907,30 +948,30 @@ const BlogHome = (props)=>{
                                     children: tagline
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/components/blog.jsx",
-                                    lineNumber: 18,
-                                    columnNumber: 11
+                                    lineNumber: 33,
+                                    columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
                                     className: "mb-3 text-5xl font-bold md:mb-4 md:text-7xl lg:text-8xl",
                                     children: heading
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/components/blog.jsx",
-                                    lineNumber: 19,
-                                    columnNumber: 11
+                                    lineNumber: 34,
+                                    columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                     className: "md:text-md",
                                     children: description
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/components/blog.jsx",
-                                    lineNumber: 20,
-                                    columnNumber: 11
+                                    lineNumber: 37,
+                                    columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/components/blog.jsx",
-                            lineNumber: 17,
-                            columnNumber: 9
+                            lineNumber: 32,
+                            columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "hidden flex-wrap items-center justify-end md:block",
@@ -940,23 +981,23 @@ const BlogHome = (props)=>{
                                 children: button.title
                             }, void 0, false, {
                                 fileName: "[project]/src/app/components/blog.jsx",
-                                lineNumber: 23,
-                                columnNumber: 11
+                                lineNumber: 40,
+                                columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/app/components/blog.jsx",
-                            lineNumber: 22,
-                            columnNumber: 9
+                            lineNumber: 39,
+                            columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/components/blog.jsx",
-                    lineNumber: 16,
-                    columnNumber: 7
+                    lineNumber: 31,
+                    columnNumber: 11
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "grid grid-cols-1 gap-x-8 gap-y-12 md:grid-cols-2 md:gap-y-16 lg:grid-cols-3",
-                    children: blogPosts.map((post, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                    children: blogs.length > 0 ? blogs.map((post, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
                             href: post.url,
                             className: "flex size-full flex-col items-center justify-start border border-border-primary hover:border-amarillo hover:border-2",
                             children: [
@@ -968,13 +1009,13 @@ const BlogHome = (props)=>{
                                         className: "absolute inset-0 size-full object-cover"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/components/blog.jsx",
-                                        lineNumber: 36,
-                                        columnNumber: 15
+                                        lineNumber: 56,
+                                        columnNumber: 21
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/components/blog.jsx",
-                                    lineNumber: 35,
-                                    columnNumber: 13
+                                    lineNumber: 55,
+                                    columnNumber: 19
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "flex w-full flex-1 flex-col justify-between px-5 py-6 md:p-6",
@@ -987,22 +1028,22 @@ const BlogHome = (props)=>{
                                                     children: post.category
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/components/blog.jsx",
-                                                    lineNumber: 44,
-                                                    columnNumber: 17
+                                                    lineNumber: 64,
+                                                    columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                     className: "inline text-sm font-semibold",
                                                     children: post.readTime
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/components/blog.jsx",
-                                                    lineNumber: 47,
-                                                    columnNumber: 17
+                                                    lineNumber: 67,
+                                                    columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/components/blog.jsx",
-                                            lineNumber: 43,
-                                            columnNumber: 15
+                                            lineNumber: 63,
+                                            columnNumber: 21
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "flex w-full flex-col items-start justify-start",
@@ -1012,15 +1053,15 @@ const BlogHome = (props)=>{
                                                     children: post.title
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/components/blog.jsx",
-                                                    lineNumber: 51,
-                                                    columnNumber: 17
+                                                    lineNumber: 71,
+                                                    columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                     children: post.description
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/components/blog.jsx",
-                                                    lineNumber: 52,
-                                                    columnNumber: 17
+                                                    lineNumber: 74,
+                                                    columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$relume_io$2f$relume$2d$ui$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
                                                     ...post.button,
@@ -1028,31 +1069,37 @@ const BlogHome = (props)=>{
                                                     children: post.button.title
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/components/blog.jsx",
-                                                    lineNumber: 53,
-                                                    columnNumber: 17
+                                                    lineNumber: 75,
+                                                    columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/components/blog.jsx",
-                                            lineNumber: 50,
-                                            columnNumber: 15
+                                            lineNumber: 70,
+                                            columnNumber: 21
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/components/blog.jsx",
-                                    lineNumber: 42,
-                                    columnNumber: 13
+                                    lineNumber: 62,
+                                    columnNumber: 19
                                 }, this)
                             ]
                         }, index, true, {
                             fileName: "[project]/src/app/components/blog.jsx",
-                            lineNumber: 30,
-                            columnNumber: 11
-                        }, this))
+                            lineNumber: 50,
+                            columnNumber: 17
+                        }, this)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                        children: "No hay publicaciones disponibles."
+                    }, void 0, false, {
+                        fileName: "[project]/src/app/components/blog.jsx",
+                        lineNumber: 86,
+                        columnNumber: 15
+                    }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/app/components/blog.jsx",
-                    lineNumber: 28,
-                    columnNumber: 7
+                    lineNumber: 47,
+                    columnNumber: 11
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$relume_io$2f$relume$2d$ui$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
                     ...button,
@@ -1060,21 +1107,22 @@ const BlogHome = (props)=>{
                     children: button.title
                 }, void 0, false, {
                     fileName: "[project]/src/app/components/blog.jsx",
-                    lineNumber: 64,
-                    columnNumber: 7
+                    lineNumber: 90,
+                    columnNumber: 11
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/components/blog.jsx",
-            lineNumber: 15,
-            columnNumber: 5
+            lineNumber: 30,
+            columnNumber: 9
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/app/components/blog.jsx",
-        lineNumber: 14,
-        columnNumber: 3
+        lineNumber: 29,
+        columnNumber: 7
     }, this);
 };
+_s(BlogHome, "RDzdeLKEs49XKHWpCIuOQAADm3U=");
 _c = BlogHome;
 // Valores predeterminados para el componente Blog44
 const Blog44Defaults = {
@@ -1102,7 +1150,7 @@ const Blog44Defaults = {
                 size: "link",
                 iconRight: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$rx$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RxChevronRight"], {}, void 0, false, {
                     fileName: "[project]/src/app/components/blog.jsx",
-                    lineNumber: 94,
+                    lineNumber: 120,
                     columnNumber: 20
                 }, this)
             }
@@ -1123,7 +1171,7 @@ const Blog44Defaults = {
                 size: "link",
                 iconRight: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$rx$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RxChevronRight"], {}, void 0, false, {
                     fileName: "[project]/src/app/components/blog.jsx",
-                    lineNumber: 112,
+                    lineNumber: 138,
                     columnNumber: 20
                 }, this)
             }
@@ -1144,7 +1192,7 @@ const Blog44Defaults = {
                 size: "link",
                 iconRight: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$rx$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RxChevronRight"], {}, void 0, false, {
                     fileName: "[project]/src/app/components/blog.jsx",
-                    lineNumber: 130,
+                    lineNumber: 156,
                     columnNumber: 20
                 }, this)
             }
