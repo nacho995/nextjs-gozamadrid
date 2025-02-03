@@ -10,6 +10,10 @@ export default{
 presets: [require("@relume_io/relume-tailwind")], 
 theme: {
     extend: {
+      fontFamily: {
+        sans: ["Chackra Petch", "sans"],
+        weight: ["400", "700"]  // Fuente predeterminada
+      },
       colors: {
         customColors: "#73FAFA",
         greenYellow:" #B1F553",

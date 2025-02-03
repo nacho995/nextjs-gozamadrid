@@ -12,9 +12,9 @@ const Eslogan = () => {
 
             {/* Contenedor con fondo oscuro transparente */}
             <div
-                className="max-w-md text-center mb-[15%] mt-[5%] z-40 relative p-8 rounded-lg"
+                className="max-w-md text-center mb-[15%] mt-[5%] z-40 relative p-8 rounded-lg border-b-8 border-t-8 border-amarillo"
                 style={{
-                    background: "linear-gradient(to right, transparent 5%, #C7A336 20%, white 80%, transparent 100%)",
+                    background: "linear-gradient(to right, transparent 0%, #C7A336 20%, white 80%, transparent 100%)",
                 }}
             >
 
