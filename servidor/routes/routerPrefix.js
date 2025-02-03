@@ -1,7 +1,7 @@
 const express = require("express")
 const prefixRouter = express.Router()
 
-const prefixController = require("/home/nacho/Documentos/Programación/gozamadrid3/servidor/controller/countryPrefix")
+const prefixController = require("/home/nacho/Documentos/Programación/nextjs-gozamadrid/servidor/controller/countryPrefix")
 
 // prefix
 
