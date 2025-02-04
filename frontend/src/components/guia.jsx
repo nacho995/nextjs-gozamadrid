@@ -6,7 +6,7 @@ export default function Guide() {
         <div className="relative w-full h-screen overflow-hidden">
 
             <div className="h-[60vh] flex flex-col bg-fixed bg-center  justify-center items-center text-center relative px-4 z-10" 
-                style={{ backgroundImage: "url('/guia.jpg')", backgroundAttachment: 'fixed' }}>
+                style={{ backgroundImage: "url('/guia.jpg')" }}>
                 <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/30"></div>
 
                 <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-amarillo drop-shadow-lg mb-4 relative z-10 mt-[-8%]">
