@@ -41,8 +41,8 @@ export default function ImageSlider() {
           >
             {/* Texto superpuesto a la imagen */}
             <div
-              className={`absolute top-[30%] left-[10%] text-white text-3xl font-bold z-10 transition-opacity duration-500 ${
-                index === 1 ? "flex opacity-100 bg-black/70 p-3 rounded-xl" : "hidden opacity-0"
+              className={`absolute top-[30%] left-[10%] text-3xl font-bold z-10 transition-opacity duration-500 ${
+                index === 1 ? "flex opacity-100 bg-black/70 p-3 rounded-xl text-white" : "flex opacity-100 bg-white/70 p-3 rounded-xl text-black"
               }`}
             >
               ¿Quieres saber <br />
@@ -50,15 +50,15 @@ export default function ImageSlider() {
             </div>
 
             {/* Gradiente superpuesto */}
-            <div
-              className={`absolute top-0 left-0 w-full h-full ${
-                index === 1 ? "flex" : "hidden"
-              } z-5`}
-            >
-              <div className="bg-gradient-to-r from-black/60 via-black/30 to-black/0 w-full h-full"></div>
-            </div>
+                  <div
+                    className={`absolute top-0 left-0 w-full h-full ${
+                    index === 1 ? "flex" : "hidden"
+                    } z-5`}
+                  >
+                    <div className="bg-gradient-to-r from-black/60 via-black/30 to-black/0 w-full h-full"></div>
+                  </div>
 
-            {/* Imagen de fondo */}
+                  {/* Imagen de fondo */}
             <div className="w-full h-full">
               <Image
                 className="object-cover w-full h-full"
@@ -79,7 +79,7 @@ export default function ImageSlider() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Valora tu propiedad
+          Valora el precio de tu propiedad
         </Link>
       </div>
     </div>
