@@ -659,6 +659,10 @@ img, video {
   width: 25vh;
 }
 
+.w-\[40vh\] {
+  width: 40vh;
+}
+
 .max-w-full {
   max-width: 100%;
 }
@@ -2254,6 +2258,10 @@ img, video {
 
 .w-\[25vh\] {
   width: 25vh;
+}
+
+.w-\[40vh\] {
+  width: 40vh;
 }
 
 .max-w-full {
