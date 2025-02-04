@@ -1,148 +1,187 @@
-"use client";
 import { useState, useEffect } from "react";
+
+
+
 import CountryPrefix from "./CountryPrefix";
 
-const Form = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [asunto, setAsunto] = useState('');
+const RegisterForm = () => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [prefix, setPrefix] = useState("");
   const [errorMessage, setErrorMessage] = useState('');
+  
 
+  // Estado para manejar errores de validación y animación
+  const [errors, setErrors] = useState({
+    name: false,
+    email: false,
+    phone: false,
+  });
+
+  // Estado para manejar la animación de shake
+  const [shake, setShake] = useState({
+    name: false,
+    email: false,
+    phone: false,
+  });
+
+  // Agregar el prefijo al número de teléfono automáticamente
   useEffect(() => {
-    if (typeof document !== 'undefined') {
-      const inputs = document.querySelectorAll('input');
-      const handleInput = (event) => {
-        if (event.target.value.trim() !== '') {
-          event.target.style.borderColor = 'gray';
-        }
-      };
-    
-      inputs.forEach(input => {
-        input.addEventListener('input', handleInput);
-      });
-    
-      // Cleanup para evitar fugas de memoria
-      return () => {
-        inputs.forEach(input => {
-          input.removeEventListener('input', handleInput);
-        });
-      };
+    if (prefix) {
+      setPhone(prevPhone => prevPhone.replace(prefix, "")); // quitar el prefijo anterior
     }
-  }, []);
+  }, [prefix]);
 
-  useEffect(() => {
-    if (typeof document !== 'undefined') {
-      const shakeAnimation = `
-        @keyframes shake {
-          0% { transform: translateX(0); }
-          25% { transform: translateX(-5px); }
-          50% { transform: translateX(5px); }
-          75% { transform: translateX(-5px); }
-          100% { transform: translateX(0); }
-        }
-        .shake {
-          animation: shake 0.5s;
-        }
-      `;
+  const completePhone = prefix + phone;
 
-      const styleSheet = document.createElement("style");
-      styleSheet.innerText = shakeAnimation;
-      document.head.appendChild(styleSheet);
-
-      const inputs = document.querySelectorAll('input');
-      inputs.forEach(input => {
-        input.addEventListener('animationend', () => {
-          input.classList.remove('shake');
-        });
-      });
-    }
-  }, []);
-
+  // Validación del formulario usando useState con shake
   const validateForm = () => {
-    const inputs = document.querySelectorAll('input');
-    let isValid = true;
+    const newErrors = {
+      name: !name.trim(),
+      email: !email.trim(),
+      phone: !phone.trim(),
+    };
 
-    inputs.forEach(input => {
-      if (input.value.trim() === '') {
-        input.classList.add('shake');
-        input.style.borderColor = 'red';
-        isValid = false;
-      } else {
-        input.classList.remove('shake');
-        input.style.borderColor = 'gray';
-      }
-    });
+    setErrors(newErrors);
 
-    return isValid;
+    // Aplicar animación de shake a los campos con error
+    setShake(newErrors);
+
+    // Quitar la clase de shake después de la animación
+    setTimeout(() => {
+      setShake({
+        name: false,
+        email: false,
+        phone: false,
+      });
+    }, 500); // Duración de la animación
+
+    return !Object.values(newErrors).includes(true);
   };
 
-  const onSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!validateForm()) {
       setErrorMessage('Por favor corrige los campos marcados en rojo.');
       return;
     }
-    setErrorMessage('');
+
+    try {
+      const newUser = {
+        name,
+        email,
+        phone: completePhone,
+      };
+
+      const userData = await createUser(newUser); // Enviar a la API
+      console.log("Usuario creado:", userData);
+
+      setErrorMessage('');
+      
+
+    } catch (err) {
+      console.error('Error al registrar al usuario', err);
+      setErrorMessage('Hubo un problema al registrar al usuario. Intenta de nuevo más tarde.');
+    }
   };
 
   return (
     <main>
-      <div className="grid justify-items-center grid-cols-2 mt-[-15%] ml-48 mb-[5%] min-h-fit">
-        <form className="rounded-lg space-y-6 border-2 p-14 border-gray-300 w-[60%]" onSubmit={onSubmit} style={{ paddingLeft: '10%', paddingRight: '10%' }}>
-          {errorMessage && <p className="text-red-500">{errorMessage}</p>}
-          <div className="text-left">
-            <h2 className="text-2xl font-bold">Contáctenos</h2>
-          </div>
-          <div className="flex flex-row items-center space-x-8">
-            <div className="w-1/3" style={{ marginLeft: '10%' }}>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nombre:</label>
-              <input type="text" id="name" name="name" value={name} onChange={e => setName(e.target.value)} placeholder="Nombre"
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none
-                focus:ring-amarillo focus:border-amarillo sm:text-sm" />
+      <div className="grid grid-cols-2 min-h-screen">
+        <div className="col-span-1 flex justify-center items-center">
+          <form className="space-y-6 border-2 p-14 border-gray-400 w-full max-w-md" onSubmit={handleSubmit}>
+            {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+            <div className="text-left">
+              <h2 className="text-2xl font-bold">Contactenos</h2>
             </div>
-            <div className="w-1/3">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email:</label>
-              <input type="email" id="email" name="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email"
-                className="mt-1 block w-full px-4 py-3 border border-gray-300
-                rounded-md shadow-sm focus:outline-none focus:ring-amarillo focus:border-amarillo sm:text-sm" />
-            </div>
-          </div>
-          <div>
-            <div className="flex flex-row space-x-8">
-              <div className="w-66" style={{ marginTop: '5%' }}>
+            <div className="flex flex-col space-y-4">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nombre:</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  placeholder="Nombre"
+                  className={`mt-1 block w-full px-4 py-2 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-amarillo focus:border-amarillo sm:text-sm ${shake.name ? 'shake' : ''}`}
+                />
+                {errors.name && <p className="text-red-500 text-sm">El nombre es obligatorio</p>}
+              </div>
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email:</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="Email"
+                  className={`mt-1 block w-full px-4 py-3 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-amarillo focus:border-amarillo sm:text-sm ${shake.email ? 'shake' : ''}`}
+                />
+                {errors.email && <p className="text-red-500 text-sm">El email es obligatorio</p>}
+              </div>
+              <div>
                 <label htmlFor="country" className="block text-sm font-medium text-gray-700">País:</label>
-                <CountryPrefix />
+                <CountryPrefix onChange={prefix => setPrefix(prefix)} />
               </div>
-              <div style={{ marginTop: '5%' }}>
+              <div>
                 <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Número de teléfono:</label>
-                <input type="tel" id="phone" name="phone" value={phone} onChange={e => setPhone(e.target.value)} placeholder="Teléfono"
-                  className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none
-                  focus:ring-amarillo focus:border-amarillo sm:text-sm" />
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="Teléfono"
+                  className={`mt-1 block w-full px-4 py-3 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-amarillo-500 focus:border-amarillo-500 sm:text-sm ${shake.phone ? 'shake' : ''}`}
+                />
+                {errors.phone && <p className="text-red-500 text-sm">El teléfono es obligatorio</p>}
+              </div>
+              <div>
+                <label htmlFor="asunto" className="block text-sm font-medium text-gray-700">Asunto:</label>
+                <textarea
+                  id="asunto"
+                  name="asunto"
+                  placeholder="Escríbenos tus inquietudes"
+                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-amarillo focus:border-amarillo sm:text-sm"
+                />
               </div>
             </div>
-          </div>
-          <div className="text-left">
-            <label className="" htmlFor="asunto">
-              ¿En qué podemos ayudarte?:
-            </label>
-            <textarea name="asunto" id="asunto" value={asunto} onChange={e => setAsunto(e.target.value)} placeholder="Escríbenos..."
-              className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none
-              focus:ring-amarillo focus:border-amarillo sm:text-sm"></textarea>
-            <div className="flex justify-center" style={{ marginTop: '10%' }}>
-              <button type="submit"
-                className="mt-4 w-1/4 inline-flex justify-center py-1 px-2 border border-transparent 
-                shadow-sm text-sm font-medium rounded-md text-black bg-amarillo hover:text-amarillo hover:bg-black transition-all
-                focus:outline-none focus:ring-2 focus:ring-offset-2">Send</button>
+            <div className="flex justify-center mt-6">
+              <button
+                type="submit"
+                className="w-1/2 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-amarillo hover:bg-amarillo transition-all focus:outline-none focus:ring-2 focus:ring-offset-2"
+              >
+                Send
+              </button>
             </div>
-          </div>
-        </form>
-        <div className="flex justify-items-center mt-8 mr-48">
+          </form>
+        </div>
+        <div className="col-span-1 flex justify-start items-center">
           <img src="/formFoto.jpeg" alt="Form Image" className="rounded-full shadow-md" />
         </div>
       </div>
+
+      {/* Estilos para la animación de shake */}
+      <style>
+        {`
+          @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+          }
+          .shake {
+            animation: shake 0.3s ease-in-out;
+          }
+        `}
+      </style>
     </main>
   );
 };
 
-export default Form;
+export default RegisterForm;
