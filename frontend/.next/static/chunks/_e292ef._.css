@@ -897,6 +897,22 @@ img, video {
   border-top-width: 8px;
 }
 
+.border-l-8 {
+  border-left-width: 8px;
+}
+
+.border-b-2 {
+  border-bottom-width: 2px;
+}
+
+.border-l-2 {
+  border-left-width: 2px;
+}
+
+.border-t-2 {
+  border-top-width: 2px;
+}
+
 .border-amarillo {
   --tw-border-opacity: 1;
   border-color: rgb(199 163 54 / var(--tw-border-opacity, 1));
@@ -2533,6 +2549,22 @@ img, video {
 
 .border-t-8 {
   border-top-width: 8px;
+}
+
+.border-l-8 {
+  border-left-width: 8px;
+}
+
+.border-b-2 {
+  border-bottom-width: 2px;
+}
+
+.border-l-2 {
+  border-left-width: 2px;
+}
+
+.border-t-2 {
+  border-top-width: 2px;
 }
 
 .border-amarillo {

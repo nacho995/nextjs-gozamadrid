@@ -581,9 +581,9 @@ const Eslogan = ()=>{
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "max-w-md text-left mt-[10%] z-40 relative p-8 mb-[20%] rounded-lg border-b-8 border-t-8 border-amarillo",
+                className: "max-w-md text-left mt-[10%] z-40 relative p-8 mb-[20%] rounded-lg border-l-2 border-b-2 border-t-2 border-amarillo",
                 style: {
-                    background: "linear-gradient(to right, transparent 0%, #C7A336 20%, white 80%, transparent 100%)"
+                    background: "linear-gradient(to right, transparent 0%, #C7A336 10%, white 90%, transparent 100%)"
                 },
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "relative z-20 ",
@@ -2202,7 +2202,7 @@ const cardData = [
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                    children: "Marta López: Tu agente de confianza."
+                    children: "Marta López: Tu vendedora de confianza."
                 }, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
                     lineNumber: 54,
@@ -2755,6 +2755,15 @@ function ControlMenu() {
                         }, void 0, false, {
                             fileName: "[project]/src/components/header.jsx",
                             lineNumber: 82,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                            href: "#",
+                            className: "text-black hover:text-gray-700",
+                            children: "Contacto"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/header.jsx",
+                            lineNumber: 85,
                             columnNumber: 11
                         }, this)
                     ]

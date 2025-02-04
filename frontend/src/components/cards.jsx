@@ -51,7 +51,7 @@ const cardData = [
                 <li>Escuchamos y asesoramos honestamente.</li>
                 <li>Nos enfocamos en la persona, no solo en la transacción.</li>
                 <li>Creamos confianza para que nos elijan siempre.</li>
-                <li>Marta López: Tu agente de confianza.</li>
+                <li>Marta López: Tu vendedora de confianza.</li>
             </ol>
         ),
     },
