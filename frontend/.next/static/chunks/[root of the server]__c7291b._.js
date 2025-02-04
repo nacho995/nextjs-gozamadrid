@@ -581,7 +581,7 @@ const Eslogan = ()=>{
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "max-w-md text-left mt-[10%] z-40 relative p-8 mb-[20%] rounded-lg border-l-2 border-b-2 border-t-2 border-amarillo",
+                className: "max-w-md text-center mb-[15%] mt-[5%] z-40 relative p-8 rounded-lg border-b-2 border-l-2 border-t-2 border-amarillo",
                 style: {
                     background: "linear-gradient(to right, transparent 0%, #C7A336 10%, white 90%, transparent 100%)"
                 },
@@ -2584,7 +2584,7 @@ function ControlMenu() {
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "relative w-full ",
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("header", {
-            className: "relative z-10 flex flex-col items-center pl-24 pr-24 p-4 bg-white bg-opacity-20 w-max mx-auto rounded-full shadow-2xl",
+            className: "relative z-10 flex flex-col items-center pl-24 pr-24 p-4 bg-white bg-opacity-40 w-max mx-auto rounded-full shadow-2xl",
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "absolute top-5 right-10 flex space-x-4 mt-4 mr-4",

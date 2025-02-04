@@ -14,7 +14,9 @@ const blogController = {
 
     addData: async (req, res) => {
         try {
+           
             const newBlog = new blog(req.body)
+
             await newBlog.save()
             res.json({ message: "Blog added" })
         } catch (err) {

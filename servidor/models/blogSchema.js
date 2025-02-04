@@ -6,9 +6,12 @@ const blogSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    content: {
+    description: {
         type: String,
         required: true
+    },
+    url: {
+        type: String,
     },
     author: {
         type: String,
@@ -18,6 +21,31 @@ const blogSchema = new mongoose.Schema({
     category: {
         type: String,
         required: true
+    },
+    image: {
+        src: {
+           type: String
+        },
+        alt:{ 
+            type: String
+        },
+    },
+    readTime: {
+        type: String
+    },
+    button: {
+        title: {
+            type: String
+        },
+        variant: {
+            type: String
+        },
+        size: {
+            type: String
+        },
+        iconRight: {
+            type: String
+        }
     }
 }, {
     timestamps: true
