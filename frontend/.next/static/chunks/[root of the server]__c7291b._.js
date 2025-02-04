@@ -2218,9 +2218,9 @@ const cardData = [
 ];
 function Cards() {
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "flex justify-center items-center w-full p-10 bg-gradient-to-t",
+        className: "flex justify-center items-center w-full p-10 h-[100vh]",
         style: {
-            background: "linear-gradient(to top, transparent 10%, #C7A336 20%, #C7A336 80%, transparent 85%)"
+            background: "linear-gradient(to top, transparent 0%, #C7A336 50%, transparent 100%)"
         },
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "grid grid-cols-4 grid-rows-4 z-20 gap-8 h-[70vh]",
@@ -2724,7 +2724,7 @@ function ControlMenu() {
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
                             href: "#",
                             className: "text-black hover:text-gray-700",
-                            children: "Reformas"
+                            children: "eXp Realty"
                         }, void 0, false, {
                             fileName: "[project]/src/components/header.jsx",
                             lineNumber: 73,
@@ -2733,7 +2733,7 @@ function ControlMenu() {
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
                             href: "#",
                             className: "text-black hover:text-gray-700",
-                            children: "Inversores"
+                            children: "Reformas"
                         }, void 0, false, {
                             fileName: "[project]/src/components/header.jsx",
                             lineNumber: 76,
@@ -2742,7 +2742,7 @@ function ControlMenu() {
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
                             href: "#",
                             className: "text-black hover:text-gray-700",
-                            children: "Blog"
+                            children: "Inversores"
                         }, void 0, false, {
                             fileName: "[project]/src/components/header.jsx",
                             lineNumber: 79,
@@ -2751,7 +2751,7 @@ function ControlMenu() {
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
                             href: "#",
                             className: "text-black hover:text-gray-700",
-                            children: "Contacto"
+                            children: "Blog"
                         }, void 0, false, {
                             fileName: "[project]/src/components/header.jsx",
                             lineNumber: 82,
