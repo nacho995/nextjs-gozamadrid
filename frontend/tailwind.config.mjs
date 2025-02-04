@@ -10,8 +10,7 @@ presets: [require("@relume_io/relume-tailwind")],
 theme: {
     extend: {
       fontFamily: {
-        sans: ["Chackra Petch", "sans"],
-        weight: ["400", "700"]  // Fuente predeterminada
+        sans: ["Chakra Petch", "sans-serif"], // Fuente predeterminada
       },
       colors: {
         customColors: "#73FAFA",

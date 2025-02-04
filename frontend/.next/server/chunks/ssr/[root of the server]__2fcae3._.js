@@ -478,7 +478,7 @@ function ControlMenu() {
         setDropdownVisible(false);
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-        className: "relative w-full h-[80vh]",
+        className: "relative w-full ",
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("header", {
             className: "relative z-10 flex flex-col items-center pl-24 pr-24 p-4 bg-white bg-opacity-40 w-max mx-auto rounded-full shadow-2xl",
             children: [
@@ -620,7 +620,7 @@ function ControlMenu() {
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__["default"], {
                             href: "#",
                             className: "text-black hover:text-gray-700",
-                            children: "Reformas"
+                            children: "eXp Realty"
                         }, void 0, false, {
                             fileName: "[project]/src/components/header.jsx",
                             lineNumber: 73,
@@ -629,7 +629,7 @@ function ControlMenu() {
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__["default"], {
                             href: "#",
                             className: "text-black hover:text-gray-700",
-                            children: "Inversores"
+                            children: "Reformas"
                         }, void 0, false, {
                             fileName: "[project]/src/components/header.jsx",
                             lineNumber: 76,
@@ -638,7 +638,7 @@ function ControlMenu() {
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__["default"], {
                             href: "#",
                             className: "text-black hover:text-gray-700",
-                            children: "Blog"
+                            children: "Inversores"
                         }, void 0, false, {
                             fileName: "[project]/src/components/header.jsx",
                             lineNumber: 79,
@@ -647,10 +647,19 @@ function ControlMenu() {
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__["default"], {
                             href: "#",
                             className: "text-black hover:text-gray-700",
-                            children: "Contacto"
+                            children: "Blog"
                         }, void 0, false, {
                             fileName: "[project]/src/components/header.jsx",
                             lineNumber: 82,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__["default"], {
+                            href: "#",
+                            className: "text-black hover:text-gray-700",
+                            children: "Contacto"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/header.jsx",
+                            lineNumber: 85,
                             columnNumber: 11
                         }, this)
                     ]
@@ -816,8 +825,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$pages$2f$api$2e$js__$
 ;
 ;
 ;
-;
-const CountryPrefix = ()=>{
+const CountryPrefix = ({ onChange })=>{
     const [countryPrefixes, setCountryPrefixes] = (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useState"])([]);
     (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useEffect"])(()=>{
         const fetchPrefixes = async ()=>{
@@ -830,30 +838,33 @@ const CountryPrefix = ()=>{
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("select", {
             id: "country",
             name: "country",
-            className: "text-black mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-amarillo focus:border-amarillo sm:text-sm bg-white",
+            onChange: (e)=>{
+                onChange(e.target.value);
+            },
+            className: "text-black mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white",
             children: countryPrefixes.map((country)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("option", {
                     className: "text-black",
                     value: country.prefix,
                     children: [
-                        country.name,
+                        country.country,
                         " (",
                         country.prefix,
                         ")"
                     ]
                 }, country.prefix, true, {
                     fileName: "[project]/src/components/CountryPrefix.jsx",
-                    lineNumber: 23,
-                    columnNumber: 21
+                    lineNumber: 22,
+                    columnNumber: 33
                 }, this))
         }, void 0, false, {
             fileName: "[project]/src/components/CountryPrefix.jsx",
-            lineNumber: 20,
-            columnNumber: 13
+            lineNumber: 17,
+            columnNumber: 6
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/components/CountryPrefix.jsx",
-        lineNumber: 19,
-        columnNumber: 9
+        lineNumber: 16,
+        columnNumber: 5
     }, this);
 };
 const __TURBOPACK__default__export__ = CountryPrefix;
@@ -869,350 +880,359 @@ __turbopack_esm__({
 var __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__ = __turbopack_import__("[externals]/react/jsx-dev-runtime [external] (react/jsx-dev-runtime, cjs)");
 var __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__ = __turbopack_import__("[externals]/react [external] (react, cjs)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$CountryPrefix$2e$jsx__$5b$ssr$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/src/components/CountryPrefix.jsx [ssr] (ecmascript)");
-"use client";
 ;
 ;
 ;
-const Form = ()=>{
-    const [name, setName] = (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useState"])('');
-    const [email, setEmail] = (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useState"])('');
-    const [phone, setPhone] = (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useState"])('');
-    const [asunto, setAsunto] = (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useState"])('');
+const RegisterForm = ()=>{
+    const [name, setName] = (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useState"])("");
+    const [email, setEmail] = (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useState"])("");
+    const [phone, setPhone] = (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useState"])("");
+    const [prefix, setPrefix] = (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useState"])("");
     const [errorMessage, setErrorMessage] = (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useState"])('');
+    // Estado para manejar errores de validación y animación
+    const [errors, setErrors] = (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useState"])({
+        name: false,
+        email: false,
+        phone: false
+    });
+    // Estado para manejar la animación de shake
+    const [shake, setShake] = (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useState"])({
+        name: false,
+        email: false,
+        phone: false
+    });
+    // Agregar el prefijo al número de teléfono automáticamente
     (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useEffect"])(()=>{
-        if (typeof document !== 'undefined') {
-            const inputs = document.querySelectorAll('input');
-            const handleInput = (event)=>{
-                if (event.target.value.trim() !== '') {
-                    event.target.style.borderColor = 'gray';
-                }
-            };
-            inputs.forEach((input)=>{
-                input.addEventListener('input', handleInput);
-            });
-            // Cleanup para evitar fugas de memoria
-            return ()=>{
-                inputs.forEach((input)=>{
-                    input.removeEventListener('input', handleInput);
-                });
-            };
+        if (prefix) {
+            setPhone((prevPhone)=>prevPhone.replace(prefix, "")); // quitar el prefijo anterior
         }
-    }, []);
-    (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useEffect"])(()=>{
-        if (typeof document !== 'undefined') {
-            const shakeAnimation = `
-        @keyframes shake {
-          0% { transform: translateX(0); }
-          25% { transform: translateX(-5px); }
-          50% { transform: translateX(5px); }
-          75% { transform: translateX(-5px); }
-          100% { transform: translateX(0); }
-        }
-        .shake {
-          animation: shake 0.5s;
-        }
-      `;
-            const styleSheet = document.createElement("style");
-            styleSheet.innerText = shakeAnimation;
-            document.head.appendChild(styleSheet);
-            const inputs = document.querySelectorAll('input');
-            inputs.forEach((input)=>{
-                input.addEventListener('animationend', ()=>{
-                    input.classList.remove('shake');
-                });
-            });
-        }
-    }, []);
+    }, [
+        prefix
+    ]);
+    const completePhone = prefix + phone;
+    // Validación del formulario usando useState con shake
     const validateForm = ()=>{
-        const inputs = document.querySelectorAll('input');
-        let isValid = true;
-        inputs.forEach((input)=>{
-            if (input.value.trim() === '') {
-                input.classList.add('shake');
-                input.style.borderColor = 'red';
-                isValid = false;
-            } else {
-                input.classList.remove('shake');
-                input.style.borderColor = 'gray';
-            }
-        });
-        return isValid;
+        const newErrors = {
+            name: !name.trim(),
+            email: !email.trim(),
+            phone: !phone.trim()
+        };
+        setErrors(newErrors);
+        // Aplicar animación de shake a los campos con error
+        setShake(newErrors);
+        // Quitar la clase de shake después de la animación
+        setTimeout(()=>{
+            setShake({
+                name: false,
+                email: false,
+                phone: false
+            });
+        }, 500); // Duración de la animación
+        return !Object.values(newErrors).includes(true);
     };
-    const onSubmit = (e)=>{
+    const handleSubmit = async (e)=>{
         e.preventDefault();
         if (!validateForm()) {
             setErrorMessage('Por favor corrige los campos marcados en rojo.');
             return;
         }
-        setErrorMessage('');
+        try {
+            const newUser = {
+                name,
+                email,
+                phone: completePhone
+            };
+            const userData = await createUser(newUser); // Enviar a la API
+            console.log("Usuario creado:", userData);
+            setErrorMessage('');
+        } catch (err) {
+            console.error('Error al registrar al usuario', err);
+            setErrorMessage('Hubo un problema al registrar al usuario. Intenta de nuevo más tarde.');
+        }
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("main", {
-        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-            className: "grid justify-items-center grid-cols-2 mt-[-15%] ml-48 mb-[5%] min-h-fit",
-            children: [
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("form", {
-                    className: "rounded-lg space-y-6 border-2 p-14 border-gray-300 w-[60%]",
-                    onSubmit: onSubmit,
-                    style: {
-                        paddingLeft: '10%',
-                        paddingRight: '10%'
-                    },
-                    children: [
-                        errorMessage && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("p", {
-                            className: "text-red-500",
-                            children: errorMessage
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/form.jsx",
-                            lineNumber: 93,
-                            columnNumber: 28
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-                            className: "text-left",
-                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("h2", {
-                                className: "text-2xl font-bold",
-                                children: "Contáctenos"
-                            }, void 0, false, {
-                                fileName: "[project]/src/components/form.jsx",
-                                lineNumber: 95,
-                                columnNumber: 13
-                            }, this)
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/form.jsx",
-                            lineNumber: 94,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-                            className: "flex flex-row items-center space-x-8",
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
+                className: "grid grid-cols-2 min-h-screen",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
+                        className: "col-span-1 flex justify-center items-center",
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("form", {
+                            className: "space-y-6 border-2 p-14 border-gray-400 w-full max-w-md",
+                            onSubmit: handleSubmit,
                             children: [
+                                errorMessage && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("p", {
+                                    className: "text-red-500",
+                                    children: errorMessage
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/form.jsx",
+                                    lineNumber: 95,
+                                    columnNumber: 30
+                                }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-                                    className: "w-1/3",
-                                    style: {
-                                        marginLeft: '10%'
-                                    },
+                                    className: "text-left",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("h2", {
+                                        className: "text-2xl font-bold",
+                                        children: "Contactenos"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/form.jsx",
+                                        lineNumber: 97,
+                                        columnNumber: 15
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/form.jsx",
+                                    lineNumber: 96,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
+                                    className: "flex flex-col space-y-4",
                                     children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("label", {
-                                            htmlFor: "name",
-                                            className: "block text-sm font-medium text-gray-700",
-                                            children: "Nombre:"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/form.jsx",
-                                            lineNumber: 99,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("input", {
-                                            type: "text",
-                                            id: "name",
-                                            name: "name",
-                                            value: name,
-                                            onChange: (e)=>setName(e.target.value),
-                                            placeholder: "Nombre",
-                                            className: "mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-amarillo focus:border-amarillo sm:text-sm"
-                                        }, void 0, false, {
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("label", {
+                                                    htmlFor: "name",
+                                                    className: "block text-sm font-medium text-gray-700",
+                                                    children: "Nombre:"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/form.jsx",
+                                                    lineNumber: 101,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("input", {
+                                                    type: "text",
+                                                    id: "name",
+                                                    name: "name",
+                                                    value: name,
+                                                    onChange: (e)=>setName(e.target.value),
+                                                    placeholder: "Nombre",
+                                                    className: `mt-1 block w-full px-4 py-2 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-amarillo focus:border-amarillo sm:text-sm ${shake.name ? 'shake' : ''}`
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/form.jsx",
+                                                    lineNumber: 102,
+                                                    columnNumber: 17
+                                                }, this),
+                                                errors.name && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("p", {
+                                                    className: "text-red-500 text-sm",
+                                                    children: "El nombre es obligatorio"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/form.jsx",
+                                                    lineNumber: 111,
+                                                    columnNumber: 33
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
                                             fileName: "[project]/src/components/form.jsx",
                                             lineNumber: 100,
                                             columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/components/form.jsx",
-                                    lineNumber: 98,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-                                    className: "w-1/3",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("label", {
-                                            htmlFor: "email",
-                                            className: "block text-sm font-medium text-gray-700",
-                                            children: "Email:"
-                                        }, void 0, false, {
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("label", {
+                                                    htmlFor: "email",
+                                                    className: "block text-sm font-medium text-gray-700",
+                                                    children: "Email:"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/form.jsx",
+                                                    lineNumber: 114,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("input", {
+                                                    type: "email",
+                                                    id: "email",
+                                                    name: "email",
+                                                    value: email,
+                                                    onChange: (e)=>setEmail(e.target.value),
+                                                    placeholder: "Email",
+                                                    className: `mt-1 block w-full px-4 py-3 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-amarillo focus:border-amarillo sm:text-sm ${shake.email ? 'shake' : ''}`
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/form.jsx",
+                                                    lineNumber: 115,
+                                                    columnNumber: 17
+                                                }, this),
+                                                errors.email && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("p", {
+                                                    className: "text-red-500 text-sm",
+                                                    children: "El email es obligatorio"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/form.jsx",
+                                                    lineNumber: 124,
+                                                    columnNumber: 34
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
                                             fileName: "[project]/src/components/form.jsx",
-                                            lineNumber: 105,
+                                            lineNumber: 113,
                                             columnNumber: 15
                                         }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("input", {
-                                            type: "email",
-                                            id: "email",
-                                            name: "email",
-                                            value: email,
-                                            onChange: (e)=>setEmail(e.target.value),
-                                            placeholder: "Email",
-                                            className: "mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-amarillo focus:border-amarillo sm:text-sm"
-                                        }, void 0, false, {
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("label", {
+                                                    htmlFor: "country",
+                                                    className: "block text-sm font-medium text-gray-700",
+                                                    children: "País:"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/form.jsx",
+                                                    lineNumber: 127,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$CountryPrefix$2e$jsx__$5b$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                    onChange: (prefix)=>setPrefix(prefix)
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/form.jsx",
+                                                    lineNumber: 128,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
                                             fileName: "[project]/src/components/form.jsx",
-                                            lineNumber: 106,
+                                            lineNumber: 126,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("label", {
+                                                    htmlFor: "phone",
+                                                    className: "block text-sm font-medium text-gray-700",
+                                                    children: "Número de teléfono:"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/form.jsx",
+                                                    lineNumber: 131,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("input", {
+                                                    type: "tel",
+                                                    id: "phone",
+                                                    name: "phone",
+                                                    value: phone,
+                                                    onChange: (e)=>setPhone(e.target.value),
+                                                    placeholder: "Teléfono",
+                                                    className: `mt-1 block w-full px-4 py-3 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-amarillo-500 focus:border-amarillo-500 sm:text-sm ${shake.phone ? 'shake' : ''}`
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/form.jsx",
+                                                    lineNumber: 132,
+                                                    columnNumber: 17
+                                                }, this),
+                                                errors.phone && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("p", {
+                                                    className: "text-red-500 text-sm",
+                                                    children: "El teléfono es obligatorio"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/form.jsx",
+                                                    lineNumber: 141,
+                                                    columnNumber: 34
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/form.jsx",
+                                            lineNumber: 130,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("label", {
+                                                    htmlFor: "asunto",
+                                                    className: "block text-sm font-medium text-gray-700",
+                                                    children: "Asunto:"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/form.jsx",
+                                                    lineNumber: 144,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("textarea", {
+                                                    id: "asunto",
+                                                    name: "asunto",
+                                                    placeholder: "Escríbenos tus inquietudes",
+                                                    className: "mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-amarillo focus:border-amarillo sm:text-sm"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/form.jsx",
+                                                    lineNumber: 145,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/form.jsx",
+                                            lineNumber: 143,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/form.jsx",
-                                    lineNumber: 104,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/src/components/form.jsx",
-                            lineNumber: 97,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-                                className: "flex flex-row space-x-8",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-                                        className: "w-66",
-                                        style: {
-                                            marginTop: '5%'
-                                        },
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("label", {
-                                                htmlFor: "country",
-                                                className: "block text-sm font-medium text-gray-700",
-                                                children: "País:"
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/form.jsx",
-                                                lineNumber: 114,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$CountryPrefix$2e$jsx__$5b$ssr$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
-                                                fileName: "[project]/src/components/form.jsx",
-                                                lineNumber: 115,
-                                                columnNumber: 17
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/src/components/form.jsx",
-                                        lineNumber: 113,
-                                        columnNumber: 15
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-                                        style: {
-                                            marginTop: '5%'
-                                        },
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("label", {
-                                                htmlFor: "phone",
-                                                className: "block text-sm font-medium text-gray-700",
-                                                children: "Número de teléfono:"
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/form.jsx",
-                                                lineNumber: 118,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("input", {
-                                                type: "tel",
-                                                id: "phone",
-                                                name: "phone",
-                                                value: phone,
-                                                onChange: (e)=>setPhone(e.target.value),
-                                                placeholder: "Teléfono",
-                                                className: "mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-amarillo focus:border-amarillo sm:text-sm"
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/form.jsx",
-                                                lineNumber: 119,
-                                                columnNumber: 17
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/src/components/form.jsx",
-                                        lineNumber: 117,
-                                        columnNumber: 15
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/src/components/form.jsx",
-                                lineNumber: 112,
-                                columnNumber: 13
-                            }, this)
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/form.jsx",
-                            lineNumber: 111,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-                            className: "text-left",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("label", {
-                                    className: "",
-                                    htmlFor: "asunto",
-                                    children: "¿En qué podemos ayudarte?:"
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/form.jsx",
-                                    lineNumber: 126,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("textarea", {
-                                    name: "asunto",
-                                    id: "asunto",
-                                    value: asunto,
-                                    onChange: (e)=>setAsunto(e.target.value),
-                                    placeholder: "Escríbenos...",
-                                    className: "mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-amarillo focus:border-amarillo sm:text-sm"
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/form.jsx",
-                                    lineNumber: 129,
+                                    lineNumber: 99,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-                                    className: "flex justify-center",
-                                    style: {
-                                        marginTop: '10%'
-                                    },
+                                    className: "flex justify-center mt-6",
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("button", {
                                         type: "submit",
-                                        className: "mt-4 w-1/4 inline-flex justify-center py-1 px-2 border border-transparent  shadow-sm text-sm font-medium rounded-md text-black bg-amarillo hover:text-amarillo hover:bg-black transition-all focus:outline-none focus:ring-2 focus:ring-offset-2",
+                                        className: "w-1/2 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-amarillo hover:bg-amarillo transition-all focus:outline-none focus:ring-2 focus:ring-offset-2",
                                         children: "Send"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/form.jsx",
-                                        lineNumber: 133,
+                                        lineNumber: 154,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/form.jsx",
-                                    lineNumber: 132,
+                                    lineNumber: 153,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/form.jsx",
-                            lineNumber: 125,
+                            lineNumber: 94,
                             columnNumber: 11
                         }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/src/components/form.jsx",
-                    lineNumber: 92,
-                    columnNumber: 9
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-                    className: "flex justify-items-center mt-8 mr-48",
-                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("img", {
-                        src: "/formFoto.jpeg",
-                        alt: "Form Image",
-                        className: "rounded-full shadow-md"
                     }, void 0, false, {
                         fileName: "[project]/src/components/form.jsx",
-                        lineNumber: 141,
-                        columnNumber: 11
+                        lineNumber: 93,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
+                        className: "col-span-1 flex justify-start items-center",
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("img", {
+                            src: "/formFoto.jpeg",
+                            alt: "Form Image",
+                            className: "rounded-full shadow-md"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/form.jsx",
+                            lineNumber: 164,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/form.jsx",
+                        lineNumber: 163,
+                        columnNumber: 9
                     }, this)
-                }, void 0, false, {
-                    fileName: "[project]/src/components/form.jsx",
-                    lineNumber: 140,
-                    columnNumber: 9
-                }, this)
-            ]
-        }, void 0, true, {
-            fileName: "[project]/src/components/form.jsx",
-            lineNumber: 91,
-            columnNumber: 7
-        }, this)
-    }, void 0, false, {
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/components/form.jsx",
+                lineNumber: 92,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("style", {
+                children: `
+          @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+          }
+          .shake {
+            animation: shake 0.3s ease-in-out;
+          }
+        `
+            }, void 0, false, {
+                fileName: "[project]/src/components/form.jsx",
+                lineNumber: 169,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
         fileName: "[project]/src/components/form.jsx",
-        lineNumber: 90,
+        lineNumber: 91,
         columnNumber: 5
     }, this);
 };
-const __TURBOPACK__default__export__ = Form;
+const __TURBOPACK__default__export__ = RegisterForm;
 }}),
 "[project]/src/pages/servicios.js [ssr] (ecmascript)": ((__turbopack_context__) => {
 "use strict";

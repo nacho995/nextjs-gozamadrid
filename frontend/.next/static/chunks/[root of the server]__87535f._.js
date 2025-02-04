@@ -979,7 +979,7 @@ function ControlMenu() {
         setDropdownVisible(false);
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "relative w-full h-[80vh]",
+        className: "relative w-full ",
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("header", {
             className: "relative z-10 flex flex-col items-center pl-24 pr-24 p-4 bg-white bg-opacity-40 w-max mx-auto rounded-full shadow-2xl",
             children: [
@@ -1121,7 +1121,7 @@ function ControlMenu() {
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
                             href: "#",
                             className: "text-black hover:text-gray-700",
-                            children: "Reformas"
+                            children: "eXp Realty"
                         }, void 0, false, {
                             fileName: "[project]/src/components/header.jsx",
                             lineNumber: 73,
@@ -1130,7 +1130,7 @@ function ControlMenu() {
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
                             href: "#",
                             className: "text-black hover:text-gray-700",
-                            children: "Inversores"
+                            children: "Reformas"
                         }, void 0, false, {
                             fileName: "[project]/src/components/header.jsx",
                             lineNumber: 76,
@@ -1139,7 +1139,7 @@ function ControlMenu() {
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
                             href: "#",
                             className: "text-black hover:text-gray-700",
-                            children: "Blog"
+                            children: "Inversores"
                         }, void 0, false, {
                             fileName: "[project]/src/components/header.jsx",
                             lineNumber: 79,
@@ -1148,10 +1148,19 @@ function ControlMenu() {
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
                             href: "#",
                             className: "text-black hover:text-gray-700",
-                            children: "Contacto"
+                            children: "Blog"
                         }, void 0, false, {
                             fileName: "[project]/src/components/header.jsx",
                             lineNumber: 82,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                            href: "#",
+                            className: "text-black hover:text-gray-700",
+                            children: "Contacto"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/header.jsx",
+                            lineNumber: 85,
                             columnNumber: 11
                         }, this)
                     ]

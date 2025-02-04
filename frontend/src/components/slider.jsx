@@ -41,8 +41,8 @@ export default function ImageSlider() {
           >
             {/* Texto superpuesto a la imagen */}
             <div
-              className={`absolute top-[30%] left-[10%] text-white text-3xl font-bold z-10 transition-opacity duration-500 ${
-                index === 1 ? "flex opacity-100 bg-black/70 p-3 rounded-xl" : "hidden opacity-0"
+              className={`absolute top-[30%] left-[10%] text-3xl font-bold z-10 transition-opacity duration-500 ${
+                index === 1 ? "flex opacity-100 bg-black/70 p-3 rounded-xl text-white" : "flex opacity-100 bg-white/70 p-3 rounded-xl text-black"
               }`}
             >
               ¿Quieres saber <br />
@@ -50,15 +50,15 @@ export default function ImageSlider() {
             </div>
 
             {/* Gradiente superpuesto */}
-            <div
-              className={`absolute top-0 left-0 w-full h-full ${
-                index === 1 ? "flex" : "hidden"
-              } z-5`}
-            >
-              <div className="bg-gradient-to-r from-black/60 via-black/30 to-black/0 w-full h-full"></div>
-            </div>
+                  <div
+                    className={`absolute top-0 left-0 w-full h-full ${
+                    index === 1 ? "flex" : "hidden"
+                    } z-5`}
+                  >
+                    <div className="bg-gradient-to-r from-black/60 via-black/30 to-black/0 w-full h-full"></div>
+                  </div>
 
-            {/* Imagen de fondo */}
+                  {/* Imagen de fondo */}
             <div className="w-full h-full">
               <Image
                 className="object-cover w-full h-full"
@@ -74,12 +74,12 @@ export default function ImageSlider() {
       {/* Botón centrado en la imagen */}
       <div className="p-3 bg-white/40 rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
         <Link
-          className="rounded-full border border-transparent transition-colors flex items-center justify-center bg-black text-white gap-2 hover:bg-amarillo hover:text-black text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 font-bold"
+          className="rounded-full border border-transparent transition-colors flex items-center justify-center bg-amarillo text-black gap-2 hover:bg-black hover:text-amarillo text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 font-bold"
           href="https://valuation.lystos.com?clientId=cd55b10c-5ba6-4f65-854e-5c8adaf88a34"
           target="_blank"
           rel="noopener noreferrer"
         >
-          Valora tu propiedad
+          Valora el precio de tu propiedad
         </Link>
       </div>
     </div>
