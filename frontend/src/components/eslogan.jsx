@@ -11,12 +11,12 @@ const Eslogan = () => {
 
             {/* Contenedor con fondo oscuro transparente */}
             <div
-                className="max-w-md text-center mb-[15%] mt-[5%] z-40 relative p-8 rounded-lg border-b-2 border-l-2 border-t-2 border-amarillo"
+                className="max-w-md text-center mb-[15%] mt-[5%] z-40 relative p-8 rounded-lg border-b-2  border-r-4 border-black"
                 style={{
-                    background: "linear-gradient(to right, transparent 0%, #C7A336 10%, white 90%, transparent 100%)",
+                    background: "linear-gradient(to right, transparent -8%, #C7A336 10%, white 90%, transparent 100%)",
                 }}
             >
-                <div className="relative z-20 ">
+                <div className="relative text-black z-20 ">
                     <h2 className="text-4xl font-bold mt-4 mb-8">
                         Cada propiedad, cada historia, <br /> un método único.
                     </h2>
@@ -27,8 +27,8 @@ const Eslogan = () => {
                     <p className="leading-relaxed font-bold">
                         Los motivos para vender son diversos:
                     </p>
-
-                    <ul className="leading-relaxed font-bold list-disc pl-6">
+                    <br />
+                    <ul className="leading-relaxed text-left font-bold list-disc pl-6">
                         <li>Un divorcio o un cambio de ciudad</li>
                         <li>Una casa demasiado grande que ya no se ajusta a tu estilo de vida</li>
                         <li>Necesidad de liquidez urgente</li>

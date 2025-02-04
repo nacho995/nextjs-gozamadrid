@@ -9,6 +9,9 @@ export default{
 presets: [require("@relume_io/relume-tailwind")], 
 theme: {
     extend: {
+      dropShadow: {
+        '3xl': '0 35px 35px rgba(0, 0, 0, 0.25)',
+      },
       fontFamily: {
         sans: ["Chakra Petch", "sans-serif"], // Fuente predeterminada
       },

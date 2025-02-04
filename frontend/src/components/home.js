@@ -12,6 +12,7 @@ import Video from "./video";
 import YoutubeVideo from "./Youtube";
 import Cards from "./cards";
 import RegisterForm from "./registerForm";
+import Guide from "./guia";
 
 
 
@@ -36,6 +37,9 @@ export default function Home() {
         </div>
         <div className="mt-[-20%] w-full mb-4">
           <BlogHome />
+        </div>
+        <div className="w-full h-[60vh] mb-4">
+        <Guide />
         </div>
         <CounterExp />
         <hr className="w-full border-t-1 border-b-1 border-amber-400 mb-4" />
