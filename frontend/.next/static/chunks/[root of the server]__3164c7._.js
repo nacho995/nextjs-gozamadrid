@@ -2116,7 +2116,7 @@ const RegisterForm = ()=>{
                                     className: "text-left",
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
                                         className: "text-2xl font-bold",
-                                        children: "Contactenos"
+                                        children: "Contáctenos"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/registerForm.jsx",
                                         lineNumber: 97,
@@ -2306,7 +2306,7 @@ const RegisterForm = ()=>{
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                         type: "submit",
                                         className: "w-1/2 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-black bg-amarillo hover:bg-black hover:text-white  transition-all focus:outline-none focus:ring-2 focus:ring-offset-2",
-                                        children: "Send"
+                                        children: "Enviar"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/registerForm.jsx",
                                         lineNumber: 154,
