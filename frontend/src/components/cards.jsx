@@ -59,12 +59,15 @@ const cardData = [
 
 export default function Cards() {
     return (
-        <div className="flex justify-center items-center w-full p-10">
-            <div className="grid grid-cols-4 grid-rows-4 gap-8 h-[50vh]">
+        <div className="flex justify-center items-center w-full p-10 bg-gradient-to-t"
+        style={{
+            background: "linear-gradient(to top, transparent 10%, #C7A336 20%, #C7A336 80%, transparent 85%)",
+        }}>
+            <div className="grid grid-cols-4 grid-rows-4 z-20 gap-8 h-[70vh]">
                 {cardData.map((card, index) => (
                     <div
                         key={index}
-                        className="relative w-[40vh] h-32 group [perspective:1000px]"
+                        className="relative w-[40vh] h-40 group [perspective:1000px]"
                         style={{ gridColumnStart: index + 1, gridRowStart: index + 1 }}
                     >
                         {/* Condicional para mostrar imágenes */}
@@ -103,14 +106,16 @@ export default function Cards() {
                                 className="absolute top-[-30vh] left-1/2 rounded-full h-[25vh] w-[25vh] transform -translate-x-1/2"
                             />
                         )}
-                        <div className="h-[30vh] relative w-full transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
-                            {/* Cara frontal */}
+                        <div className="h-[40vh] relative w-full transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+                           {/* Cara frontal */}
                             <div
                                 className="absolute w-full h-full bg-amarillo text-black shadow-lg hover:shadow-xl rounded-lg p-2 flex items-center justify-center [backface-visibility:hidden]"
                                 aria-hidden="true"
                             >
-                                <div className="absolute inset-0 bg-cover bg-center opacity-50 rounded-lg" style={{ backgroundImage: "url('/fondoamarillo.jpg')" }}></div>
-                                <h2 className="text-xl font-bold text-center z-20">{card.front}</h2>
+                                <div className="absolute inset-0 bg-cover bg-center rounded-lg" style={{ backgroundImage: "url('/fondoamarillo.jpg')" }}>
+                                    <div className="absolute inset-0 bg-white opacity-15 rounded-lg"></div>
+                                </div>
+                                <h2 className="text-3xl font-bold text-center text-black z-20">{card.front}</h2>
                             </div>
 
                             {/* Cara trasera */}
@@ -119,11 +124,11 @@ export default function Cards() {
                                 aria-hidden="true"
                             >
                                 {/* Nuevo div para la imagen de fondo */}
-                                <div className="absolute inset-0 bg-cover bg-center opacity-50 rounded-lg" style={{ backgroundImage: "url('/fondoazul.jpg')" }}></div>
+                                <div className="absolute inset-0 bg-cover bg-center  rounded-lg" style={{ backgroundImage: "url('/fondonegro.jpg')" }}></div>
 
                                 {/* Contenido de la tarjeta */}
                                 <div className="relative z-10 text-center text-lg">
-                                    <ol className="list-decimal list-inside text-left">
+                                    <ol className="list-decimal list-inside text-left text-white">
                                         {card.back.props.children}
                                     </ol>
                                 </div>

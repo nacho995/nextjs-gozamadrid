@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-// import "../../globals.css";
 import Link from "next/link";
 
 const Eslogan = () => {
@@ -12,15 +11,14 @@ const Eslogan = () => {
 
             {/* Contenedor con fondo oscuro transparente */}
             <div
-                className="max-w-md text-center mb-8 mt-4 z-40 relative p-8 rounded-lg border-b-8 border-t-8 border-amarillo"
+                className="max-w-md text-left mt-[10%] z-40 relative p-8 mb-[20%] rounded-lg border-b-8 border-t-8 border-amarillo"
                 style={{
                     background: "linear-gradient(to right, transparent 0%, #C7A336 20%, white 80%, transparent 100%)",
                 }}
             >
-
-                <div className="relative z-20">
+                <div className="relative z-20 ">
                     <h2 className="text-4xl font-bold mt-4 mb-8">
-                        Cada propiedad, cada historia,  <br /> un método único.
+                        Cada propiedad, cada historia, <br /> un método único.
                     </h2>
                     <p className="leading-relaxed font-bold">
                         Si estás heredando una vivienda, un local o cualquier activo inmobiliario, cada operación requiere un enfoque diferente. No trabajamos captando propiedades sin más; de hecho, muchas veces es mejor decir NO. ¿Por qué? Porque cuando aceptamos una propiedad, tenemos claro que la vamos a vender.
@@ -30,7 +28,7 @@ const Eslogan = () => {
                         Los motivos para vender son diversos:
                     </p>
 
-                    <ul className="leading-relaxed font-bold">
+                    <ul className="leading-relaxed font-bold list-disc pl-6">
                         <li>Un divorcio o un cambio de ciudad</li>
                         <li>Una casa demasiado grande que ya no se ajusta a tu estilo de vida</li>
                         <li>Necesidad de liquidez urgente</li>
