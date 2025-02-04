@@ -27,7 +27,9 @@ export default function Home() {
         <div className="w-full h-[100vh] z-0 flex justify-center items-center">
           <Cards />
         </div>
+        <div className="w-full h[100vh] mt-[5%] ">
         <Eslogan />
+        </div>
         <div className="w-full mb-4">
           <ImageSlider />
         </div>

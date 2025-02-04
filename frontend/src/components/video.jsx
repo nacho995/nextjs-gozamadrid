@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 
 const Video = () => {
     const videoRef = useRef(null);
-    const [videoSrc, setVideoSrc] = useState("/MadridCanva2.mp4"); // Asegúrate de que el archivo esté en la carpeta public
+    const [videoSrc, setVideoSrc] = useState("/video.mp4"); // Asegúrate de que el archivo esté en la carpeta public
 
     useEffect(() => {
         const videoElement = videoRef.current;
