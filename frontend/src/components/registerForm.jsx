@@ -153,7 +153,7 @@ const RegisterForm = () => {
             <div className="flex justify-center mt-6">
               <button
                 type="submit"
-                className="w-1/2 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-amarillo hover:bg-amarillo transition-all focus:outline-none focus:ring-2 focus:ring-offset-2"
+                className="w-1/2 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-black bg-amarillo hover:bg-black hover:text-white  transition-all focus:outline-none focus:ring-2 focus:ring-offset-2"
               >
                 Send
               </button>
