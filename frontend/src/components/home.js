@@ -10,6 +10,7 @@ import BlogHome from "./blog";
 import CounterExp from "./countereXp";
 import Video from "./video";
 import YoutubeVideo from "./Youtube";
+import Cards from "./cards";
 
 
 
@@ -22,11 +23,13 @@ export default function Home() {
       <div className="absolute top-0 left-0 mb-[-15%] w-full h-full z-0">
         <Video />
       </div>
-
-      <div className="relative z-10 flex flex-col m-0 p-0">
-        
-          <Eslogan />
-       
+      <div className="relative z-10 flex flex-col mt-[60vh] p-0">
+        <div className="w-full h-[100vh] z-0 flex justify-center items-center">
+          <Cards />
+        </div>
+        <div className="w-full h[100vh] mt-[5%] ">
+        <Eslogan />
+        </div>
         <div className="w-full mb-4">
           <ImageSlider />
         </div>
@@ -41,7 +44,7 @@ export default function Home() {
         </div>
         <hr className="w-full border-t-1 border-b-1 border-amber-400 mb-4" />
         <hr className="w-full border-t-1 border-b-1 border-black mb-4" />
-        <div className="mb[-50%] mt-[20%] w-full p-4 max-w-full">
+        <div className="mb[-50%] w-full p-4 max-w-full">
           <Form />
         </div>
       </div>

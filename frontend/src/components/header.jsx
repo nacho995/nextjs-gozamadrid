@@ -19,7 +19,7 @@ export default function ControlMenu() {
   };
 
   return (
-    <div className="relative w-full h-[80vh]">
+    <div className="relative w-full ">
       {/* Contenido del encabezado */}
         <header className="relative z-10 flex flex-col items-center pl-24 pr-24 p-4 bg-white bg-opacity-40 w-max mx-auto rounded-full shadow-2xl">
           {/* Íconos sociales */}
@@ -71,6 +71,9 @@ export default function ControlMenu() {
             Propiedades
           </Link>
           <Link href="#" className="text-black hover:text-gray-700">
+            eXp Realty
+          </Link>
+          <Link href="#" className="text-black hover:text-gray-700">
             Reformas
           </Link>
           <Link href="#" className="text-black hover:text-gray-700">
@@ -82,6 +85,7 @@ export default function ControlMenu() {
           <Link href="#" className="text-black hover:text-gray-700">
             Contacto
           </Link>
+          
         </nav>
       </header>
     </div>

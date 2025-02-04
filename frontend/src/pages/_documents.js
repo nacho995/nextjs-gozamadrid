@@ -4,16 +4,16 @@ import Document, { Html, Head, Main, NextScript } from "next/document";
 import { Chakra_Petch as ChakraPetch } from "@next/font/google";
 
 const chakraPetch = ChakraPetch({
-  subsets: ["regular"],
+  subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
 
 class MyDocument extends Document {
   render() {
     return (
-      <Html>
+      <Html className={chakraPetch.className}>
         <Head />
-        <body className={chakraPetch.className}>
+        <body>
           <Main />
           <NextScript />
         </body>

@@ -13,7 +13,11 @@
       "static/chunks/[root of the server]__e1e651._.js",
       "static/chunks/src_globals_1d81ed.css",
       "static/chunks/src_pages__app_5771e1._.js",
+<<<<<<< HEAD
       "static/chunks/src_pages__app_ddf90d._.js"
+=======
+      "static/chunks/src_pages__app_ca71c0._.js"
+>>>>>>> 93484c8cfe72382ae02e0919533b482e085aa561
     ],
     "/_error": [
       "static/chunks/[root of the server]__31723f._.js",

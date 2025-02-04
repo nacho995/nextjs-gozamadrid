@@ -1,6 +1,13 @@
 {
   "/_app": "pages/_app.js",
   "/_document": "pages/_document.js",
+<<<<<<< HEAD
   "/_error": "pages/_error.js",
   "/": "pages/index.js"
+=======
+  "/": "pages/index.js",
+  "/servicios": "pages/servicios.js",
+  "/_error": "pages/_error.js",
+  "/servicios/vender": "pages/servicios/vender.js"
+>>>>>>> 93484c8cfe72382ae02e0919533b482e085aa561
 }
