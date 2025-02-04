@@ -7,7 +7,7 @@ const Eslogan = () => {
     return (
         <div className="mt-4 grid grid-cols-2 place-items-center relative bg-cover bg-center z-40 rounded-3xl" style={{ minHeight: "100vh" }}>
             {/* Capa de color negro transparente */}
-            <div className="absolute inset-0 bg-black opacity-10 z-30 rounded-3xl"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent  z-30 rounded-3xl"></div>
 
             {/* Contenedor con fondo oscuro transparente */}
             <div

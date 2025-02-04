@@ -574,7 +574,7 @@ const Eslogan = ()=>{
         },
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "absolute inset-0 bg-black opacity-10 z-30 rounded-3xl"
+                className: "absolute inset-0 bg-gradient-to-t from-black/30 to-transparent  z-30 rounded-3xl"
             }, void 0, false, {
                 fileName: "[project]/src/components/eslogan.jsx",
                 lineNumber: 10,
@@ -2405,8 +2405,7 @@ function Guide() {
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "h-[60vh] flex flex-col bg-fixed bg-center  justify-center items-center text-center relative px-4 z-10",
                 style: {
-                    backgroundImage: "url('/guia.jpg')",
-                    backgroundAttachment: 'fixed'
+                    backgroundImage: "url('/guia.jpg')"
                 },
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
