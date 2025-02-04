@@ -24,7 +24,7 @@ export default function Home() {
         <Video />
       </div>
       <div className="relative z-10 flex flex-col mt-[60vh] p-0">
-        <div className="w-full h-[80vh] z-0 flex justify-center items-center">
+        <div className="w-full h-[100vh] z-0 flex justify-center items-center">
           <Cards />
         </div>
         <Eslogan />
