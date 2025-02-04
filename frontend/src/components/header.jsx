@@ -71,6 +71,9 @@ export default function ControlMenu() {
             Propiedades
           </Link>
           <Link href="#" className="text-black hover:text-gray-700">
+            eXp Realty
+          </Link>
+          <Link href="#" className="text-black hover:text-gray-700">
             Reformas
           </Link>
           <Link href="#" className="text-black hover:text-gray-700">
@@ -79,9 +82,7 @@ export default function ControlMenu() {
           <Link href="#" className="text-black hover:text-gray-700">
             Blog
           </Link>
-          <Link href="#" className="text-black hover:text-gray-700">
-            Contacto
-          </Link>
+          
         </nav>
       </header>
     </div>
