@@ -82,6 +82,9 @@ export default function ControlMenu() {
           <Link href="#" className="text-black hover:text-gray-700">
             Blog
           </Link>
+          <Link href="#" className="text-black hover:text-gray-700">
+            Contacto
+          </Link>
           
         </nav>
       </header>
