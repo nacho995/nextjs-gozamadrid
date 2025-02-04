@@ -2029,32 +2029,32 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$ind
 ;
 const cardData = [
     {
-        front: "Ventas ágiles y seguras",
+        front: "Ventas ágiles y seguras en un máximo de 70 días",
         back: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ol", {
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                    children: "Vendemos tu inmueble en menos de 70 días."
+                    children: "Vender un piso no es jugar a la lotería."
                 }, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
                     lineNumber: 8,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                    children: "Análisis de mercado preciso y estrategia de precio competitiva."
+                    children: "Sabemos que el mercado inmobiliario a subido de precio."
                 }, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
                     lineNumber: 9,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                    children: "Marketing inmobiliario de alto impacto y red de compradores."
+                    children: "¡Ojo! Algunos propietarios estan inflando los precios, pensando que así sacaran más beneficio"
                 }, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
                     lineNumber: 10,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                    children: "Máximo éxito para el vendedor."
+                    children: "El precio fuera de mercado aleja a compradores"
                 }, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
                     lineNumber: 11,
@@ -2072,28 +2072,28 @@ const cardData = [
         back: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ol", {
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                    children: "¿Muchas visitas y pocas ofertas? Algo falla."
+                    children: "Precio correcto = venta rápida y efectiva. "
                 }, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
                     lineNumber: 19,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                    children: "Causas comunes: precio, estrategia, comprador."
+                    children: "Precio inflado = meses (o años) sin vender, y posibles bajadas obligadas."
                 }, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
                     lineNumber: 20,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                    children: "Un experto inmobiliario marca la diferencia."
+                    children: "Si de verdad quieres vender, hazlo con estrategia y no con especulación."
                 }, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
                     lineNumber: 21,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                    children: "Vende ágil y al mejor precio."
+                    children: "Te ayudamos a definir el precio real de tu vivienda para que no pierdas el tiempo"
                 }, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
                     lineNumber: 22,
@@ -2223,7 +2223,7 @@ function Cards() {
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "grid grid-cols-4 grid-rows-4 gap-8 h-[50vh]",
             children: cardData.map((card, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "relative w-[35vh] h-32 group [perspective:1000px]",
+                    className: "relative w-[40vh] h-32 group [perspective:1000px]",
                     style: {
                         gridColumnStart: index + 1,
                         gridRowStart: index + 1
@@ -2266,7 +2266,7 @@ function Cards() {
                             columnNumber: 29
                         }, this),
                         index === 4 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
-                            src: "/conexion.jpeg",
+                            src: "/formFoto.jpeg",
                             alt: "Image above Card 4",
                             className: "absolute top-[-30vh] left-1/2 rounded-full h-[25vh] w-[25vh] transform -translate-x-1/2"
                         }, void 0, false, {

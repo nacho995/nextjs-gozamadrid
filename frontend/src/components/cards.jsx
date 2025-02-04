@@ -2,13 +2,13 @@ import React from "react";
 
 const cardData = [
     {
-        front: "Ventas ágiles y seguras",
+        front: "Ventas ágiles y seguras en un máximo de 70 días",
         back: (
             <ol>
-                <li>Vendemos tu inmueble en menos de 70 días.</li>
-                <li>Análisis de mercado preciso y estrategia de precio competitiva.</li>
-                <li>Marketing inmobiliario de alto impacto y red de compradores.</li>
-                <li>Máximo éxito para el vendedor.</li>
+                <li>Vender un piso no es jugar a la lotería.</li>
+                <li>Sabemos que el mercado inmobiliario a subido de precio.</li>
+                <li>¡Ojo! Algunos propietarios estan inflando los precios, pensando que así sacaran más beneficio</li>
+                <li>El precio fuera de mercado aleja a compradores</li>
             </ol>
         ),
     },
@@ -16,10 +16,10 @@ const cardData = [
         front: "¿Por qué no se vende tu inmueble?",
         back: (
             <ol>
-                <li>¿Muchas visitas y pocas ofertas? Algo falla.</li>
-                <li>Causas comunes: precio, estrategia, comprador.</li>
-                <li>Un experto inmobiliario marca la diferencia.</li>
-                <li>Vende ágil y al mejor precio.</li>
+                <li>Precio correcto = venta rápida y efectiva. </li>
+                <li>Precio inflado = meses (o años) sin vender, y posibles bajadas obligadas.</li>
+                <li>Si de verdad quieres vender, hazlo con estrategia y no con especulación.</li>
+                <li>Te ayudamos a definir el precio real de tu vivienda para que no pierdas el tiempo</li>
             </ol>
         ),
     },
@@ -64,7 +64,7 @@ export default function Cards() {
                 {cardData.map((card, index) => (
                     <div
                         key={index}
-                        className="relative w-[35vh] h-32 group [perspective:1000px]"
+                        className="relative w-[40vh] h-32 group [perspective:1000px]"
                         style={{ gridColumnStart: index + 1, gridRowStart: index + 1 }}
                     >
                         {/* Condicional para mostrar imágenes */}
@@ -98,7 +98,7 @@ export default function Cards() {
                         )}
                         {index === 4 && (
                             <img
-                                src="/conexion.jpeg"
+                                src="/formFoto.jpeg"
                                 alt="Image above Card 4"
                                 className="absolute top-[-30vh] left-1/2 rounded-full h-[25vh] w-[25vh] transform -translate-x-1/2"
                             />
