@@ -4,13 +4,14 @@ import "tailwindcss/tailwind.css";
 
 import Eslogan from "./eslogan";
 import ImageSlider from "./slider";
-import Form from "./form";
+
 import BlogHome from "./blog";
 
 import CounterExp from "./countereXp";
 import Video from "./video";
 import YoutubeVideo from "./Youtube";
 import Cards from "./cards";
+import RegisterForm from "./registerForm";
 
 
 
@@ -45,7 +46,7 @@ export default function Home() {
         <hr className="w-full border-t-1 border-b-1 border-amber-400 mb-4" />
         <hr className="w-full border-t-1 border-b-1 border-black mb-4" />
         <div className="mb[-50%] w-full p-4 max-w-full">
-          <Form />
+          <RegisterForm />
         </div>
       </div>
     </>

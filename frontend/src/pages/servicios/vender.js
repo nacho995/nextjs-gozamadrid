@@ -1,11 +1,12 @@
-import { Form } from "@relume_io/relume-ui";
+import RegisterForm from "@/components/registerForm";
+
 
 
 export default function Vender() {
   return (
     <>
     <h2>Formulario</h2>
-      <Form/>
+      <RegisterForm/>
     </>
   );
 }
