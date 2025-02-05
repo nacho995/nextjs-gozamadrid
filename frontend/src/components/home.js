@@ -13,6 +13,7 @@ import YoutubeVideo from "./Youtube";
 import Cards from "./cards";
 import RegisterForm from "./registerForm";
 import Guide from "./guia";
+import Agreements from "./Agreements";
 
 
 
@@ -30,7 +31,7 @@ export default function Home() {
           <Cards />
         </div>
         <div className="w-full h[100vh] mt-[5%] ">
-        <Eslogan />
+          <Eslogan />
         </div>
         <div className="w-full mb-4">
           <ImageSlider />
@@ -39,7 +40,7 @@ export default function Home() {
           <BlogHome />
         </div>
         <div className="w-full h-[60vh] mb-4">
-        <Guide />
+          <Guide />
         </div>
         <CounterExp />
         <hr className="w-full border-t-1 border-b-1 border-amber-400 mb-4" />
@@ -52,6 +53,10 @@ export default function Home() {
         <div className="mb[-50%] w-full p-4 max-w-full">
           <RegisterForm />
         </div>
+        <div className="w-full min-h-[50vh] ">
+          <Agreements />
+        </div>
+
       </div>
     </>
   );

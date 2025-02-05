@@ -1,42 +1,80 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from "react";
 
 const CounterExp = () => {
     const [count, setCount] = useState(0);
+    const [countCountry, setCountCountry] = useState(0);
     const targetCount = 95000;
-    const incrementTime = 10; // milliseconds
+    const incrementTime = 15;
+    const targetCountCountry = 25;
+    const incrementTimeCountry = 100; // Incrementar cada 200ms en lugar de 5ms
+    const observerRef = useRef(null);
+    const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        // Función para incrementar el contador
-        const incrementCounter = () => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                }
+            },
+            { threshold: 0.5 }
+        );
+
+        if (observerRef.current) {
+            observer.observe(observerRef.current);
+        }
+
+        return () => {
+            if (observerRef.current) {
+                observer.unobserve(observerRef.current);
+            }
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!isVisible) return;
+
+        // Intervalo para contar los agentes
+        const intervalAgents = setInterval(() => {
             setCount(prevCount => {
                 if (prevCount < targetCount) {
                     return Math.min(prevCount + 1000, targetCount);
                 }
-                return prevCount; // No incrementa más si ya llegó al objetivo
+                clearInterval(intervalAgents);
+                return prevCount;
             });
+        }, incrementTime);
+
+        // Intervalo para contar los países
+        const intervalCountries = setInterval(() => {
+            setCountCountry(prevCountCountry => {
+                if (prevCountCountry < targetCountCountry) {
+                    return Math.min(prevCountCountry + 1, targetCountCountry);
+                }
+                clearInterval(intervalCountries);
+                return prevCountCountry;
+            });
+        }, incrementTimeCountry);
+
+        // Limpiar ambos intervalos cuando el componente se desmonte
+        return () => {
+            clearInterval(intervalAgents);
+            clearInterval(intervalCountries);
         };
-
-        // Establecer el intervalo para incrementar el contador
-        const interval = setInterval(incrementCounter, incrementTime);
-
-        // Limpiar el intervalo cuando el componente se desmonta
-        return () => clearInterval(interval);
-    }, []); // Esta vez, el useEffect se ejecutará solo una vez al montar el componente
+    }, [isVisible]);
 
     return (
-        <div className="relative bottom-0 left-0 w-full flex justify-center items-center z-10">
+        <div ref={observerRef} className="relative bottom-0 left-0 w-full flex justify-center items-center z-10">
             <div className="relative w-full h-40 flex items-center justify-center">
-                {/* Gradiente con bordes ligeramente transparentes */}
                 <div
                     className="absolute w-full h-full bg-gradient-to-t"
                     style={{
                         background: "linear-gradient(to top, transparent 5%, #C7A336 20%, #C7A336 80%, transparent 95%)",
                     }}
                 ></div>
-                {/* Contador */}
-                <div className="absolute text-shadow-xl text-black px-2 text-6xl font-bold z-20">
-                   Más de {count.toLocaleString()} agentes trabajando en eXp alrededor de 25 países
+                <div className="absolute text-shadow-xl text-white px-2 text-6xl font-bold z-20">
+                   Más de <span className="text-black">{count.toLocaleString()}</span> agentes trabajando en eXp alrededor de <span className="text-black">{countCountry.toLocaleString()}</span> países
                 </div>
             </div>
         </div>
