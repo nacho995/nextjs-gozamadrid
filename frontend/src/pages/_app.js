@@ -1,6 +1,8 @@
 // src/pages/_app.js
-import Layout from '@/components/layout'; // Asegúrate de que la ruta sea correcta
+; // Asegúrate de que la ruta sea correcta
+import Layout from '@/components/layout';
 import '../globals.css'; // Cambia la ruta si es necesario
+// Cambia la ruta si es necesario
 
 function MyApp({ Component, pageProps }) {
   return (

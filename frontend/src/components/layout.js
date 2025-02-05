@@ -2,7 +2,8 @@
 import React from 'react';
 import ControlMenu from './header';
 import Footer3 from './footer';
-import '@/globals.css'; // Cambia la ruta si es necesario
+
+// Cambia la ruta si es necesario
 
 const Layout = ({ children }) => (
   <>
