@@ -1347,12 +1347,26 @@ const CounterExp = ()=>{
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "absolute text-shadow-xl text-black px-2 text-6xl font-bold z-20",
+                    className: "absolute text-shadow-xl text-white px-2 text-6xl font-bold z-20",
                     children: [
                         "Más de ",
-                        count.toLocaleString(),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                            className: "text-black",
+                            children: count.toLocaleString()
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/countereXp.jsx",
+                            lineNumber: 77,
+                            columnNumber: 27
+                        }, this),
                         " agentes trabajando en eXp alrededor de ",
-                        countCountry.toLocaleString(),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                            className: "text-black",
+                            children: countCountry.toLocaleString()
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/countereXp.jsx",
+                            lineNumber: 77,
+                            columnNumber: 127
+                        }, this),
                         " países"
                     ]
                 }, void 0, true, {
