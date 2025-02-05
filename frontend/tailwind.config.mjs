@@ -9,8 +9,11 @@ export default{
 presets: [require("@relume_io/relume-tailwind")], 
 theme: {
     extend: {
-      dropShadow: {
-        '3xl': '0 35px 35px rgba(0, 0, 0, 0.25)',
+      textShadow: {
+        'custom': '2px 2px 2px rgba(0, 0, 0, 0.3)',
+        'sm': '1px 1px 1px rgba(0, 0, 0, 0.25)',
+        'md': '2px 2px 2px rgba(0, 0, 0, 0.35)',
+        'lg': '3px 3px 3px rgba(0, 0, 0, 0.4)',
       },
       fontFamily: {
         sans: ["Chakra Petch", "sans-serif"], // Fuente predeterminada
@@ -25,6 +28,6 @@ theme: {
     },
   },
   plugins: [
-    require('tailwindcss-textshadow')
+    require('tailwindcss-textshadow'),
   ],
 };

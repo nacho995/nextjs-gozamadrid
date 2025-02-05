@@ -1,9 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 55, "column": 0}, "map": {"version":3,"sources":["file:///home/nacho/Documentos/Programaci%C3%B3n/nextjs-gozamadrid/frontend/src/pages/_app.js"],"sourcesContent":["// src/pages/_app.js\n // Asegúrate de que la ruta sea correcta\nimport '../globals.css'; // Cambia la ruta si es necesario\n\nfunction MyApp({ Component, pageProps }) {\n  return (\n    <Layout>\n      <Component {...pageProps} />\n    </Layout>\n  );\n}\n\nexport default MyApp;\n"],"names":[],"mappings":"AAAA,oBAAoB;AACnB,wCAAwC;;;;;;;AAGzC,SAAS,MAAM,EAAE,SAAS,EAAE,SAAS,EAAE;IACrC,qBACE,qKAAC;kBACC,cAAA,qKAAC;YAAW,GAAG,SAAS;;;;;;;;;;;AAG9B;uCAEe"}},
-    {"offset": {"line": 79, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}},
-    {"offset": {"line": 85, "column": 0}, "map": {"version":3,"sources":["file:///home/nacho/Documentos/Programaci%C3%B3n/nextjs-gozamadrid/frontend/src/pages/servicios/vender.js"],"sourcesContent":["import Form from '../../components/Form';\n\n\n\nexport default function Vender() {\n  return (\n    <>\n    <h2>Formulario</h2>\n      <Form/>\n    </>\n  );\n}\n\n\n\n\n"],"names":[],"mappings":";;;;;;;;;;;AAIe,SAAS;IACtB,qBACE;;0BACA,qKAAC;0BAAG;;;;;;0BACF,qKAAC;;;;;;;AAGP"}},
-    {"offset": {"line": 114, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}}]
-}

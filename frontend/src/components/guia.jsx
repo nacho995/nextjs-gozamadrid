@@ -9,7 +9,7 @@ export default function Guide() {
                 style={{ backgroundImage: "url('/guia.jpg')" }}>
                 <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/30"></div>
 
-                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-amarillo drop-shadow-lg mb-4 relative z-10 mt-[-8%]">
+                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-amarillo mb-4 relative z-10 mt-[-8%]" style={{ textShadow: "2px 2px 5px gray" }}>
                     Guía para vender una propiedad
                 </h2>
 
