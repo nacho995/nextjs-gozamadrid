@@ -323,10 +323,6 @@ img, video {
   visibility: visible;
 }
 
-.fixed {
-  position: fixed;
-}
-
 .absolute {
   position: absolute;
 }
@@ -605,10 +601,6 @@ img, video {
 
 .h-screen {
   height: 100vh;
-}
-
-.h-\[30vh\] {
-  height: 30vh;
 }
 
 .min-h-screen {
@@ -905,11 +897,6 @@ img, video {
   background-color: rgb(199 163 54 / var(--tw-bg-opacity, 1));
 }
 
-.bg-black {
-  --tw-bg-opacity: 1;
-  background-color: rgb(0 0 0 / var(--tw-bg-opacity, 1));
-}
-
 .bg-black\/70 {
   background-color: #000000b3;
 }
@@ -949,6 +936,12 @@ img, video {
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
+.from-black\/30 {
+  --tw-gradient-from: #0000004d var(--tw-gradient-from-position);
+  --tw-gradient-to: #0000 var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
 .from-black\/60 {
   --tw-gradient-from: #0009 var(--tw-gradient-from-position);
   --tw-gradient-to: #0000 var(--tw-gradient-to-position);
@@ -957,24 +950,6 @@ img, video {
 
 .from-black\/80 {
   --tw-gradient-from: #000c var(--tw-gradient-from-position);
-  --tw-gradient-to: #0000 var(--tw-gradient-to-position);
-  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
-}
-
-.from-black\/50 {
-  --tw-gradient-from: #00000080 var(--tw-gradient-from-position);
-  --tw-gradient-to: #0000 var(--tw-gradient-to-position);
-  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
-}
-
-.from-black {
-  --tw-gradient-from: #000 var(--tw-gradient-from-position);
-  --tw-gradient-to: #0000 var(--tw-gradient-to-position);
-  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
-}
-
-.from-black\/30 {
-  --tw-gradient-from: #0000004d var(--tw-gradient-from-position);
   --tw-gradient-to: #0000 var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
@@ -1006,10 +981,6 @@ img, video {
 
 .bg-fixed {
   background-attachment: fixed;
-}
-
-.bg-scroll {
-  background-attachment: scroll;
 }
 
 .bg-center {
@@ -1252,10 +1223,6 @@ img, video {
 
 .opacity-0 {
   opacity: 0;
-}
-
-.opacity-10 {
-  opacity: .1;
 }
 
 .opacity-100 {
@@ -1953,10 +1920,6 @@ img, video {
   visibility: visible;
 }
 
-.fixed {
-  position: fixed;
-}
-
 .absolute {
   position: absolute;
 }
@@ -2235,10 +2198,6 @@ img, video {
 
 .h-screen {
   height: 100vh;
-}
-
-.h-\[30vh\] {
-  height: 30vh;
 }
 
 .min-h-screen {
@@ -2535,11 +2494,6 @@ img, video {
   background-color: rgb(199 163 54 / var(--tw-bg-opacity, 1));
 }
 
-.bg-black {
-  --tw-bg-opacity: 1;
-  background-color: rgb(0 0 0 / var(--tw-bg-opacity, 1));
-}
-
 .bg-black\/70 {
   background-color: #000000b3;
 }
@@ -2579,6 +2533,12 @@ img, video {
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
+.from-black\/30 {
+  --tw-gradient-from: #0000004d var(--tw-gradient-from-position);
+  --tw-gradient-to: #0000 var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
 .from-black\/60 {
   --tw-gradient-from: #0009 var(--tw-gradient-from-position);
   --tw-gradient-to: #0000 var(--tw-gradient-to-position);
@@ -2587,24 +2547,6 @@ img, video {
 
 .from-black\/80 {
   --tw-gradient-from: #000c var(--tw-gradient-from-position);
-  --tw-gradient-to: #0000 var(--tw-gradient-to-position);
-  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
-}
-
-.from-black\/50 {
-  --tw-gradient-from: #00000080 var(--tw-gradient-from-position);
-  --tw-gradient-to: #0000 var(--tw-gradient-to-position);
-  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
-}
-
-.from-black {
-  --tw-gradient-from: #000 var(--tw-gradient-from-position);
-  --tw-gradient-to: #0000 var(--tw-gradient-to-position);
-  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
-}
-
-.from-black\/30 {
-  --tw-gradient-from: #0000004d var(--tw-gradient-from-position);
   --tw-gradient-to: #0000 var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
@@ -2636,10 +2578,6 @@ img, video {
 
 .bg-fixed {
   background-attachment: fixed;
-}
-
-.bg-scroll {
-  background-attachment: scroll;
 }
 
 .bg-center {
@@ -2882,10 +2820,6 @@ img, video {
 
 .opacity-0 {
   opacity: 0;
-}
-
-.opacity-10 {
-  opacity: .1;
 }
 
 .opacity-100 {
