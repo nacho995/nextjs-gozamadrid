@@ -1,5 +1,5 @@
 __turbopack_load_page_chunks__("/", [
-  "static/chunks/[root of the server]__80947c._.js",
+  "static/chunks/[root of the server]__0d1e26._.js",
   "static/chunks/node_modules_next_37536c._.js",
   "static/chunks/node_modules_react_1cad9b._.js",
   "static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e07.js",
@@ -11,9 +11,6 @@ __turbopack_load_page_chunks__("/", [
   "static/chunks/node_modules_react-icons_io5_index_mjs_e31071._.js",
   "static/chunks/node_modules_react-icons_bi_index_mjs_41d22a._.js",
   "static/chunks/node_modules_react-icons_lu_index_mjs_c31279._.js",
-  "static/chunks/node_modules_react-icons_ai_index_mjs_2e83ab._.js",
-  "static/chunks/node_modules_react-icons_fa_index_mjs_bad01e._.js",
-  "static/chunks/node_modules_react-icons_fa6_index_mjs_991a21._.js",
   "static/chunks/node_modules_react-icons_lib_75a63d._.js",
   "static/chunks/807ad_framer-motion_dist_es_56b41b._.js",
   "static/chunks/node_modules_@relume_io_relume-ui_dist_index_mjs_7eea24._.js",
@@ -22,5 +19,5 @@ __turbopack_load_page_chunks__("/", [
   "static/chunks/node_modules_0eb967._.js",
   "static/chunks/node_modules_tailwindcss_tailwind_254820.css",
   "static/chunks/src_pages_index_5771e1._.js",
-  "static/chunks/src_pages_index_962eab._.js"
+  "static/chunks/src_pages_index_1259dc._.js"
 ])

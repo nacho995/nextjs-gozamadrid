@@ -7,6 +7,7 @@ const blogController = require("../controller/blogController")
 
 
 blogRouter.get("/", blogController.getData)
+blogRouter.get("/:id", blogController.getDataById)
 blogRouter.post("/", blogController.addData)
 blogRouter.delete("/:id", blogController.deleteData)
 blogRouter.patch("/:id", blogController.updateData)

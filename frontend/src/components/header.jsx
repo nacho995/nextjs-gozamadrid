@@ -4,6 +4,7 @@ import { FaFacebook, FaInstagram, FaPhone } from "react-icons/fa";
 import { AiOutlineMenuUnfold, AiOutlineMenuFold } from "react-icons/ai";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
+import ReactDOM from "react-dom";
 
 export default function ControlMenu() {
   const [isDropdownVisible, setDropdownVisible] = useState(false);
@@ -13,7 +14,17 @@ export default function ControlMenu() {
   const extraLinksRef = useRef(null);
   const [extraWidth, setExtraWidth] = useState(0);
 
-  // Usamos ResizeObserver para recalcular el ancho cuando cambie el tamaño del contenedor
+  // Referencia para el enlace "Vende tu propiedad"
+  const venderRef = useRef(null);
+  const [venderRect, setVenderRect] = useState({
+    top: 1,
+    left: 0,
+    width: 0,
+    height: 0,
+    bottom: 0,
+  });
+
+  // Usamos ResizeObserver para recalcular el ancho cuando cambie el tamaño del contenedor extra
   useEffect(() => {
     if (extraLinksRef.current) {
       const resizeObserver = new ResizeObserver((entries) => {
@@ -26,6 +37,14 @@ export default function ControlMenu() {
     }
   }, []);
 
+  // Cada vez que se muestre el dropdown, calculamos la posición del enlace "Vende tu propiedad"
+  useEffect(() => {
+    if (venderRef.current && isDropdownVisible) {
+      const rect = venderRef.current.getBoundingClientRect();
+      setVenderRect(rect);
+    }
+  }, [isDropdownVisible]);
+
   const handleMouseEnter = () => setDropdownVisible(true);
   const handleMouseLeave = () => setDropdownVisible(false);
 
@@ -34,7 +53,7 @@ export default function ControlMenu() {
       {/* Menú Principal */}
       <header className="relative z-10 flex flex-col items-center px-24 p-4 bg-white bg-opacity-40 w-max mx-auto rounded-full shadow-2xl">
         {/* Íconos sociales y botón de menú */}
-        <div className="absolute top-5 right-10 flex space-x-4 mt-4 mr-4">
+        <div className="absolute left-1/4 top-1/2 flex space-x-4 mt-4 ml-4">
           <button
             onClick={() => setMenuVisible(!menuVisible)}
             className="text-black hover:text-gray-700 flex items-center space-x-2"
@@ -46,27 +65,22 @@ export default function ControlMenu() {
               <AiOutlineMenuUnfold size={30} />
             )}
           </button>
+        </div>
 
-          {/* Redes sociales */}
+        <div className="absolute top-5 right-10 flex space-x-4 mt-4 mr-4">
           <Link
             href="https://www.facebook.com"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <FaFacebook
-              size={25}
-              className="hover:text-gray-700 text-blue-600"
-            />
+            <FaFacebook size={25} className="hover:text-gray-700 text-blue-600" />
           </Link>
           <Link
             href="https://www.instagram.com"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <FaInstagram
-              size={25}
-              className="hover:text-gray-700 text-pink-600"
-            />
+            <FaInstagram size={25} className="hover:text-gray-700 text-pink-600" />
           </Link>
           <Link href="tel:+34919012103">
             <FaPhone size={25} className="hover:text-gray-700" />
@@ -84,28 +98,37 @@ export default function ControlMenu() {
           <Link href="/" className="text-black hover:text-gray-700">
             Inicio
           </Link>
-          {/* Link con dropdown para "Vende tu propiedad" */}
+          {/* Envolvemos "Vende tu propiedad" en un contenedor al que asignamos venderRef */}
           <div
+            ref={venderRef}
             className="relative whitespace-nowrap"
             onMouseEnter={handleMouseEnter}
-            
+            // También podemos dejar onMouseLeave en el dropdown o en este contenedor
           >
             <Link href="/vender" className="text-black hover:text-gray-700">
               Vende tu propiedad
             </Link>
-            {isDropdownVisible && (
-              <div
-                className="absolute bg-black bg-opacity-50 mt-2 rounded shadow-lg flex flex-col transition-all duration-300 ease-in-out"
-                onMouseLeave={handleMouseLeave}
-              >
-                <Link
-                  href="/vender/comprar"
-                  className="block px-4 py-2 text-white"
+            {isDropdownVisible &&
+              ReactDOM.createPortal(
+                <div
+                  className="absolute bg-black bg-opacity-50 rounded shadow-lg flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold"
+                  style={{
+                    // Posicionamos el dropdown justo debajo del enlace, con un pequeño margen (por ejemplo, 4px)
+                    top: venderRect.bottom + window.scrollY + 18,
+                    left: venderRect.left + window.scrollX,
+                    minWidth: venderRect.width,
+                  }}
+                  onMouseLeave={handleMouseLeave}
                 >
-                  Compra tu propiedad
-                </Link>
-              </div>
-            )}
+                  <Link
+                    href="/vender/comprar"
+                    className="block px-4 py-2 text-white"
+                  >
+                    Compra tu propiedad
+                  </Link>
+                </div>,
+                document.body
+              )}
           </div>
           <Link href="/exp-realty" className="text-black hover:text-gray-700">
             eXp Realty
@@ -116,9 +139,7 @@ export default function ControlMenu() {
             className="inline-block overflow-hidden transition-all duration-500 ease-in-out"
             style={{
               width: menuVisible ? `${extraWidth}px` : "0px",
-              // Cuando el menú está oculto, cancelamos el espacio reservado; al expandirse, dejamos un margen de 1rem.
-              marginLeft: menuVisible ? "3rem" : "-1rem",
-              marginRight: menuVisible ? "0px" : "0px",
+              marginLeft: menuVisible ? "3rem" : "0rem",
             }}
           >
             <div ref={extraLinksRef} className="inline-flex gap-11">
