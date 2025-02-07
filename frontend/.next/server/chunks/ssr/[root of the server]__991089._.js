@@ -1214,103 +1214,105 @@ const BlogHome = (props)=>{
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
                     className: "grid grid-cols-1 gap-x-8 gap-y-12 md:grid-cols-2 md:gap-y-16 lg:grid-cols-3",
-                    children: blogs.length > 0 ? blogs.map((post, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("a", {
-                            href: post.url,
-                            className: "flex size-full flex-col items-center justify-start border border-border-primary hover:border-amarillo hover:border-2",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-                                    className: "relative w-full overflow-hidden pt-[66%]",
-                                    children: post.image && post.image.src && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("img", {
-                                        src: post.image.src,
-                                        alt: post.image.alt,
-                                        className: "absolute inset-0 size-full object-cover"
+                    children: blogs.length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["Fragment"], {
+                        children: blogs.slice(0, 3).map((post, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("a", {
+                                href: post.url,
+                                className: "flex size-full flex-col items-center justify-start border border-border-primary hover:border-amarillo hover:border-2",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
+                                        className: "relative w-full overflow-hidden pt-[66%]",
+                                        children: post.image && post.image.src && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("img", {
+                                            src: post.image.src,
+                                            alt: post.image.alt,
+                                            className: "absolute inset-0 size-full object-cover"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/blog.jsx",
+                                            lineNumber: 56,
+                                            columnNumber: 23
+                                        }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/blog.jsx",
-                                        lineNumber: 55,
-                                        columnNumber: 21
+                                        lineNumber: 54,
+                                        columnNumber: 19
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
+                                        className: "flex w-full flex-1 flex-col justify-between px-5 py-6 md:p-6",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
+                                                className: "rb-4 mb-4 flex items-center",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("p", {
+                                                        className: "mr-4 bg-background-secondary px-2 py-1 text-sm font-semibold",
+                                                        children: post.category
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/blog.jsx",
+                                                        lineNumber: 65,
+                                                        columnNumber: 23
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("p", {
+                                                        className: "inline text-sm font-semibold",
+                                                        children: post.readTime
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/blog.jsx",
+                                                        lineNumber: 68,
+                                                        columnNumber: 23
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/components/blog.jsx",
+                                                lineNumber: 64,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
+                                                className: "flex w-full flex-col items-start justify-start",
+                                                children: [
+                                                    post.title && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("h2", {
+                                                        className: "mb-2 text-xl font-bold md:text-2xl",
+                                                        children: post.title
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/blog.jsx",
+                                                        lineNumber: 73,
+                                                        columnNumber: 25
+                                                    }, this),
+                                                    post.description && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("p", {
+                                                        children: post.description
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/blog.jsx",
+                                                        lineNumber: 77,
+                                                        columnNumber: 44
+                                                    }, this),
+                                                    post.button && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$externals$5d2f40$relume_io$2f$relume$2d$ui__$5b$external$5d$__$2840$relume_io$2f$relume$2d$ui$2c$__esm_import$29$__["Button"], {
+                                                        ...post.button,
+                                                        className: "mt-6 flex items-center justify-center gap-x-1 hover:bg-amarillo hover:font-bold",
+                                                        children: post.button.title
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/blog.jsx",
+                                                        lineNumber: 79,
+                                                        columnNumber: 25
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/components/blog.jsx",
+                                                lineNumber: 71,
+                                                columnNumber: 21
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/blog.jsx",
+                                        lineNumber: 63,
+                                        columnNumber: 19
                                     }, this)
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/blog.jsx",
-                                    lineNumber: 53,
-                                    columnNumber: 17
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-                                    className: "flex w-full flex-1 flex-col justify-between px-5 py-6 md:p-6",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-                                            className: "rb-4 mb-4 flex items-center",
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("p", {
-                                                    className: "mr-4 bg-background-secondary px-2 py-1 text-sm font-semibold",
-                                                    children: post.category
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/components/blog.jsx",
-                                                    lineNumber: 64,
-                                                    columnNumber: 21
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("p", {
-                                                    className: "inline text-sm font-semibold",
-                                                    children: post.readTime
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/components/blog.jsx",
-                                                    lineNumber: 67,
-                                                    columnNumber: 21
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/src/components/blog.jsx",
-                                            lineNumber: 63,
-                                            columnNumber: 19
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-                                            className: "flex w-full flex-col items-start justify-start",
-                                            children: [
-                                                post.title && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("h2", {
-                                                    className: "mb-2 text-xl font-bold md:text-2xl",
-                                                    children: post.title
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/components/blog.jsx",
-                                                    lineNumber: 72,
-                                                    columnNumber: 23
-                                                }, this),
-                                                post.description && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("p", {
-                                                    children: post.description
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/components/blog.jsx",
-                                                    lineNumber: 76,
-                                                    columnNumber: 42
-                                                }, this),
-                                                post.button && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$externals$5d2f40$relume_io$2f$relume$2d$ui__$5b$external$5d$__$2840$relume_io$2f$relume$2d$ui$2c$__esm_import$29$__["Button"], {
-                                                    ...post.button,
-                                                    className: "mt-6 flex items-center justify-center gap-x-1 hover:bg-amarillo hover:font-bold",
-                                                    children: post.button.title
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/components/blog.jsx",
-                                                    lineNumber: 78,
-                                                    columnNumber: 23
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/src/components/blog.jsx",
-                                            lineNumber: 70,
-                                            columnNumber: 19
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/components/blog.jsx",
-                                    lineNumber: 62,
-                                    columnNumber: 17
-                                }, this)
-                            ]
-                        }, index, true, {
-                            fileName: "[project]/src/components/blog.jsx",
-                            lineNumber: 48,
-                            columnNumber: 15
-                        }, this)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("p", {
+                                ]
+                            }, index, true, {
+                                fileName: "[project]/src/components/blog.jsx",
+                                lineNumber: 49,
+                                columnNumber: 17
+                            }, this))
+                    }, void 0, false) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("p", {
                         children: "No hay publicaciones disponibles."
                     }, void 0, false, {
                         fileName: "[project]/src/components/blog.jsx",
-                        lineNumber: 90,
+                        lineNumber: 92,
                         columnNumber: 13
                     }, this)
                 }, void 0, false, {
@@ -1324,7 +1326,7 @@ const BlogHome = (props)=>{
                     children: button.title
                 }, void 0, false, {
                     fileName: "[project]/src/components/blog.jsx",
-                    lineNumber: 94,
+                    lineNumber: 97,
                     columnNumber: 9
                 }, this)
             ]
@@ -1365,7 +1367,7 @@ const Blog44Defaults = {
                 size: "link",
                 iconRight: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$rx$2f$index$2e$mjs__$5b$ssr$5d$__$28$ecmascript$29$__["RxChevronRight"], {}, void 0, false, {
                     fileName: "[project]/src/components/blog.jsx",
-                    lineNumber: 125,
+                    lineNumber: 128,
                     columnNumber: 20
                 }, this)
             }
@@ -1386,7 +1388,7 @@ const Blog44Defaults = {
                 size: "link",
                 iconRight: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$rx$2f$index$2e$mjs__$5b$ssr$5d$__$28$ecmascript$29$__["RxChevronRight"], {}, void 0, false, {
                     fileName: "[project]/src/components/blog.jsx",
-                    lineNumber: 143,
+                    lineNumber: 146,
                     columnNumber: 20
                 }, this)
             }
@@ -1407,7 +1409,7 @@ const Blog44Defaults = {
                 size: "link",
                 iconRight: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$rx$2f$index$2e$mjs__$5b$ssr$5d$__$28$ecmascript$29$__["RxChevronRight"], {}, void 0, false, {
                     fileName: "[project]/src/components/blog.jsx",
-                    lineNumber: 161,
+                    lineNumber: 164,
                     columnNumber: 20
                 }, this)
             }
@@ -1514,14 +1516,26 @@ const CounterExp = ()=>{
                             lineNumber: 77,
                             columnNumber: 27
                         }, this),
-                        " agentes trabajando en eXp alrededor de ",
+                        " agentes trabajando en ",
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("span", {
+                            className: "text-black",
+                            style: {
+                                textShadow: "4px 4px 5px white"
+                            },
+                            children: "eXp"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/countereXp.jsx",
+                            lineNumber: 77,
+                            columnNumber: 110
+                        }, this),
+                        " alrededor de ",
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("span", {
                             className: "text-black",
                             children: countCountry.toLocaleString()
                         }, void 0, false, {
                             fileName: "[project]/src/components/countereXp.jsx",
                             lineNumber: 77,
-                            columnNumber: 127
+                            columnNumber: 206
                         }, this),
                         " países"
                     ]
