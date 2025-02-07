@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 25, "column": 0}, "map": {"version":3,"sources":["file:///home/nacho/Documentos/Programaci%C3%B3n/nextjs-gozamadrid/frontend/src/pages/_app.js"],"sourcesContent":["import { motion } from 'framer-motion';\nimport Layout from './components/layout'; // Asegúrate de que la ruta esté correcta\n\nfunction MyApp({ Component, pageProps }) {\n  return (\n    <Layout>\n      <motion.div\n        initial={{ opacity: 0, y: 50 }}\n        whileInView={{ opacity: 1, y: 0 }}\n        transition={{ duration: 0.8, ease: \"easeOut\" }}\n      >\n        <Component {...pageProps} />\n      </motion.div>\n    </Layout>\n  );\n}\n\nexport default MyApp;\n"],"names":[],"mappings":";;;;AAAA;;;;;;;;;;;;;AAGA,SAAS,MAAM,EAAE,SAAS,EAAE,SAAS,EAAE;IACrC,qBACE,qKAAC;kBACC,cAAA,qKAAC,gIAAA,CAAA,SAAM,CAAC,GAAG;YACT,SAAS;gBAAE,SAAS;gBAAG,GAAG;YAAG;YAC7B,aAAa;gBAAE,SAAS;gBAAG,GAAG;YAAE;YAChC,YAAY;gBAAE,UAAU;gBAAK,MAAM;YAAU;sBAE7C,cAAA,qKAAC;gBAAW,GAAG,SAAS;;;;;;;;;;;;;;;;AAIhC;uCAEe"}},
-    {"offset": {"line": 76, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}}]
-}

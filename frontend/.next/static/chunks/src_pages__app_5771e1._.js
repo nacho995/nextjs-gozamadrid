@@ -16,7 +16,8 @@
     "static/chunks/node_modules_react-icons_lib_75a63d._.js",
     "static/chunks/node_modules_framer-motion_dist_es_f4c567._.js",
     "static/chunks/node_modules_47e579._.js",
-    "static/chunks/[root of the server]__e1e651._.js"
+    "static/chunks/[root of the server]__e1e651._.js",
+    "static/chunks/src_globals_1d81ed.css"
   ],
   "source": "entry"
 });

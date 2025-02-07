@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import Layout from '../components/layout'; // Asegúrate de que la ruta esté correcta
-
+import '../globals.css';
 function MyApp({ Component, pageProps }) {
   return (
     <Layout>
