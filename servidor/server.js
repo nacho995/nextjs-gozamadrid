@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const dataClientRouter = require("./routes/router")
 const prefixRouter = require("./routes/routerPrefix")
 const blogRouter = require("./routes/blogRouter")
+const blogContentRouter = require("./routes/blogContentRouter")
 
 const app = express();
 const port = process.env.PORT || 3000
@@ -17,6 +18,7 @@ app.use(cors())
 app.use("/emails", dataClientRouter)
 app.use("/prefix", prefixRouter)
 app.use("/blog", blogRouter )
+app.use("/blogContent", blogContentRouter)
 
 
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })

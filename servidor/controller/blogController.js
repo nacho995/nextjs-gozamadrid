@@ -1,5 +1,6 @@
 const blog = require('../models/blogSchema');
 
+
 const blogController = { 
 
     getData: async (req, res) => {

@@ -61,7 +61,7 @@ export default function Cards() {
     return (
         <div className="flex justify-center items-center w-full p-10 h-[100vh]"
         style={{
-            background: "linear-gradient(to top, transparent 0%, #C7A336 50%, transparent 100%)"
+            background: "linear-gradient(to top, transparent 0%, gray 50%, transparent 100%)"
         }}>
             <div className="grid grid-cols-4 grid-rows-4 z-20 gap-8 h-[70vh]">
                 {cardData.map((card, index) => (

@@ -44,51 +44,54 @@ const BlogHome = (props) => {
 
         <div className="grid grid-cols-1 gap-x-8 gap-y-12 md:grid-cols-2 md:gap-y-16 lg:grid-cols-3">
           {blogs.length > 0 ? (
-            blogs.map((post, index) => (
-              <a
-                key={index}
-                href={post.url}
-                className="flex size-full flex-col items-center justify-start border border-border-primary hover:border-amarillo hover:border-2"
-              >
-                <div className="relative w-full overflow-hidden pt-[66%]">
-                  {post.image && post.image.src && (
-                    <img
-                      src={post.image.src}
-                      alt={post.image.alt}
-                      className="absolute inset-0 size-full object-cover"
-                    />
-                  )}
-                </div>
-                <div className="flex w-full flex-1 flex-col justify-between px-5 py-6 md:p-6">
-                  <div className="rb-4 mb-4 flex items-center">
-                    <p className="mr-4 bg-background-secondary px-2 py-1 text-sm font-semibold">
-                      {post.category}
-                    </p>
-                    <p className="inline text-sm font-semibold">{post.readTime}</p>
+            <>
+              {blogs.slice(0, 3).map((post, index) => (
+                <a
+                  key={index}
+                  href={post.url}
+                  className="flex size-full flex-col items-center justify-start border border-border-primary hover:border-amarillo hover:border-2"
+                >
+                  <div className="relative w-full overflow-hidden pt-[66%]">
+                    {post.image && post.image.src && (
+                      <img
+                        src={post.image.src}
+                        alt={post.image.alt}
+                        className="absolute inset-0 size-full object-cover"
+                      />
+                    )}
                   </div>
+                  <div className="flex w-full flex-1 flex-col justify-between px-5 py-6 md:p-6">
+                    <div className="rb-4 mb-4 flex items-center">
+                      <p className="mr-4 bg-background-secondary px-2 py-1 text-sm font-semibold">
+                        {post.category}
+                      </p>
+                      <p className="inline text-sm font-semibold">{post.readTime}</p>
+                    </div>
 
-                  <div className="flex w-full flex-col items-start justify-start">
-                    {post.title && (
-                      <h2 className="mb-2 text-xl font-bold md:text-2xl">
-                        {post.title}
-                      </h2>
-                    )}
-                    {post.description && <p>{post.description}</p>}
-                    {post.button && (
-                      <Button
-                        {...post.button}
-                        className="mt-6 flex items-center justify-center gap-x-1 hover:bg-amarillo hover:font-bold"
-                      >
-                        {post.button.title}
-                      </Button>
-                    )}
+                    <div className="flex w-full flex-col items-start justify-start">
+                      {post.title && (
+                        <h2 className="mb-2 text-xl font-bold md:text-2xl">
+                          {post.title}
+                        </h2>
+                      )}
+                      {post.description && <p>{post.description}</p>}
+                      {post.button && (
+                        <Button
+                          {...post.button}
+                          className="mt-6 flex items-center justify-center gap-x-1 hover:bg-amarillo hover:font-bold"
+                        >
+                          {post.button.title}
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </a>
-            ))
+                </a>
+              ))}
+            </>
           ) : (
             <p>No hay publicaciones disponibles.</p>
           )}
+
         </div>
 
         <Button {...button} className="mt-12 md:hidden hover:bg-amarillo hover:font-bold">
