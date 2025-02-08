@@ -73,7 +73,7 @@ const CounterExp = () => {
                         background: "linear-gradient(to top, transparent 5%, #C7A336 20%, #C7A336 80%, transparent 95%)",
                     }}
                 ></div>
-                <div className="absolute text-shadow-xl text-white px-2 text-6xl font-bold z-20">
+                <div className="absolute text-transparent bg-clip-text bg-gradient-to-r from-white via-black to-white px-2 text-6xl font-bold z-20">
                    Más de <span className="text-black">{count.toLocaleString()}</span> agentes trabajando en <span className="text-black" style={{ textShadow: "4px 4px 5px white"}}>eXp</span> alrededor de <span className="text-black">{countCountry.toLocaleString()}</span> países
                 </div>
             </div>
