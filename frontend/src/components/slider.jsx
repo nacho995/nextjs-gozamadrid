@@ -30,7 +30,7 @@ export default function ImageSlider() {
   }, []);
 
   return (
-    <div className="relative w-full h-screen overflow-hidden parallax">
+    <div className="relative w-full h-[60vh] overflow-hidden parallax">
       {/* Contenedor para las imágenes (60vh de altura) */}
       <div className="absolute w-full h-[60vh]">
         {images.map((image, index) => (

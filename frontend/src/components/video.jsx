@@ -40,7 +40,7 @@ const Video = () => {
                         }}
                     ></div>
 
-                    <span className="relative text-white px-2 text-6xl font-bold">
+                    <span className="relative text-transparent bg-clip-text bg-gradient-to-r from-white via-yellow-400 to-white px-2 text-6xl font-bold">
                         Invierte en bienes inmuebles en Madrid
                     </span>
                 </div>
