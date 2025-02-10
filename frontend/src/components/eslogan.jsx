@@ -2,9 +2,11 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import AnimatedOnScroll from "./AnimatedScroll";
 
 const Eslogan = () => {
     return (
+        <AnimatedOnScroll>
         <div className="mt-4 grid grid-cols-2 place-items-center relative bg-cover bg-center z-40 rounded-3xl" style={{ minHeight: "100vh" }}>
             {/* Capa de color negro transparente */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent  z-30 rounded-3xl"></div>
@@ -62,6 +64,7 @@ const Eslogan = () => {
                 </Link>
             </div>
         </div>
+        </AnimatedOnScroll>
     );
 };
 

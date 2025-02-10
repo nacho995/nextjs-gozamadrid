@@ -11,7 +11,7 @@ import CounterExp from "./countereXp";
 import Video from "./video";
 import YoutubeVideo from "./Youtube";
 import Cards from "./cards";
-import RegisterForm from "./registerForm";
+import RegisterForm from "./FormContact";
 import Guide from "./guia";
 import Agreements from "./Agreements";
 
@@ -36,7 +36,7 @@ export default function Home() {
         <div className="w-full mb-4">
           <ImageSlider />
         </div>
-        <div className="mt-[-20%] w-full mb-4">
+        <div className=" w-full mb-4">
           <BlogHome />
         </div>
         <div className="w-full h-[60vh] mb-4">

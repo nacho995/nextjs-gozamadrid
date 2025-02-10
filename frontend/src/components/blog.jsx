@@ -1,10 +1,13 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@relume_io/relume-ui";
 import { RxChevronRight } from "react-icons/rx";
 import { getBlogPosts } from "../pages/api";
+import Link from "next/link";
+import AnimatedOnScroll from "./AnimatedScroll";
 
-// Componente Blog44
+
+// Componente BlogHome
 const BlogHome = (props) => {
   const [blogs, setBlogs] = useState([]);
   const { tagline, heading, description, button } = {
@@ -16,7 +19,7 @@ const BlogHome = (props) => {
     const fetchBlogs = async () => {
       try {
         const data = await getBlogPosts();
-        setBlogs(data);
+        setBlogs(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Error fetching blog data:", error);
       }
@@ -25,8 +28,10 @@ const BlogHome = (props) => {
   }, []);
 
   return (
+    <AnimatedOnScroll>
     <section id="relume" className="px-[5%] py-16 md:py-24 lg:py-28">
-      <div className="container">
+      <div className="container mx-auto">
+        {/* Encabezado */}
         <div className="rb-12 mb-12 grid grid-cols-1 items-start justify-start gap-y-8 md:mb-18 md:grid-cols-[1fr_max-content] md:items-end md:justify-between md:gap-x-12 md:gap-y-4 lg:mb-20 lg:gap-x-20">
           <div className="w-full max-w-lg">
             <p className="mb-3 font-semibold md:mb-4">{tagline}</p>
@@ -36,37 +41,43 @@ const BlogHome = (props) => {
             <p className="md:text-md">{description}</p>
           </div>
           <div className="hidden flex-wrap items-center justify-end md:block">
+           <Link href="/blog">
             <Button {...button} className="hover:bg-amarillo hover:font-bold">
               {button.title}
             </Button>
+            </Link>
           </div>
         </div>
 
+        {/* Grilla de blogs */}
         <div className="grid grid-cols-1 gap-x-8 gap-y-12 md:grid-cols-2 md:gap-y-16 lg:grid-cols-3">
           {blogs.length > 0 ? (
-            blogs.map((post, index) => (
-              <a
-                key={index}
-                href={post.url}
-                className="flex size-full flex-col items-center justify-start border border-border-primary hover:border-amarillo hover:border-2"
+            blogs.slice(0, 3).map((post) => (
+              <Link
+                key={post._id}
+                href={`/blog/${post._id}`}
+                className="flex w-full flex-col items-center justify-start border border-border-primary hover:border-amarillo hover:border-2 transition-colors"
               >
+                {/* Contenedor de la imagen con relación de aspecto */}
                 <div className="relative w-full overflow-hidden pt-[66%]">
                   {post.image && post.image.src && (
                     <img
                       src={post.image.src}
-                      alt={post.image.alt}
-                      className="absolute inset-0 size-full object-cover"
+                      alt={post.image.alt || "Imagen del blog"}
+                      className="absolute inset-0 w-full h-full object-cover"
                     />
                   )}
                 </div>
+                {/* Contenido de la tarjeta */}
                 <div className="flex w-full flex-1 flex-col justify-between px-5 py-6 md:p-6">
                   <div className="rb-4 mb-4 flex items-center">
                     <p className="mr-4 bg-background-secondary px-2 py-1 text-sm font-semibold">
                       {post.category}
                     </p>
-                    <p className="inline text-sm font-semibold">{post.readTime}</p>
+                    <p className="inline text-sm font-semibold">
+                      {post.readTime}
+                    </p>
                   </div>
-
                   <div className="flex w-full flex-col items-start justify-start">
                     {post.title && (
                       <h2 className="mb-2 text-xl font-bold md:text-2xl">
@@ -84,18 +95,18 @@ const BlogHome = (props) => {
                     )}
                   </div>
                 </div>
-              </a>
+              </Link>
             ))
           ) : (
-            <p>No hay publicaciones disponibles.</p>
+            <p className="text-center text-gray-500">No hay publicaciones disponibles.</p>
           )}
         </div>
 
-        <Button {...button} className="mt-12 md:hidden hover:bg-amarillo hover:font-bold">
-          {button.title}
-        </Button>
+        {/* Botón para ver todos (visible en móvil) */}
+        
       </div>
     </section>
+    </AnimatedOnScroll>
   );
 };
 
@@ -105,7 +116,6 @@ const Blog44Defaults = {
   heading: "Ver detalles inmobiliarios",
   description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
   button: { title: "Ver todo", variant: "secondary" },
-
   blogPosts: [
     {
       url: "#",

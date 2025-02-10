@@ -1,14 +1,22 @@
-// src/pages/_app.js
-; // Asegúrate de que la ruta sea correcta
-import Layout from '@/components/layout';
-import '../globals.css'; // Cambia la ruta si es necesario
-// Cambia la ruta si es necesario
+
+import Head from 'next/head';
+import Layout from '../components/layout';
+import '../globals.css';
 
 function MyApp({ Component, pageProps }) {
   return (
-    <Layout>
-      <Component {...pageProps} />
-    </Layout>
+    <>
+      <Head>
+        <title>Goza Madrid</title>
+        <link rel="icon" href="/logo.png" />
+        <meta name="description" content="Descripción de mi sitio web" />
+      </Head>
+      <Layout>
+        
+          <Component {...pageProps} />
+  
+      </Layout>
+    </>
   );
 }
 
