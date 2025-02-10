@@ -7,6 +7,6 @@ runtime.loadChunk("server/chunks/ssr/node_modules_react-icons_bi_index_mjs_1be2b
 runtime.loadChunk("server/chunks/ssr/node_modules_react-icons_fa6_index_mjs_d4f54d._.js");
 runtime.loadChunk("server/chunks/ssr/node_modules_react-icons_lib_6322da._.js");
 runtime.loadChunk("server/chunks/ssr/node_modules_@swc_helpers_cjs_ac5ba3._.js");
-runtime.loadChunk("server/chunks/ssr/[root of the server]__23dc35._.js");
+runtime.loadChunk("server/chunks/ssr/[root of the server]__07f161._.js");
 runtime.loadChunk("server/chunks/ssr/src_globals_b99327.css");
 module.exports = runtime.getOrInstantiateRuntimeModule("[project]/src/pages/_app.js [ssr] (ecmascript)", CHUNK_PUBLIC_PATH).exports;

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 
 
 import CountryPrefix from "./CountryPrefix";
+import AnimatedOnScroll from "./AnimatedScroll";
 
 const RegisterForm = () => {
   const [name, setName] = useState("");
@@ -88,6 +89,7 @@ const RegisterForm = () => {
   };
 
   return (
+    <AnimatedOnScroll>
     <main>
       <div className="grid grid-cols-2 min-h-screen">
         <div className="col-span-1 flex justify-center items-center">
@@ -181,6 +183,7 @@ const RegisterForm = () => {
         `}
       </style>
     </main>
+    </AnimatedOnScroll>
   );
 };
 

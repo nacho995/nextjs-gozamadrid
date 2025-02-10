@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import React from 'react';
+import AnimatedOnScroll from './AnimatedScroll';
 
 export default function Guide() {
     return (
+        <AnimatedOnScroll>
         <div className="relative w-full h-screen overflow-hidden">
 
             <div className="h-[60vh] flex flex-col bg-fixed bg-center  justify-center items-center text-center relative px-4 z-10" 
@@ -31,5 +33,6 @@ export default function Guide() {
                 </Link>
             </div>
         </div>
+        </AnimatedOnScroll>
     );
 };

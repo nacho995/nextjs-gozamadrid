@@ -2,6 +2,7 @@
 import { getBlogById, getBlogPosts } from "@/pages/api";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import AnimatedOnScroll from "./AnimatedScroll";
 
 export default function BlogPage() {
     // Estado para indicar que el componente se montó (solo en cliente)
@@ -52,7 +53,8 @@ export default function BlogPage() {
     }
 
     return (
-        // Contenedor principal relativo
+        <AnimatedOnScroll>
+        
         <div className="relative min-h-screen py-8">
             {/* Fondo absoluto con gradiente y opacidad 50 */}
             <div className="absolute inset-0 z-0 opacity-10"
@@ -142,5 +144,6 @@ export default function BlogPage() {
                
             </div>
         </div>
+        </AnimatedOnScroll>
     );
 }

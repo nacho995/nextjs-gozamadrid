@@ -1,4 +1,5 @@
 import React from "react";
+import AnimatedOnScroll from "./AnimatedScroll";
 
 const cardData = [
     {
@@ -59,6 +60,7 @@ const cardData = [
 
 export default function Cards() {
     return (
+        <AnimatedOnScroll>
         <div className="flex justify-center items-center w-full p-10 h-[100vh]"
         style={{
             background: "linear-gradient(to top, transparent 0%, gray 50%, transparent 100%)"
@@ -138,5 +140,6 @@ export default function Cards() {
                 ))}
             </div>
         </div>
+        </AnimatedOnScroll>
     );
 }

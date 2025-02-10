@@ -1,8 +1,10 @@
 // components/DefaultBlogContent.jsx
 import React from 'react';
+import AnimatedOnScroll from './AnimatedScroll';
 
 export default function DefaultBlogContent({ blog }) {
   return (
+    <AnimatedOnScroll>
     <article className="prose max-w-none">
       <h1 className="text-5xl font-bold mb-4">{blog.title}</h1>
       {blog.image && blog.image.src && (
@@ -23,5 +25,6 @@ export default function DefaultBlogContent({ blog }) {
         ))}
       </div>
     </article>
+    </AnimatedOnScroll>
   );
 }

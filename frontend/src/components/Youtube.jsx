@@ -1,5 +1,6 @@
 "use client";
 import React, { useRef, useState } from "react";
+import AnimatedOnScroll from "./AnimatedScroll";
 
 const YoutubeVideo = ({ videoId, title }) => {
   const iframeRef = useRef(null);
@@ -12,6 +13,7 @@ const YoutubeVideo = ({ videoId, title }) => {
   };
 
   return (
+    <AnimatedOnScroll>
     <div className="relative w-full flex justify-end">
       <hr className="absolute top-0 left-0 w-full  border-gray-500" />
       <div
@@ -45,6 +47,7 @@ const YoutubeVideo = ({ videoId, title }) => {
         />
       </div>
     </div>
+    </AnimatedOnScroll>
   );
 };
 

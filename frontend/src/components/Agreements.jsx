@@ -1,5 +1,8 @@
+import AnimatedOnScroll from "./AnimatedScroll";
+
 export default function Agreements() {
     return (
+        <AnimatedOnScroll>
         <div className="relative w-full min-h-[80vh] pb-[10vh] overflow-hidden">
             {/* Fondo opaco */}
             <div className="absolute inset-0 z-0 opacity-10"
@@ -29,6 +32,7 @@ export default function Agreements() {
 
             {/* Contenido */}
             <div className="relative z-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 gap-y-[25vh] mt-[5%] p-4">
+                
                 <div className="flex flex-col items-center">
                     <img src="/exprealty.png" alt="eXp" className="w-[50vh] h-[25vh] object-cover" />
                     <p className="m-[8%] text-center">Descripción de la foto 1</p>
@@ -75,5 +79,6 @@ export default function Agreements() {
                 </div>
             </div>
         </div>
+        </AnimatedOnScroll>
     );
 }
