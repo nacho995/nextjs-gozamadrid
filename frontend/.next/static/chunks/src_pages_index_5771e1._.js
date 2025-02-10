@@ -5,11 +5,12 @@
 (globalThis.TURBOPACK_CHUNK_LISTS = globalThis.TURBOPACK_CHUNK_LISTS || []).push({
   "path": "static/chunks/src_pages_index_5771e1._.js",
   "chunks": [
-    "static/chunks/[root of the server]__0d1e26._.js",
+    "static/chunks/[root of the server]__690f99._.js",
     "static/chunks/node_modules_next_37536c._.js",
     "static/chunks/node_modules_react_1cad9b._.js",
     "static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e07.js",
     "static/chunks/node_modules_react-dom_f14d04._.js",
+    "static/chunks/node_modules_@react-spring_core_dist_react-spring_core_modern_mjs_c982ab._.js",
     "static/chunks/node_modules_react-day-picker_dist_esm_bd73b3._.js",
     "static/chunks/node_modules_luxon_src_a3f2b6._.js",
     "static/chunks/node_modules_react-icons_cg_index_mjs_6cbc53._.js",
@@ -22,7 +23,7 @@
     "static/chunks/node_modules_@relume_io_relume-ui_dist_index_mjs_7eea24._.js",
     "static/chunks/node_modules_@radix-ui_3a24c0._.js",
     "static/chunks/node_modules_@floating-ui_056e3f._.js",
-    "static/chunks/node_modules_0eb967._.js",
+    "static/chunks/node_modules_a72e0e._.js",
     "static/chunks/node_modules_tailwindcss_tailwind_254820.css"
   ],
   "source": "entry"

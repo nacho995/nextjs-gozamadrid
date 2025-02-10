@@ -4,6 +4,7 @@ import { Button } from "@relume_io/relume-ui";
 import { RxChevronRight } from "react-icons/rx";
 import { getBlogPosts } from "../pages/api";
 import Link from "next/link";
+import AnimatedOnScroll from "./AnimatedScroll";
 
 
 // Componente BlogHome
@@ -27,6 +28,7 @@ const BlogHome = (props) => {
   }, []);
 
   return (
+    <AnimatedOnScroll>
     <section id="relume" className="px-[5%] py-16 md:py-24 lg:py-28">
       <div className="container mx-auto">
         {/* Encabezado */}
@@ -104,6 +106,7 @@ const BlogHome = (props) => {
         
       </div>
     </section>
+    </AnimatedOnScroll>
   );
 };
 

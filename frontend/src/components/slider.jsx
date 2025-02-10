@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import AnimatedOnScroll from "./AnimatedScroll";
 
 const images = [
   "/inicio.jpg", // Ruta de la imagen de fondo 1 (debe estar en la carpeta public)
@@ -30,6 +31,7 @@ export default function ImageSlider() {
   }, []);
 
   return (
+    <AnimatedOnScroll>
     <div className="relative w-full h-[60vh] overflow-hidden parallax">
       {/* Contenedor para las imágenes (60vh de altura) */}
       <div className="absolute w-full h-[60vh]">
@@ -87,5 +89,6 @@ export default function ImageSlider() {
         </Link>
       </div>
     </div>
+    </AnimatedOnScroll>
   );
 }

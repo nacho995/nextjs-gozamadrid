@@ -11,7 +11,7 @@ import CounterExp from "./countereXp";
 import Video from "./video";
 import YoutubeVideo from "./Youtube";
 import Cards from "./cards";
-import RegisterForm from "./registerForm";
+import RegisterForm from "./FormContact";
 import Guide from "./guia";
 import Agreements from "./Agreements";
 

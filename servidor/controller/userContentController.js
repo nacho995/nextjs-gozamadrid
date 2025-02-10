@@ -50,33 +50,32 @@ const usersController = {
   },
 
   loginUser: async (req, res) => {
-    console.log(req.body);
-    // primero cogemos el email y el password
-    const { email, password } = req.body;
-    // luego buscamos el usuario en la base de datos
-    const user = await User.findOne({ email });
-    // si el usuario no existe, devolvemos un error
-    if (!user) {
-      return res.status(401).json({ message: "User not found" });
-    }
-    // luego comprobamos si el password es correcto
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) {
-      return res.status(401).json({ message: "Invalid password" });
-    }
-    // si el password es correcto, devolvemos el un token
-    const token = jwt.sign(
-      {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
-
-    res.json({ msg: "User logged in", token });
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
+        if (!user) {
+          return res.status(401).json({ message: "User not found" });
+        }
+        const validPassword = await bcrypt.compare(password, user.password);
+        if (!validPassword) {
+          return res.status(401).json({ message: "Invalid password" });
+        }
+        const token = jwt.sign(
+          {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+          },
+          process.env.JWT_SECRET,
+          { expiresIn: "1h" }
+        );
+        // Se incluye también el nombre en la respuesta
+        res.json({ msg: "User logged in", token, name: user.name });
+      } catch (err) {
+        console.error("Error al iniciar sesión:", err);
+        res.status(500).json({ message: "Error al iniciar sesión" });
+      }
   },
 
   requestPasswordReset: async (req, res) => {
@@ -128,33 +127,42 @@ const usersController = {
 
   changeUserPerfil: async (req, res) => {
     try {
-      const { id } = req.params;  // o, si usas autenticación, podrías obtener el id de req.decodedToken.id
-      const updates = {};
-      if (req.body.name) updates.name = req.body.name;
-      if (req.file) {
-        // Aquí puedes construir la URL de la imagen subida
-        updates.profilePic = {
-          src: `http://localhost:3000/uploads/${req.file.filename}`,
-          alt: req.file.originalname
-        };
+        // Obtén el id del usuario del token
+        const userId = req.decodedToken && req.decodedToken.id;
+        if (!userId) {
+          return res.status(400).json({ message: 'User id not provided' });
+        }
+    
+        const updates = {};
+    
+        if (req.body.name && req.body.name.trim() !== '') {
+          updates.name = req.body.name;
+        }
+    
+        if (req.file) {
+          const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+          updates.profilePic = {
+            src: fileUrl,
+            alt: req.file.originalname || 'Foto de perfil',
+          };
+        }
+    
+        const updatedUser = await User.findByIdAndUpdate(userId, updates, { new: true });
+        if (!updatedUser) {
+          return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+    
+        res.json({
+          message: 'Perfil actualizado correctamente',
+          profilePic: updatedUser.profilePic ? updatedUser.profilePic.src : null,
+          name: updatedUser.name,
+        });
+      } catch (err) {
+        console.error("Error en changeUserPerfil:", err);
+        res.status(500).json({ message: 'Error al actualizar el perfil', error: err.message });
       }
-      const updatedUser = await User.findByIdAndUpdate(id, updates, { new: true });
-
-      if (!updatedUser) {
-          
-          return res.status(404).json({ message: "Usuario no encontrado" });
-      }
-
-      res.json({
-        message: "Perfil actualizado correctamente",
-        profilePic: updatedUser.profilePic?.src,  // O el objeto completo, según necesites
-        name: updatedUser.name,
-      });
-    } catch (err) {
-      console.log("Error:", err);
-      res.status(500).json({ message: "Error al actualizar el perfil" });
     }
-  }
-}
+  // Otros métodos...
+};
 
 module.exports = usersController;

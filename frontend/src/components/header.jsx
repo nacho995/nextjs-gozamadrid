@@ -5,6 +5,7 @@ import { AiOutlineMenuUnfold, AiOutlineMenuFold } from "react-icons/ai";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
+import AnimatedOnScroll from "./AnimatedScroll";
 
 export default function ControlMenu() {
   const [isDropdownVisible, setDropdownVisible] = useState(false);
@@ -50,6 +51,7 @@ export default function ControlMenu() {
 
   return (
     <div className="relative w-full">
+
       {/* Menú Principal */}
       <header className="relative z-10 flex flex-col items-center px-24 p-4 bg-white bg-opacity-40 w-max mx-auto rounded-full shadow-2xl">
         {/* Íconos sociales y botón de menú */}
@@ -103,7 +105,7 @@ export default function ControlMenu() {
             ref={venderRef}
             className="relative whitespace-nowrap"
             onMouseEnter={handleMouseEnter}
-            // También podemos dejar onMouseLeave en el dropdown o en este contenedor
+          // También podemos dejar onMouseLeave en el dropdown o en este contenedor
           >
             <Link href="/vender" className="text-black hover:text-gray-700">
               Vende tu propiedad

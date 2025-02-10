@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import AnimatedOnScroll from "./AnimatedScroll";
 
 const CounterExp = () => {
     const [count, setCount] = useState(0);
@@ -65,6 +66,7 @@ const CounterExp = () => {
     }, [isVisible]);
 
     return (
+        <AnimatedOnScroll>
         <div ref={observerRef} className="relative bottom-0 left-0 w-full flex justify-center items-center z-10">
             <div className="relative w-full h-40 flex items-center justify-center">
                 <div
@@ -78,6 +80,7 @@ const CounterExp = () => {
                 </div>
             </div>
         </div>
+        </AnimatedOnScroll>
     );
 };
 
