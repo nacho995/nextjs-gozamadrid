@@ -11,8 +11,12 @@ const chakraPetch = ChakraPetch({
 class MyDocument extends Document {
   render() {
     return (
-      <Html className={chakraPetch.className}>
-        <Head />
+      <Html className={chakraPetch.className} lang="es">
+        <Head>
+          {/* Meta viewport para hacer el sitio responsive */}
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          {/* Puedes agregar otras metaetiquetas o enlaces a fuentes, etc. */}
+        </Head>
         <body>
           <Main />
           <NextScript />

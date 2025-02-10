@@ -1421,7 +1421,7 @@ function MyApp({ Component, pageProps }) {
                         children: "Goza Madrid"
                     }, void 0, false, {
                         fileName: "[project]/src/pages/_app.js",
-                        lineNumber: 10,
+                        lineNumber: 9,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("link", {
@@ -1429,7 +1429,7 @@ function MyApp({ Component, pageProps }) {
                         href: "/logo.png"
                     }, void 0, false, {
                         fileName: "[project]/src/pages/_app.js",
-                        lineNumber: 11,
+                        lineNumber: 10,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meta", {
@@ -1437,13 +1437,21 @@ function MyApp({ Component, pageProps }) {
                         content: "Descripción de mi sitio web"
                     }, void 0, false, {
                         fileName: "[project]/src/pages/_app.js",
-                        lineNumber: 12,
+                        lineNumber: 11,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meta", {
+                        name: "viewport",
+                        content: "width=device-width, initial-scale=1"
+                    }, void 0, false, {
+                        fileName: "[project]/src/pages/_app.js",
+                        lineNumber: 13,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/pages/_app.js",
-                lineNumber: 9,
+                lineNumber: 8,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$layout$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1452,11 +1460,11 @@ function MyApp({ Component, pageProps }) {
                 }, void 0, false, {
                     fileName: "[project]/src/pages/_app.js",
                     lineNumber: 16,
-                    columnNumber: 11
+                    columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/pages/_app.js",
-                lineNumber: 14,
+                lineNumber: 15,
                 columnNumber: 7
             }, this)
         ]
