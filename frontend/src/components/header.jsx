@@ -4,18 +4,14 @@ import { FaFacebook, FaInstagram, FaPhone } from "react-icons/fa";
 import { AiOutlineMenuUnfold, AiOutlineMenuFold } from "react-icons/ai";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
-import ReactDOM from "react-dom";
-import AnimatedOnScroll from "./AnimatedScroll";
 
 export default function ControlMenu() {
   const [isDropdownVisible, setDropdownVisible] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
 
-  // Referencia para medir el ancho natural de los links adicionales
   const extraLinksRef = useRef(null);
   const [extraWidth, setExtraWidth] = useState(0);
 
-  // Referencia para el enlace "Vende tu propiedad"
   const venderRef = useRef(null);
   const [venderRect, setVenderRect] = useState({
     top: 1,
@@ -25,7 +21,6 @@ export default function ControlMenu() {
     bottom: 0,
   });
 
-  // Usamos ResizeObserver para recalcular el ancho cuando cambie el tamaño del contenedor extra
   useEffect(() => {
     if (extraLinksRef.current) {
       const resizeObserver = new ResizeObserver((entries) => {
@@ -38,7 +33,6 @@ export default function ControlMenu() {
     }
   }, []);
 
-  // Cada vez que se muestre el dropdown, calculamos la posición del enlace "Vende tu propiedad"
   useEffect(() => {
     if (venderRef.current && isDropdownVisible) {
       const rect = venderRef.current.getBoundingClientRect();
@@ -49,18 +43,42 @@ export default function ControlMenu() {
   const handleMouseEnter = () => setDropdownVisible(true);
   const handleMouseLeave = () => setDropdownVisible(false);
 
+  const toggleMenu = () => {
+    setMenuVisible(!menuVisible);
+    setDropdownVisible(false);
+  };
+
+  const toggleDropdown = () => {
+    setDropdownVisible(!isDropdownVisible);
+  };
+
   return (
     <div className="relative w-full">
+      {/* Botón de menú para móviles */}
+        {!menuVisible && (
+          <div className="lg:hidden fixed left-4 top-4 z-50 text-amarillo bg-gray-600 p-2 rounded">
+            <button
+          onClick={toggleMenu}
+          className="text-amarillo hover:text-gray-700 flex items-center space-x-2"
+            >
+          {menuVisible ? (
+            <AiOutlineMenuFold size={30} />
+          ) : (
+            <AiOutlineMenuUnfold size={30} />
+          )}
+            </button>
+          </div>
+        )}
 
-      {/* Menú Principal */}
-      <header className="relative z-10 flex flex-col items-center px-24 p-4 bg-white bg-opacity-40 w-max mx-auto rounded-full shadow-2xl">
+        {/* Menú Principal */}
+      <header className="relative z-10  flex-col items-center px-24 p-4 bg-white bg-opacity-40 w-max mx-auto rounded-full shadow-2xl hidden lg:flex">
         {/* Íconos sociales y botón de menú */}
         <div className="absolute left-1/4 top-1/2 flex space-x-4 mt-4 ml-4">
           <button
-            onClick={() => setMenuVisible(!menuVisible)}
+            onClick={toggleMenu}
             className="text-black hover:text-gray-700 flex items-center space-x-2"
           >
-            <span>{menuVisible ? "Ver menos" : "Ver más"}</span>
+            <span className="hidden lg:block">{menuVisible ? "Ver menos" : "Ver más"}</span>
             {menuVisible ? (
               <AiOutlineMenuFold size={30} />
             ) : (
@@ -92,51 +110,42 @@ export default function ControlMenu() {
           </span>
         </div>
 
-        {/* Logo */}
         <Image src="/logo.png" alt="Logo" width={150} height={30} className="m-0" />
 
-        {/* Navegación principal */}
         <nav className="text-black flex items-center space-x-14 mt-4 text-2xl font-bold">
           <Link href="/" className="text-black hover:text-gray-700">
             Inicio
           </Link>
-          {/* Envolvemos "Vende tu propiedad" en un contenedor al que asignamos venderRef */}
           <div
             ref={venderRef}
             className="relative whitespace-nowrap"
             onMouseEnter={handleMouseEnter}
-          // También podemos dejar onMouseLeave en el dropdown o en este contenedor
           >
             <Link href="/vender" className="text-black hover:text-gray-700">
               Vende tu propiedad
             </Link>
-            {isDropdownVisible &&
-              ReactDOM.createPortal(
-                <div
-                  className="absolute bg-black bg-opacity-50 rounded shadow-lg flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold"
-                  style={{
-                    // Posicionamos el dropdown justo debajo del enlace, con un pequeño margen (por ejemplo, 4px)
-                    top: venderRect.bottom + window.scrollY + 18,
-                    left: venderRect.left + window.scrollX,
-                    minWidth: venderRect.width,
-                  }}
-                  onMouseLeave={handleMouseLeave}
+            {isDropdownVisible && (
+              <div
+                className="absolute bg-black bg-opacity-50 rounded shadow-lg flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold"
+                style={{
+                  top: venderRect.bottom + window.scrollY + 18,
+                  left: venderRect.left + window.scrollX,
+                  minWidth: venderRect.width,
+                }}
+                onMouseLeave={handleMouseLeave}
+              >
+                <Link
+                  href="/vender/comprar"
+                  className="block px-4 py-2 text-white"
                 >
-                  <Link
-                    href="/vender/comprar"
-                    className="block px-4 py-2 text-white"
-                  >
-                    Compra tu propiedad
-                  </Link>
-                </div>,
-                document.body
-              )}
+                  Compra tu propiedad
+                </Link>
+              </div>
+            )}
           </div>
           <Link href="/exp-realty" className="text-black hover:text-gray-700">
             eXp Realty
           </Link>
-
-          {/* Contenedor de links adicionales animado colocado antes de Blog y Contacto */}
           <div
             className="inline-block overflow-hidden transition-all duration-500 ease-in-out"
             style={{
@@ -165,7 +174,6 @@ export default function ControlMenu() {
               </Link>
             </div>
           </div>
-
           <Link href="/blog" className="text-black hover:text-gray-700">
             Blog
           </Link>
@@ -174,6 +182,53 @@ export default function ControlMenu() {
           </Link>
         </nav>
       </header>
+
+      {/* Menú Lateral para dispositivos móviles */}
+      {menuVisible && (
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-20 lg:hidden">
+          <div className="bg-white bg-opacity-50 w-64 max-h-screen shadow-lg flex flex-col p-4">
+            <div className="flex justify-between items-center">
+              <Image src="/logo.png" alt="Logo" width={100} height={20} />
+              <button onClick={toggleMenu} className="text-black hover:text-gray-700">
+                <AiOutlineMenuFold size={30} />
+              </button>
+            </div>
+            <nav className="mt-8 flex flex-col space-y-4 text-xl font-bold">
+              <Link href="/" className="text-black hover:text-gray-700">
+                Inicio
+              </Link>
+              <div className="relative whitespace-nowrap">
+                <button onClick={toggleDropdown} className="text-black hover:text-gray-700">
+                  Vende tu propiedad
+                </button>
+                <div className={`transition-all duration-300 ease-in-out ${isDropdownVisible ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
+                  <Link href="/vender/comprar" className="block px-4 py-2 text-white bg-black bg-opacity-50 rounded shadow-lg">
+                    Compra tu propiedad
+                  </Link>
+                </div>
+              </div>
+              <Link href="/exp-realty" className="text-black hover:text-gray-700">
+                eXp Realty
+              </Link>
+              <Link href="/reformas" className="text-black hover:text-gray-700">
+                Reformas
+              </Link>
+              <Link href="/inversores" className="text-black hover:text-gray-700">
+                Inversores
+              </Link>
+              <Link href="/servicios" className="text-black hover:text-gray-700">
+                Servicios
+              </Link>
+              <Link href="/blog" className="text-black hover:text-gray-700">
+                Blog
+              </Link>
+              <Link href="/contacto" className="text-black hover:text-gray-700">
+                Contacto
+              </Link>
+            </nav>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

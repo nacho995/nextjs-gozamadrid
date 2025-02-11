@@ -926,6 +926,164 @@ function ControlMenu() {
                             fileName: "[project]/src/components/header.jsx",
                             lineNumber: 172,
                             columnNumber: 11
+                        }, this),
+                        menuVisible && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-20 lg:hidden",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "bg-white w-64 h-full shadow-lg flex flex-col p-4",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "flex justify-between items-center",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                                                src: "/logo.png",
+                                                alt: "Logo",
+                                                width: 100,
+                                                height: 20
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/header.jsx",
+                                                lineNumber: 180,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                onClick: toggleMenu,
+                                                className: "text-black hover:text-gray-700",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$ai$2f$index$2e$mjs__$5b$client$5d$__$28$ecmascript$29$__["AiOutlineMenuFold"], {
+                                                    size: 30
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/header.jsx",
+                                                    lineNumber: 182,
+                                                    columnNumber: 17
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/header.jsx",
+                                                lineNumber: 181,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/header.jsx",
+                                        lineNumber: 179,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("nav", {
+                                        className: "mt-8 flex flex-col space-y-4 text-xl font-bold",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                                                href: "/",
+                                                className: "text-black hover:text-gray-700",
+                                                children: "Inicio"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/header.jsx",
+                                                lineNumber: 186,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                ref: venderRef,
+                                                className: "relative whitespace-nowrap",
+                                                onClick: ()=>setDropdownVisible(!isDropdownVisible),
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                                                        href: "/vender",
+                                                        className: "text-black hover:text-gray-700",
+                                                        children: "Vende tu propiedad"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/header.jsx",
+                                                        lineNumber: 194,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    isDropdownVisible && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "bg-black bg-opacity-50 rounded shadow-lg flex flex-col transition-all duration-300 ease-in-out text-xl font-bold",
+                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                                                            href: "/vender/comprar",
+                                                            className: "block px-4 py-2 text-white",
+                                                            children: "Compra tu propiedad"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/src/components/header.jsx",
+                                                            lineNumber: 199,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/header.jsx",
+                                                        lineNumber: 198,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/components/header.jsx",
+                                                lineNumber: 189,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                                                href: "/exp-realty",
+                                                className: "text-black hover:text-gray-700",
+                                                children: "eXp Realty"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/header.jsx",
+                                                lineNumber: 205,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                                                href: "/reformas",
+                                                className: "text-black hover:text-gray-700",
+                                                children: "Reformas"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/header.jsx",
+                                                lineNumber: 208,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                                                href: "/inversores",
+                                                className: "text-black hover:text-gray-700",
+                                                children: "Inversores"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/header.jsx",
+                                                lineNumber: 211,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                                                href: "/servicios",
+                                                className: "text-black hover:text-gray-700",
+                                                children: "Servicios"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/header.jsx",
+                                                lineNumber: 214,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                                                href: "/blog",
+                                                className: "text-black hover:text-gray-700",
+                                                children: "Blog"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/header.jsx",
+                                                lineNumber: 217,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                                                href: "/contacto",
+                                                className: "text-black hover:text-gray-700",
+                                                children: "Contacto"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/header.jsx",
+                                                lineNumber: 220,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/header.jsx",
+                                        lineNumber: 185,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/header.jsx",
+                                lineNumber: 178,
+                                columnNumber: 11
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/header.jsx",
+                            lineNumber: 177,
+                            columnNumber: 9
                         }, this)
                     ]
                 }, void 0, true, {
