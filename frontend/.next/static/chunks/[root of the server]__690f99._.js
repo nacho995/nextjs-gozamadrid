@@ -2037,7 +2037,7 @@ const cardData = [
             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "grid grid-cols-4 grid-rows-4 z-20 gap-8 h-[70vh]",
                 children: cardData.map((card, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "relative w-[40vh] h-40 group [perspective:1000px]",
+                        className: "relative w-[40vh] h-[40vh] group [perspective:1000px]",
                         style: {
                             gridColumnStart: index + 1,
                             gridRowStart: index + 1
@@ -2141,16 +2141,13 @@ const cardData = [
                                                 columnNumber: 37
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "relative z-10 text-center whitespace-normal break-words overflow-hidden",
-                                                style: {
-                                                    fontSize: "clamp(0.7rem, 2vw, 0.5rem)"
-                                                },
+                                                className: "relative z-10 text-center overflow-hidden whitespace-normal break-words text-sm sm:text-base md:text-lg lg:text-xl",
                                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ol", {
                                                     className: "list-decimal list-inside text-left text-white",
                                                     children: card.back.props.children
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/cards.jsx",
-                                                    lineNumber: 172,
+                                                    lineNumber: 171,
                                                     columnNumber: 41
                                                 }, this)
                                             }, void 0, false, {
@@ -2259,7 +2256,7 @@ _c = DesktopCards;
                                 columnNumber: 21
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "relative z-10 text-center text-xs sm:text-sm px-1 break-words overflow-hidden",
+                                className: "relative z-10 text-center whitespace-normal break-words overflow-hidden text-xs sm:text-sm md:text-base lg:text-lg",
                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ol", {
                                     className: "list-decimal list-inside text-left text-white",
                                     children: card.back.props.children
@@ -2291,7 +2288,7 @@ _c = DesktopCards;
                 className: "mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
             }, void 0, false, {
                 fileName: "[project]/src/components/cards.jsx",
-                lineNumber: 233,
+                lineNumber: 234,
                 columnNumber: 17
             }, this),
             index === 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
@@ -2300,7 +2297,7 @@ _c = DesktopCards;
                 className: "mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
             }, void 0, false, {
                 fileName: "[project]/src/components/cards.jsx",
-                lineNumber: 240,
+                lineNumber: 241,
                 columnNumber: 17
             }, this),
             index === 2 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
@@ -2309,7 +2306,7 @@ _c = DesktopCards;
                 className: "mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
             }, void 0, false, {
                 fileName: "[project]/src/components/cards.jsx",
-                lineNumber: 247,
+                lineNumber: 248,
                 columnNumber: 17
             }, this),
             index === 3 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
@@ -2318,7 +2315,7 @@ _c = DesktopCards;
                 className: "mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
             }, void 0, false, {
                 fileName: "[project]/src/components/cards.jsx",
-                lineNumber: 254,
+                lineNumber: 255,
                 columnNumber: 17
             }, this),
             index === 4 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
@@ -2327,7 +2324,7 @@ _c = DesktopCards;
                 className: "mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
             }, void 0, false, {
                 fileName: "[project]/src/components/cards.jsx",
-                lineNumber: 261,
+                lineNumber: 262,
                 columnNumber: 17
             }, this)
         ]
@@ -2339,26 +2336,197 @@ _c = DesktopCards;
 }
 _s1(MobileCard, "QYn2hzWSEiNCpFk01FECw92BS70=");
 _c1 = MobileCard;
+function TabletCards() {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: "flex justify-center items-center w-full p-5 h-[100vh]",
+        style: {
+            background: "linear-gradient(to top, transparent 0%, gray 50%, transparent 100%)"
+        },
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "grid grid-cols-3 gap-4 w-full max-w-3xl",
+            children: cardData.map((card, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "flex flex-col items-center p-2",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "relative w-[30vh] h-[55vh] overflow-hidden transition-transform duration-700 cursor-pointer",
+                            // Puedes agregar flip on click si lo deseas; para este ejemplo, lo dejamos sin flip.
+                            onClick: ()=>{},
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "absolute w-full h-full bg-amarillo text-black shadow-lg rounded-lg p-2 flex items-center justify-center overflow-hidden",
+                                    "aria-hidden": "true",
+                                    style: {
+                                        backfaceVisibility: "hidden"
+                                    },
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "absolute inset-0 bg-cover bg-center rounded-lg",
+                                            style: {
+                                                backgroundImage: "url('/fondoamarillo.jpg')"
+                                            },
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "absolute inset-0 bg-white opacity-15 rounded-lg"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/cards.jsx",
+                                                lineNumber: 299,
+                                                columnNumber: 37
+                                            }, this)
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/cards.jsx",
+                                            lineNumber: 295,
+                                            columnNumber: 33
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                            className: "text-xl sm:text-2xl font-bold text-center text-black z-20 px-2 break-words",
+                                            children: card.front
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/cards.jsx",
+                                            lineNumber: 301,
+                                            columnNumber: 33
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/cards.jsx",
+                                    lineNumber: 290,
+                                    columnNumber: 29
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "absolute w-full h-full font-bold text-black shadow-lg rounded-lg p-2 flex items-center justify-center text-center overflow-hidden",
+                                    "aria-hidden": "true",
+                                    style: {
+                                        backfaceVisibility: "hidden",
+                                        transform: "rotateY(180deg)"
+                                    },
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "absolute inset-0 bg-cover bg-center rounded-lg",
+                                            style: {
+                                                backgroundImage: "url('/fondonegro.jpg')"
+                                            }
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/cards.jsx",
+                                            lineNumber: 310,
+                                            columnNumber: 33
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "relative z-10 text-center text-base sm:text-lg px-2 break-words overflow-hidden",
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ol", {
+                                                className: "list-decimal list-inside text-left text-white",
+                                                children: card.back.props.children
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/cards.jsx",
+                                                lineNumber: 315,
+                                                columnNumber: 37
+                                            }, this)
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/cards.jsx",
+                                            lineNumber: 314,
+                                            columnNumber: 33
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/cards.jsx",
+                                    lineNumber: 305,
+                                    columnNumber: 29
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/cards.jsx",
+                            lineNumber: 285,
+                            columnNumber: 25
+                        }, this),
+                        index === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                            src: "/analisis.png",
+                            alt: "Image for Card 1",
+                            className: "mt-4 rounded-full h-[20vh] w-[20vh] object-cover"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/cards.jsx",
+                            lineNumber: 323,
+                            columnNumber: 29
+                        }, this),
+                        index === 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                            src: "/agenteinmo.png",
+                            alt: "Image for Card 2",
+                            className: "mt-4 rounded-full h-[20vh] w-[20vh] object-cover"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/cards.jsx",
+                            lineNumber: 330,
+                            columnNumber: 29
+                        }, this),
+                        index === 2 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                            src: "/analisisdemercado.jpeg",
+                            alt: "Image for Card 3",
+                            className: "mt-4 rounded-full h-[20vh] w-[20vh] object-cover"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/cards.jsx",
+                            lineNumber: 337,
+                            columnNumber: 29
+                        }, this),
+                        index === 3 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                            src: "/agentesinmobiliarios.jpeg",
+                            alt: "Image for Card 4",
+                            className: "mt-4 rounded-full h-[20vh] w-[20vh] object-cover"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/cards.jsx",
+                            lineNumber: 344,
+                            columnNumber: 29
+                        }, this),
+                        index === 4 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                            src: "/formFoto.jpeg",
+                            alt: "Image for Card 5",
+                            className: "mt-4 rounded-full h-[20vh] w-[20vh] object-cover"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/cards.jsx",
+                            lineNumber: 351,
+                            columnNumber: 29
+                        }, this)
+                    ]
+                }, index, true, {
+                    fileName: "[project]/src/components/cards.jsx",
+                    lineNumber: 284,
+                    columnNumber: 21
+                }, this))
+        }, void 0, false, {
+            fileName: "[project]/src/components/cards.jsx",
+            lineNumber: 282,
+            columnNumber: 13
+        }, this)
+    }, void 0, false, {
+        fileName: "[project]/src/components/cards.jsx",
+        lineNumber: 274,
+        columnNumber: 9
+    }, this);
+}
+_c2 = TabletCards;
 function Cards() {
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$AnimatedScroll$2e$jsx__$5b$client$5d$__$28$ecmascript$29$__["default"], {
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "hidden lg:flex justify-center items-center w-full p-10 h-[100vh]",
+                className: "hidden xl:flex justify-center items-center w-full p-10 h-[100vh]",
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(DesktopCards, {}, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
-                    lineNumber: 279,
+                    lineNumber: 370,
                     columnNumber: 17
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/cards.jsx",
-                lineNumber: 275,
+                lineNumber: 369,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "lg:hidden flex justify-center items-center w-full p-10 min-h-screen",
-                style: {
-                    background: "linear-gradient(to top, transparent 0%, gray 50%, transparent 100%)"
-                },
+                className: "hidden md:flex xl:hidden justify-center items-center w-full p-5 min-h-screen",
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(TabletCards, {}, void 0, false, {
+                    fileName: "[project]/src/components/cards.jsx",
+                    lineNumber: 375,
+                    columnNumber: 17
+                }, this)
+            }, void 0, false, {
+                fileName: "[project]/src/components/cards.jsx",
+                lineNumber: 374,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "md:hidden flex justify-center items-center w-full p-5 min-h-screen",
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "grid grid-cols-2 gap-4 w-full max-w-xl",
                     children: cardData.map((card, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(MobileCard, {
@@ -2366,31 +2534,32 @@ function Cards() {
                             index: index
                         }, index, false, {
                             fileName: "[project]/src/components/cards.jsx",
-                            lineNumber: 292,
+                            lineNumber: 382,
                             columnNumber: 25
                         }, this))
                 }, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
-                    lineNumber: 290,
+                    lineNumber: 380,
                     columnNumber: 17
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/cards.jsx",
-                lineNumber: 283,
+                lineNumber: 379,
                 columnNumber: 13
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/cards.jsx",
-        lineNumber: 273,
+        lineNumber: 367,
         columnNumber: 9
     }, this);
 }
-_c2 = Cards;
-var _c, _c1, _c2;
+_c3 = Cards;
+var _c, _c1, _c2, _c3;
 __turbopack_refresh__.register(_c, "DesktopCards");
 __turbopack_refresh__.register(_c1, "MobileCard");
-__turbopack_refresh__.register(_c2, "Cards");
+__turbopack_refresh__.register(_c2, "TabletCards");
+__turbopack_refresh__.register(_c3, "Cards");
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_refresh__.registerExports(module, globalThis.$RefreshHelpers$);
 }
