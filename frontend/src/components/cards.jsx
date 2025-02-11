@@ -1,5 +1,7 @@
-import React from "react";
+"use client";
+import React, { useState, useEffect, useRef } from "react";
 import AnimatedOnScroll from "./AnimatedScroll";
+import ReactDOM from "react-dom";
 
 const cardData = [
     {
@@ -7,9 +9,9 @@ const cardData = [
         back: (
             <ol>
                 <li>Vender un piso no es jugar a la lotería.</li>
-                <li>Sabemos que el mercado inmobiliario a subido de precio.</li>
-                <li>¡Ojo! Algunos propietarios estan inflando los precios, pensando que así sacaran más beneficio</li>
-                <li>El precio fuera de mercado aleja a compradores</li>
+                <li>Sabemos que el mercado inmobiliario ha subido de precio.</li>
+                <li>¡Ojo! Algunos propietarios están inflando los precios, pensando que así sacarán más beneficio.</li>
+                <li>El precio fuera de mercado aleja a compradores.</li>
             </ol>
         ),
     },
@@ -17,10 +19,10 @@ const cardData = [
         front: "¿Por qué no se vende tu inmueble?",
         back: (
             <ol>
-                <li>Precio correcto = venta rápida y efectiva. </li>
+                <li>Precio correcto = venta rápida y efectiva.</li>
                 <li>Precio inflado = meses (o años) sin vender, y posibles bajadas obligadas.</li>
                 <li>Si de verdad quieres vender, hazlo con estrategia y no con especulación.</li>
-                <li>Te ayudamos a definir el precio real de tu vivienda para que no pierdas el tiempo</li>
+                <li>Te ayudamos a definir el precio real de tu vivienda para que no pierdas el tiempo.</li>
             </ol>
         ),
     },
@@ -58,88 +60,239 @@ const cardData = [
     },
 ];
 
-export default function Cards() {
+/* ============================
+   Desktop Version (PC)
+   ============================ */
+function DesktopCards() {
+    // Mantenemos los refs y estados originales para el efecto de flip en desktop
+    const extraLinksRef = useRef(null);
+    const [extraWidth, setExtraWidth] = useState(0);
+    const venderRef = useRef(null);
+    const [venderRect, setVenderRect] = useState({
+        top: 1,
+        left: 0,
+        width: 0,
+        height: 0,
+        bottom: 0,
+    });
+
+    useEffect(() => {
+        if (extraLinksRef.current) {
+            const resizeObserver = new ResizeObserver((entries) => {
+                for (let entry of entries) {
+                    setExtraWidth(entry.target.scrollWidth);
+                }
+            });
+            resizeObserver.observe(extraLinksRef.current);
+            return () => resizeObserver.disconnect();
+        }
+    }, []);
+
+    useEffect(() => {
+        if (venderRef.current) {
+            const rect = venderRef.current.getBoundingClientRect();
+            setVenderRect(rect);
+        }
+    }, [venderRect, venderRef]);
+
     return (
         <AnimatedOnScroll>
-        <div className="flex justify-center items-center w-full p-10 h-[100vh]"
-        style={{
-            background: "linear-gradient(to top, transparent 0%, gray 50%, transparent 100%)"
-        }}>
-            <div className="grid grid-cols-4 grid-rows-4 z-20 gap-8 h-[70vh]">
-                {cardData.map((card, index) => (
-                    <div
-                        key={index}
-                        className="relative w-[40vh] h-40 group [perspective:1000px]"
-                        style={{ gridColumnStart: index + 1, gridRowStart: index + 1 }}
-                    >
-                        {/* Condicional para mostrar imágenes */}
-                        {index === 0 && (
-                            <img
-                                src="/analisis.png"
-                                alt="Image below Card 1"
-                                className="absolute bottom-[-50vh] left-1/2 rounded-full h-[25vh] w-[25vh] transform -translate-x-1/2"
-                            />
-                        )}
-                        {index === 1 && (
-                            <img
-                                src="/agenteinmo.png"
-                                alt="Image below Card 2"
-                                className="absolute bottom-[-50vh] left-1/2 rounded-full h-[25vh] w-[25vh] transform -translate-x-1/2"
-                            />
-                        )}
-                        {index === 2 && (
-                            <img
-                                src="/analisisdemercado.jpeg"
-                                alt="Image above Card 3"
-                                className="absolute top-[-30vh] left-1/2 rounded-full h-[25vh] w-[25vh] transform -translate-x-1/2"
-                            />
-                        )}
-                        {index === 3 && (
-                            <img
-                                src="/agentesinmobiliarios.jpeg"
-                                alt="Image above Card 4"
-                               className="absolute top-[-30vh] left-1/2 rounded-full h-[25vh] w-[25vh] transform -translate-x-1/2"
-                            />
-                        )}
-                        {index === 4 && (
-                            <img
-                                src="/formFoto.jpeg"
-                                alt="Image above Card 4"
-                                className="absolute top-[-30vh] left-1/2 rounded-full h-[25vh] w-[25vh] transform -translate-x-1/2"
-                            />
-                        )}
-                        <div className="h-[40vh] relative w-full transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
-                           {/* Cara frontal */}
-                            <div
-                                className="absolute w-full h-full bg-amarillo text-black shadow-lg hover:shadow-xl rounded-lg p-2 flex items-center justify-center [backface-visibility:hidden]"
-                                aria-hidden="true"
-                            >
-                                <div className="absolute inset-0 bg-cover bg-center rounded-lg" style={{ backgroundImage: "url('/fondoamarillo.jpg')" }}>
-                                    <div className="absolute inset-0 bg-white opacity-15 rounded-lg"></div>
+            <div className="flex justify-center items-center w-full p-10 h-[100vh]"
+                style={{
+                    background: "linear-gradient(to top, transparent 0%, gray 50%, transparent 100%)"
+                }}>
+                <div className="grid grid-cols-4 grid-rows-4 z-20 gap-8 h-[70vh]">
+                    {cardData.map((card, index) => (
+                        <div
+                            key={index}
+                            className="relative w-[40vh] h-40 group [perspective:1000px]"
+                            style={{ gridColumnStart: index + 1, gridRowStart: index + 1 }}
+                        >
+                            {/* Condicional para mostrar imágenes */}
+                            {index === 0 && (
+                                <img
+                                    src="/analisis.png"
+                                    alt="Image below Card 1"
+                                    className="absolute bottom-[-50vh] left-1/2 rounded-full h-[25vh] w-[25vh] transform -translate-x-1/2"
+                                />
+                            )}
+                            {index === 1 && (
+                                <img
+                                    src="/agenteinmo.png"
+                                    alt="Image below Card 2"
+                                    className="absolute bottom-[-50vh] left-1/2 rounded-full h-[25vh] w-[25vh] transform -translate-x-1/2"
+                                />
+                            )}
+                            {index === 2 && (
+                                <img
+                                    src="/analisisdemercado.jpeg"
+                                    alt="Image above Card 3"
+                                    className="absolute top-[-30vh] left-1/2 rounded-full h-[25vh] w-[25vh] transform -translate-x-1/2"
+                                />
+                            )}
+                            {index === 3 && (
+                                <img
+                                    src="/agentesinmobiliarios.jpeg"
+                                    alt="Image above Card 4"
+                                    className="absolute top-[-30vh] left-1/2 rounded-full h-[25vh] w-[25vh] transform -translate-x-1/2"
+                                />
+                            )}
+                            {index === 4 && (
+                                <img
+                                    src="/formFoto.jpeg"
+                                    alt="Image above Card 4"
+                                    className="absolute top-[-30vh] left-1/2 rounded-full h-[25vh] w-[25vh] transform -translate-x-1/2"
+                                />
+                            )}
+                            <div className="h-[40vh] relative w-full transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+                                {/* Cara frontal */}
+                                <div
+                                    className="absolute w-full h-full bg-amarillo text-black shadow-lg hover:shadow-xl rounded-lg p-2 flex items-center justify-center [backface-visibility:hidden]"
+                                    aria-hidden="true"
+                                >
+                                    <div className="absolute inset-0 bg-cover bg-center rounded-lg" style={{ backgroundImage: "url('/fondoamarillo.jpg')" }}>
+                                        <div className="absolute inset-0 bg-white opacity-15 rounded-lg"></div>
+                                    </div>
+                                    <h2 className="text-3xl font-bold text-center text-black z-20">{card.front}</h2>
                                 </div>
-                                <h2 className="text-3xl font-bold text-center text-black z-20">{card.front}</h2>
-                            </div>
 
-                            {/* Cara trasera */}
-                            <div
-                                className="absolute w-full h-full font-bold text-black shadow-lg hover:shadow-xl rounded-lg p-2 flex items-center justify-center text-center [backface-visibility:hidden] [transform:rotateY(180deg)]"
-                                aria-hidden="true"
-                            >
-                                {/* Nuevo div para la imagen de fondo */}
-                                <div className="absolute inset-0 bg-cover bg-center  rounded-lg" style={{ backgroundImage: "url('/fondonegro.jpg')" }}></div>
+                                {/* Cara trasera */}
+                                <div
+                                    className="absolute w-full h-full font-bold text-black shadow-lg hover:shadow-xl rounded-lg p-2 flex items-center justify-center text-center [backface-visibility:hidden] [transform:rotateY(180deg)]"
+                                    aria-hidden="true"
+                                >
+                                    {/* Nuevo div para la imagen de fondo */}
+                                    <div className="absolute inset-0 bg-cover bg-center  rounded-lg" style={{ backgroundImage: "url('/fondonegro.jpg')" }}></div>
 
-                                {/* Contenido de la tarjeta */}
-                                <div className="relative z-10 text-center text-lg">
-                                    <ol className="list-decimal list-inside text-left text-white">
-                                        {card.back.props.children}
-                                    </ol>
+                                    {/* Contenido de la tarjeta */}
+                                    <div
+                                        className="relative z-10 text-center whitespace-normal break-words overflow-hidden"
+                                        style={{ fontSize: "clamp(0.7rem, 2vw, 0.5rem)" }}
+                                    >
+                                        <ol className="list-decimal list-inside text-left text-white">
+                                            {card.back.props.children}
+                                        </ol>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
+                </div>
             </div>
+        </AnimatedOnScroll>
+    );
+}
+
+
+/* ============================
+   Mobile/Tablet Version (2 columns)
+   ============================ */
+function MobileCard({ card, index }) {
+    const [flipped, setFlipped] = useState(false);
+    return (
+        <div className="flex flex-col items-center p-2">
+            <div
+                className="w-[120%] h-[50vh] relative transition-transform duration-700 [transform-style:preserve-3d]"
+                onClick={() => setFlipped(!flipped)}
+                style={{ transform: flipped ? "rotateY(180deg)" : "rotateY(0)" }}
+            >
+                {/* Cara frontal */}
+                <div
+                    className="absolute w-full h-full bg-amarillo text-black shadow-lg rounded-lg p-2 flex items-center justify-center [backface-visibility:hidden] overflow-hidden"
+                    aria-hidden="true"
+                >
+                    <div
+                        className="absolute inset-0 bg-cover bg-center rounded-lg"
+                        style={{ backgroundImage: "url('/fondoamarillo.jpg')" }}
+                    >
+                        <div className="absolute inset-0 bg-white opacity-15 rounded-lg"></div>
+                    </div>
+                    <h2 className="text-lg font-bold text-center text-black z-20 px-1 break-words">
+                        {card.front}
+                    </h2>
+                </div>
+                {/* Cara trasera */}
+                <div
+                    className="absolute w-full h-full font-bold text-black shadow-lg rounded-lg p-2 flex items-center justify-center text-center [backface-visibility:hidden] [transform:rotateY(180deg)] overflow-hidden"
+                    aria-hidden="true"
+                >
+                    <div
+                        className="absolute inset-0 bg-cover bg-center rounded-lg"
+                        style={{ backgroundImage: "url('/fondonegro.jpg')" }}
+                    ></div>
+                    <div className="relative z-10 text-center text-xs sm:text-sm px-1 break-words overflow-hidden">
+                        <ol className="list-decimal list-inside text-left text-white">
+                            {card.back.props.children}
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            {/* Imagen debajo */}
+            {index === 0 && (
+                <img
+                    src="/analisis.png"
+                    alt="Image below Card 1"
+                    className="mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
+                />
+            )}
+            {index === 1 && (
+                <img
+                    src="/agenteinmo.png"
+                    alt="Image below Card 2"
+                    className="mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
+                />
+            )}
+            {index === 2 && (
+                <img
+                    src="/analisisdemercado.jpeg"
+                    alt="Image above Card 3"
+                    className="mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
+                />
+            )}
+            {index === 3 && (
+                <img
+                    src="/agentesinmobiliarios.jpeg"
+                    alt="Image above Card 4"
+                    className="mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
+                />
+            )}
+            {index === 4 && (
+                <img
+                    src="/formFoto.jpeg"
+                    alt="Image above Card 5"
+                    className="mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
+                />
+            )}
         </div>
+    );
+}
+
+export default function Cards() {
+    return (
+        <AnimatedOnScroll>
+            {/* Desktop Version */}
+            <div
+                className="hidden lg:flex justify-center items-center w-full p-10 h-[100vh]"
+
+            >
+                <DesktopCards />
+            </div>
+
+            {/* Mobile/Tablet Version */}
+            <div
+                className="lg:hidden flex justify-center items-center w-full p-10 min-h-screen"
+                style={{
+                    background:
+                        "linear-gradient(to top, transparent 0%, gray 50%, transparent 100%)",
+                }}
+            >
+                <div className="grid grid-cols-2 gap-4 w-full max-w-xl">
+                    {cardData.map((card, index) => (
+                        <MobileCard key={index} card={card} index={index} />
+                    ))}
+                </div>
+            </div>
         </AnimatedOnScroll>
     );
 }

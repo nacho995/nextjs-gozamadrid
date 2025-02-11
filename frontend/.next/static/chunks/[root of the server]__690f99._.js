@@ -1532,9 +1532,11 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/next/link.js [client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/react/index.js [client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$AnimatedScroll$2e$jsx__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/src/components/AnimatedScroll.jsx [client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/next/image.js [client] (ecmascript)");
 ;
 var _s = __turbopack_refresh__.signature();
 "use client";
+;
 ;
 ;
 ;
@@ -1546,104 +1548,102 @@ const Video = ()=>{
         "Video.useEffect": ()=>{
             const videoElement = videoRef.current;
             if (videoElement) {
-                videoElement.loop = true; // Hace que el video se repita
-                videoElement.load(); // Recarga el video
-                videoElement.play(); // Reproduce el video automáticamente
+                videoElement.loop = true; // Repetir video
+                videoElement.load(); // Recargar el video
+                videoElement.play(); // Reproducir automáticamente
             }
         }
     }["Video.useEffect"], [
         videoSrc
     ]);
-    // Usamos el src directamente
-    const completeVideoSrc = videoSrc;
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$AnimatedScroll$2e$jsx__$5b$client$5d$__$28$ecmascript$29$__["default"], {
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "w-full h-[70vh] sm:h-[90vh] overflow-hidden relative",
+            className: "w-full md:h-[90vh] h-[25vh] overflow-hidden relative",
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("video", {
-                    className: "absolute top-0 left-0 w-full h-full object-cover",
+                    className: "absolute md:top-[-10%] left-0 w-full md:h-full md:object-cover",
                     autoPlay: true,
                     muted: true,
                     playsInline: true,
                     ref: videoRef,
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("source", {
-                            src: completeVideoSrc,
+                            src: videoSrc,
                             type: "video/mp4"
                         }, void 0, false, {
                             fileName: "[project]/src/components/video.jsx",
-                            lineNumber: 33,
-                            columnNumber: 11
+                            lineNumber: 31,
+                            columnNumber: 21
                         }, this),
                         "Tu navegador no soporta el elemento de video."
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/video.jsx",
-                    lineNumber: 26,
-                    columnNumber: 9
+                    lineNumber: 24,
+                    columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "absolute bottom-0 left-0 w-full flex justify-center items-center z-10",
+                    className: "w-full flex justify-center items-center z-10 relative mt-[35%] md:absolute md:bottom-0 md:left-0",
                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "relative w-full h-24 sm:h-32 flex items-center justify-center",
+                        className: "relative w-full md:h-40 h-12  flex items-center justify-center",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "absolute w-full h-full bg-gradient-to-t",
                                 style: {
-                                    background: "linear-gradient(to top, transparent 10%, black 30%, black 70%, transparent 90%)"
+                                    background: "linear-gradient(to top, transparent 5%, black 20%, black 80%, transparent 95%)"
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/src/components/video.jsx",
-                                lineNumber: 41,
-                                columnNumber: 13
+                                lineNumber: 40,
+                                columnNumber: 25
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                className: "relative text-transparent bg-clip-text bg-gradient-to-r from-white via-yellow-400 to-white px-2 text-xl sm:text-3xl md:text-6xl font-bold",
+                                className: "relative text-transparent bg-clip-text bg-gradient-to-r from-white via-yellow-400 to-white px-2 md:text-6xl text-sm font-bold",
                                 children: "Invierte en bienes inmuebles en Madrid"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/video.jsx",
-                                lineNumber: 49,
-                                columnNumber: 13
+                                lineNumber: 47,
+                                columnNumber: 25
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/video.jsx",
                         lineNumber: 39,
-                        columnNumber: 11
+                        columnNumber: 21
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/components/video.jsx",
-                    lineNumber: 38,
-                    columnNumber: 9
+                    lineNumber: 36,
+                    columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "p-3 bg-white/40 rounded-full absolute top-[65%] sm:top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10",
+                    className: "p-3 bg-white/40 rounded-full absolute top-[10vh] md:top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10",
                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
-                        className: "rounded-full border border-transparent transition-colors flex items-center justify-center bg-amarillo text-black gap-2 hover:bg-black hover:text-white text-xs sm:text-sm md:text-base h-8 sm:h-10 md:h-12 px-3 sm:px-4 md:px-5 font-bold",
+                        className: "rounded-full border border-transparent transition-colors flex items-center justify-center bg-amarillo text-black gap-2 hover:bg-black hover:text-white text-sm sm:text-lg h-10 sm:h-12 px-4 sm:px-5 font-bold",
                         href: "https://valuation.lystos.com?clientId=cd55b10c-5ba6-4f65-854e-5c8adaf88a34",
                         target: "_blank",
                         rel: "noopener noreferrer",
                         children: "Valora el precio de tu propiedad"
                     }, void 0, false, {
                         fileName: "[project]/src/components/video.jsx",
-                        lineNumber: 57,
-                        columnNumber: 11
+                        lineNumber: 58,
+                        columnNumber: 21
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/components/video.jsx",
-                    lineNumber: 56,
-                    columnNumber: 9
+                    lineNumber: 57,
+                    columnNumber: 17
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/video.jsx",
-            lineNumber: 24,
-            columnNumber: 7
+            lineNumber: 22,
+            columnNumber: 13
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/components/video.jsx",
-        lineNumber: 23,
-        columnNumber: 5
+        lineNumber: 21,
+        columnNumber: 9
     }, this);
 };
 _s(Video, "XpaCO5wqePq4Sq7daS0hQH3+fdE=");
@@ -1788,6 +1788,10 @@ __turbopack_esm__({
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/react/jsx-dev-runtime.js [client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/react/index.js [client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$AnimatedScroll$2e$jsx__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/src/components/AnimatedScroll.jsx [client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$dom$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/react-dom/index.js [client] (ecmascript)");
+;
+var _s = __turbopack_refresh__.signature(), _s1 = __turbopack_refresh__.signature();
+"use client";
 ;
 ;
 ;
@@ -1800,34 +1804,34 @@ const cardData = [
                     children: "Vender un piso no es jugar a la lotería."
                 }, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
-                    lineNumber: 9,
-                    columnNumber: 17
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                    children: "Sabemos que el mercado inmobiliario a subido de precio."
-                }, void 0, false, {
-                    fileName: "[project]/src/components/cards.jsx",
-                    lineNumber: 10,
-                    columnNumber: 17
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                    children: "¡Ojo! Algunos propietarios estan inflando los precios, pensando que así sacaran más beneficio"
-                }, void 0, false, {
-                    fileName: "[project]/src/components/cards.jsx",
                     lineNumber: 11,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                    children: "El precio fuera de mercado aleja a compradores"
+                    children: "Sabemos que el mercado inmobiliario ha subido de precio."
                 }, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
                     lineNumber: 12,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
+                    children: "¡Ojo! Algunos propietarios están inflando los precios, pensando que así sacarán más beneficio."
+                }, void 0, false, {
+                    fileName: "[project]/src/components/cards.jsx",
+                    lineNumber: 13,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
+                    children: "El precio fuera de mercado aleja a compradores."
+                }, void 0, false, {
+                    fileName: "[project]/src/components/cards.jsx",
+                    lineNumber: 14,
                     columnNumber: 17
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/cards.jsx",
-            lineNumber: 8,
+            lineNumber: 10,
             columnNumber: 13
         }, this)
     },
@@ -1836,37 +1840,37 @@ const cardData = [
         back: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ol", {
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                    children: "Precio correcto = venta rápida y efectiva. "
-                }, void 0, false, {
-                    fileName: "[project]/src/components/cards.jsx",
-                    lineNumber: 20,
-                    columnNumber: 17
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                    children: "Precio inflado = meses (o años) sin vender, y posibles bajadas obligadas."
-                }, void 0, false, {
-                    fileName: "[project]/src/components/cards.jsx",
-                    lineNumber: 21,
-                    columnNumber: 17
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                    children: "Si de verdad quieres vender, hazlo con estrategia y no con especulación."
+                    children: "Precio correcto = venta rápida y efectiva."
                 }, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
                     lineNumber: 22,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                    children: "Te ayudamos a definir el precio real de tu vivienda para que no pierdas el tiempo"
+                    children: "Precio inflado = meses (o años) sin vender, y posibles bajadas obligadas."
                 }, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
                     lineNumber: 23,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
+                    children: "Si de verdad quieres vender, hazlo con estrategia y no con especulación."
+                }, void 0, false, {
+                    fileName: "[project]/src/components/cards.jsx",
+                    lineNumber: 24,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
+                    children: "Te ayudamos a definir el precio real de tu vivienda para que no pierdas el tiempo."
+                }, void 0, false, {
+                    fileName: "[project]/src/components/cards.jsx",
+                    lineNumber: 25,
                     columnNumber: 17
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/cards.jsx",
-            lineNumber: 19,
+            lineNumber: 21,
             columnNumber: 13
         }, this)
     },
@@ -1878,27 +1882,27 @@ const cardData = [
                     children: "Los recuerdos van contigo, el valor lo pone el mercado."
                 }, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
-                    lineNumber: 31,
+                    lineNumber: 33,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                     children: "Compradores buscan: ubicación, precio, potencial."
                 }, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
-                    lineNumber: 32,
+                    lineNumber: 34,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                     children: "Acepta el cambio y vende con decisión."
                 }, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
-                    lineNumber: 33,
+                    lineNumber: 35,
                     columnNumber: 17
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/cards.jsx",
-            lineNumber: 30,
+            lineNumber: 32,
             columnNumber: 13
         }, this)
     },
@@ -1910,34 +1914,34 @@ const cardData = [
                     children: "Somos vendedores y negociadores."
                 }, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
-                    lineNumber: 41,
+                    lineNumber: 43,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                     children: "Acompañamos, asesoramos y logramos acuerdos."
                 }, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
-                    lineNumber: 42,
+                    lineNumber: 44,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                     children: "Dedicación, negociación efectiva y confianza."
                 }, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
-                    lineNumber: 43,
+                    lineNumber: 45,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                     children: "Vendemos entendiendo y ayudando."
                 }, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
-                    lineNumber: 44,
+                    lineNumber: 46,
                     columnNumber: 17
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/cards.jsx",
-            lineNumber: 40,
+            lineNumber: 42,
             columnNumber: 13
         }, this)
     },
@@ -1949,39 +1953,81 @@ const cardData = [
                     children: "Escuchamos y asesoramos honestamente."
                 }, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
-                    lineNumber: 52,
+                    lineNumber: 54,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                     children: "Nos enfocamos en la persona, no solo en la transacción."
                 }, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
-                    lineNumber: 53,
+                    lineNumber: 55,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                     children: "Creamos confianza para que nos elijan siempre."
                 }, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
-                    lineNumber: 54,
+                    lineNumber: 56,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                     children: "Marta López: Tu vendedora de confianza."
                 }, void 0, false, {
                     fileName: "[project]/src/components/cards.jsx",
-                    lineNumber: 55,
+                    lineNumber: 57,
                     columnNumber: 17
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/cards.jsx",
-            lineNumber: 51,
+            lineNumber: 53,
             columnNumber: 13
         }, this)
     }
 ];
-function Cards() {
+/* ============================
+   Desktop Version (PC)
+   ============================ */ function DesktopCards() {
+    _s();
+    // Mantenemos los refs y estados originales para el efecto de flip en desktop
+    const extraLinksRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const [extraWidth, setExtraWidth] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])(0);
+    const venderRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const [venderRect, setVenderRect] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])({
+        top: 1,
+        left: 0,
+        width: 0,
+        height: 0,
+        bottom: 0
+    });
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "DesktopCards.useEffect": ()=>{
+            if (extraLinksRef.current) {
+                const resizeObserver = new ResizeObserver({
+                    "DesktopCards.useEffect": (entries)=>{
+                        for (let entry of entries){
+                            setExtraWidth(entry.target.scrollWidth);
+                        }
+                    }
+                }["DesktopCards.useEffect"]);
+                resizeObserver.observe(extraLinksRef.current);
+                return ({
+                    "DesktopCards.useEffect": ()=>resizeObserver.disconnect()
+                })["DesktopCards.useEffect"];
+            }
+        }
+    }["DesktopCards.useEffect"], []);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "DesktopCards.useEffect": ()=>{
+            if (venderRef.current) {
+                const rect = venderRef.current.getBoundingClientRect();
+                setVenderRect(rect);
+            }
+        }
+    }["DesktopCards.useEffect"], [
+        venderRect,
+        venderRef
+    ]);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$AnimatedScroll$2e$jsx__$5b$client$5d$__$28$ecmascript$29$__["default"], {
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "flex justify-center items-center w-full p-10 h-[100vh]",
@@ -2003,8 +2049,8 @@ function Cards() {
                                 className: "absolute bottom-[-50vh] left-1/2 rounded-full h-[25vh] w-[25vh] transform -translate-x-1/2"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/cards.jsx",
-                                lineNumber: 77,
-                                columnNumber: 29
+                                lineNumber: 113,
+                                columnNumber: 33
                             }, this),
                             index === 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
                                 src: "/agenteinmo.png",
@@ -2012,8 +2058,8 @@ function Cards() {
                                 className: "absolute bottom-[-50vh] left-1/2 rounded-full h-[25vh] w-[25vh] transform -translate-x-1/2"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/cards.jsx",
-                                lineNumber: 84,
-                                columnNumber: 29
+                                lineNumber: 120,
+                                columnNumber: 33
                             }, this),
                             index === 2 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
                                 src: "/analisisdemercado.jpeg",
@@ -2021,8 +2067,8 @@ function Cards() {
                                 className: "absolute top-[-30vh] left-1/2 rounded-full h-[25vh] w-[25vh] transform -translate-x-1/2"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/cards.jsx",
-                                lineNumber: 91,
-                                columnNumber: 29
+                                lineNumber: 127,
+                                columnNumber: 33
                             }, this),
                             index === 3 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
                                 src: "/agentesinmobiliarios.jpeg",
@@ -2030,8 +2076,8 @@ function Cards() {
                                 className: "absolute top-[-30vh] left-1/2 rounded-full h-[25vh] w-[25vh] transform -translate-x-1/2"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/cards.jsx",
-                                lineNumber: 98,
-                                columnNumber: 29
+                                lineNumber: 134,
+                                columnNumber: 33
                             }, this),
                             index === 4 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
                                 src: "/formFoto.jpeg",
@@ -2039,8 +2085,8 @@ function Cards() {
                                 className: "absolute top-[-30vh] left-1/2 rounded-full h-[25vh] w-[25vh] transform -translate-x-1/2"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/cards.jsx",
-                                lineNumber: 105,
-                                columnNumber: 29
+                                lineNumber: 141,
+                                columnNumber: 33
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "h-[40vh] relative w-full transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]",
@@ -2058,27 +2104,27 @@ function Cards() {
                                                     className: "absolute inset-0 bg-white opacity-15 rounded-lg"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/cards.jsx",
-                                                    lineNumber: 118,
-                                                    columnNumber: 37
+                                                    lineNumber: 154,
+                                                    columnNumber: 41
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/cards.jsx",
-                                                lineNumber: 117,
-                                                columnNumber: 33
+                                                lineNumber: 153,
+                                                columnNumber: 37
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
                                                 className: "text-3xl font-bold text-center text-black z-20",
                                                 children: card.front
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/cards.jsx",
-                                                lineNumber: 120,
-                                                columnNumber: 33
+                                                lineNumber: 156,
+                                                columnNumber: 37
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/cards.jsx",
-                                        lineNumber: 113,
-                                        columnNumber: 29
+                                        lineNumber: 149,
+                                        columnNumber: 33
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "absolute w-full h-full font-bold text-black shadow-lg hover:shadow-xl rounded-lg p-2 flex items-center justify-center text-center [backface-visibility:hidden] [transform:rotateY(180deg)]",
@@ -2091,61 +2137,260 @@ function Cards() {
                                                 }
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/cards.jsx",
-                                                lineNumber: 129,
-                                                columnNumber: 33
+                                                lineNumber: 165,
+                                                columnNumber: 37
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "relative z-10 text-center text-lg",
+                                                className: "relative z-10 text-center whitespace-normal break-words overflow-hidden",
+                                                style: {
+                                                    fontSize: "clamp(0.7rem, 2vw, 0.5rem)"
+                                                },
                                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ol", {
                                                     className: "list-decimal list-inside text-left text-white",
                                                     children: card.back.props.children
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/cards.jsx",
-                                                    lineNumber: 133,
-                                                    columnNumber: 37
+                                                    lineNumber: 172,
+                                                    columnNumber: 41
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/cards.jsx",
-                                                lineNumber: 132,
-                                                columnNumber: 33
+                                                lineNumber: 168,
+                                                columnNumber: 37
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/cards.jsx",
-                                        lineNumber: 124,
-                                        columnNumber: 29
+                                        lineNumber: 160,
+                                        columnNumber: 33
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/cards.jsx",
-                                lineNumber: 111,
-                                columnNumber: 25
+                                lineNumber: 147,
+                                columnNumber: 29
                             }, this)
                         ]
                     }, index, true, {
                         fileName: "[project]/src/components/cards.jsx",
-                        lineNumber: 70,
-                        columnNumber: 21
+                        lineNumber: 106,
+                        columnNumber: 25
                     }, this))
             }, void 0, false, {
                 fileName: "[project]/src/components/cards.jsx",
-                lineNumber: 68,
-                columnNumber: 13
+                lineNumber: 104,
+                columnNumber: 17
             }, this)
         }, void 0, false, {
             fileName: "[project]/src/components/cards.jsx",
-            lineNumber: 64,
-            columnNumber: 9
+            lineNumber: 100,
+            columnNumber: 13
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/components/cards.jsx",
-        lineNumber: 63,
+        lineNumber: 99,
         columnNumber: 9
     }, this);
 }
-_c = Cards;
-var _c;
-__turbopack_refresh__.register(_c, "Cards");
+_s(DesktopCards, "+LndaEGDdpfSFCIx2nmceSoEIN8=");
+_c = DesktopCards;
+/* ============================
+   Mobile/Tablet Version (2 columns)
+   ============================ */ function MobileCard({ card, index }) {
+    _s1();
+    const [flipped, setFlipped] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: "flex flex-col items-center p-2",
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "w-[120%] h-[50vh] relative transition-transform duration-700 [transform-style:preserve-3d]",
+                onClick: ()=>setFlipped(!flipped),
+                style: {
+                    transform: flipped ? "rotateY(180deg)" : "rotateY(0)"
+                },
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "absolute w-full h-full bg-amarillo text-black shadow-lg rounded-lg p-2 flex items-center justify-center [backface-visibility:hidden] overflow-hidden",
+                        "aria-hidden": "true",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "absolute inset-0 bg-cover bg-center rounded-lg",
+                                style: {
+                                    backgroundImage: "url('/fondoamarillo.jpg')"
+                                },
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "absolute inset-0 bg-white opacity-15 rounded-lg"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/cards.jsx",
+                                    lineNumber: 209,
+                                    columnNumber: 25
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/cards.jsx",
+                                lineNumber: 205,
+                                columnNumber: 21
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                className: "text-lg font-bold text-center text-black z-20 px-1 break-words",
+                                children: card.front
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/cards.jsx",
+                                lineNumber: 211,
+                                columnNumber: 21
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/cards.jsx",
+                        lineNumber: 201,
+                        columnNumber: 17
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "absolute w-full h-full font-bold text-black shadow-lg rounded-lg p-2 flex items-center justify-center text-center [backface-visibility:hidden] [transform:rotateY(180deg)] overflow-hidden",
+                        "aria-hidden": "true",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "absolute inset-0 bg-cover bg-center rounded-lg",
+                                style: {
+                                    backgroundImage: "url('/fondonegro.jpg')"
+                                }
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/cards.jsx",
+                                lineNumber: 220,
+                                columnNumber: 21
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "relative z-10 text-center text-xs sm:text-sm px-1 break-words overflow-hidden",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ol", {
+                                    className: "list-decimal list-inside text-left text-white",
+                                    children: card.back.props.children
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/cards.jsx",
+                                    lineNumber: 225,
+                                    columnNumber: 25
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/cards.jsx",
+                                lineNumber: 224,
+                                columnNumber: 21
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/cards.jsx",
+                        lineNumber: 216,
+                        columnNumber: 17
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/components/cards.jsx",
+                lineNumber: 195,
+                columnNumber: 13
+            }, this),
+            index === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                src: "/analisis.png",
+                alt: "Image below Card 1",
+                className: "mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
+            }, void 0, false, {
+                fileName: "[project]/src/components/cards.jsx",
+                lineNumber: 233,
+                columnNumber: 17
+            }, this),
+            index === 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                src: "/agenteinmo.png",
+                alt: "Image below Card 2",
+                className: "mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
+            }, void 0, false, {
+                fileName: "[project]/src/components/cards.jsx",
+                lineNumber: 240,
+                columnNumber: 17
+            }, this),
+            index === 2 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                src: "/analisisdemercado.jpeg",
+                alt: "Image above Card 3",
+                className: "mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
+            }, void 0, false, {
+                fileName: "[project]/src/components/cards.jsx",
+                lineNumber: 247,
+                columnNumber: 17
+            }, this),
+            index === 3 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                src: "/agentesinmobiliarios.jpeg",
+                alt: "Image above Card 4",
+                className: "mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
+            }, void 0, false, {
+                fileName: "[project]/src/components/cards.jsx",
+                lineNumber: 254,
+                columnNumber: 17
+            }, this),
+            index === 4 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                src: "/formFoto.jpeg",
+                alt: "Image above Card 5",
+                className: "mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
+            }, void 0, false, {
+                fileName: "[project]/src/components/cards.jsx",
+                lineNumber: 261,
+                columnNumber: 17
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/src/components/cards.jsx",
+        lineNumber: 194,
+        columnNumber: 9
+    }, this);
+}
+_s1(MobileCard, "QYn2hzWSEiNCpFk01FECw92BS70=");
+_c1 = MobileCard;
+function Cards() {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$AnimatedScroll$2e$jsx__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "hidden lg:flex justify-center items-center w-full p-10 h-[100vh]",
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(DesktopCards, {}, void 0, false, {
+                    fileName: "[project]/src/components/cards.jsx",
+                    lineNumber: 279,
+                    columnNumber: 17
+                }, this)
+            }, void 0, false, {
+                fileName: "[project]/src/components/cards.jsx",
+                lineNumber: 275,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "lg:hidden flex justify-center items-center w-full p-10 min-h-screen",
+                style: {
+                    background: "linear-gradient(to top, transparent 0%, gray 50%, transparent 100%)"
+                },
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "grid grid-cols-2 gap-4 w-full max-w-xl",
+                    children: cardData.map((card, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(MobileCard, {
+                            card: card,
+                            index: index
+                        }, index, false, {
+                            fileName: "[project]/src/components/cards.jsx",
+                            lineNumber: 292,
+                            columnNumber: 25
+                        }, this))
+                }, void 0, false, {
+                    fileName: "[project]/src/components/cards.jsx",
+                    lineNumber: 290,
+                    columnNumber: 17
+                }, this)
+            }, void 0, false, {
+                fileName: "[project]/src/components/cards.jsx",
+                lineNumber: 283,
+                columnNumber: 13
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/src/components/cards.jsx",
+        lineNumber: 273,
+        columnNumber: 9
+    }, this);
+}
+_c2 = Cards;
+var _c, _c1, _c2;
+__turbopack_refresh__.register(_c, "DesktopCards");
+__turbopack_refresh__.register(_c1, "MobileCard");
+__turbopack_refresh__.register(_c2, "Cards");
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_refresh__.registerExports(module, globalThis.$RefreshHelpers$);
 }
@@ -3118,7 +3363,7 @@ function Home() {
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Fragment"], {
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "absolute top-0 left-0 mb-[-15%] w-full h-full z-0",
+                className: "absolute top-0 left-0 mb-[-15%] w-full mb:h-full h-[20vh] z-0",
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$video$2e$jsx__$5b$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                     fileName: "[project]/src/components/home.js",
                     lineNumber: 27,
@@ -3130,10 +3375,10 @@ function Home() {
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "relative z-10 flex flex-col mt-[60vh] p-0",
+                className: "relative z-10 flex flex-col mt-[70vh] p-0",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "w-full h-[100vh] z-0 flex justify-center items-center",
+                        className: "w-full md:h-[100vh] h-[50vh] md:mt-[-0.5%] mt-[80%] z-0 flex justify-center items-center",
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$cards$2e$jsx__$5b$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                             fileName: "[project]/src/components/home.js",
                             lineNumber: 31,

@@ -445,6 +445,164 @@ function ControlMenu() {
                             fileName: "[project]/src/components/header.jsx",
                             lineNumber: 172,
                             columnNumber: 11
+                        }, this),
+                        menuVisible && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
+                            className: "fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-20 lg:hidden",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
+                                className: "bg-white w-64 h-full shadow-lg flex flex-col p-4",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
+                                        className: "flex justify-between items-center",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                src: "/logo.png",
+                                                alt: "Logo",
+                                                width: 100,
+                                                height: 20
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/header.jsx",
+                                                lineNumber: 180,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("button", {
+                                                onClick: toggleMenu,
+                                                className: "text-black hover:text-gray-700",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$ai$2f$index$2e$mjs__$5b$ssr$5d$__$28$ecmascript$29$__["AiOutlineMenuFold"], {
+                                                    size: 30
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/header.jsx",
+                                                    lineNumber: 182,
+                                                    columnNumber: 17
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/header.jsx",
+                                                lineNumber: 181,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/header.jsx",
+                                        lineNumber: 179,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("nav", {
+                                        className: "mt-8 flex flex-col space-y-4 text-xl font-bold",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                href: "/",
+                                                className: "text-black hover:text-gray-700",
+                                                children: "Inicio"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/header.jsx",
+                                                lineNumber: 186,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
+                                                ref: venderRef,
+                                                className: "relative whitespace-nowrap",
+                                                onClick: ()=>setDropdownVisible(!isDropdownVisible),
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                        href: "/vender",
+                                                        className: "text-black hover:text-gray-700",
+                                                        children: "Vende tu propiedad"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/header.jsx",
+                                                        lineNumber: 194,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    isDropdownVisible && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
+                                                        className: "bg-black bg-opacity-50 rounded shadow-lg flex flex-col transition-all duration-300 ease-in-out text-xl font-bold",
+                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                            href: "/vender/comprar",
+                                                            className: "block px-4 py-2 text-white",
+                                                            children: "Compra tu propiedad"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/src/components/header.jsx",
+                                                            lineNumber: 199,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/header.jsx",
+                                                        lineNumber: 198,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/components/header.jsx",
+                                                lineNumber: 189,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                href: "/exp-realty",
+                                                className: "text-black hover:text-gray-700",
+                                                children: "eXp Realty"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/header.jsx",
+                                                lineNumber: 205,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                href: "/reformas",
+                                                className: "text-black hover:text-gray-700",
+                                                children: "Reformas"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/header.jsx",
+                                                lineNumber: 208,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                href: "/inversores",
+                                                className: "text-black hover:text-gray-700",
+                                                children: "Inversores"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/header.jsx",
+                                                lineNumber: 211,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                href: "/servicios",
+                                                className: "text-black hover:text-gray-700",
+                                                children: "Servicios"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/header.jsx",
+                                                lineNumber: 214,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                href: "/blog",
+                                                className: "text-black hover:text-gray-700",
+                                                children: "Blog"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/header.jsx",
+                                                lineNumber: 217,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                href: "/contacto",
+                                                className: "text-black hover:text-gray-700",
+                                                children: "Contacto"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/header.jsx",
+                                                lineNumber: 220,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/header.jsx",
+                                        lineNumber: 185,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/header.jsx",
+                                lineNumber: 178,
+                                columnNumber: 11
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/header.jsx",
+                            lineNumber: 177,
+                            columnNumber: 9
                         }, this)
                     ]
                 }, void 0, true, {
@@ -1884,103 +2042,101 @@ const Video = ()=>{
     (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useEffect"])(()=>{
         const videoElement = videoRef.current;
         if (videoElement) {
-            videoElement.loop = true; // Hace que el video se repita
+            videoElement.loop = true; // Esto asegura que el video se repita
             videoElement.load(); // Recarga el video
             videoElement.play(); // Reproduce el video automáticamente
         }
     }, [
         videoSrc
-    ]);
-    // Usamos el src directamente
-    const completeVideoSrc = videoSrc;
+    ]); // El video se controla automáticamente sin necesidad de cambiar el src
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$AnimatedScroll$2e$jsx__$5b$ssr$5d$__$28$ecmascript$29$__["default"], {
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-            className: "w-full h-[70vh] sm:h-[90vh] overflow-hidden relative",
+            className: "w-full h-[90vh] overflow-hidden min-h-[40vh] sm:min-h-[50vh] md:min-h-[70vh] lg:min-h-[85vh] xl:min-h-[90vh] 2xl:min-h-screen aspect-video relative ",
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("video", {
-                    className: "absolute top-0 left-0 w-full h-full object-cover",
+                    className: "absolute top-[-10%] left-0 w-full h-full object-cover ",
                     autoPlay: true,
                     muted: true,
                     playsInline: true,
                     ref: videoRef,
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("source", {
-                            src: completeVideoSrc,
+                            src: videoSrc,
                             type: "video/mp4"
                         }, void 0, false, {
                             fileName: "[project]/src/components/video.jsx",
-                            lineNumber: 33,
-                            columnNumber: 11
+                            lineNumber: 30,
+                            columnNumber: 17
                         }, this),
                         "Tu navegador no soporta el elemento de video."
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/video.jsx",
-                    lineNumber: 26,
-                    columnNumber: 9
+                    lineNumber: 23,
+                    columnNumber: 13
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
                     className: "absolute bottom-0 left-0 w-full flex justify-center items-center z-10",
                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-                        className: "relative w-full h-24 sm:h-32 flex items-center justify-center",
+                        className: "relative w-full h-40 sm:h-24 md:h-32 flex items-center justify-center",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
                                 className: "absolute w-full h-full bg-gradient-to-t",
                                 style: {
-                                    background: "linear-gradient(to top, transparent 10%, black 30%, black 70%, transparent 90%)"
+                                    background: "linear-gradient(to top, transparent 5%, black 20%, black 80%, transparent 95%)"
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/src/components/video.jsx",
-                                lineNumber: 41,
-                                columnNumber: 13
+                                lineNumber: 38,
+                                columnNumber: 21
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("span", {
-                                className: "relative text-transparent bg-clip-text bg-gradient-to-r from-white via-yellow-400 to-white px-2 text-xl sm:text-3xl md:text-6xl font-bold",
+                                className: "relative text-transparent bg-clip-text bg-gradient-to-r from-white via-yellow-400 to-white px-2 text-base sm:text-xl md:text-3xl lg:text-5xl xl:text-6xl font-bold",
                                 children: "Invierte en bienes inmuebles en Madrid"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/video.jsx",
-                                lineNumber: 49,
-                                columnNumber: 13
+                                lineNumber: 45,
+                                columnNumber: 21
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/video.jsx",
-                        lineNumber: 39,
-                        columnNumber: 11
+                        lineNumber: 36,
+                        columnNumber: 17
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/components/video.jsx",
-                    lineNumber: 38,
-                    columnNumber: 9
+                    lineNumber: 35,
+                    columnNumber: 13
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-                    className: "p-3 bg-white/40 rounded-full absolute top-[65%] sm:top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10",
+                    className: "p-3 bg-white/40 rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10",
                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__["default"], {
-                        className: "rounded-full border border-transparent transition-colors flex items-center justify-center bg-amarillo text-black gap-2 hover:bg-black hover:text-white text-xs sm:text-sm md:text-base h-8 sm:h-10 md:h-12 px-3 sm:px-4 md:px-5 font-bold",
+                        className: "rounded-full border border-transparent transition-colors flex items-center justify-center  bg-amarillo text-black gap-2 hover:bg-black hover:text-white text-xs sm:text-sm md:text-lg h-8 sm:h-10 md:h-12 px-4 sm:px-6 md:px-8 font-bold",
                         href: "https://valuation.lystos.com?clientId=cd55b10c-5ba6-4f65-854e-5c8adaf88a34",
                         target: "_blank",
                         rel: "noopener noreferrer",
                         children: "Valora el precio de tu propiedad"
                     }, void 0, false, {
                         fileName: "[project]/src/components/video.jsx",
-                        lineNumber: 57,
-                        columnNumber: 11
+                        lineNumber: 51,
+                        columnNumber: 9
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/components/video.jsx",
-                    lineNumber: 56,
-                    columnNumber: 9
+                    lineNumber: 50,
+                    columnNumber: 13
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/video.jsx",
-            lineNumber: 24,
-            columnNumber: 7
+            lineNumber: 21,
+            columnNumber: 9
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/components/video.jsx",
-        lineNumber: 23,
-        columnNumber: 5
+        lineNumber: 20,
+        columnNumber: 9
     }, this);
 };
 const __TURBOPACK__default__export__ = Video;
