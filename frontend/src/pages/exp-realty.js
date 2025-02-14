@@ -1,14 +1,11 @@
-import BlogPage from "@/components/blogPage";
+import ExpPage from "@/components/expPage";
 
 
-
-
-
-export default function ExpRealty() {
+export default function ExpRealtyPage() {
   return (
     <>
   
-      <BlogPage/>
+        <ExpPage />
     </>
   );
 }

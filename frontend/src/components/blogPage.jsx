@@ -53,33 +53,35 @@ export default function BlogPage() {
     }
 
     return (
-        <AnimatedOnScroll>
-        
-        <div className="relative min-h-screen py-8">
+
+        <>
+
             {/* Fondo absoluto con gradiente y opacidad 50 */}
-            <div className="absolute inset-0 z-0 opacity-10"
+            < div className="fixed inset-0 z-0 opacity-10"
                 style={{
                     background: `
-         repeating-linear-gradient(
-           40deg,
-           #000000,
-           #000000 5vh,
-           #ffffff 20vh,
-           #C7A336  30vh
-         )`
-                }}>
-            </div>
+                    repeating-linear-gradient(
+                        40deg,
+                        #000000,
+                        #000000 5vh,
+                        #ffffff 20vh,
+                        #C7A336  30vh
+                        )`, backgroundAttachment: "fixed"
+                }
+                }>
+            </div >
+            <div className="relative min-h-screen py-8">
+                <AnimatedOnScroll>
 
-
-            {/* Contenedor de contenido con posición relativa para que no herede la opacidad del fondo */}
-            <div className="relative container mx-auto px-4">
-                {/* Encabezado */}
-                <header className="mb-8 text-center">
-                    <div className="relative inline-block">
-                        {/* Fondo: este div se posiciona absolutamente y tiene la opacidad deseada */}
-                        <div className="absolute inset-0 opacity-30 rounded-lg"
-                            style={{
-                                background: `
+                    {/* Contenedor de contenido con posición relativa para que no herede la opacidad del fondo */}
+                    <div className="relative container mx-auto px-4">
+                        {/* Encabezado */}
+                        <header className="mb-8 text-center">
+                            <div className="relative inline-block">
+                                {/* Fondo: este div se posiciona absolutamente y tiene la opacidad deseada */}
+                                <div className="absolute inset-0 opacity-30 rounded-lg"
+                                    style={{
+                                        background: `
                  repeating-linear-gradient(
                    30deg,
                    #000000,
@@ -87,63 +89,64 @@ export default function BlogPage() {
                    #000000 15vh,
                    #C7A336  25vh
                  )`
-                            }}
-                        ></div>
+                                    }}
+                                ></div>
 
-                        {/* Texto: este elemento se posiciona relativo para estar sobre el fondo */}
-                        <h1 className="relative text-gray-700 inline-block text-lg font-bold px-4 py-2">
-                            Lee e infórmate con nuestros blogs
-                        </h1>
+                                {/* Texto: este elemento se posiciona relativo para estar sobre el fondo */}
+                                <h1 className="relative text-gray-700 inline-block text-lg font-bold px-4 py-2">
+                                    Lee e infórmate con nuestros blogs
+                                </h1>
 
-                    </div>
-
-                    <p className="text-4xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-yellow-900 ">
-                        Descubre nuestros artículos y últimas noticias.
-                    </p>
-
-
-                </header>
-
-                {/* Lista de blogs */}
-                {blogs && Array.isArray(blogs) && blogs.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {blogs.map((blog) => (
-                            <div
-                                key={blog._id}
-                                className="bg-white border border-black border-b-4 border-r-4 p-6 hover:bg-amarillo rounded-lg shadow-md hover:shadow-xl transition-shadow"
-                            >
-                                {/* Si el blog tiene imagen, la renderizamos */}
-                                {blog.image && blog.image.src && (
-                                    <div className="relative w-full overflow-hidden pb-[56.25%] mb-4">
-                                        <img
-                                            src={blog.image.src}
-                                            alt={blog.image.alt || "Imagen del blog"}
-                                            className="absolute inset-0 w-full h-full object-cover"
-                                        />
-                                    </div>
-                                )}
-                                <h2 className="text-2xl font-semibold mb-2">{blog.title}</h2>
-                                <p className="text-black mb-4">
-                                    {blog.description
-                                        ? blog.description.slice(0, 100) + "..."
-                                        : ""}
-                                </p>
-                                <Link href={`/blog/${blog._id}`}>
-                                    <span className="text-black hover:bg-gray-800 hover:rounded-xl hover:p-2 hover:text-white font-bold">
-                                        Leer más &rarr;
-                                    </span>
-                                </Link>
                             </div>
-                        ))}
-                    </div>
-                ) : (
-                    <p className="text-center text-gray-500">No hay blogs disponibles.</p>
-                )}
 
-                {/* Contenido del blog seleccionado */}
-               
+                            <p className="text-4xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-yellow-900 ">
+                                Descubre nuestros artículos y últimas noticias.
+                            </p>
+
+
+                        </header>
+
+                        {/* Lista de blogs */}
+                        {blogs && Array.isArray(blogs) && blogs.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {blogs.map((blog) => (
+                                    <div
+                                        key={blog._id}
+                                        className="bg-white border border-black border-b-4 border-r-4 p-6 hover:bg-amarillo rounded-lg shadow-md hover:shadow-xl transition-shadow"
+                                    >
+                                        {/* Si el blog tiene imagen, la renderizamos */}
+                                        {blog.image && blog.image.src && (
+                                            <div className="relative w-full overflow-hidden pb-[56.25%] mb-4">
+                                                <img
+                                                    src={blog.image.src}
+                                                    alt={blog.image.alt || "Imagen del blog"}
+                                                    className="absolute inset-0 w-full h-full object-cover"
+                                                />
+                                            </div>
+                                        )}
+                                        <h2 className="text-2xl font-semibold mb-2">{blog.title}</h2>
+                                        <p className="text-black mb-4">
+                                            {blog.description
+                                                ? blog.description.slice(0, 100) + "..."
+                                                : ""}
+                                        </p>
+                                        <Link href={`/blog/${blog._id}`}>
+                                            <span className="text-black hover:bg-gray-800 hover:rounded-xl hover:p-2 hover:text-white font-bold">
+                                                Leer más &rarr;
+                                            </span>
+                                        </Link>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-center text-gray-500">No hay blogs disponibles.</p>
+                        )}
+
+                        {/* Contenido del blog seleccionado */}
+
+                    </div>
+                </AnimatedOnScroll >
             </div>
-        </div>
-        </AnimatedOnScroll>
+        </>
     );
 }

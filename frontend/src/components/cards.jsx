@@ -97,7 +97,7 @@ function DesktopCards() {
 
     return (
         <AnimatedOnScroll>
-            <div className="flex justify-center items-center w-full p-10 h-[100vh]"
+            <div className="fixed flex justify-center items-center w-full p-10 h-[100vh]"
                 style={{
                     background: "linear-gradient(to top, transparent 0%, gray 50%, transparent 100%)"
                 }}>
@@ -269,113 +269,108 @@ function MobileCard({ card, index }) {
     );
 }
 
-function TabletCards() {
-    return (
-        <div
-            className="flex justify-center items-center w-full p-5 h-[100vh]"
-            style={{
-                background:
-                    "linear-gradient(to top, transparent 0%, gray 50%, transparent 100%)",
-            }}
-        >
-            {/* Grid de 3 columnas para tablets */}
-            <div className="grid grid-cols-3 gap-4 w-full max-w-3xl">
-                {cardData.map((card, index) => (
-                    <div key={index} className="flex flex-col items-center p-2">
-                        <div
-                            className="relative w-[30vh] h-[55vh] overflow-hidden transition-transform duration-700 cursor-pointer"
-                            // Puedes agregar flip on click si lo deseas; para este ejemplo, lo dejamos sin flip.
-                            onClick={() => { }}
-                        >
-                            <div
-                                className="absolute w-full h-full bg-amarillo text-black shadow-lg rounded-lg p-2 flex items-center justify-center overflow-hidden"
-                                aria-hidden="true"
-                                style={{ backfaceVisibility: "hidden" }}
-                            >
-                                <div
-                                    className="absolute inset-0 bg-cover bg-center rounded-lg"
-                                    style={{ backgroundImage: "url('/fondoamarillo.jpg')" }}
-                                >
-                                    <div className="absolute inset-0 bg-white opacity-15 rounded-lg"></div>
-                                </div>
-                                <h2 className="text-xl sm:text-2xl font-bold text-center text-black z-20 px-2 break-words">
-                                    {card.front}
-                                </h2>
-                            </div>
-                            <div
-                                className="absolute w-full h-full font-bold text-black shadow-lg rounded-lg p-2 flex items-center justify-center text-center overflow-hidden"
-                                aria-hidden="true"
-                                style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
-                            >
-                                <div
-                                    className="absolute inset-0 bg-cover bg-center rounded-lg"
-                                    style={{ backgroundImage: "url('/fondonegro.jpg')" }}
-                                ></div>
-                                <div className="relative z-10 text-center text-base sm:text-lg px-2 break-words overflow-hidden">
-                                    <ol className="list-decimal list-inside text-left text-white">
-                                        {card.back.props.children}
-                                    </ol>
-                                </div>
-                            </div>
-                        </div>
-                        {/* Imagen debajo */}
-                        {index === 0 && (
-                            <img
-                                src="/analisis.png"
-                                alt="Image for Card 1"
-                                className="mt-4 rounded-full h-[20vh] w-[20vh] object-cover"
-                            />
-                        )}
-                        {index === 1 && (
-                            <img
-                                src="/agenteinmo.png"
-                                alt="Image for Card 2"
-                                className="mt-4 rounded-full h-[20vh] w-[20vh] object-cover"
-                            />
-                        )}
-                        {index === 2 && (
-                            <img
-                                src="/analisisdemercado.jpeg"
-                                alt="Image for Card 3"
-                                className="mt-4 rounded-full h-[20vh] w-[20vh] object-cover"
-                            />
-                        )}
-                        {index === 3 && (
-                            <img
-                                src="/agentesinmobiliarios.jpeg"
-                                alt="Image for Card 4"
-                                className="mt-4 rounded-full h-[20vh] w-[20vh] object-cover"
-                            />
-                        )}
-                        {index === 4 && (
-                            <img
-                                src="/formFoto.jpeg"
-                                alt="Image for Card 5"
-                                className="mt-4 rounded-full h-[20vh] w-[20vh] object-cover"
-                            />
-                        )}
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
-}
 
+function TabletCard({ card, index }) {
+    const [flipped, setFlipped] = useState(false);
+
+    return (
+        <div className="flex flex-col items-center p-2">
+            <div
+                className="w-[30vw] h-[55vh] relative transition-transform duration-700 [transform-style:preserve-3d]"
+                onClick={() => setFlipped(!flipped)}
+                style={{ transform: flipped ? "rotateY(180deg)" : "rotateY(0)" }}
+            >
+                {/* Cara frontal */}
+                <div
+                    className="absolute w-full h-full bg-amarillo text-black shadow-lg rounded-lg p-2 flex items-center justify-center [backface-visibility:hidden] overflow-hidden"
+                    aria-hidden="true"
+                >
+                    <div
+                        className="absolute inset-0 bg-cover bg-center rounded-lg"
+                        style={{ backgroundImage: "url('/fondoamarillo.jpg')" }}
+                    >
+                        <div className="absolute inset-0 bg-white opacity-15 rounded-lg"></div>
+                    </div>
+                    <h2 className="text-lg font-bold text-center text-black z-20 px-1 break-words">
+                        {card.front}
+                    </h2>
+                </div>
+                {/* Cara trasera */}
+                <div
+                    className="absolute w-full h-full font-bold text-black shadow-lg rounded-lg p-2 flex items-center justify-center text-center [backface-visibility:hidden] [transform:rotateY(180deg)] overflow-hidden"
+                    aria-hidden="true"
+                >
+                    <div
+                        className="absolute inset-0 bg-cover bg-center rounded-lg"
+                        style={{ backgroundImage: "url('/fondonegro.jpg')" }}
+                    ></div>
+                    <div className="relative z-10 text-center whitespace-normal break-words overflow-hidden text-xs sm:text-sm md:text-base lg:text-lg">
+                        <ol className="list-decimal list-inside text-left text-white">
+                            {card.back.props.children}
+                        </ol>
+                    </div>
+
+                </div>
+            </div>
+            {/* Imágenes debajo de la tarjeta según el índice */}
+            {index === 0 && (
+                <img
+                    src="/analisis.png"
+                    alt="Image for Card 1"
+                    className="mt-4 rounded-full h-[20vh] w-[20vh] object-cover"
+                />
+            )}
+            {index === 1 && (
+                <img
+                    src="/agenteinmo.png"
+                    alt="Image for Card 2"
+                    className="mt-4 rounded-full h-[20vh] w-[20vh] object-cover"
+                />
+            )}
+            {index === 2 && (
+                <img
+                    src="/analisisdemercado.jpeg"
+                    alt="Image for Card 3"
+                    className="mt-4 rounded-full h-[20vh] w-[20vh] object-cover"
+                />
+            )}
+            {index === 3 && (
+                <img
+                    src="/agentesinmobiliarios.jpeg"
+                    alt="Image for Card 4"
+                    className="mt-4 rounded-full h-[20vh] w-[20vh] object-cover"
+                />
+            )}
+            {index === 4 && (
+                <img
+                    src="/formFoto.jpeg"
+                    alt="Image for Card 5"
+                    className="mt-4 rounded-full h-[20vh] w-[20vh] object-cover"
+                />
+            )}
+        </div>
+    )
+}
 
 export default function Cards() {
     return (
         <AnimatedOnScroll>
             {/* Desktop Version (XL screens) */}
-            <div className="hidden xl:flex justify-center items-center w-full p-10 h-[100vh]">
+            {/* Desktop Version (visible en lg: 1024px a xl: 1280px) */}
+            <div className="hidden lg:flex xl:hidden justify-center items-center w-full p-10 h-[100vh]">
                 <DesktopCards />
             </div>
 
-            {/* Tablet Version (MD to XL: 768px to 1280px) */}
-            <div className="hidden md:flex xl:hidden justify-center items-center w-full p-5 min-h-screen">
-                <TabletCards />
+            {/* Tablet Version (visible en md: 768px a lg: 1024px) */}
+            <div className="hidden md:flex lg:hidden justify-center items-center w-full p-5 min-h-screen">
+                <div className="grid grid-cols-3 gap-4 w-full max-w-3xl">
+                    {cardData.map((card, index) => (
+                        <TabletCard key={index} card={card} index={index} />
+                    ))}
+                </div>
             </div>
 
-            {/* Mobile Version (<768px) */}
+            {/* Mobile Version (visible para pantallas <768px) */}
             <div className="md:hidden flex justify-center items-center w-full p-5 min-h-screen">
                 <div className="grid grid-cols-2 gap-4 w-full max-w-xl">
                     {cardData.map((card, index) => (
@@ -383,6 +378,7 @@ export default function Cards() {
                     ))}
                 </div>
             </div>
+
         </AnimatedOnScroll>
     );
 }

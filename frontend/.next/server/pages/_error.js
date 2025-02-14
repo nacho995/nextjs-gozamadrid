@@ -1,12 +1,12 @@
 const CHUNK_PUBLIC_PATH = "server/pages/_error.js";
 const runtime = require("../chunks/ssr/[turbopack]_runtime.js");
-runtime.loadChunk("server/chunks/ssr/node_modules_next_d4d182._.js");
+runtime.loadChunk("server/chunks/ssr/node_modules_next_e2aace._.js");
 runtime.loadChunk("server/chunks/ssr/node_modules_react-icons_ai_index_mjs_4adee0._.js");
 runtime.loadChunk("server/chunks/ssr/node_modules_react-icons_fa_index_mjs_275a22._.js");
 runtime.loadChunk("server/chunks/ssr/node_modules_react-icons_bi_index_mjs_1be2b1._.js");
 runtime.loadChunk("server/chunks/ssr/node_modules_react-icons_fa6_index_mjs_d4f54d._.js");
 runtime.loadChunk("server/chunks/ssr/node_modules_react-icons_lib_6322da._.js");
 runtime.loadChunk("server/chunks/ssr/node_modules_@swc_helpers_cjs_ac5ba3._.js");
-runtime.loadChunk("server/chunks/ssr/[root of the server]__ace969._.js");
+runtime.loadChunk("server/chunks/ssr/[root of the server]__38ca67._.js");
 runtime.loadChunk("server/chunks/ssr/src_globals_b99327.css");
 module.exports = runtime.getOrInstantiateRuntimeModule("[project]/node_modules/next/dist/esm/build/templates/pages.js { INNER_PAGE => \"[project]/node_modules/next/error.js [ssr] (ecmascript)\", INNER_DOCUMENT => \"[project]/node_modules/next/document.js [ssr] (ecmascript)\", INNER_APP => \"[project]/src/pages/_app.js [ssr] (ecmascript)\" } [ssr] (ecmascript)", CHUNK_PUBLIC_PATH).exports;

@@ -759,40 +759,42 @@ function BlogPage() {
             columnNumber: 16
         }, this);
     }
-    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$AnimatedScroll$2e$jsx__$5b$client$5d$__$28$ecmascript$29$__["default"], {
-        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "relative min-h-screen py-8",
-            children: [
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "absolute inset-0 z-0 opacity-10",
-                    style: {
-                        background: `
-         repeating-linear-gradient(
-           40deg,
-           #000000,
-           #000000 5vh,
-           #ffffff 20vh,
-           #C7A336  30vh
-         )`
-                    }
-                }, void 0, false, {
-                    fileName: "[project]/src/components/blogPage.jsx",
-                    lineNumber: 60,
-                    columnNumber: 13
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "relative container mx-auto px-4",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("header", {
-                            className: "mb-8 text-center",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "relative inline-block",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "absolute inset-0 opacity-30 rounded-lg",
-                                            style: {
-                                                background: `
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Fragment"], {
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "fixed inset-0 z-0 opacity-10",
+                style: {
+                    background: `
+                    repeating-linear-gradient(
+                        40deg,
+                        #000000,
+                        #000000 5vh,
+                        #ffffff 20vh,
+                        #C7A336  30vh
+                        )`,
+                    backgroundAttachment: "fixed"
+                }
+            }, void 0, false, {
+                fileName: "[project]/src/components/blogPage.jsx",
+                lineNumber: 60,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "relative min-h-screen py-8",
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$AnimatedScroll$2e$jsx__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "relative container mx-auto px-4",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("header", {
+                                className: "mb-8 text-center",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "relative inline-block",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "absolute inset-0 opacity-30 rounded-lg",
+                                                style: {
+                                                    background: `
                  repeating-linear-gradient(
                    30deg,
                    #000000,
@@ -800,127 +802,128 @@ function BlogPage() {
                    #000000 15vh,
                    #C7A336  25vh
                  )`
-                                            }
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/blogPage.jsx",
-                                            lineNumber: 80,
-                                            columnNumber: 25
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
-                                            className: "relative text-gray-700 inline-block text-lg font-bold px-4 py-2",
-                                            children: "Lee e infórmate con nuestros blogs"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/blogPage.jsx",
-                                            lineNumber: 94,
-                                            columnNumber: 25
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/components/blogPage.jsx",
-                                    lineNumber: 78,
-                                    columnNumber: 21
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                    className: "text-4xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-yellow-900 ",
-                                    children: "Descubre nuestros artículos y últimas noticias."
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/blogPage.jsx",
-                                    lineNumber: 100,
-                                    columnNumber: 21
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/src/components/blogPage.jsx",
-                            lineNumber: 77,
-                            columnNumber: 17
-                        }, this),
-                        blogs && Array.isArray(blogs) && blogs.length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
-                            children: blogs.map((blog)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "bg-white border border-black border-b-4 border-r-4 p-6 hover:bg-amarillo rounded-lg shadow-md hover:shadow-xl transition-shadow",
-                                    children: [
-                                        blog.image && blog.image.src && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "relative w-full overflow-hidden pb-[56.25%] mb-4",
-                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
-                                                src: blog.image.src,
-                                                alt: blog.image.alt || "Imagen del blog",
-                                                className: "absolute inset-0 w-full h-full object-cover"
+                                                }
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/blogPage.jsx",
-                                                lineNumber: 118,
+                                                lineNumber: 82,
+                                                columnNumber: 33
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
+                                                className: "relative text-gray-700 inline-block text-lg font-bold px-4 py-2",
+                                                children: "Lee e infórmate con nuestros blogs"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/blogPage.jsx",
+                                                lineNumber: 96,
+                                                columnNumber: 33
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/blogPage.jsx",
+                                        lineNumber: 80,
+                                        columnNumber: 29
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        className: "text-4xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-yellow-900 ",
+                                        children: "Descubre nuestros artículos y últimas noticias."
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/blogPage.jsx",
+                                        lineNumber: 102,
+                                        columnNumber: 29
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/blogPage.jsx",
+                                lineNumber: 79,
+                                columnNumber: 25
+                            }, this),
+                            blogs && Array.isArray(blogs) && blogs.length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
+                                children: blogs.map((blog)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "bg-white border border-black border-b-4 border-r-4 p-6 hover:bg-amarillo rounded-lg shadow-md hover:shadow-xl transition-shadow",
+                                        children: [
+                                            blog.image && blog.image.src && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "relative w-full overflow-hidden pb-[56.25%] mb-4",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                                    src: blog.image.src,
+                                                    alt: blog.image.alt || "Imagen del blog",
+                                                    className: "absolute inset-0 w-full h-full object-cover"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/blogPage.jsx",
+                                                    lineNumber: 120,
+                                                    columnNumber: 49
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/blogPage.jsx",
+                                                lineNumber: 119,
+                                                columnNumber: 45
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                                className: "text-2xl font-semibold mb-2",
+                                                children: blog.title
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/blogPage.jsx",
+                                                lineNumber: 127,
+                                                columnNumber: 41
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "text-black mb-4",
+                                                children: blog.description ? blog.description.slice(0, 100) + "..." : ""
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/blogPage.jsx",
+                                                lineNumber: 128,
+                                                columnNumber: 41
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                                                href: `/blog/${blog._id}`,
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "text-black hover:bg-gray-800 hover:rounded-xl hover:p-2 hover:text-white font-bold",
+                                                    children: "Leer más →"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/blogPage.jsx",
+                                                    lineNumber: 134,
+                                                    columnNumber: 45
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/blogPage.jsx",
+                                                lineNumber: 133,
                                                 columnNumber: 41
                                             }, this)
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/blogPage.jsx",
-                                            lineNumber: 117,
-                                            columnNumber: 37
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                            className: "text-2xl font-semibold mb-2",
-                                            children: blog.title
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/blogPage.jsx",
-                                            lineNumber: 125,
-                                            columnNumber: 33
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            className: "text-black mb-4",
-                                            children: blog.description ? blog.description.slice(0, 100) + "..." : ""
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/blogPage.jsx",
-                                            lineNumber: 126,
-                                            columnNumber: 33
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
-                                            href: `/blog/${blog._id}`,
-                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                className: "text-black hover:bg-gray-800 hover:rounded-xl hover:p-2 hover:text-white font-bold",
-                                                children: "Leer más →"
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/blogPage.jsx",
-                                                lineNumber: 132,
-                                                columnNumber: 37
-                                            }, this)
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/blogPage.jsx",
-                                            lineNumber: 131,
-                                            columnNumber: 33
-                                        }, this)
-                                    ]
-                                }, blog._id, true, {
-                                    fileName: "[project]/src/components/blogPage.jsx",
-                                    lineNumber: 111,
-                                    columnNumber: 29
-                                }, this))
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/blogPage.jsx",
-                            lineNumber: 109,
-                            columnNumber: 21
-                        }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                            className: "text-center text-gray-500",
-                            children: "No hay blogs disponibles."
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/blogPage.jsx",
-                            lineNumber: 140,
-                            columnNumber: 21
-                        }, this)
-                    ]
-                }, void 0, true, {
+                                        ]
+                                    }, blog._id, true, {
+                                        fileName: "[project]/src/components/blogPage.jsx",
+                                        lineNumber: 113,
+                                        columnNumber: 37
+                                    }, this))
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/blogPage.jsx",
+                                lineNumber: 111,
+                                columnNumber: 29
+                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                className: "text-center text-gray-500",
+                                children: "No hay blogs disponibles."
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/blogPage.jsx",
+                                lineNumber: 142,
+                                columnNumber: 29
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/blogPage.jsx",
+                        lineNumber: 77,
+                        columnNumber: 21
+                    }, this)
+                }, void 0, false, {
                     fileName: "[project]/src/components/blogPage.jsx",
-                    lineNumber: 75,
-                    columnNumber: 13
+                    lineNumber: 74,
+                    columnNumber: 17
                 }, this)
-            ]
-        }, void 0, true, {
-            fileName: "[project]/src/components/blogPage.jsx",
-            lineNumber: 58,
-            columnNumber: 9
-        }, this)
-    }, void 0, false, {
-        fileName: "[project]/src/components/blogPage.jsx",
-        lineNumber: 56,
-        columnNumber: 9
-    }, this);
+            }, void 0, false, {
+                fileName: "[project]/src/components/blogPage.jsx",
+                lineNumber: 73,
+                columnNumber: 13
+            }, this)
+        ]
+    }, void 0, true);
 }
 _s(BlogPage, "piV+wz2yebxk/W8McpF3PdvUo9s=");
 _c = BlogPage;
