@@ -14,7 +14,7 @@ export default {
       },
       colors: {
         customColors: "#73FAFA",
-        greenYellow: "#B1F553",
+        bluecolor: "#000752",
         amarillo: "#C7A336",
         background: "var(--background)",
         foreground: "var(--foreground)",
