@@ -142,7 +142,7 @@ export default function ExpRealty({ videoId, title }) {
 
             </AnimatedOnScroll >
             <AnimatedOnScroll>
-                <div className="mx-0 text-transparent bg-clip-text pb-10">
+                <div className="mx-0 text-transparent bg-clip-text ">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-0 mt-0 min-h-[40vh] md:min-h-[60vh]">
                         <div className="relative w-full h-auto min-h-[35vh]">
                             <iframe
@@ -181,6 +181,7 @@ export default function ExpRealty({ videoId, title }) {
                     </div>
                 </div>
             </AnimatedOnScroll>
+            
         </>
     );
 }

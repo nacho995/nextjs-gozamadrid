@@ -6,9 +6,9 @@ import ExpCountries from "./expCountries";
 
 export default function ExpPage() {
     return (
-        <>
-        <ExpRealty videoId="UHx6yIrI5UY" title="Exp Realty"/>
-        <ExpCountries />
-        </>
+        <div className="m-0 p-0">
+            <ExpRealty videoId="UHx6yIrI5UY" title="Exp Realty" />
+            <ExpCountries />
+        </div>
     );
-    }
+}
