@@ -997,246 +997,302 @@ function ExpCountries() {
             className: "grid grid-cols-2 md:grid-cols-4 w-full overflow-hidden",
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "relative  transform transition duration-300 hover:scale-105",
+                    className: "relative rounded-s transform transition h-[40vh] duration-700 z-10 hover:scale-105 hover:z-50",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
                             src: "/spain.jpg",
                             alt: "Spain",
-                            className: "w-full h-full rounded-lg object-cover"
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/expCountries.jsx",
-                            lineNumber: 12,
-                            columnNumber: 21
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                            className: "absolute inset-0 flex items-center justify-center text-2xl font-bold text-gray-950 italic",
-                            style: {
-                                textShadow: "2px 2px 3px rgba(65,105,225,0.7)"
-                            },
-                            children: "Spain"
+                            className: "w-full h-full rounded-s object-cover"
                         }, void 0, false, {
                             fileName: "[project]/src/components/expCountries.jsx",
                             lineNumber: 13,
                             columnNumber: 21
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "absolute inset-0 bg-black/50 rounded-s"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/expCountries.jsx",
+                            lineNumber: 19,
+                            columnNumber: 21
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                            className: "absolute inset-0 flex items-center justify-center text-2xl font-bold text-white ",
+                            style: {
+                                textShadow: "2px 2px 3px rgba(65,105,225,0.7)"
+                            },
+                            children: "Andalucía"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/expCountries.jsx",
+                            lineNumber: 20,
+                            columnNumber: 21
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/expCountries.jsx",
-                    lineNumber: 11,
+                    lineNumber: 12,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "relative transform transition duration-300 hover:scale-105",
+                    className: "relative rounded-s transform transition duration-700 z-10 hover:scale-105 hover:z-50",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                            src: "/madrid.jpg",
+                            alt: "Spain",
+                            className: "w-full h-full rounded-s object-cover"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/expCountries.jsx",
+                            lineNumber: 29,
+                            columnNumber: 21
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "absolute inset-0 bg-black/50 rounded-s"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/expCountries.jsx",
+                            lineNumber: 34,
+                            columnNumber: 21
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                            className: "absolute inset-0 flex items-center justify-center text-2xl font-bold text-white italic",
+                            style: {
+                                textShadow: "2px 2px 3px rgba(65,105,225,0.7)"
+                            },
+                            children: "Madrid"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/expCountries.jsx",
+                            lineNumber: 35,
+                            columnNumber: 21
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/src/components/expCountries.jsx",
+                    lineNumber: 28,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "relative rounded-s transform transition duration-700 z-10 hover:scale-105 hover:z-50 h-[40vh]",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                            src: "/cataluña.jpg",
+                            alt: "Spain",
+                            className: "w-full h-full rounded-s object-cover"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/expCountries.jsx",
+                            lineNumber: 44,
+                            columnNumber: 21
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "absolute inset-0 bg-black/50 rounded-s"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/expCountries.jsx",
+                            lineNumber: 49,
+                            columnNumber: 21
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                            className: "absolute inset-0 flex items-center justify-center text-2xl font-bold text-white italic",
+                            style: {
+                                textShadow: "2px 2px 3px rgba(65,105,225,0.7)"
+                            },
+                            children: "Cataluña"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/expCountries.jsx",
+                            lineNumber: 50,
+                            columnNumber: 21
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/src/components/expCountries.jsx",
+                    lineNumber: 43,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "relative rounded-s transform transition duration-700 z-10 hover:scale-105 hover:z-50",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                            src: "/valencia.jpg",
+                            alt: "Spain",
+                            className: "w-full h-full rounded-s object-cover"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/expCountries.jsx",
+                            lineNumber: 59,
+                            columnNumber: 21
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "absolute inset-0 bg-black/50 rounded-s"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/expCountries.jsx",
+                            lineNumber: 64,
+                            columnNumber: 21
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                            className: "absolute inset-0 flex items-center justify-center text-2xl font-bold text-white italic",
+                            style: {
+                                textShadow: "2px 2px 3px rgba(65,105,225,0.7)"
+                            },
+                            children: "Valencia"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/expCountries.jsx",
+                            lineNumber: 65,
+                            columnNumber: 21
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/src/components/expCountries.jsx",
+                    lineNumber: 58,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "relative rounded-s transform transition duration-700 z-10 h-[40vh] hover:scale-105 hover:z-50",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                            src: "/mexico.jpg",
+                            alt: "Spain",
+                            className: "w-full h-full rounded-s object-cover"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/expCountries.jsx",
+                            lineNumber: 74,
+                            columnNumber: 21
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "absolute inset-0 bg-black/50 rounded-s"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/expCountries.jsx",
+                            lineNumber: 79,
+                            columnNumber: 21
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                            className: "absolute inset-0 flex items-center justify-center text-2xl font-bold text-white italic",
+                            style: {
+                                textShadow: "2px 2px 3px rgba(65,105,225,0.7)"
+                            },
+                            children: "México"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/expCountries.jsx",
+                            lineNumber: 80,
+                            columnNumber: 21
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/src/components/expCountries.jsx",
+                    lineNumber: 73,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "relative rounded-s transform transition duration-700 z-10 hover:scale-105 hover:z-50",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
                             src: "/spain.jpg",
                             alt: "Spain",
-                            className: " rounded-lg w-full h-full object-cover"
+                            className: "w-full h-full rounded-s object-cover"
                         }, void 0, false, {
                             fileName: "[project]/src/components/expCountries.jsx",
-                            lineNumber: 22,
+                            lineNumber: 89,
+                            columnNumber: 21
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "absolute inset-0 bg-black/50 rounded-s"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/expCountries.jsx",
+                            lineNumber: 94,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                            className: "absolute inset-0 flex items-center justify-center text-2xl font-bold text-gray-950 italic",
+                            className: "absolute inset-0 flex items-center justify-center text-2xl font-bold text-white italic",
                             style: {
                                 textShadow: "2px 2px 3px rgba(65,105,225,0.7)"
                             },
                             children: "Spain"
                         }, void 0, false, {
                             fileName: "[project]/src/components/expCountries.jsx",
-                            lineNumber: 23,
+                            lineNumber: 95,
                             columnNumber: 21
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/expCountries.jsx",
-                    lineNumber: 21,
+                    lineNumber: 88,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "relative rounded-lg transform transition duration-300 hover:scale-105",
+                    className: "relative rounded-s h-[40vh] transform transition duration-700 z-10 hover:scale-105 hover:z-50",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
                             src: "/spain.jpg",
                             alt: "Spain",
-                            className: " rounded-lg w-full h-full object-cover"
+                            className: "w-full h-full rounded-s object-cover"
                         }, void 0, false, {
                             fileName: "[project]/src/components/expCountries.jsx",
-                            lineNumber: 32,
+                            lineNumber: 104,
+                            columnNumber: 21
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "absolute inset-0 bg-black/50 rounded-s"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/expCountries.jsx",
+                            lineNumber: 109,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                            className: "absolute inset-0 flex items-center justify-center text-2xl font-bold text-gray-950 italic",
+                            className: "absolute inset-0 flex items-center justify-center text-2xl font-bold text-white italic",
                             style: {
                                 textShadow: "2px 2px 3px rgba(65,105,225,0.7)"
                             },
                             children: "Spain"
                         }, void 0, false, {
                             fileName: "[project]/src/components/expCountries.jsx",
-                            lineNumber: 33,
+                            lineNumber: 110,
                             columnNumber: 21
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/expCountries.jsx",
-                    lineNumber: 31,
+                    lineNumber: 103,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "relative rounded-lg transform transition duration-300 hover:scale-105",
+                    className: "relative rounded-s transform transition duration-700 z-10 hover:scale-105 hover:z-50",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
                             src: "/spain.jpg",
                             alt: "Spain",
-                            className: " rounded-lg w-full h-full object-cover"
+                            className: "w-full h-full rounded-s object-cover"
                         }, void 0, false, {
                             fileName: "[project]/src/components/expCountries.jsx",
-                            lineNumber: 42,
+                            lineNumber: 119,
+                            columnNumber: 21
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "absolute inset-0 bg-black/50 rounded-s"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/expCountries.jsx",
+                            lineNumber: 124,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                            className: "absolute inset-0 flex items-center justify-center text-2xl font-bold text-gray-950 italic",
+                            className: "absolute inset-0 flex items-center justify-center text-2xl font-bold text-white italic",
                             style: {
                                 textShadow: "2px 2px 3px rgba(65,105,225,0.7)"
                             },
                             children: "Spain"
                         }, void 0, false, {
                             fileName: "[project]/src/components/expCountries.jsx",
-                            lineNumber: 43,
+                            lineNumber: 125,
                             columnNumber: 21
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/expCountries.jsx",
-                    lineNumber: 41,
-                    columnNumber: 17
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "relative rounded-lg transform transition duration-300 hover:scale-105",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
-                            src: "/spain.jpg",
-                            alt: "Spain",
-                            className: " rounded-lg w-full h-full object-cover"
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/expCountries.jsx",
-                            lineNumber: 52,
-                            columnNumber: 21
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                            className: "absolute inset-0 flex items-center justify-center text-2xl font-bold text-gray-950 italic",
-                            style: {
-                                textShadow: "2px 2px 3px rgba(65,105,225,0.7)"
-                            },
-                            children: "Spain"
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/expCountries.jsx",
-                            lineNumber: 53,
-                            columnNumber: 21
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/src/components/expCountries.jsx",
-                    lineNumber: 51,
-                    columnNumber: 17
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "relative rounded-lg transform transition duration-300 hover:scale-105",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
-                            src: "/spain.jpg",
-                            alt: "Spain",
-                            className: " rounded-lg w-full h-full object-cover"
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/expCountries.jsx",
-                            lineNumber: 62,
-                            columnNumber: 21
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                            className: "absolute inset-0 flex items-center justify-center text-2xl font-bold text-gray-950 italic",
-                            style: {
-                                textShadow: "2px 2px 3px rgba(65,105,225,0.7)"
-                            },
-                            children: "Spain"
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/expCountries.jsx",
-                            lineNumber: 63,
-                            columnNumber: 21
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/src/components/expCountries.jsx",
-                    lineNumber: 61,
-                    columnNumber: 17
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "relative rounded-lg transform transition duration-300 hover:scale-105",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
-                            src: "/spain.jpg",
-                            alt: "Spain",
-                            className: " rounded-lg w-full h-full object-cover"
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/expCountries.jsx",
-                            lineNumber: 72,
-                            columnNumber: 21
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                            className: "absolute inset-0 flex items-center justify-center text-2xl font-bold text-gray-950 italic",
-                            style: {
-                                textShadow: "2px 2px 3px rgba(65,105,225,0.7)"
-                            },
-                            children: "Spain"
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/expCountries.jsx",
-                            lineNumber: 73,
-                            columnNumber: 21
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/src/components/expCountries.jsx",
-                    lineNumber: 71,
-                    columnNumber: 17
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "relative rounded-lg transform transition duration-300 hover:scale-105",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
-                            src: "/spain.jpg",
-                            alt: "Spain",
-                            className: " rounded-lg w-full h-full object-cover"
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/expCountries.jsx",
-                            lineNumber: 82,
-                            columnNumber: 21
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                            className: "absolute inset-0 flex items-center justify-center text-2xl font-bold text-gray-950 italic",
-                            style: {
-                                textShadow: "2px 2px 3px rgba(65,105,225,0.7)"
-                            },
-                            children: "Spain"
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/expCountries.jsx",
-                            lineNumber: 83,
-                            columnNumber: 21
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/src/components/expCountries.jsx",
-                    lineNumber: 81,
+                    lineNumber: 118,
                     columnNumber: 17
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/expCountries.jsx",
-            lineNumber: 9,
+            lineNumber: 10,
             columnNumber: 13
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/components/expCountries.jsx",
-        lineNumber: 8,
+        lineNumber: 9,
         columnNumber: 9
     }, this);
 }

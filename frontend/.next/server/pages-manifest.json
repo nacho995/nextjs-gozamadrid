@@ -1,5 +1,7 @@
 {
   "/_app": "pages/_app.js",
   "/_document": "pages/_document.js",
-  "/exp-realty": "pages/exp-realty.js"
+  "/exp-realty": "pages/exp-realty.js",
+  "/blog": "pages/blog.js",
+  "/contacto": "pages/contacto.js"
 }
