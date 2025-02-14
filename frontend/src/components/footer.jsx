@@ -29,12 +29,12 @@ export default function Footer3(props) {
   }
 
 return (
-    <footer id="relume" className="px-[5%] py-12 md:py-18 lg:py-20 bg-gradient-to-r from-amarillo to-black text-white">
+    <footer id="relume" className="px-[5%] py-12 md:py-18 lg:py-20 bg-gradient-to-r from-amarillo to-black text-white z-50 relative">
         <div className="container">
             <div className="grid grid-cols-1 gap-x-[4vw] gap-y-12 pb-12 md:gap-y-16 md:pb-18 lg:grid-cols-[1fr_0.5fr] lg:gap-y-4 lg:pb-20">
                 <div>
                     <div className="rb-6 mb-6 md:mb-8">
-                        <a href={logo.url}>
+                        <Link href={logo.url}>
                             <Image
                                 src={logo.src}
                                 alt={logo.alt || "Logo"}
@@ -42,7 +42,7 @@ return (
                                 height={40}
                                 className="inline-block"
                             />
-                        </a>
+                        </Link>
                     </div>
                     <div className="rb-6 mb-6 md:mb-8">
                         <div>
@@ -52,16 +52,16 @@ return (
                         <div>
                             <p className="mb-1 text-sm font-semibold">{contact.label}</p>
                             <p className="flex flex-col text-sm underline decoration-white underline-offset-1 md:mb-6">
-                                <a href={`tel:${contact.phone}`}>{contact.phone}</a>
-                                <a href={`mailto:${contact.email}`}>{contact.email}</a>
+                                <Link href={`tel:${contact.phone}`}>{contact.phone}</Link>
+                                <Link href={`mailto:${contact.email}`}>{contact.email}</Link>
                             </p>
                         </div>
                     </div>
                     <div className="grid grid-flow-col grid-cols-[max-content] items-start justify-start gap-x-3">
                         {socialMediaLinks.map((link, index) => (
-                            <a key={index} href={link.url}>
+                            <Link key={index} href={link.url}>
                                 {link.icon}
-                            </a>
+                            </Link>
                         ))}
                     </div>
                 </div>

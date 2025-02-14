@@ -22,7 +22,7 @@ const Video = () => {
             <div className="w-full md:h-[90vh] h-[25vh] overflow-hidden relative">
                 {/* Video */}
                 <video
-                    className="absolute md:top-[-10%] left-0 w-full md:h-full md:object-cover"
+                    className="absolute md:top-[-10%] left-0 w-full md:h-full lg:object-cover"
                     autoPlay
                     muted
                     playsInline

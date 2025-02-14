@@ -11,7 +11,8 @@
     "static/chunks/node_modules_react-dom_f14d04._.js",
     "static/chunks/node_modules_@react-spring_core_dist_react-spring_core_modern_mjs_c982ab._.js",
     "static/chunks/node_modules_81559e._.js",
-    "static/chunks/[root of the server]__6751b7._.js"
+    "static/chunks/[root of the server]__5e02c3._.js",
+    "static/chunks/node_modules_tailwindcss_tailwind_254820.css"
   ],
   "source": "entry"
 });
