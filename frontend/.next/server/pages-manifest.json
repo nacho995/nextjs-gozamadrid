@@ -3,5 +3,6 @@
   "/_document": "pages/_document.js",
   "/exp-realty": "pages/exp-realty.js",
   "/blog": "pages/blog.js",
-  "/contacto": "pages/contacto.js"
+  "/contacto": "pages/contacto.js",
+  "/": "pages/index.js"
 }

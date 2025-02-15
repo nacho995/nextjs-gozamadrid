@@ -2505,12 +2505,12 @@ function ExpRealtyMore({ videoId, title }) {
                                     onClick: handlePlay
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ExpRealty2.jsx",
-                                    lineNumber: 26,
+                                    lineNumber: 23,
                                     columnNumber: 29
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/components/ExpRealty2.jsx",
-                                lineNumber: 25,
+                                lineNumber: 22,
                                 columnNumber: 25
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -2524,7 +2524,7 @@ function ExpRealtyMore({ videoId, title }) {
                                         children: "¿Por qué elegir eXp Realty?"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/ExpRealty2.jsx",
-                                        lineNumber: 41,
+                                        lineNumber: 38,
                                         columnNumber: 29
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("p", {
@@ -2535,29 +2535,29 @@ function ExpRealtyMore({ videoId, title }) {
                                         children: "Exposición internacional para cada propiedad. Plataforma digital avanzada sin límites geográficos. Red de más de 90.000 agentes que trabajan en equipo para maximizar las oportunidades de venta. Enfoque estratégico para seleccionar las mejores propiedades y garantizar ventas exitosas."
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/ExpRealty2.jsx",
-                                        lineNumber: 44,
+                                        lineNumber: 41,
                                         columnNumber: 29
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/ExpRealty2.jsx",
-                                lineNumber: 37,
+                                lineNumber: 34,
                                 columnNumber: 25
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/ExpRealty2.jsx",
-                        lineNumber: 24,
+                        lineNumber: 21,
                         columnNumber: 21
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/components/ExpRealty2.jsx",
-                    lineNumber: 23,
+                    lineNumber: 20,
                     columnNumber: 17
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/ExpRealty2.jsx",
-                lineNumber: 22,
+                lineNumber: 19,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$AnimatedScroll$2e$jsx__$5b$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -2578,12 +2578,12 @@ function ExpRealtyMore({ videoId, title }) {
                                     children: "Únete a nuestra comunidad de más de 85K mil agentes"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ExpRealty2.jsx",
-                                    lineNumber: 64,
+                                    lineNumber: 61,
                                     columnNumber: 25
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/components/ExpRealty2.jsx",
-                                lineNumber: 63,
+                                lineNumber: 60,
                                 columnNumber: 21
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -2595,12 +2595,12 @@ function ExpRealtyMore({ videoId, title }) {
                                     }
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ExpRealty2.jsx",
-                                    lineNumber: 74,
+                                    lineNumber: 71,
                                     columnNumber: 25
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/components/ExpRealty2.jsx",
-                                lineNumber: 73,
+                                lineNumber: 70,
                                 columnNumber: 21
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -2613,12 +2613,12 @@ function ExpRealtyMore({ videoId, title }) {
                                     children: "desde nuestra remuneración competitiva y nuestro modelo de negocio basado en la nube"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ExpRealty2.jsx",
-                                    lineNumber: 82,
+                                    lineNumber: 79,
                                     columnNumber: 25
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/components/ExpRealty2.jsx",
-                                lineNumber: 81,
+                                lineNumber: 78,
                                 columnNumber: 21
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -2631,47 +2631,47 @@ function ExpRealtyMore({ videoId, title }) {
                                     children: "Presentación de eXp Realty"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ExpRealty2.jsx",
-                                    lineNumber: 95,
+                                    lineNumber: 92,
                                     columnNumber: 25
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/components/ExpRealty2.jsx",
-                                lineNumber: 94,
+                                lineNumber: 91,
                                 columnNumber: 21
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/ExpRealty2.jsx",
-                        lineNumber: 58,
+                        lineNumber: 55,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
                         className: "md:hidden w-full py-8",
                         style: {
-                            backgroundImage: "url('/fondoblue.jpg')"
+                            backgroundImage: "url('/fondoblanco.jpg')"
                         },
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
                             className: "flex flex-col items-center justify-center space-y-4",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("p", {
-                                    className: "text-center text-xl sm:text-2xl font-bold text-white italic px-4",
+                                    className: "text-center text-xl sm:text-2xl font-bold text-black italic px-4",
                                     style: {
                                         textShadow: "2px 2px 3px rgba(255,255,255,0.7)"
                                     },
                                     children: "Únete a nuestra comunidad de más de 85K mil agentes, eXp Realty: Desde nuestra remuneración competitiva y nuestro modelo de negocio basado en la nube"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ExpRealty2.jsx",
-                                    lineNumber: 111,
+                                    lineNumber: 108,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
                                     className: "w-[40vw] h-[25vh] bg-cover min-w-[150px] bg-center",
                                     style: {
-                                        backgroundImage: "url('/circle-unscreen.gif')"
+                                        backgroundImage: "url('/BlueCircle.gif')"
                                     }
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ExpRealty2.jsx",
-                                    lineNumber: 118,
+                                    lineNumber: 115,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -2684,29 +2684,29 @@ function ExpRealtyMore({ videoId, title }) {
                                         children: "Apúntate"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/ExpRealty2.jsx",
-                                        lineNumber: 124,
+                                        lineNumber: 121,
                                         columnNumber: 29
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ExpRealty2.jsx",
-                                    lineNumber: 123,
+                                    lineNumber: 120,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/ExpRealty2.jsx",
-                            lineNumber: 109,
+                            lineNumber: 106,
                             columnNumber: 21
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/ExpRealty2.jsx",
-                        lineNumber: 107,
+                        lineNumber: 104,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/ExpRealty2.jsx",
-                lineNumber: 57,
+                lineNumber: 54,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$AnimatedScroll$2e$jsx__$5b$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -2726,7 +2726,7 @@ function ExpRealtyMore({ videoId, title }) {
                                         children: "Vende Sin Fronteras"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/ExpRealty2.jsx",
-                                        lineNumber: 144,
+                                        lineNumber: 141,
                                         columnNumber: 29
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("p", {
@@ -2737,13 +2737,13 @@ function ExpRealtyMore({ videoId, title }) {
                                         children: "Si buscas vender tu propiedad con la máxima visibilidad y sin fronteras, o quieres formar parte de una inmobiliaria digital líder en el mundo, contáctanos y descubre cómo podemos ayudarte.Únete a la nueva era del sector inmobiliario con eXp Realty."
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/ExpRealty2.jsx",
-                                        lineNumber: 147,
+                                        lineNumber: 144,
                                         columnNumber: 29
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/ExpRealty2.jsx",
-                                lineNumber: 140,
+                                lineNumber: 137,
                                 columnNumber: 25
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
@@ -2759,55 +2759,97 @@ function ExpRealtyMore({ videoId, title }) {
                                     onClick: handlePlay
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ExpRealty2.jsx",
-                                    lineNumber: 155,
+                                    lineNumber: 152,
                                     columnNumber: 29
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/components/ExpRealty2.jsx",
-                                lineNumber: 154,
+                                lineNumber: 151,
                                 columnNumber: 25
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/ExpRealty2.jsx",
-                        lineNumber: 139,
+                        lineNumber: 136,
                         columnNumber: 21
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/components/ExpRealty2.jsx",
-                    lineNumber: 138,
+                    lineNumber: 135,
                     columnNumber: 17
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/ExpRealty2.jsx",
-                lineNumber: 137,
+                lineNumber: 134,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-                className: "object-cover w-full h-full bg-cover bg-center",
+                className: "relative w-full bg-cover bg-center pb-10 h-[80vh] md:h-[80vh]",
                 style: {
                     backgroundImage: "url('/agenteinmobiliario.jpg')"
                 },
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
-                    className: "bg-gradient-to-t from-black/80 to-black/30",
+                    className: "absolute left-0 top-0 p-4 bg-black bg-opacity-50 border-2 border-white flex flex-row md:flex-col w-full md:w-1/3 h-auto md:h-[80vh]",
                     children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("h3", {
-                            className: "text-4xl sm:text-6xl font-bold text-white text-center pt-10",
-                            children: "Derriba barreras en una de las inmobiliarias digitales de mayor crecimiento del mundo y descubre nuevas maneras de facturar, aprender y hacer crecer tu negocio"
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/ExpRealty2.jsx",
-                            lineNumber: 172,
-                            columnNumber: 21
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__["default"], {
-                            className: "bg-white rounded-xl p-5 text-2xl font-bold hover:bg-black hover:text-white",
-                            href: "https://join.expglobal.partners/index.html",
-                            children: "Conviértete en agente"
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
+                            className: "flex border-2 border-white items-center mt-[5vh] justify-center w-1/2 md:w-full",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("h3", {
+                                className: "text-center font-bold text-white",
+                                style: {
+                                    textShadow: "2px 2px 3px rgba(65,105,225,0.7)",
+                                    fontSize: "clamp(1.5rem, 3vw, 3rem)"
+                                },
+                                children: "Rompe Barreras. Crece de manera digital."
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/ExpRealty2.jsx",
+                                lineNumber: 176,
+                                columnNumber: 25
+                            }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/components/ExpRealty2.jsx",
                             lineNumber: 175,
                             columnNumber: 21
-                        }, this)
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("div", {
+                            className: "flex flex-col items-center justify-center pt-[10vh] w-1/2 md:w-full",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])("p", {
+                                    className: "text-center font-bold text-white mb-4",
+                                    style: {
+                                        textShadow: "2px 2px 3px rgba(65,105,225,0.7)",
+                                        fontSize: "clamp(1rem, 2vw, 1.5rem)",
+                                        margin: 0,
+                                        padding: "0.5rem"
+                                    },
+                                    children: "Derriba barreras en una de las inmobiliarias digitales de mayor crecimiento del mundo y descubre nuevas maneras de facturar, aprender y hacer crecer tu negocio"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/ExpRealty2.jsx",
+                                    lineNumber: 188,
+                                    columnNumber: 25
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react$2f$jsx$2d$dev$2d$runtime__$5b$external$5d$__$28$react$2f$jsx$2d$dev$2d$runtime$2c$__cjs$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                    className: "mt-[5vh] bg-transparent border-2 border-white hover:bg-bluecolor inline-block rounded-xl font-bold",
+                                    href: "https://join.expglobal.partners/index.html",
+                                    target: "_blank",
+                                    rel: "noopener noreferrer",
+                                    style: {
+                                        color: "white",
+                                        fontSize: "clamp(1rem, 2vw, 1.5rem)",
+                                        padding: "0.5rem 1rem"
+                                    },
+                                    children: "Conviértete en agente"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/ExpRealty2.jsx",
+                                    lineNumber: 199,
+                                    columnNumber: 25
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/ExpRealty2.jsx",
+                            lineNumber: 187,
+                            columnNumber: 21
+                        }, this),
+                        "º                "
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/ExpRealty2.jsx",
@@ -2816,7 +2858,7 @@ function ExpRealtyMore({ videoId, title }) {
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/ExpRealty2.jsx",
-                lineNumber: 169,
+                lineNumber: 167,
                 columnNumber: 13
             }, this)
         ]
