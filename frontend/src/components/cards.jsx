@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import AnimatedOnScroll from "./AnimatedScroll";
-import ReactDOM from "react-dom";
 
 const cardData = [
     {
@@ -61,9 +60,9 @@ const cardData = [
 ];
 
 /* ============================
-   Desktop Version (PC)
+   Desktop Version (PC) - visible en lg (≥1024px)
    ============================ */
-function DesktopCards() {
+function DesktopCards({ card, index }) {
     // Mantenemos los refs y estados originales para el efecto de flip en desktop
     const extraLinksRef = useRef(null);
     const [extraWidth, setExtraWidth] = useState(0);
@@ -97,93 +96,50 @@ function DesktopCards() {
 
     return (
         <AnimatedOnScroll>
-            <div className="fixed flex justify-center items-center w-full p-10 h-[100vh]"
+            {/* Contenedor principal fijo */}
+            <div
+                className="relative w-[40vh] h-[40vh] group [perspective:1000px] transform transition duration-300 hover:scale-105"
                 style={{
-                    background: "linear-gradient(to top, transparent 0%, gray 50%, transparent 100%)"
-                }}>
-                <div className="grid grid-cols-4 grid-rows-4 z-20 gap-8 h-[70vh]">
-                    {cardData.map((card, index) => (
+                    gridColumnStart: index + 1,
+                    gridRowStart: index + 1,
+                }}
+            >
+                <div className="h-full w-full transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+                    {/* Cara frontal */}
+                    <div
+                        className="absolute inset-0 bg-yellow-300 text-black shadow-lg rounded-lg p-2 flex items-center justify-center [backface-visibility:hidden] overflow-hidden"
+                        aria-hidden="true"
+                    >
                         <div
-                            key={index}
-                            className="relative w-[40vh] h-[40vh] group [perspective:1000px]"
-                            style={{ gridColumnStart: index + 1, gridRowStart: index + 1 }}
+                            className="absolute inset-0 bg-cover bg-center rounded-lg"
+                            style={{ backgroundImage: "url('/fondoamarillo.jpg')" }}
                         >
-                            {/* Condicional para mostrar imágenes */}
-                            {index === 0 && (
-                                <img
-                                    src="/analisis.png"
-                                    alt="Image below Card 1"
-                                    className="absolute bottom-[-50vh] left-1/2 rounded-full h-[25vh] w-[25vh] transform -translate-x-1/2"
-                                />
-                            )}
-                            {index === 1 && (
-                                <img
-                                    src="/agenteinmo.png"
-                                    alt="Image below Card 2"
-                                    className="absolute bottom-[-50vh] left-1/2 rounded-full h-[25vh] w-[25vh] transform -translate-x-1/2"
-                                />
-                            )}
-                            {index === 2 && (
-                                <img
-                                    src="/analisisdemercado.jpeg"
-                                    alt="Image above Card 3"
-                                    className="absolute top-[-30vh] left-1/2 rounded-full h-[25vh] w-[25vh] transform -translate-x-1/2"
-                                />
-                            )}
-                            {index === 3 && (
-                                <img
-                                    src="/agentesinmobiliarios.jpeg"
-                                    alt="Image above Card 4"
-                                    className="absolute top-[-30vh] left-1/2 rounded-full h-[25vh] w-[25vh] transform -translate-x-1/2"
-                                />
-                            )}
-                            {index === 4 && (
-                                <img
-                                    src="/formFoto.jpeg"
-                                    alt="Image above Card 4"
-                                    className="absolute top-[-30vh] left-1/2 rounded-full h-[25vh] w-[25vh] transform -translate-x-1/2"
-                                />
-                            )}
-                            <div className="h-[40vh] relative w-full transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
-                                {/* Cara frontal */}
-                                <div
-                                    className="absolute w-full h-full bg-amarillo text-black shadow-lg hover:shadow-xl rounded-lg p-2 flex items-center justify-center [backface-visibility:hidden]"
-                                    aria-hidden="true"
-                                >
-                                    <div className="absolute inset-0 bg-cover bg-center rounded-lg" style={{ backgroundImage: "url('/fondoamarillo.jpg')" }}>
-                                        <div className="absolute inset-0 bg-white opacity-15 rounded-lg"></div>
-                                    </div>
-                                    <h2 className="text-3xl font-bold text-center text-black z-20">{card.front}</h2>
-                                </div>
-
-                                {/* Cara trasera */}
-                                <div
-                                    className="absolute w-full h-full font-bold text-black shadow-lg hover:shadow-xl rounded-lg p-2 flex items-center justify-center text-center [backface-visibility:hidden] [transform:rotateY(180deg)]"
-                                    aria-hidden="true"
-                                >
-                                    {/* Nuevo div para la imagen de fondo */}
-                                    <div className="absolute inset-0 bg-cover bg-center  rounded-lg" style={{ backgroundImage: "url('/fondonegro.jpg')" }}></div>
-
-                                    {/* Contenido de la tarjeta */}
-                                    <div
-                                        className="relative z-10 text-center overflow-hidden whitespace-normal break-words text-sm sm:text-base md:text-lg lg:text-xl"
-                                    >
-                                        <ol className="list-decimal list-inside text-left text-white">
-                                            {card.back.props.children}
-                                        </ol>
-                                    </div>
-
-
-                                </div>
-                            </div>
+                            <div className="absolute inset-0 bg-white opacity-15 rounded-lg"></div>
                         </div>
-                    ))}
+                        <h2 className="text-3xl font-bold text-center text-black z-20">
+                            {card.front}
+                        </h2>
+                    </div>
+                    {/* Cara trasera */}
+                    <div
+                        className="absolute inset-0 font-bold text-black shadow-lg rounded-lg p-2 flex items-center justify-center text-center [backface-visibility:hidden] [transform:rotateY(180deg)] overflow-hidden"
+                        aria-hidden="true"
+                    >
+                        <div
+                            className="absolute inset-0 bg-cover bg-center rounded-lg"
+                            style={{ backgroundImage: "url('/fondonegro.jpg')" }}
+                        ></div>
+                        <div className="relative z-10 text-center overflow-hidden whitespace-normal break-words text-sm sm:text-base md:text-lg lg:text-xl">
+                            <ol className="list-decimal list-inside text-left text-white">
+                                {card.back.props.children}
+                            </ol>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </AnimatedOnScroll>
+        </AnimatedOnScroll >
     );
 }
-
 
 /* ============================
    Mobile/Tablet Version (2 columns)
@@ -191,7 +147,7 @@ function DesktopCards() {
 function MobileCard({ card, index }) {
     const [flipped, setFlipped] = useState(false);
     return (
-        <div className="flex flex-col items-center p-2">
+        <div className="flex flex-col-5 items-center p-2">
             <div
                 className="w-[120%] h-[50vh] relative transition-transform duration-700 [transform-style:preserve-3d]"
                 onClick={() => setFlipped(!flipped)}
@@ -226,7 +182,6 @@ function MobileCard({ card, index }) {
                             {card.back.props.children}
                         </ol>
                     </div>
-
                 </div>
             </div>
             {/* Imagen debajo */}
@@ -269,7 +224,6 @@ function MobileCard({ card, index }) {
     );
 }
 
-
 function TabletCard({ card, index }) {
     const [flipped, setFlipped] = useState(false);
 
@@ -309,7 +263,6 @@ function TabletCard({ card, index }) {
                             {card.back.props.children}
                         </ol>
                     </div>
-
                 </div>
             </div>
             {/* Imágenes debajo de la tarjeta según el índice */}
@@ -349,19 +302,30 @@ function TabletCard({ card, index }) {
                 />
             )}
         </div>
-    )
+    );
 }
 
 export default function Cards() {
     return (
         <AnimatedOnScroll>
-            {/* Desktop Version (XL screens) */}
-            {/* Desktop Version (visible en lg: 1024px a xl: 1280px) */}
-            <div className="hidden lg:flex xl:hidden justify-center items-center w-full p-10 h-[100vh]">
-                <DesktopCards />
+            {/* Desktop Version (visible en lg: ≥1024px) */}
+            <div
+                className="flex justify-center items-center w-full p-10 h-[100vh]"
+                style={{
+                    background:
+                        "linear-gradient(to top, transparent 0%, gray 50%, transparent 100%)",
+                }}
+            >
+                <div
+                    className="grid grid-cols-5 grid-rows-5 gap-4 w-full"
+                    style={{ height: "70vh" }}
+                >
+                    {cardData.map((card, index) => (
+                        <DesktopCards key={index} card={card} index={index} />
+                    ))}
+                </div>
             </div>
-
-            {/* Tablet Version (visible en md: 768px a lg: 1024px) */}
+            {/* Tablet Version (visible en md: 768px a lg: 1023px) */}
             <div className="hidden md:flex lg:hidden justify-center items-center w-full p-5 min-h-screen">
                 <div className="grid grid-cols-3 gap-4 w-full max-w-3xl">
                     {cardData.map((card, index) => (
@@ -378,7 +342,6 @@ export default function Cards() {
                     ))}
                 </div>
             </div>
-
         </AnimatedOnScroll>
     );
 }

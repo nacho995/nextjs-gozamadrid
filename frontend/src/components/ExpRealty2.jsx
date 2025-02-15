@@ -16,9 +16,6 @@ export default function ExpRealtyMore({ videoId, title }) {
 
     return (
         <>
-
-
-
             <AnimatedOnScroll>
                 <div className="mx-0 text-transparent bg-clip-text ">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-0 mt-0 min-h-[40vh] md:min-h-[60vh]">
@@ -105,11 +102,11 @@ export default function ExpRealtyMore({ videoId, title }) {
 
                 {/* Versión Mobile/Tablet: Visible para pantallas menores a md */}
                 <div className="md:hidden w-full py-8"
-                    style={{ backgroundImage: "url('/fondoblue.jpg')" }}>
+                    style={{ backgroundImage: "url('/fondoblanco.jpg')" }}>
                     <div className="flex flex-col items-center justify-center space-y-4">
                         {/* Texto combinado en un solo párrafo */}
                         <p
-                            className="text-center text-xl sm:text-2xl font-bold text-white italic px-4"
+                            className="text-center text-xl sm:text-2xl font-bold text-black italic px-4"
                             style={{ textShadow: "2px 2px 3px rgba(255,255,255,0.7)" }}
                         >
                             Únete a nuestra comunidad de más de 85K mil agentes, eXp Realty: Desde nuestra remuneración competitiva y nuestro modelo de negocio basado en la nube
@@ -117,7 +114,7 @@ export default function ExpRealtyMore({ videoId, title }) {
                         {/* GIF centrado */}
                         <div
                             className="w-[40vw] h-[25vh] bg-cover min-w-[150px] bg-center"
-                            style={{ backgroundImage: "url('/circle-unscreen.gif')" }}
+                            style={{ backgroundImage: "url('/BlueCircle.gif')" }}
                         ></div>
                         {/* Enlace */}
                         <div className="flex justify-center py-8">
@@ -166,18 +163,55 @@ export default function ExpRealtyMore({ videoId, title }) {
                     </div>
                 </div>
             </AnimatedOnScroll>
-            <div className="object-cover w-full h-full bg-cover bg-center"
-                style={{ backgroundImage: "url('/agenteinmobiliario.jpg')" }}>
-                <div className="bg-gradient-to-t from-black/80 to-black/30">
-                    <h3 className="text-4xl sm:text-6xl font-bold text-white text-center pt-10">
-                    Derriba barreras en una de las inmobiliarias digitales de mayor crecimiento del mundo y descubre nuevas maneras de facturar, aprender y hacer crecer tu negocio
-                    </h3>
-                    <Link className="bg-white rounded-xl p-5 text-2xl font-bold hover:bg-black hover:text-white"
-                        href="https://join.expglobal.partners/index.html">
-                        Conviértete en agente
-                    </Link>
-                </div>
+
+            <div
+                className="relative w-full bg-cover bg-center pb-10 h-[80vh] md:h-[80vh]"
+                style={{ backgroundImage: "url('/agenteinmobiliario.jpg')" }}
+            >
+                <div
+                    className="absolute left-0 top-0 p-4 bg-black bg-opacity-50 border-2 border-white flex flex-row md:flex-col w-full md:w-1/3 h-auto md:h-[80vh]"
+                >
+                    {/* Contenedor del título: en mobile ocupa la mitad, en md ocupa el 100% */}
+                    <div className="flex border-2 border-white items-center mt-[5vh] justify-center w-1/2 md:w-full">
+                        <h3
+                            className="text-center font-bold text-white"
+                            style={{
+                                textShadow: "2px 2px 3px rgba(65,105,225,0.7)",
+                                fontSize: "clamp(1.5rem, 3vw, 3rem)"
+                            }}
+                        >
+                            Rompe Barreras. Crece de manera digital.
+                        </h3>
+                    </div>
+
+                    <div className="flex flex-col items-center justify-center pt-[10vh] w-1/2 md:w-full">
+                        <p
+                            className="text-center font-bold text-white mb-4"
+                            style={{
+                                textShadow: "2px 2px 3px rgba(65,105,225,0.7)",
+                                fontSize: "clamp(1rem, 2vw, 1.5rem)",
+                                margin: 0,
+                                padding: "0.5rem"
+                            }}
+                        >
+                            Derriba barreras en una de las inmobiliarias digitales de mayor crecimiento del mundo y descubre nuevas maneras de facturar, aprender y hacer crecer tu negocio
+                        </p>
+                        <Link
+                            className="mt-[5vh] bg-transparent border-2 border-white hover:bg-bluecolor inline-block rounded-xl font-bold"
+                            href="https://join.expglobal.partners/index.html"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                                color: "white",
+                                fontSize: "clamp(1rem, 2vw, 1.5rem)",
+                                padding: "0.5rem 1rem"
+                            }}
+                        >
+                            Conviértete en agente
+                        </Link>
+                    </div>
+º                </div>
             </div>
-        </>
-    );
+                </>
+                );
 }
