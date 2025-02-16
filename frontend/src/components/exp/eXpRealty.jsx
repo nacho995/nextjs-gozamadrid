@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 
 import Link from "next/link";
-import AnimatedOnScroll from "./AnimatedScroll";
+import AnimatedOnScroll from "../AnimatedScroll";
 
 export default function ExpRealty({ videoId, title }) {
     const iframeRef = useRef(null);

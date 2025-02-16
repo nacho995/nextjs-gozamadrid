@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 
 import Link from "next/link";
-import AnimatedOnScroll from "./AnimatedScroll";
+import AnimatedOnScroll from "../AnimatedScroll";
 
 export default function ExpRealtyMore({ videoId, title }) {
     const iframeRef = useRef(null);
@@ -81,7 +81,7 @@ export default function ExpRealtyMore({ videoId, title }) {
                             style={{ textShadow: "2px 2px 3px rgba(0, 0, 0,  0.5)" }}
 
                         >
-                            desde nuestra remuneración competitiva y nuestro modelo de negocio basado en la nube
+                            Trabaja con lo último de nuestras tecnologías y nuestro modelo de negocio basado en la nube
                         </h2>
                     </div>
 
@@ -109,7 +109,7 @@ export default function ExpRealtyMore({ videoId, title }) {
                             className="text-center text-xl sm:text-2xl font-bold text-black italic px-4"
                             style={{ textShadow: "2px 2px 3px rgba(255,255,255,0.7)" }}
                         >
-                            Únete a nuestra comunidad de más de 85K mil agentes, eXp Realty: Desde nuestra remuneración competitiva y nuestro modelo de negocio basado en la nube
+                            Únete a nuestra comunidad de más de 85K mil agentes. Trabaja con lo último de nuestras tecnologías y nuestro modelo de negocio basado en la nube
                         </p>
                         {/* GIF centrado */}
                         <div
@@ -124,7 +124,7 @@ export default function ExpRealtyMore({ videoId, title }) {
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
-                                Apúntate
+                                Presentación de eXp Realty
                             </Link>
                         </div>
                     </div>

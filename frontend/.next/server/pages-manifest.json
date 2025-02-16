@@ -4,5 +4,6 @@
   "/exp-realty": "pages/exp-realty.js",
   "/blog": "pages/blog.js",
   "/contacto": "pages/contacto.js",
-  "/": "pages/index.js"
+  "/": "pages/index.js",
+  "/vender": "pages/vender.js"
 }

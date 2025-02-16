@@ -1559,7 +1559,7 @@ const RegisterForm = ()=>{
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "text-left",
                                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                            className: "text-2xl font-bold",
+                                            className: "text-sm sm:text-md lg:text-2xl font-bold",
                                             children: "Contáctenos"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/FormContact.jsx",
@@ -1985,7 +1985,7 @@ function ExpRealtyMore({ videoId, title }) {
                                     style: {
                                         textShadow: "2px 2px 3px rgba(0, 0, 0,  0.5)"
                                     },
-                                    children: "desde nuestra remuneración competitiva y nuestro modelo de negocio basado en la nube"
+                                    children: "Trabaja con lo último de nuestras tecnologías y nuestro modelo de negocio basado en la nube"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ExpRealty2.jsx",
                                     lineNumber: 79,
@@ -2033,7 +2033,7 @@ function ExpRealtyMore({ videoId, title }) {
                                     style: {
                                         textShadow: "2px 2px 3px rgba(255,255,255,0.7)"
                                     },
-                                    children: "Únete a nuestra comunidad de más de 85K mil agentes, eXp Realty: Desde nuestra remuneración competitiva y nuestro modelo de negocio basado en la nube"
+                                    children: "Únete a nuestra comunidad de más de 85K mil agentes. Trabaja con lo último de nuestras tecnologías y nuestro modelo de negocio basado en la nube"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ExpRealty2.jsx",
                                     lineNumber: 108,
@@ -2056,7 +2056,7 @@ function ExpRealtyMore({ videoId, title }) {
                                         href: "https://landing.expglobalspain.com/modelo-de-negocio-exp-spain",
                                         target: "_blank",
                                         rel: "noopener noreferrer",
-                                        children: "Apúntate"
+                                        children: "Presentación de eXp Realty"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/ExpRealty2.jsx",
                                         lineNumber: 121,

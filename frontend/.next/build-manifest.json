@@ -70,10 +70,22 @@
       "static/chunks/node_modules_@relume_io_relume-ui_dist_index_mjs_7eea24._.js",
       "static/chunks/node_modules_@radix-ui_3a24c0._.js",
       "static/chunks/node_modules_@floating-ui_056e3f._.js",
-      "static/chunks/node_modules_a72e0e._.js",
+      "static/chunks/node_modules_057049._.js",
       "static/chunks/node_modules_tailwindcss_tailwind_254820.css",
+      "static/chunks/node_modules_rellax_rellax_0e1054.js",
       "static/chunks/src_pages_index_5771e1._.js",
-      "static/chunks/src_pages_index_ec7fc0._.js"
+      "static/chunks/src_pages_index_e7d989._.js"
+    ],
+    "/vender": [
+      "static/chunks/node_modules_next_dist_f1b02b._.js",
+      "static/chunks/node_modules_react_1cad9b._.js",
+      "static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e07.js",
+      "static/chunks/node_modules_react-dom_f14d04._.js",
+      "static/chunks/node_modules_@react-spring_core_dist_react-spring_core_modern_mjs_c982ab._.js",
+      "static/chunks/node_modules_81559e._.js",
+      "static/chunks/[root of the server]__fdd5dd._.js",
+      "static/chunks/src_pages_vender_5771e1._.js",
+      "static/chunks/src_pages_vender_bac980._.js"
     ]
   },
   "devFiles": [],
