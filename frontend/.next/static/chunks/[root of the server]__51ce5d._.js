@@ -861,7 +861,7 @@ const RegisterForm = ()=>{
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "text-left",
                                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                            className: "text-2xl font-bold",
+                                            className: "text-sm sm:text-md lg:text-2xl font-bold",
                                             children: "Contáctenos"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/FormContact.jsx",
@@ -1153,7 +1153,7 @@ function Contact() {
             className: "relative w-full min-h-[80vh] pb-[10vh] overflow-hidden",
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "absolute inset-0 z-0 w-full h-full opacity-10",
+                    className: "fixed inset-0 z-0 w-full h-full opacity-10",
                     style: {
                         background: `
          repeating-linear-gradient(
@@ -1167,7 +1167,7 @@ function Contact() {
                 }, void 0, false, {
                     fileName: "[project]/src/pages/contacto.js",
                     lineNumber: 10,
-                    columnNumber: 9
+                    columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$FormContact$2e$jsx__$5b$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                     fileName: "[project]/src/pages/contacto.js",
@@ -1178,7 +1178,7 @@ function Contact() {
         }, void 0, true, {
             fileName: "[project]/src/pages/contacto.js",
             lineNumber: 9,
-            columnNumber: 9
+            columnNumber: 13
         }, this)
     }, void 0, false);
 }

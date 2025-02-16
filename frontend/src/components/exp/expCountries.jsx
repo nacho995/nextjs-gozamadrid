@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import AnimatedOnScroll from "./AnimatedScroll";
+import AnimatedOnScroll from "../AnimatedScroll";
 
 
 export default function ExpCountries() {

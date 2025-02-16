@@ -731,31 +731,31 @@ function ControlMenu() {
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/header.jsx",
                                     lineNumber: 92,
-                                    columnNumber: 15
+                                    columnNumber: 13
                                 }, this),
                                 menuVisible ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$ai$2f$index$2e$mjs__$5b$client$5d$__$28$ecmascript$29$__["AiOutlineMenuFold"], {
                                     size: 30
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/header.jsx",
                                     lineNumber: 94,
-                                    columnNumber: 17
+                                    columnNumber: 15
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$ai$2f$index$2e$mjs__$5b$client$5d$__$28$ecmascript$29$__["AiOutlineMenuUnfold"], {
                                     size: 30
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/header.jsx",
                                     lineNumber: 96,
-                                    columnNumber: 17
+                                    columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/header.jsx",
                             lineNumber: 88,
-                            columnNumber: 13
+                            columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/header.jsx",
                         lineNumber: 87,
-                        columnNumber: 11
+                        columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "absolute top-5 right-10 flex space-x-4 mt-4 mr-4",
@@ -770,12 +770,12 @@ function ControlMenu() {
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/header.jsx",
                                     lineNumber: 107,
-                                    columnNumber: 15
+                                    columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/components/header.jsx",
                                 lineNumber: 102,
-                                columnNumber: 13
+                                columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
                                 href: "https://www.instagram.com",
@@ -787,12 +787,12 @@ function ControlMenu() {
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/header.jsx",
                                     lineNumber: 114,
-                                    columnNumber: 15
+                                    columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/components/header.jsx",
                                 lineNumber: 109,
-                                columnNumber: 13
+                                columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
                                 href: "tel:+34919012103",
@@ -802,12 +802,12 @@ function ControlMenu() {
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/header.jsx",
                                     lineNumber: 117,
-                                    columnNumber: 15
+                                    columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/components/header.jsx",
                                 lineNumber: 116,
-                                columnNumber: 13
+                                columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                 className: "hover:text-gray-700 text-black text-2xl",
@@ -815,13 +815,13 @@ function ControlMenu() {
                             }, void 0, false, {
                                 fileName: "[project]/src/components/header.jsx",
                                 lineNumber: 119,
-                                columnNumber: 13
+                                columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/header.jsx",
                         lineNumber: 101,
-                        columnNumber: 11
+                        columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
                         src: "/logo.png",
@@ -832,7 +832,7 @@ function ControlMenu() {
                     }, void 0, false, {
                         fileName: "[project]/src/components/header.jsx",
                         lineNumber: 124,
-                        columnNumber: 11
+                        columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("nav", {
                         className: "text-black flex items-center space-x-14 mt-4 text-2xl font-bold",
@@ -844,13 +844,12 @@ function ControlMenu() {
                             }, void 0, false, {
                                 fileName: "[project]/src/components/header.jsx",
                                 lineNumber: 127,
-                                columnNumber: 13
+                                columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 ref: venderRef,
                                 className: "relative whitespace-nowrap",
                                 onMouseEnter: handleMouseEnter,
-                                onMouseLeave: handleMouseLeave,
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
                                         href: "/vender",
@@ -859,7 +858,7 @@ function ControlMenu() {
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/header.jsx",
                                         lineNumber: 136,
-                                        columnNumber: 15
+                                        columnNumber: 13
                                     }, this),
                                     isDropdownVisible && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "absolute bg-black bg-opacity-50 rounded shadow-lg flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold",
@@ -876,18 +875,18 @@ function ControlMenu() {
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/header.jsx",
                                             lineNumber: 149,
-                                            columnNumber: 19
+                                            columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/header.jsx",
                                         lineNumber: 140,
-                                        columnNumber: 17
+                                        columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/header.jsx",
                                 lineNumber: 130,
-                                columnNumber: 13
+                                columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
                                 href: "/exp-realty",
@@ -896,7 +895,7 @@ function ControlMenu() {
                             }, void 0, false, {
                                 fileName: "[project]/src/components/header.jsx",
                                 lineNumber: 155,
-                                columnNumber: 13
+                                columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "inline-block overflow-hidden transition-all duration-500 ease-in-out",
@@ -915,7 +914,7 @@ function ControlMenu() {
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/header.jsx",
                                             lineNumber: 166,
-                                            columnNumber: 17
+                                            columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
                                             href: "/inversores",
@@ -924,36 +923,36 @@ function ControlMenu() {
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/header.jsx",
                                             lineNumber: 169,
-                                            columnNumber: 17
+                                            columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
-                                            href: "/servicios",
-                                            className: "text-black hover:text-gray-700 whitespace-nowrap",
-                                            children: "Servicios"
+                                            href: "/blog",
+                                            className: "text-black hover:text-gray-700",
+                                            children: "Blog"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/header.jsx",
                                             lineNumber: 172,
-                                            columnNumber: 17
+                                            columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/header.jsx",
                                     lineNumber: 165,
-                                    columnNumber: 15
+                                    columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/components/header.jsx",
                                 lineNumber: 158,
-                                columnNumber: 13
+                                columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
-                                href: "/blog",
-                                className: "text-black hover:text-gray-700",
-                                children: "Blog"
+                                href: "/servicios",
+                                className: "text-black hover:text-gray-700 whitespace-nowrap",
+                                children: "Servicios"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/header.jsx",
                                 lineNumber: 177,
-                                columnNumber: 13
+                                columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
                                 href: "/contacto",
@@ -962,19 +961,19 @@ function ControlMenu() {
                             }, void 0, false, {
                                 fileName: "[project]/src/components/header.jsx",
                                 lineNumber: 180,
-                                columnNumber: 13
+                                columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/header.jsx",
                         lineNumber: 126,
-                        columnNumber: 11
+                        columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/header.jsx",
                 lineNumber: 82,
-                columnNumber: 9
+                columnNumber: 7
             }, this),
             menuVisible && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-20 lg:hidden",

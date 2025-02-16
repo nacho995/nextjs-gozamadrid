@@ -116,7 +116,8 @@ function DesktopCards({ card, index }) {
                         >
                             <div className="absolute inset-0 bg-white opacity-15 rounded-lg"></div>
                         </div>
-                        <h2 className="text-3xl font-bold text-center text-black z-20">
+                        <h2 className="text-3xl font-bold text-center text-black z-20"
+                                  style={{textShadow: "2px 2px 3px rgba(255,255,225,1)"}}>
                             {card.front}
                         </h2>
                     </div>
@@ -317,8 +318,8 @@ export default function Cards() {
                 }}
             >
                 <div
-                    className="grid grid-cols-5 grid-rows-5 gap-4 w-full"
-                    style={{ height: "70vh" }}
+                    className="grid grid-cols-5 grid-rows-5 gap-4 w-full h-[70vh]"
+                    
                 >
                     {cardData.map((card, index) => (
                         <DesktopCards key={index} card={card} index={index} />

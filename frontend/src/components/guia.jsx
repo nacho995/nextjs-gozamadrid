@@ -5,17 +5,17 @@ import AnimatedOnScroll from './AnimatedScroll';
 export default function Guide() {
     return (
         <AnimatedOnScroll>
-        <div className="relative w-full h-screen overflow-hidden">
+        <div className="relative w-full h-screen ">
 
-            <div className="h-[60vh] flex flex-col bg-fixed bg-center  justify-center items-center text-center relative px-4 z-10" 
+            <div className="h-[60vh] flex flex-col bg-fixed bg-center fixed justify-center items-center text-center  px-4 z-10" 
                 style={{ backgroundImage: "url('/guia.jpg')" }}>
                 <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/30"></div>
 
-                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-amarillo mb-4 relative z-10 mt-[-8%]" style={{ textShadow: "2px 2px 5px gray" }}>
+                <h2 className="text-xl sm:text-xl lg:text-6xl font-bold text-amarillo mb-4 relative z-10 mt-[-8%]" style={{ textShadow: "2px 2px 5px gray" }}>
                     Guía para vender una propiedad
                 </h2>
 
-                <p className="max-w-3xl text-white sm:text-2xl text-center z-10 mt-[3%] ml-[10%] mr-[10%] px-4">
+                <p className="text-sm sm:text-md lg:text-3xl text-white  text-center z-10 mt-[3%] ml-[10%] mr-[10%] px-4">
                     Aquí te presentamos un resumen conciso de los aspectos clave que debes considerar al comprar una propiedad. 
                     Al final, tendrás la oportunidad de descargar nuestra guía completa «Cómo Comprar una Vivienda en España», 
                     que te llevará paso a paso a través de todo el proceso. ¡Descúbrelo ahora!

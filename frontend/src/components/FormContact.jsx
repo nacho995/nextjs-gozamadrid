@@ -96,7 +96,7 @@ const RegisterForm = () => {
           <form className="space-y-6 border-2 p-14 border-gray-400 w-full max-w-md" onSubmit={handleSubmit}>
             {errorMessage && <p className="text-red-500">{errorMessage}</p>}
             <div className="text-left">
-              <h2 className="text-2xl font-bold">Contáctenos</h2>
+              <h2 className="text-sm sm:text-md lg:text-2xl font-bold">Contáctenos</h2>
             </div>
             <div className="flex flex-col space-y-4">
               <div>
