@@ -955,7 +955,9 @@ __turbopack_esm__({
     "deleteBlogPost": (()=>deleteBlogPost),
     "getBlogById": (()=>getBlogById),
     "getBlogPosts": (()=>getBlogPosts),
-    "getCountryPrefix": (()=>getCountryPrefix)
+    "getCountryPrefix": (()=>getCountryPrefix),
+    "getPropertyById": (()=>getPropertyById),
+    "getPropertyPosts": (()=>getPropertyPosts)
 });
 async function getCountryPrefix() {
     const response = await fetch('http://localhost:3000/prefix', {
@@ -1014,6 +1016,22 @@ async function getBlogById(id) {
     }
     const data = await response.json();
     return data;
+}
+async function getPropertyPosts() {
+    const response = await fetch(`http://localhost:3000/property`);
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al obtener los property posts');
+    }
+    return response.json();
+}
+async function getPropertyById(id) {
+    const response = await fetch(`http://localhost:3000/property/${id}`);
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al obtener el property post');
+    }
+    return response.json();
 }
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_refresh__.registerExports(module, globalThis.$RefreshHelpers$);

@@ -5,8 +5,8 @@ import { getBlogById } from '@/pages/api'; // Asegúrate de que la ruta sea corr
 // Importa las diferentes plantillas
 
 
-import EstiloABlogContent from '@/components/ABlogContent';
-import DefaultBlogContent from '@/components/blogcontent';
+import EstiloABlogContent from '@/components/blog/ABlogContent';
+import DefaultBlogContent from '@/components/blog/blogcontent';
 
 const BlogDetail = ({ blog }) => {
   if (!blog) {

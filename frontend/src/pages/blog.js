@@ -1,4 +1,4 @@
-import BlogPage from "@/components/blogPage";
+import BlogPage from "@/components/blog/blogPage";
 
 
 

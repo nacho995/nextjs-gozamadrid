@@ -65,4 +65,23 @@ export async function getBlogById(id) {
   const data = await response.json();
   return data;
 }
+export async function getPropertyPosts() {
+  const response = await fetch(`http://localhost:3000/property`)
 
+  if (!response.ok) {
+    const errorData = await response.json()
+    throw new Error(errorData.message || 'Error al obtener los property posts')
+  }
+
+  return response.json()
+}
+export async function getPropertyById(id) {
+  const response = await fetch(`http://localhost:3000/property/${id}`)
+
+  if (!response.ok) {
+    const errorData = await response.json()
+    throw new Error(errorData.message || 'Error al obtener el property post')
+  }
+
+  return response.json()
+}
