@@ -1,6 +1,6 @@
 const CHUNK_PUBLIC_PATH = "server/pages/exp-realty.js";
 const runtime = require("../chunks/ssr/[turbopack]_runtime.js");
-runtime.loadChunk("server/chunks/ssr/[root of the server]__4c7c3a._.js");
+runtime.loadChunk("server/chunks/ssr/[root of the server]__59fbc8._.js");
 runtime.loadChunk("server/chunks/ssr/node_modules_next_1044c8._.js");
 runtime.loadChunk("server/chunks/ssr/node_modules_react-icons_ai_index_mjs_4adee0._.js");
 runtime.loadChunk("server/chunks/ssr/node_modules_react-icons_fa_index_mjs_275a22._.js");

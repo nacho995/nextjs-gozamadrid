@@ -163,55 +163,56 @@ export default function ExpRealtyMore({ videoId, title }) {
                     </div>
                 </div>
             </AnimatedOnScroll>
-
-            <div
-                className="relative w-full bg-cover bg-center pb-10 h-[80vh] md:h-[80vh]"
-                style={{ backgroundImage: "url('/agenteinmobiliario.jpg')" }}
-            >
+            <AnimatedOnScroll>
                 <div
-                    className="absolute left-0 top-0 p-4 bg-black bg-opacity-50 border-2 border-white flex flex-row md:flex-col w-full md:w-1/3 h-auto md:h-[80vh]"
+                    className="relative w-full bg-cover bg-center pb-10 h-[80vh] md:h-[80vh]"
+                    style={{ backgroundImage: "url('/agenteinmobiliario.jpg')" }}
                 >
-                    {/* Contenedor del título: en mobile ocupa la mitad, en md ocupa el 100% */}
-                    <div className="flex border-2 border-white items-center mt-[5vh] justify-center w-1/2 md:w-full">
-                        <h3
-                            className="text-center font-bold text-white"
-                            style={{
-                                textShadow: "2px 2px 3px rgba(65,105,225,0.7)",
-                                fontSize: "clamp(1.5rem, 3vw, 3rem)"
-                            }}
-                        >
-                            Rompe Barreras. Crece de manera digital.
-                        </h3>
-                    </div>
+                    <div
+                        className="absolute left-0 top-0 p-4 bg-black bg-opacity-50 border-2 border-white flex flex-row md:flex-col w-full md:w-1/3 h-auto md:h-[80vh]"
+                    >
+                        {/* Contenedor del título: en mobile ocupa la mitad, en md ocupa el 100% */}
+                        <div className="flex border-2 border-white items-center mt-[5vh] justify-center w-1/2 md:w-full">
+                            <h3
+                                className="text-center font-bold text-white"
+                                style={{
+                                    textShadow: "2px 2px 3px rgba(65,105,225,0.7)",
+                                    fontSize: "clamp(1.5rem, 3vw, 3rem)"
+                                }}
+                            >
+                                Rompe Barreras. Crece de manera digital.
+                            </h3>
+                        </div>
 
-                    <div className="flex flex-col items-center justify-center pt-[10vh] w-1/2 md:w-full">
-                        <p
-                            className="text-center font-bold text-white mb-4"
-                            style={{
-                                textShadow: "2px 2px 3px rgba(65,105,225,0.7)",
-                                fontSize: "clamp(1rem, 2vw, 1.5rem)",
-                                margin: 0,
-                                padding: "0.5rem"
-                            }}
-                        >
-                            Derriba barreras en una de las inmobiliarias digitales de mayor crecimiento del mundo y descubre nuevas maneras de facturar, aprender y hacer crecer tu negocio
-                        </p>
-                        <Link
-                            className="mt-[5vh] bg-transparent border-2 border-white hover:bg-bluecolor inline-block rounded-xl font-bold"
-                            href="https://join.expglobal.partners/index.html"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{
-                                color: "white",
-                                fontSize: "clamp(1rem, 2vw, 1.5rem)",
-                                padding: "0.5rem 1rem"
-                            }}
-                        >
-                            Conviértete en agente
-                        </Link>
-                    </div>
-º                </div>
-            </div>
-                </>
-                );
+                        <div className="flex flex-col items-center justify-center pt-[10vh] w-1/2 md:w-full">
+                            <p
+                                className="text-center font-bold text-white mb-4"
+                                style={{
+                                    textShadow: "2px 2px 3px rgba(65,105,225,0.7)",
+                                    fontSize: "clamp(1rem, 2vw, 1.5rem)",
+                                    margin: 0,
+                                    padding: "0.5rem"
+                                }}
+                            >
+                                Derriba barreras en una de las inmobiliarias digitales de mayor crecimiento del mundo y descubre nuevas maneras de facturar, aprender y hacer crecer tu negocio
+                            </p>
+                            <Link
+                                className="mt-[5vh] bg-transparent border-2 border-white hover:bg-bluecolor inline-block rounded-xl font-bold"
+                                href="https://join.expglobal.partners/index.html"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                    color: "white",
+                                    fontSize: "clamp(1rem, 2vw, 1.5rem)",
+                                    padding: "0.5rem 1rem"
+                                }}
+                            >
+                                Conviértete en agente
+                            </Link>
+                        </div>
+                        º                </div>
+                </div>
+            </AnimatedOnScroll>
+        </>
+    );
 }

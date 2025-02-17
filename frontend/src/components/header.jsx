@@ -5,17 +5,20 @@ import { FaFacebook, FaInstagram, FaPhone } from "react-icons/fa";
 import { AiOutlineMenuUnfold, AiOutlineMenuFold } from "react-icons/ai";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
-import AnimatedOnScroll from './AnimatedScroll';
+import { useNavbar } from './context /navBarContext';
+
+
 
 export default function ControlMenu() {
-  // Usamos usePathname para obtener la ruta actual (compatible con la carpeta app)
+  // Obtenemos el estado global del menú del contexto
+  const { menuVisible, toggleMenu } = useNavbar();
   const pathname = usePathname();
-  // Verifica si la ruta actual es /exp-realty
   const isExpRealty = pathname === '/exp-realty';
 
+  // Estado local para el dropdown (puedes seguir usándolo de forma local)
   const [isDropdownVisible, setDropdownVisible] = useState(false);
-  const [menuVisible, setMenuVisible] = useState(false);
 
+  // Referencias para enlaces extra y el enlace "Vende tu propiedad"
   const extraLinksRef = useRef(null);
   const [extraWidth, setExtraWidth] = useState(0);
 
@@ -49,15 +52,7 @@ export default function ControlMenu() {
 
   const handleMouseEnter = () => setDropdownVisible(true);
   const handleMouseLeave = () => setDropdownVisible(false);
-
-  const toggleMenu = () => {
-    setMenuVisible(!menuVisible);
-    setDropdownVisible(false);
-  };
-
-  const toggleDropdown = () => {
-    setDropdownVisible(!isDropdownVisible);
-  };
+  const toggleDropdown = () => setDropdownVisible(!isDropdownVisible);
 
   return (
     <div className="relative w-full">
@@ -78,10 +73,12 @@ export default function ControlMenu() {
       )}
 
       {/* Menú Principal */}
-
       <header
-        className={`relative z-10 flex-col items-center px-24 p-4 ${isExpRealty ? 'bg-gradient-to-r from-blue-900/40 via-amarillo/40 to-blue-900/40' : 'bg-white bg-opacity-40'
-          } w-max mx-auto rounded-full shadow-2xl hidden lg:flex`}
+        className={`relative z-10 flex-col items-center px-24 p-4 ${
+          isExpRealty
+            ? 'bg-gradient-to-r from-blue-900/40 via-amarillo/40 to-blue-900/40'
+            : 'bg-white bg-opacity-40'
+        } w-max mx-auto rounded-full shadow-2xl hidden lg:flex`}
       >
         {/* Íconos sociales y botón de menú */}
         <div className="absolute left-1/4 top-1/2 flex space-x-4 mt-4 ml-4">
@@ -99,18 +96,10 @@ export default function ControlMenu() {
         </div>
 
         <div className="absolute top-5 right-10 flex space-x-4 mt-4 mr-4">
-          <Link
-            href="https://www.facebook.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <Link href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
             <FaFacebook size={25} className="hover:text-gray-700 text-blue-600" />
           </Link>
-          <Link
-            href="https://www.instagram.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <Link href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">
             <FaInstagram size={25} className="hover:text-gray-700 text-pink-600" />
           </Link>
           <Link href="tel:+34919012103">
@@ -131,7 +120,6 @@ export default function ControlMenu() {
             ref={venderRef}
             className="relative whitespace-nowrap"
             onMouseEnter={handleMouseEnter}
-
           >
             <Link href="/vender" className="text-black hover:text-gray-700">
               Vende tu propiedad
@@ -158,7 +146,9 @@ export default function ControlMenu() {
           <div
             className="inline-block overflow-hidden transition-all duration-500 ease-in-out"
             style={{
-              width: menuVisible ? `${extraLinksRef.current ? extraLinksRef.current.scrollWidth : 0}px` : "0px",
+              width: menuVisible
+                ? `${extraLinksRef.current ? extraLinksRef.current.scrollWidth : 0}px`
+                : "0px",
               marginLeft: menuVisible ? "3rem" : "0rem",
             }}
           >
@@ -202,8 +192,9 @@ export default function ControlMenu() {
                   Vende tu propiedad
                 </button>
                 <div
-                  className={`transition-all duration-300 ease-in-out ${isDropdownVisible ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
-                    } overflow-hidden`}
+                  className={`transition-all duration-300 ease-in-out ${
+                    isDropdownVisible ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
+                  } overflow-hidden`}
                 >
                   <Link
                     href="/vender/comprar"

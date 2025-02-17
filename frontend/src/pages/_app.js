@@ -1,8 +1,12 @@
+// pages/_app.js
 import Head from 'next/head';
-import { useState, useEffect } from 'react';
 import Router from 'next/router';
+import { useState, useEffect } from 'react';
 import Layout from '../components/layout';
 import '../globals.css';
+import ControlMenu from '@/components/header';
+import { NavbarProvider } from '@/components/context /navBarContext';
+
 
 function MyApp({ Component, pageProps }) {
   const [loading, setLoading] = useState(false);
@@ -31,14 +35,16 @@ function MyApp({ Component, pageProps }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
       {loading ? (
-        // Loading screen displayed during page transitions
         <div className="flex justify-center items-center h-screen w-full bg-white">
           <p className="text-2xl font-bold">Cargando...</p>
         </div>
       ) : (
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
+        <NavbarProvider>
+          <Layout>
+            <ControlMenu />
+            <Component {...pageProps} />
+          </Layout>
+        </NavbarProvider>
       )}
     </>
   );

@@ -1312,7 +1312,9 @@ __turbopack_esm__({
     "deleteBlogPost": (()=>deleteBlogPost),
     "getBlogById": (()=>getBlogById),
     "getBlogPosts": (()=>getBlogPosts),
-    "getCountryPrefix": (()=>getCountryPrefix)
+    "getCountryPrefix": (()=>getCountryPrefix),
+    "getPropertyById": (()=>getPropertyById),
+    "getPropertyPosts": (()=>getPropertyPosts)
 });
 async function getCountryPrefix() {
     const response = await fetch('http://localhost:3000/prefix', {
@@ -1371,6 +1373,22 @@ async function getBlogById(id) {
     }
     const data = await response.json();
     return data;
+}
+async function getPropertyPosts() {
+    const response = await fetch(`http://localhost:3000/property`);
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al obtener los property posts');
+    }
+    return response.json();
+}
+async function getPropertyById(id) {
+    const response = await fetch(`http://localhost:3000/property/${id}`);
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al obtener el property post');
+    }
+    return response.json();
 }
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_refresh__.registerExports(module, globalThis.$RefreshHelpers$);
@@ -2158,82 +2176,88 @@ function ExpRealtyMore({ videoId, title }) {
                 lineNumber: 134,
                 columnNumber: 13
             }, this),
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "relative w-full bg-cover bg-center pb-10 h-[80vh] md:h-[80vh]",
-                style: {
-                    backgroundImage: "url('/agenteinmobiliario.jpg')"
-                },
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$AnimatedScroll$2e$jsx__$5b$client$5d$__$28$ecmascript$29$__["default"], {
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "absolute left-0 top-0 p-4 bg-black bg-opacity-50 border-2 border-white flex flex-row md:flex-col w-full md:w-1/3 h-auto md:h-[80vh]",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "flex border-2 border-white items-center mt-[5vh] justify-center w-1/2 md:w-full",
-                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                className: "text-center font-bold text-white",
-                                style: {
-                                    textShadow: "2px 2px 3px rgba(65,105,225,0.7)",
-                                    fontSize: "clamp(1.5rem, 3vw, 3rem)"
-                                },
-                                children: "Rompe Barreras. Crece de manera digital."
-                            }, void 0, false, {
-                                fileName: "[project]/src/components/exp/ExpRealty2.jsx",
-                                lineNumber: 176,
-                                columnNumber: 25
-                            }, this)
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/exp/ExpRealty2.jsx",
-                            lineNumber: 175,
-                            columnNumber: 21
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "flex flex-col items-center justify-center pt-[10vh] w-1/2 md:w-full",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                    className: "text-center font-bold text-white mb-4",
+                    className: "relative w-full bg-cover bg-center pb-10 h-[80vh] md:h-[80vh]",
+                    style: {
+                        backgroundImage: "url('/agenteinmobiliario.jpg')"
+                    },
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "absolute left-0 top-0 p-4 bg-black bg-opacity-50 border-2 border-white flex flex-row md:flex-col w-full md:w-1/3 h-auto md:h-[80vh]",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "flex border-2 border-white items-center mt-[5vh] justify-center w-1/2 md:w-full",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                    className: "text-center font-bold text-white",
                                     style: {
                                         textShadow: "2px 2px 3px rgba(65,105,225,0.7)",
-                                        fontSize: "clamp(1rem, 2vw, 1.5rem)",
-                                        margin: 0,
-                                        padding: "0.5rem"
+                                        fontSize: "clamp(1.5rem, 3vw, 3rem)"
                                     },
-                                    children: "Derriba barreras en una de las inmobiliarias digitales de mayor crecimiento del mundo y descubre nuevas maneras de facturar, aprender y hacer crecer tu negocio"
+                                    children: "Rompe Barreras. Crece de manera digital."
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/exp/ExpRealty2.jsx",
-                                    lineNumber: 188,
-                                    columnNumber: 25
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
-                                    className: "mt-[5vh] bg-transparent border-2 border-white hover:bg-bluecolor inline-block rounded-xl font-bold",
-                                    href: "https://join.expglobal.partners/index.html",
-                                    target: "_blank",
-                                    rel: "noopener noreferrer",
-                                    style: {
-                                        color: "white",
-                                        fontSize: "clamp(1rem, 2vw, 1.5rem)",
-                                        padding: "0.5rem 1rem"
-                                    },
-                                    children: "Conviértete en agente"
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/exp/ExpRealty2.jsx",
-                                    lineNumber: 199,
-                                    columnNumber: 25
+                                    lineNumber: 176,
+                                    columnNumber: 29
                                 }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/src/components/exp/ExpRealty2.jsx",
-                            lineNumber: 187,
-                            columnNumber: 21
-                        }, this),
-                        "º                "
-                    ]
-                }, void 0, true, {
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/exp/ExpRealty2.jsx",
+                                lineNumber: 175,
+                                columnNumber: 25
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "flex flex-col items-center justify-center pt-[10vh] w-1/2 md:w-full",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        className: "text-center font-bold text-white mb-4",
+                                        style: {
+                                            textShadow: "2px 2px 3px rgba(65,105,225,0.7)",
+                                            fontSize: "clamp(1rem, 2vw, 1.5rem)",
+                                            margin: 0,
+                                            padding: "0.5rem"
+                                        },
+                                        children: "Derriba barreras en una de las inmobiliarias digitales de mayor crecimiento del mundo y descubre nuevas maneras de facturar, aprender y hacer crecer tu negocio"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/exp/ExpRealty2.jsx",
+                                        lineNumber: 188,
+                                        columnNumber: 29
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                                        className: "mt-[5vh] bg-transparent border-2 border-white hover:bg-bluecolor inline-block rounded-xl font-bold",
+                                        href: "https://join.expglobal.partners/index.html",
+                                        target: "_blank",
+                                        rel: "noopener noreferrer",
+                                        style: {
+                                            color: "white",
+                                            fontSize: "clamp(1rem, 2vw, 1.5rem)",
+                                            padding: "0.5rem 1rem"
+                                        },
+                                        children: "Conviértete en agente"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/exp/ExpRealty2.jsx",
+                                        lineNumber: 199,
+                                        columnNumber: 29
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/exp/ExpRealty2.jsx",
+                                lineNumber: 187,
+                                columnNumber: 25
+                            }, this),
+                            "º                "
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/exp/ExpRealty2.jsx",
+                        lineNumber: 171,
+                        columnNumber: 21
+                    }, this)
+                }, void 0, false, {
                     fileName: "[project]/src/components/exp/ExpRealty2.jsx",
-                    lineNumber: 171,
+                    lineNumber: 167,
                     columnNumber: 17
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/exp/ExpRealty2.jsx",
-                lineNumber: 167,
+                lineNumber: 166,
                 columnNumber: 13
             }, this)
         ]
