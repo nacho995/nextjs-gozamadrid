@@ -3,5 +3,6 @@
   "/_document": "pages/_document.js",
   "/vender/comprar": "pages/vender/comprar.js",
   "/_error": "pages/_error.js",
-  "/property/[id]": "pages/property/[id].js"
+  "/property/[id]": "pages/property/[id].js",
+  "/exp-realty": "pages/exp-realty.js"
 }
