@@ -777,7 +777,7 @@ function DefaultPropertyContent({ property }) {
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "mt-6 pb-20",
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "grid lg:grid-cols-12 md:grid-cols-2 gap-6",
+                                        className: "grid grid-cols-1 lg:grid-cols-12 gap-6",
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: "lg:col-span-8",
@@ -831,7 +831,7 @@ function DefaultPropertyContent({ property }) {
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
                                                                                 lineNumber: 91,
-                                                                                columnNumber: 49
+                                                                                columnNumber: 53
                                                                             }, this),
                                                                             " ",
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -843,7 +843,7 @@ function DefaultPropertyContent({ property }) {
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
                                                                                 lineNumber: 91,
-                                                                                columnNumber: 107
+                                                                                columnNumber: 112
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
@@ -859,7 +859,7 @@ function DefaultPropertyContent({ property }) {
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
                                                                                 lineNumber: 94,
-                                                                                columnNumber: 49
+                                                                                columnNumber: 53
                                                                             }, this),
                                                                             "  ",
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -871,7 +871,7 @@ function DefaultPropertyContent({ property }) {
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
                                                                                 lineNumber: 94,
-                                                                                columnNumber: 105
+                                                                                columnNumber: 110
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {

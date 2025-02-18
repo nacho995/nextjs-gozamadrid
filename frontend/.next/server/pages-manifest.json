@@ -1,8 +1,12 @@
 {
   "/_app": "pages/_app.js",
   "/_document": "pages/_document.js",
+  "/blog/[id]": "pages/blog/[id].js",
+  "/blog": "pages/blog.js",
   "/vender/comprar": "pages/vender/comprar.js",
-  "/_error": "pages/_error.js",
   "/property/[id]": "pages/property/[id].js",
+  "/_error": "pages/_error.js",
+  "/vender": "pages/vender.js",
+  "/": "pages/index.js",
   "/exp-realty": "pages/exp-realty.js"
 }

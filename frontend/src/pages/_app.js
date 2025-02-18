@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import Layout from '../components/layout';
 import '../globals.css';
 import ControlMenu from '@/components/header';
-import { NavbarProvider } from '@/components/context /navBarContext';
+import { NavbarProvider } from '@/components/context/navBarContext';
 
 
 function MyApp({ Component, pageProps }) {
@@ -41,7 +41,7 @@ function MyApp({ Component, pageProps }) {
       ) : (
         <NavbarProvider>
           <Layout>
-            <ControlMenu />
+            
             <Component {...pageProps} />
           </Layout>
         </NavbarProvider>

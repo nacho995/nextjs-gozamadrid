@@ -77,7 +77,7 @@ export default function DefaultPropertyContent({ property }) {
                                 </div>
                             </div>
                             <div className="mt-6 pb-20">
-                                <div className="grid lg:grid-cols-12 md:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                                     <div className="lg:col-span-8">
                                         <div className="bg-white dark:bg-gray-100 p-6 rounded-md shadow dark:shadow-gray-700">
                                             <h4 className="text-2xl font-medium">{property.address}</h4>
@@ -88,10 +88,10 @@ export default function DefaultPropertyContent({ property }) {
                                                 </li>
 
                                                 <li className="flex items-center lg:me-6 me-4">
-                                                <MdMeetingRoom className="w-10 h-10 mr-5 text-amarillo"/> <span className="lg:text-xl">{property.rooms} Habitaciones</span>
+                                                    <MdMeetingRoom className="w-10 h-10 mr-5 text-amarillo" /> <span className="lg:text-xl">{property.rooms} Habitaciones</span>
                                                 </li>
                                                 <li className="flex items-center">
-                                                <FaRestroom className="w-10 h-10 mr-5 text-amarillo"/>  <span className="lg:text-xl">{property.wc} Baños</span>
+                                                    <FaRestroom className="w-10 h-10 mr-5 text-amarillo" />  <span className="lg:text-xl">{property.wc} Baños</span>
                                                 </li>
                                             </ul>
                                             <p className="text-black text-md">{property.description}</p>
