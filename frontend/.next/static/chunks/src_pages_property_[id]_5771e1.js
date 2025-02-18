@@ -5,11 +5,15 @@
 (globalThis.TURBOPACK_CHUNK_LISTS = globalThis.TURBOPACK_CHUNK_LISTS || []).push({
   "path": "static/chunks/src_pages_property_[id]_5771e1.js",
   "chunks": [
-    "static/chunks/node_modules_next_f80f03._.js",
+    "static/chunks/node_modules_next_63408d._.js",
     "static/chunks/node_modules_react_1cad9b._.js",
     "static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e07.js",
     "static/chunks/node_modules_react-dom_f14d04._.js",
     "static/chunks/node_modules_@react-spring_core_dist_react-spring_core_modern_mjs_c982ab._.js",
+    "static/chunks/node_modules_react-icons_hi2_index_mjs_6d8a1b._.js",
+    "static/chunks/node_modules_react-icons_md_index_mjs_57194a._.js",
+    "static/chunks/node_modules_react-icons_fa_index_mjs_bad01e._.js",
+    "static/chunks/node_modules_react-icons_lib_75a63d._.js",
     "static/chunks/node_modules_81559e._.js",
     "static/chunks/[root of the server]__40e577._.js"
   ],

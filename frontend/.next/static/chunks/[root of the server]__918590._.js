@@ -564,11 +564,47 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$ind
     e.code = 'MODULE_NOT_FOUND';
     throw e;
 })();
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/next/link.js [client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/next/image.js [client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$solid$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/@heroicons/react/solid/index.js [client] (ecmascript)");
+;
+var _s = __turbopack_refresh__.signature();
 "use client";
 ;
 ;
 ;
+;
+;
 function DefaultPropertyContent({ property }) {
+    _s();
+    const [current, setCurrent] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])(0);
+    if (!property.images || property.images.length === 0) {
+        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "relative w-full h-96 overflow-hidden rounded-lg shadow-md mb-6",
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                src: "/placeholder.png",
+                alt: "Placeholder",
+                fill: true,
+                style: {
+                    objectFit: "cover"
+                }
+            }, void 0, false, {
+                fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
+                lineNumber: 14,
+                columnNumber: 9
+            }, this)
+        }, void 0, false, {
+            fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
+            lineNumber: 13,
+            columnNumber: 7
+        }, this);
+    }
+    const prevSlide = ()=>{
+        setCurrent((prev)=>prev === 0 ? property.images.length - 1 : prev - 1);
+    };
+    const nextSlide = ()=>{
+        setCurrent((prev)=>prev === property.images.length - 1 ? 0 : prev + 1);
+    };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(AnimatedOnScroll, {
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("article", {
             className: "prose max-w-none",
@@ -582,80 +618,127 @@ function DefaultPropertyContent({ property }) {
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h5", {
                                     className: "text-lg font-semibold",
-                                    children: "Property Detail"
+                                    children: "Detalles de la propiedad"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                    lineNumber: 13,
+                                    lineNumber: 41,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
                                     className: "tracking-[0.5px] inline-block sm:mt-0 mt-3",
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                                            className: "inline-block capitalize text-[16px] font-medium dark:text-white/70 hover:text-green-600",
-                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
-                                                href: "/",
-                                                children: "Hously"
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                lineNumber: 16,
-                                                columnNumber: 19
-                                            }, this)
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                            lineNumber: 15,
-                                            columnNumber: 17
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                                             className: "inline-block text-base dark:text-white/70 mx-0.5",
                                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("i", {
                                                 className: "mdi mdi-chevron-right"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                lineNumber: 19,
+                                                lineNumber: 46,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                            lineNumber: 18,
+                                            lineNumber: 45,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                                            className: "inline-block capitalize text-[16px] font-medium text-green-600 dark:text-white",
+                                            className: "inline-block capitalize text-[16px] font-medium text-amarillo dark:text-white",
                                             "aria-current": "page",
-                                            children: "Property Detail"
+                                            children: "Detalles de la propiedad"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                            lineNumber: 21,
+                                            lineNumber: 48,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                    lineNumber: 14,
+                                    lineNumber: 44,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                            lineNumber: 12,
+                            lineNumber: 40,
                             columnNumber: 13
                         }, this),
-                        property.images && property.images.length > 0 && property.images[0].src && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "relative w-full h-96 overflow-hidden rounded-lg shadow-md mb-6",
-                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
-                                src: property.images[0].src,
-                                alt: property.images[0].alt || property.typeProperty,
-                                className: "w-full h-full object-cover"
-                            }, void 0, false, {
-                                fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                lineNumber: 30,
-                                columnNumber: 17
-                            }, this)
-                        }, void 0, false, {
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                                    src: property.images[current].src,
+                                    alt: property.images[current].alt || "Imagen principal",
+                                    fill: true,
+                                    style: {
+                                        objectFit: "cover"
+                                    }
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
+                                    lineNumber: 60,
+                                    columnNumber: 15
+                                }, this),
+                                property.images.length > 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    onClick: prevSlide,
+                                    className: "absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-2 rounded-full",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$solid$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["ChevronLeftIcon"], {
+                                        className: "h-6 w-6"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
+                                        lineNumber: 73,
+                                        columnNumber: 19
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
+                                    lineNumber: 69,
+                                    columnNumber: 17
+                                }, this),
+                                property.images.length > 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    onClick: nextSlide,
+                                    className: "absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-2 rounded-full",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$solid$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["ChevronRightIcon"], {
+                                        className: "h-6 w-6"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
+                                        lineNumber: 83,
+                                        columnNumber: 19
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
+                                    lineNumber: 79,
+                                    columnNumber: 17
+                                }, this),
+                                property.images.length > 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2",
+                                    children: property.images.map((img, idx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                            onClick: ()=>setCurrent(idx),
+                                            className: `w-12 h-12 border-2 rounded overflow-hidden ${idx === current ? "border-green-600" : "border-transparent"}`,
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                                                src: img.src,
+                                                alt: img.alt || `Miniatura ${idx + 1}`,
+                                                fill: true,
+                                                style: {
+                                                    objectFit: "cover"
+                                                }
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
+                                                lineNumber: 98,
+                                                columnNumber: 23
+                                            }, this)
+                                        }, idx, false, {
+                                            fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
+                                            lineNumber: 91,
+                                            columnNumber: 21
+                                        }, this))
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
+                                    lineNumber: 89,
+                                    columnNumber: 17
+                                }, this)
+                            ]
+                        }, void 0, true, {
                             fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                            lineNumber: 29,
-                            columnNumber: 15
+                            lineNumber: 58,
+                            columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "grid lg:grid-cols-12 md:grid-cols-2 gap-6 mt-6",
@@ -663,14 +746,14 @@ function DefaultPropertyContent({ property }) {
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "lg:col-span-8",
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "bg-white dark:bg-slate-900 p-6 rounded-md shadow dark:shadow-gray-700",
+                                        className: "bg-white dark:bg-gray-100 p-6 rounded-md shadow dark:shadow-gray-700",
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
                                                 className: "text-2xl font-medium",
                                                 children: property.address
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                lineNumber: 43,
+                                                lineNumber: 115,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -680,87 +763,87 @@ function DefaultPropertyContent({ property }) {
                                                         className: "flex items-center lg:me-6 me-4",
                                                         children: [
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("i", {
-                                                                className: "mdi mdi-arrow-expand-all lg:text-3xl text-2xl me-2 text-green-600"
+                                                                className: "mdi mdi-arrow-expand-all lg:text-3xl text-2xl me-2 text-amarillo"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                                lineNumber: 47,
+                                                                lineNumber: 119,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 className: "lg:text-xl",
                                                                 children: [
                                                                     property.m2,
-                                                                    " sqf"
+                                                                    " m2"
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                                lineNumber: 48,
+                                                                lineNumber: 120,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                        lineNumber: 46,
+                                                        lineNumber: 118,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                                                         className: "flex items-center lg:me-6 me-4",
                                                         children: [
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("i", {
-                                                                className: "mdi mdi-bed lg:text-3xl text-2xl me-2 text-green-600"
+                                                                className: "mdi mdi-bed lg:text-3xl text-2xl me-2 text-amarillo"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                                lineNumber: 51,
+                                                                lineNumber: 123,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 className: "lg:text-xl",
                                                                 children: [
                                                                     property.rooms,
-                                                                    " Beds"
+                                                                    " Habitaciones"
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                                lineNumber: 52,
+                                                                lineNumber: 124,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                        lineNumber: 50,
+                                                        lineNumber: 122,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                                                         className: "flex items-center",
                                                         children: [
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("i", {
-                                                                className: "mdi mdi-shower lg:text-3xl text-2xl me-2 text-green-600"
+                                                                className: "mdi mdi-shower lg:text-3xl text-2xl me-2 text-amarillo"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                                lineNumber: 55,
+                                                                lineNumber: 127,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 className: "lg:text-xl",
                                                                 children: [
                                                                     property.wc,
-                                                                    " Baths"
+                                                                    " Baños"
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                                lineNumber: 56,
+                                                                lineNumber: 128,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                        lineNumber: 54,
+                                                        lineNumber: 126,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                lineNumber: 45,
+                                                lineNumber: 117,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -768,7 +851,7 @@ function DefaultPropertyContent({ property }) {
                                                 children: property.description
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                lineNumber: 60,
+                                                lineNumber: 132,
                                                 columnNumber: 19
                                             }, this),
                                             property.mapEmbed && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -783,41 +866,41 @@ function DefaultPropertyContent({ property }) {
                                                     allowFullScreen: true
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                    lineNumber: 65,
+                                                    lineNumber: 137,
                                                     columnNumber: 23
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                lineNumber: 64,
+                                                lineNumber: 136,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                        lineNumber: 42,
+                                        lineNumber: 114,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                    lineNumber: 41,
+                                    lineNumber: 113,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "lg:col-span-4",
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "rounded-md bg-white dark:bg-slate-900 shadow dark:shadow-gray-700 p-6",
+                                            className: "rounded-md bg-white dark:bg-amarillo/10 py-10 px-2 dark:shadow-gray-700",
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h5", {
                                                     className: "text-2xl font-medium",
                                                     children: "Price:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                    lineNumber: 80,
+                                                    lineNumber: 152,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "flex justify-between items-center mt-4",
+                                                    className: "flex justify-between items-center mt-6",
                                                     children: [
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             className: "text-xl font-medium",
@@ -827,105 +910,53 @@ function DefaultPropertyContent({ property }) {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                            lineNumber: 82,
+                                                            lineNumber: 154,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                            className: "bg-green-600/10 text-green-600 text-sm px-2.5 py-0.75 rounded h-6",
-                                                            children: "For Sale"
+                                                            className: "bg-black text-amarillo text-sm px-2.5 py-0.75 rounded h-6",
+                                                            children: "En venta"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                            lineNumber: 83,
+                                                            lineNumber: 155,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                    lineNumber: 81,
+                                                    lineNumber: 153,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
                                                     className: "list-none mt-4",
-                                                    children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                                                            className: "flex justify-between items-center",
-                                                            children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                    className: "text-slate-400 text-sm",
-                                                                    children: "Days on Market"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                                    lineNumber: 89,
-                                                                    columnNumber: 23
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                    className: "font-medium text-sm",
-                                                                    children: property.daysOnMarket || "N/A"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                                    lineNumber: 90,
-                                                                    columnNumber: 23
-                                                                }, this)
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                            lineNumber: 88,
-                                                            columnNumber: 21
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                                                            className: "flex justify-between items-center mt-2",
-                                                            children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                    className: "text-slate-400 text-sm",
-                                                                    children: "Price per sq ft"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                                    lineNumber: 93,
-                                                                    columnNumber: 23
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                    className: "font-medium text-sm",
-                                                                    children: property.pricePerSqft || "N/A"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                                    lineNumber: 94,
-                                                                    columnNumber: 23
-                                                                }, this)
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                            lineNumber: 92,
-                                                            columnNumber: 21
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                                                            className: "flex justify-between items-center mt-2",
-                                                            children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                    className: "text-slate-400 text-sm",
-                                                                    children: "Monthly Payment (estimate)"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                                    lineNumber: 97,
-                                                                    columnNumber: 23
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                    className: "font-medium text-sm",
-                                                                    children: property.monthlyPayment || "N/A"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                                    lineNumber: 98,
-                                                                    columnNumber: 23
-                                                                }, this)
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                            lineNumber: 96,
-                                                            columnNumber: 21
-                                                        }, this)
-                                                    ]
-                                                }, void 0, true, {
+                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
+                                                        className: "flex justify-between items-center mt-2",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: "text-slate-400 text-sm",
+                                                                children: "Precio por metro cuadrado"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
+                                                                lineNumber: 161,
+                                                                columnNumber: 23
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: "font-medium text-sm",
+                                                                children: property.priceM2 || "N/A"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
+                                                                lineNumber: 162,
+                                                                columnNumber: 23
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
+                                                        lineNumber: 160,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                }, void 0, false, {
                                                     fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                    lineNumber: 87,
+                                                    lineNumber: 159,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -933,124 +964,137 @@ function DefaultPropertyContent({ property }) {
                                                     children: [
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                             className: "p-1 w-1/2",
-                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Link, {
+                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
                                                                 href: "/booking",
-                                                                className: "btn bg-green-600 hover:bg-green-700 text-white rounded-md w-full",
-                                                                children: "Book Now"
+                                                                className: "block text-white rounded-md w-full",
+                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                    className: "bg-black text-white hover:text-amarillo text-lg px-2.5 py-0.75 rounded p-2",
+                                                                    children: "Agenda una visita"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
+                                                                    lineNumber: 168,
+                                                                    columnNumber: 25
+                                                                }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                                lineNumber: 103,
+                                                                lineNumber: 167,
                                                                 columnNumber: 23
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                            lineNumber: 102,
+                                                            lineNumber: 166,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                             className: "p-1 w-1/2",
-                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Link, {
+                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
                                                                 href: "/offer",
-                                                                className: "btn bg-green-600 hover:bg-green-700 text-white rounded-md w-full",
-                                                                children: "Offer Now"
+                                                                className: "block text-white rounded-md w-full",
+                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                    className: "bg-black text-white hover:text-amarillo text-lg px-2.5 py-0.75 rounded p-2",
+                                                                    children: "Haz una oferta"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
+                                                                    lineNumber: 175,
+                                                                    columnNumber: 25
+                                                                }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                                lineNumber: 108,
+                                                                lineNumber: 174,
                                                                 columnNumber: 23
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                            lineNumber: 107,
+                                                            lineNumber: 173,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                    lineNumber: 101,
+                                                    lineNumber: 165,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                            lineNumber: 79,
+                                            lineNumber: 151,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "mt-12 text-center",
+                                            className: "mt-12 text-center py-14",
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                                    className: "mb-6 text-xl leading-normal font-medium text-black dark:text-white",
-                                                    children: "Have Question? Get in touch!"
+                                                    className: "mb-6 text-xl leading-normal font-medium text-black dark:text-black",
+                                                    children: "¿Tienes preguntas sobre esta propiedad?"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                    lineNumber: 116,
+                                                    lineNumber: 184,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                     className: "mt-6",
-                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Link, {
+                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
                                                         href: "/contact",
-                                                        className: "btn bg-transparent hover:bg-green-600 border border-green-600 text-green-600 hover:text-white rounded-md",
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("i", {
-                                                                className: "mdi mdi-phone align-middle me-2"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                                lineNumber: 124,
-                                                                columnNumber: 23
-                                                            }, this),
-                                                            " Contact us"
-                                                        ]
-                                                    }, void 0, true, {
+                                                        className: "border-amarillo text-amarillo hover:text-amarillo rounded-md",
+                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            className: "bg-black text-white hover:text-amarillo border text-xl px-2.5 py-0.75 rounded p-2",
+                                                            children: "Contáctanos"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
+                                                            lineNumber: 192,
+                                                            columnNumber: 23
+                                                        }, this)
+                                                    }, void 0, false, {
                                                         fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                        lineNumber: 120,
+                                                        lineNumber: 188,
                                                         columnNumber: 21
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                                    lineNumber: 119,
+                                                    lineNumber: 187,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                            lineNumber: 115,
+                                            lineNumber: 183,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                                    lineNumber: 78,
+                                    lineNumber: 150,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                            lineNumber: 39,
+                            lineNumber: 111,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                    lineNumber: 10,
+                    lineNumber: 38,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-                lineNumber: 9,
+                lineNumber: 37,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-            lineNumber: 8,
+            lineNumber: 36,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
-        lineNumber: 7,
+        lineNumber: 35,
         columnNumber: 5
     }, this);
 }
+_s(DefaultPropertyContent, "8+O75ArtRNvpQgzeZSk5wKohTHI=");
 _c = DefaultPropertyContent;
 var _c;
 __turbopack_refresh__.register(_c, "DefaultPropertyContent");
@@ -1165,7 +1209,6 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$pages$2f$api$2e$js__$
 ;
 ;
 ;
-// Importa las diferentes plantillas para las propiedades
 const PropertyDetail = ({ property })=>{
     if (!property) {
         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1175,17 +1218,16 @@ const PropertyDetail = ({ property })=>{
                 children: "Propiedad no encontrada"
             }, void 0, false, {
                 fileName: "[project]/src/pages/property/[id].js",
-                lineNumber: 12,
+                lineNumber: 10,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/src/pages/property/[id].js",
-            lineNumber: 11,
+            lineNumber: 9,
             columnNumber: 7
         }, this);
     }
-    // Selecciona la plantilla según el campo `template` de la propiedad.
-    // Por defecto se usa "default" si no se especifica
+    // Selecciona la plantilla en función del campo `template`
     let PropertyContentComponent;
     switch(property.template){
         case "estiloA":
@@ -1201,12 +1243,12 @@ const PropertyDetail = ({ property })=>{
             property: property
         }, void 0, false, {
             fileName: "[project]/src/pages/property/[id].js",
-            lineNumber: 31,
+            lineNumber: 28,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/pages/property/[id].js",
-        lineNumber: 30,
+        lineNumber: 27,
         columnNumber: 5
     }, this);
 };
