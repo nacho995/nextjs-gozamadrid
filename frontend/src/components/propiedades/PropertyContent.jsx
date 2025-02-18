@@ -36,8 +36,8 @@ export default function DefaultPropertyContent({ property }) {
                 <article className="prose max-w-none relative z-10">
                     <div className="container-fluid relative px-3">
                         <div className="layout-specing">
-                            <div className="md:flex justify-between items-center">
-                                <h5 className="text-lg font-semibold">Detalles de la propiedad</h5>
+                            <div className="md:flex justify-center items-center">
+                                <h5 className="text-3xl text-transparent bg-clip-text bg-gradient-to-b from-amarillo via-amarillo to-black  font-semibold">Detalles de la propiedad</h5>
                             </div>
                             <div className="flex flex-col items-center gap-4">
                                 <div className="relative w-full md:w-3/4 h-96 overflow-hidden rounded-lg shadow-md">
@@ -88,10 +88,10 @@ export default function DefaultPropertyContent({ property }) {
                                                 </li>
 
                                                 <li className="flex items-center lg:me-6 me-4">
-                                                <MdMeetingRoom className="w-10 h-10 mr-5"/> <span className="lg:text-xl">{property.rooms} Habitaciones</span>
+                                                <MdMeetingRoom className="w-10 h-10 mr-5 text-amarillo"/> <span className="lg:text-xl">{property.rooms} Habitaciones</span>
                                                 </li>
                                                 <li className="flex items-center">
-                                                <FaRestroom className="w-10 h-10 mr-5"/>  <span className="lg:text-xl">{property.wc} Baños</span>
+                                                <FaRestroom className="w-10 h-10 mr-5 text-amarillo"/>  <span className="lg:text-xl">{property.wc} Baños</span>
                                                 </li>
                                             </ul>
                                             <p className="text-black text-md">{property.description}</p>

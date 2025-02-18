@@ -678,9 +678,9 @@ function DefaultPropertyContent({ property }) {
                             className: "layout-specing",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "md:flex justify-between items-center",
+                                    className: "md:flex justify-center items-center",
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h5", {
-                                        className: "text-lg font-semibold",
+                                        className: "text-3xl text-transparent bg-clip-text bg-gradient-to-b from-amarillo via-amarillo to-black  font-semibold",
                                         children: "Detalles de la propiedad"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
@@ -827,7 +827,7 @@ function DefaultPropertyContent({ property }) {
                                                                         className: "flex items-center lg:me-6 me-4",
                                                                         children: [
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$md$2f$index$2e$mjs__$5b$client$5d$__$28$ecmascript$29$__["MdMeetingRoom"], {
-                                                                                className: "w-10 h-10 mr-5"
+                                                                                className: "w-10 h-10 mr-5 text-amarillo"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
                                                                                 lineNumber: 91,
@@ -843,7 +843,7 @@ function DefaultPropertyContent({ property }) {
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
                                                                                 lineNumber: 91,
-                                                                                columnNumber: 93
+                                                                                columnNumber: 107
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
@@ -855,7 +855,7 @@ function DefaultPropertyContent({ property }) {
                                                                         className: "flex items-center",
                                                                         children: [
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$icons$2f$fa$2f$index$2e$mjs__$5b$client$5d$__$28$ecmascript$29$__["FaRestroom"], {
-                                                                                className: "w-10 h-10 mr-5"
+                                                                                className: "w-10 h-10 mr-5 text-amarillo"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
                                                                                 lineNumber: 94,
@@ -871,7 +871,7 @@ function DefaultPropertyContent({ property }) {
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/propiedades/PropertyContent.jsx",
                                                                                 lineNumber: 94,
-                                                                                columnNumber: 91
+                                                                                columnNumber: 105
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
