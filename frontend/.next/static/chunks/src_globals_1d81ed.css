@@ -2423,6 +2423,10 @@ img, video {
   background-image: linear-gradient(to top right, var(--tw-gradient-stops));
 }
 
+.bg-gradient-to-b {
+  background-image: linear-gradient(to bottom, var(--tw-gradient-stops));
+}
+
 .from-amarillo {
   --tw-gradient-from: #c7a336 var(--tw-gradient-from-position);
   --tw-gradient-to: #c7a33600 var(--tw-gradient-to-position);
@@ -2513,6 +2517,11 @@ img, video {
   --tw-gradient-stops: var(--tw-gradient-from), #facc15 var(--tw-gradient-via-position), var(--tw-gradient-to);
 }
 
+.via-amarillo {
+  --tw-gradient-to: #c7a33600 var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), #c7a336 var(--tw-gradient-via-position), var(--tw-gradient-to);
+}
+
 .to-amarillo\/90 {
   --tw-gradient-to: #c7a336e6 var(--tw-gradient-to-position);
 }
@@ -2551,6 +2560,10 @@ img, video {
 
 .to-yellow-900 {
   --tw-gradient-to: #713f12 var(--tw-gradient-to-position);
+}
+
+.to-amarillo {
+  --tw-gradient-to: #c7a336 var(--tw-gradient-to-position);
 }
 
 .bg-cover {
