@@ -79,14 +79,14 @@ export default function ImageSlider() {
 
       {/* Botón centrado en la imagen */}
       <div className="p-3 bg-white/40 rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
-        <Link
+        <a
           href="https://valuation.lystos.com?clientId=cd55b10c-5ba6-4f65-854e-5c8adaf88a34"
           target="_blank"
           rel="noopener noreferrer"
           className="rounded-full border border-transparent transition-colors flex items-center justify-center bg-amarillo text-black gap-2 hover:bg-black hover:text-white text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 font-bold"
         >
           Valora el precio de tu propiedad
-        </Link>
+        </a>
       </div>
     </div>
     </AnimatedOnScroll>

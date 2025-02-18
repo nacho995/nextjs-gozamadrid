@@ -1,12 +1,13 @@
 import RegisterForm from "@/components/FormContact";
+import VenderPropiedad from "@/components/vender/venderPropiedad";
 
 
 
 export default function Vender() {
   return (
     <>
-    <h2>Formulario</h2>
-      <RegisterForm/>
+    
+      <VenderPropiedad/>
     </>
   );
 }
