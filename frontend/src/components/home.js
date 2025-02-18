@@ -23,14 +23,14 @@ import Agreements from "./Agreements";
 export default function Home() {
   return (
     <>
-      <div className="absolute top-0 left-0 mb-[-15%] w-full mb:h-full h-[20vh] z-0">
+      <div className="absolute top-0 left-0 w-full md:h-full h-[20vh] z-0">
         <Video />
       </div>
-      <div className="relative z-10 flex flex-col mt-[70vh] p-0">
-        <div className="w-full md:h-[100vh] h-[50vh] md:mt-[-0.5%] mt-[80%] z-0 flex justify-center items-center">
+      <div className="relative z-10 flex flex-col lg:mt-[70vh] p-0">
+        <div className="w-full md:h-[100vh] h-[50vh] md:mt-[-40vh] lg:mt-[0vh] z-0 flex justify-center items-center">
           <Cards />
         </div>
-        <div className="w-full h[100vh] mt-[5%] ">
+        <div className="w-full h[100vh] lg:mt-[5vh] md:mt-[100vh] ">
           <Eslogan />
         </div>
         <div className="w-full mb-4">

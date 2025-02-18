@@ -19,10 +19,10 @@ const Video = () => {
 
     return (
         <AnimatedOnScroll>
-            <div className="w-full md:h-[90vh] h-[25vh] overflow-hidden relative">
+            <div className="w-full md:mt-[-15vh] md:h-[90vh] h-[40vh] lg:mt-[0.5vh] overflow-hidden relative">
                 {/* Video */}
                 <video
-                    className="absolute md:top-[-10%] left-0 w-full md:h-full lg:object-cover"
+                    className="absolute md:top-[-10%] left-0 w-[110vw] md:h-full lg:object-cover"
                     autoPlay
                     muted
                     playsInline
@@ -34,9 +34,9 @@ const Video = () => {
 
                 {/* Línea gris con texto */}
                 <div
-                    className="w-full flex justify-center items-center z-10 relative mt-[35%] md:absolute md:bottom-0 md:left-0"
+                    className="w-full flex justify-center items-center z-10 relative mt-[35%] lg:mt-[35%] lg:mb-[3.5vh] md:mb-[20vh] md:absolute md:bottom-0 md:left-0"
                 >
-                    <div className="relative w-full md:h-40 h-12  flex items-center justify-center">
+                    <div className="relative w-full md:h-40 h-12 flex items-center justify-center">
                         <div
                             className="absolute w-full h-full bg-gradient-to-t"
                             style={{

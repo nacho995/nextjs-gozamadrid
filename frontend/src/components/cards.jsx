@@ -98,13 +98,10 @@ function DesktopCards({ card, index }) {
         <AnimatedOnScroll>
             {/* Contenedor principal fijo */}
             <div
-                className="relative w-[40vh] h-[40vh] group [perspective:1000px] transform transition duration-300 hover:scale-105"
-                style={{
-                    gridColumnStart: index + 1,
-                    gridRowStart: index + 1,
-                }}
+                className="relative w-[40vw] h-[40vh] group [perspective:1000px] transform transition duration-300 hover:scale-105"
+
             >
-                <div className="h-full w-full transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+                <div className="h-full w-[19vw] transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
                     {/* Cara frontal */}
                     <div
                         className="absolute inset-0 bg-yellow-300 text-black shadow-lg rounded-lg p-2 flex items-center justify-center [backface-visibility:hidden] overflow-hidden"
@@ -117,7 +114,7 @@ function DesktopCards({ card, index }) {
                             <div className="absolute inset-0 bg-white opacity-15 rounded-lg"></div>
                         </div>
                         <h2 className="text-3xl font-bold text-center text-black z-20"
-                                  style={{textShadow: "2px 2px 3px rgba(255,255,225,1)"}}>
+                            style={{ textShadow: "2px 2px 3px rgba(255,255,225,1)" }}>
                             {card.front}
                         </h2>
                     </div>
@@ -148,9 +145,47 @@ function DesktopCards({ card, index }) {
 function MobileCard({ card, index }) {
     const [flipped, setFlipped] = useState(false);
     return (
-        <div className="flex flex-col-5 items-center p-2">
+        <div className="flex flex-col items-center p-2">
+            {/* Imagen sobre la card */}
+            {index === 0 && (
+                <img
+                    src="/analisis.png"
+                    alt="Image for Card 1"
+                    className="mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
+                />
+            )}
+            {index === 1 && (
+                <img
+                    src="/agenteinmo.png"
+                    alt="Image for Card 2"
+                    className="mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
+                />
+            )}
+            {index === 2 && (
+                <img
+                    src="/analisisdemercado.jpeg"
+                    alt="Image for Card 3"
+                    className="mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
+                />
+            )}
+            {index === 3 && (
+                <img
+                    src="/agentesinmobiliarios.jpeg"
+                    alt="Image for Card 4"
+                    className="mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
+                />
+            )}
+            {index === 4 && (
+                <img
+                    src="/formFoto.jpeg"
+                    alt="Image for Card 5"
+                    className="mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
+                />
+            )}
+
+            {/* Card */}
             <div
-                className="w-[120%] h-[50vh] relative transition-transform duration-700 [transform-style:preserve-3d]"
+                className="w-[45vw] h-[30vh] relative transition-transform duration-700 [transform-style:preserve-3d]"
                 onClick={() => setFlipped(!flipped)}
                 style={{ transform: flipped ? "rotateY(180deg)" : "rotateY(0)" }}
             >
@@ -178,49 +213,13 @@ function MobileCard({ card, index }) {
                         className="absolute inset-0 bg-cover bg-center rounded-lg"
                         style={{ backgroundImage: "url('/fondonegro.jpg')" }}
                     ></div>
-                    <div className="relative z-10 text-center whitespace-normal break-words overflow-hidden text-xs sm:text-sm md:text-base lg:text-lg">
+                    <div className="relative z-10 text-center whitespace-normal break-words overflow-hidden text-xs sm:text-xs md:text-base lg:text-lg">
                         <ol className="list-decimal list-inside text-left text-white">
                             {card.back.props.children}
                         </ol>
                     </div>
                 </div>
             </div>
-            {/* Imagen debajo */}
-            {index === 0 && (
-                <img
-                    src="/analisis.png"
-                    alt="Image below Card 1"
-                    className="mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
-                />
-            )}
-            {index === 1 && (
-                <img
-                    src="/agenteinmo.png"
-                    alt="Image below Card 2"
-                    className="mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
-                />
-            )}
-            {index === 2 && (
-                <img
-                    src="/analisisdemercado.jpeg"
-                    alt="Image above Card 3"
-                    className="mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
-                />
-            )}
-            {index === 3 && (
-                <img
-                    src="/agentesinmobiliarios.jpeg"
-                    alt="Image above Card 4"
-                    className="mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
-                />
-            )}
-            {index === 4 && (
-                <img
-                    src="/formFoto.jpeg"
-                    alt="Image above Card 5"
-                    className="mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
-                />
-            )}
         </div>
     );
 }
@@ -229,7 +228,8 @@ function TabletCard({ card, index }) {
     const [flipped, setFlipped] = useState(false);
 
     return (
-        <div className="flex flex-col items-center p-2">
+
+        <div className="flex  flex-col items-center p-2">
             <div
                 className="w-[30vw] h-[55vh] relative transition-transform duration-700 [transform-style:preserve-3d]"
                 onClick={() => setFlipped(!flipped)}
@@ -303,6 +303,7 @@ function TabletCard({ card, index }) {
                 />
             )}
         </div>
+
     );
 }
 
@@ -311,7 +312,7 @@ export default function Cards() {
         <AnimatedOnScroll>
             {/* Desktop Version (visible en lg: ≥1024px) */}
             <div
-                className="flex justify-center items-center w-full p-10 h-[100vh]"
+                className="hidden lg:flex justify-center items-center w-full p-10 h-[100vh]"
                 style={{
                     background:
                         "linear-gradient(to top, transparent 0%, gray 50%, transparent 100%)",
@@ -319,15 +320,17 @@ export default function Cards() {
             >
                 <div
                     className="grid grid-cols-5 grid-rows-5 gap-4 w-full h-[70vh]"
-                    
+
                 >
                     {cardData.map((card, index) => (
-                        <DesktopCards key={index} card={card} index={index} />
+                        <div key={index} style={{ gridColumnStart: index + 1, gridRowStart: index + 1 }}>
+                            <DesktopCards key={index} card={card} index={index} />
+                        </div>
                     ))}
                 </div>
             </div>
             {/* Tablet Version (visible en md: 768px a lg: 1023px) */}
-            <div className="hidden md:flex lg:hidden justify-center items-center w-full p-5 min-h-screen">
+            <div className="hidden md:flex lg:hidden justify-center items-center w-full p-5 ">
                 <div className="grid grid-cols-3 gap-4 w-full max-w-3xl">
                     {cardData.map((card, index) => (
                         <TabletCard key={index} card={card} index={index} />
@@ -336,13 +339,16 @@ export default function Cards() {
             </div>
 
             {/* Mobile Version (visible para pantallas <768px) */}
-            <div className="md:hidden flex justify-center items-center w-full p-5 min-h-screen">
+           
+            <div className="md:hidden flex justify-center items-start w-full p-5">
                 <div className="grid grid-cols-2 gap-4 w-full max-w-xl">
                     {cardData.map((card, index) => (
                         <MobileCard key={index} card={card} index={index} />
                     ))}
                 </div>
             </div>
+
+
         </AnimatedOnScroll>
     );
 }
