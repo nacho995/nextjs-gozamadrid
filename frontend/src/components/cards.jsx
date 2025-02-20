@@ -229,7 +229,7 @@ function TabletCard({ card, index }) {
 
     return (
 
-        <div className="flex  flex-col items-center p-2">
+        <div className="flex flex-col items-center p-2">
             <div
                 className="w-[30vw] h-[55vh] relative transition-transform duration-700 [transform-style:preserve-3d]"
                 onClick={() => setFlipped(!flipped)}
