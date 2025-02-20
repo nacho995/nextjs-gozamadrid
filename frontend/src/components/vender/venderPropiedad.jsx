@@ -35,7 +35,7 @@ export default function VenderPropiedad() {
                                 href="https://valuation.lystos.com?clientId=cd55b10c-5ba6-4f65-854e-5c8adaf88a34"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="block w-full sm:w-3/4 md:w-1/2 lg:w-[15vw] mx-auto rounded-full bg-white text-black px-4 py-2 text-sm font-bold hover:bg-black hover:text-white transition-colors"
+                                className="block w-full text-sm sm:w-3/4 md:w-1/2 lg:w-[15vw] mx-auto rounded-full bg-white text-black px-4 py-2  font-bold hover:bg-black hover:text-white transition-colors"
                             >
                                 Valora el precio de tu propiedad
                             </a>
