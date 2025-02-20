@@ -17,9 +17,6 @@ import Agreements from "./Agreements";
 
 
 
-
-
-
 export default function Home() {
   return (
     <>
@@ -27,7 +24,7 @@ export default function Home() {
         <Video />
       </div>
       <div className="relative z-10 flex flex-col lg:mt-[70vh] p-0">
-        <div className="w-full md:h-[100vh] h-[50vh] md:mt-[-40vh] lg:mt-[0vh] z-0 flex justify-center items-center">
+        <div className="w-full sm:mt-[80vh] sm:mb-[70vh] md:h-[100vh] h-[50vh] md:mt-[100vh] md:mb-[-50vh] lg:mt-[0vh] lg:mb-[20vh] my-[70vh] z-0 flex justify-center items-center">
           <Cards />
         </div>
         <div className="w-full h[100vh] lg:mt-[5vh] md:mt-[100vh] ">
