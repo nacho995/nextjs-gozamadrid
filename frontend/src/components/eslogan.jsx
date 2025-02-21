@@ -58,11 +58,18 @@ const Eslogan = () => {
                                 className="object-contain"
                             />
                         </div>
-                        <Link 
-                            href="/contacto" 
-                            className="hover:text-white hover:bg-black bg-amarillo text-black px-4 py-2 rounded mt-8 transition-all duration-300"
+                        <Link
+                            href="/contacto"
+                            className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-black/50 
+                                px-4 sm:px-6 lg:px-8 
+                                py-2 sm:py-2.5 lg:py-3 
+                                transition-all duration-300 hover:bg-black/70 backdrop-blur-sm
+                                max-w-[90%] sm:max-w-[80%] lg:max-w-none"
                         >
-                            Contáctenos
+                            <span className="relative text-sm sm:text-base lg:text-lg font-semibold text-white whitespace-normal text-center">
+                                Contáctenos
+                            </span>
+                            <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-amarillo via-black to-amarillo transition-transform duration-300 group-hover:translate-x-full"></span>
                         </Link>
                     </ScaleInView>
                 </div>

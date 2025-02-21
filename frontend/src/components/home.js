@@ -71,13 +71,14 @@ export default function Home() {
           </div>
           <hr className="w-full border-t-1 border-b-1 border-amber-400 mb-4" />
           <hr className="w-full border-t-1 border-b-1 border-black mb-4" />
-          <div className="mb[-50%] w-full p-4 max-w-full">
+          
+          <div className="w-full p-4 max-w-full mt-[40vh] sm:mt-[40vh] md:mt-16 lg:mt-0">
             <RegisterForm />
           </div>
         </div>
       </div>
 
-      <div className="relative z-50 w-full min-h-[50vh]">
+      <div className="relative z-[90] w-full min-h-[50vh] bg-white">
         <Agreements />
       </div>
     </>

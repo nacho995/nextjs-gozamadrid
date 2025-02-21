@@ -17,7 +17,7 @@ export default function GuiaCompraInmuebles() {
             <FadeInView direction="down" className="mb-16">
                 <div className="relative h-[60vh] rounded-2xl overflow-hidden hover:scale-[1.02] transition-all duration-300">
                     <Image
-                        src="/guiacompra.jpg"
+                        src="/guiacompra.png"
                         alt="Guía de Compra"
                         fill
                         className="object-cover"
@@ -125,7 +125,7 @@ export default function GuiaCompraInmuebles() {
                 className="relative rounded-2xl overflow-hidden mb-20"
             >
                 <Image
-                    src="/beneficios-compra.jpg"
+                    src="/beneficioscompra.png"
                     alt="Beneficios"
                     width={1200}
                     height={400}
