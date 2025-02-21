@@ -77,84 +77,99 @@ export default function DefaultPropertyContent({ property }) {
                                 </div>
                             </div>
                             <div className="mt-6 pb-20">
-                                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                                     <div className="lg:col-span-8">
-                                        <div className="bg-white dark:bg-gray-100 p-6 rounded-md shadow dark:shadow-gray-700">
-                                            <h4 className="text-2xl font-medium">{property.address}</h4>
-                                            <ul className="py-6 flex items-center list-none">
-                                                <li className="flex items-center lg:me-6 me-4">
-                                                    <HiMiniSquare3Stack3D className="w-10 h-10 mr-5 text-amarillo" />
-                                                    <span className="lg:text-xl">{property.m2} m2</span>
-                                                </li>
+                                        <div className="bg-white rounded-2xl shadow-lg p-8 transition-all duration-300 hover:shadow-xl">
+                                            <h4 className="text-3xl font-semibold text-gray-800 mb-6">{property.address}</h4>
+                                            
+                                            <div className="grid grid-cols-3 gap-6 py-8 border-t border-b border-gray-100">
+                                                <div className="flex items-center justify-center">
+                                                    <HiMiniSquare3Stack3D className="w-8 h-8 text-amarillo" />
+                                                    <div className="ml-4">
+                                                        <p className="text-sm text-gray-500">Superficie</p>
+                                                        <p className="text-lg font-semibold">{property.m2} m²</p>
+                                                    </div>
+                                                </div>
 
-                                                <li className="flex items-center lg:me-6 me-4">
-                                                    <MdMeetingRoom className="w-10 h-10 mr-5 text-amarillo" /> <span className="lg:text-xl">{property.rooms} Habitaciones</span>
-                                                </li>
-                                                <li className="flex items-center">
-                                                    <FaRestroom className="w-10 h-10 mr-5 text-amarillo" />  <span className="lg:text-xl">{property.wc} Baños</span>
-                                                </li>
-                                            </ul>
-                                            <p className="text-black text-md">{property.description}</p>
-                                        </div>
-                                        <div className="mt-6">
-                                            <iframe
-                                                width="100%"
-                                                height="400"
-                                                loading="lazy"
-                                                allowFullScreen
-                                                referrerPolicy="no-referrer-when-downgrade"
-                                                src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyAZAI0_oecmQkuzwZ4IM2H_NLynxD2Lkxo&q=${encodeURIComponent(property.address)}`}
-                                                title="Mapa de ubicación"
-                                            ></iframe>
+                                                <div className="flex items-center justify-center">
+                                                    <MdMeetingRoom className="w-8 h-8 text-amarillo" />
+                                                    <div className="ml-4">
+                                                        <p className="text-sm text-gray-500">Habitaciones</p>
+                                                        <p className="text-lg font-semibold">{property.rooms}</p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-center justify-center">
+                                                    <FaRestroom className="w-8 h-8 text-amarillo" />
+                                                    <div className="ml-4">
+                                                        <p className="text-sm text-gray-500">Baños</p>
+                                                        <p className="text-lg font-semibold">{property.wc}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="mt-8">
+                                                <h5 className="text-xl font-semibold mb-4">Descripción</h5>
+                                                <p className="text-gray-600 leading-relaxed">{property.description}</p>
+                                            </div>
+
+                                            <div className="mt-8 rounded-xl overflow-hidden shadow-lg">
+                                                <iframe
+                                                    width="100%"
+                                                    height="400"
+                                                    loading="lazy"
+                                                    allowFullScreen
+                                                    referrerPolicy="no-referrer-when-downgrade"
+                                                    src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyAZAI0_oecmQkuzwZ4IM2H_NLynxD2Lkxo&q=${encodeURIComponent(property.address)}`}
+                                                    title="Mapa de ubicación"
+                                                    className="rounded-xl"
+                                                ></iframe>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="lg:col-span-4">
-                                        <div className="rounded-md bg-white dark:bg-amarillo/10 py-10 px-2 dark:shadow-gray-700">
-                                            <h5 className="text-2xl font-medium">Price:</h5>
-                                            <div className="flex justify-between items-center mt-6">
-                                                <span className="text-xl font-medium">{property.price}€</span>
-                                                <span className="bg-black text-amarillo text-sm px-2.5 py-0.75 rounded h-6">
+                                    <div className="lg:col-span-4 space-y-8">
+                                        <div className="bg-white rounded-2xl shadow-lg p-8">
+                                            <div className="flex justify-between items-center mb-6">
+                                                <h5 className="text-2xl font-semibold text-gray-800">Precio</h5>
+                                                <span className="bg-amarillo/20 text-black font-semibold px-4 py-2 rounded-full text-sm">
                                                     En venta
                                                 </span>
                                             </div>
-                                            <ul className="list-none mt-4">
-                                                <li className="flex justify-between items-center mt-2">
-                                                    <span className="text-black text-md">Precio por metro cuadrado</span>
-                                                    <span className="font-medium text-md">{property.priceM2 || "N/A"}€</span>
-                                                </li>
-                                            </ul>
-                                            <div className="flex mt-4">
-                                                <div className="p-1 w-1/2">
-                                                    <Link href="/booking" className="block text-white rounded-md w-full no-underline">
-                                                        <span className="bg-black text-white hover:text-amarillo text-lg px-2.5 py-0.75 rounded p-2">
-                                                            Agenda una visita
-                                                        </span>
-                                                    </Link>
+
+                                            <div className="text-3xl font-bold text-gray-800 mb-6">
+                                                {property.price.toLocaleString()}€
+                                            </div>
+
+                                            <div className="p-4 bg-gray-50 rounded-xl mb-6">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-gray-600">Precio/m²</span>
+                                                    <span className="font-semibold">{property.priceM2 || "N/A"}€</span>
                                                 </div>
-                                                <div className="p-1 w-1/2">
-                                                    <Link href="/offer" className="block text-white rounded-md w-full no-underline">
-                                                        <span className="bg-black text-white hover:text-amarillo text-lg px-2.5 py-0.75 rounded p-2">
-                                                            Haz una oferta
-                                                        </span>
-                                                    </Link>
-                                                </div>
+                                            </div>
+
+                                            <div className="space-y-4">
+                                                <Link href="/booking" className="block">
+                                                    <button className="w-full bg-black text-white hover:bg-gray-800 transition-colors duration-300 py-3 rounded-xl font-semibold flex items-center justify-center space-x-2">
+                                                        <span>Agendar Visita</span>
+                                                    </button>
+                                                </Link>
+                                                <Link href="/offer" className="block">
+                                                    <button className="w-full bg-amarillo text-black hover:bg-amarillo/90 transition-colors duration-300 py-3 rounded-xl font-semibold flex items-center justify-center space-x-2">
+                                                        <span>Hacer Oferta</span>
+                                                    </button>
+                                                </Link>
                                             </div>
                                         </div>
 
-                                        <div className="mt-12 text-center py-14">
-                                            <h3 className="mb-6 text-xl leading-normal font-medium text-black dark:text-black">
+                                        <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl shadow-lg p-8 text-center">
+                                            <h3 className="text-2xl font-semibold text-gray-800 mb-6">
                                                 ¿Tienes preguntas sobre esta propiedad?
                                             </h3>
-                                            <div className="mt-6">
-                                                <Link
-                                                    href="/contact"
-                                                    className="border-amarillo text-amarillo hover:text-amarillo rounded-md no-underline"
-                                                >
-                                                    <span className="bg-black text-white hover:text-amarillo border text-xl px-2.5 py-0.75 rounded p-2">
-                                                        Contáctanos
-                                                    </span>
-                                                </Link>
-                                            </div>
+                                            <Link href="/contact">
+                                                <button className="bg-black text-white hover:bg-gray-800 transition-colors duration-300 py-3 px-8 rounded-xl font-semibold">
+                                                    Contáctanos
+                                                </button>
+                                            </Link>
                                         </div>
                                     </div>
                                 </div>
