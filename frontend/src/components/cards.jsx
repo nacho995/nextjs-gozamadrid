@@ -127,7 +127,7 @@ function DesktopCards({ card, index }) {
                             className="absolute inset-0 bg-cover bg-center rounded-lg"
                             style={{ backgroundImage: "url('/fondonegro.jpg')" }}
                         ></div>
-                        <div className="relative z-10 text-center overflow-hidden whitespace-normal break-words text-sm sm:text-base md:text-lg lg:text-xl">
+                        <div className="relative z-10 text-center overflow-hidden whitespace-normal break-words text-sm sm:text-base md:text-lg lg:text-base">
                             <ol className="list-decimal list-inside text-left text-white">
                                 {card.back.props.children}
                             </ol>
@@ -312,7 +312,7 @@ export default function Cards() {
         <AnimatedOnScroll>
             {/* Desktop Version (visible en lg: ≥1024px) */}
             <div
-                className="hidden lg:flex justify-center items-center w-full p-10 h-[100vh]"
+                className="hidden lg:flex justify-center items-center w-full p-10 mt-[-60vh] h-[100vh]"
                 style={{
                     background:
                         "linear-gradient(to top, transparent 0%, gray 50%, transparent 100%)",

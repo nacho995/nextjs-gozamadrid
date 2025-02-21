@@ -23,14 +23,14 @@ export default function Guide() {
             </div>
 
             <div className="p-3 bg-white/40 rounded-full absolute flex items-end top-2/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
-                <Link
+                <a
                     className="rounded-full border border-transparent transition-colors flex items-center justify-center bg-amarillo text-black gap-2 hover:bg-black hover:text-white text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 font-bold"
                     href="https://martalopezpedroza.exp-spain.com/1/descarga-de-guia-de-venta?t=20230526084141"
                     target="_blank"
                     rel="noopener noreferrer"
                 >
                     Ver guía
-                </Link>
+                </a>
             </div>
         </div>
         </AnimatedOnScroll>

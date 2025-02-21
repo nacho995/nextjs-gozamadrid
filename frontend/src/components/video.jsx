@@ -19,10 +19,10 @@ const Video = () => {
 
     return (
         <AnimatedOnScroll>
-            <div className="w-full md:mt-[-15vh] md:h-[90vh] h-[40vh] lg:mt-[0.5vh] overflow-hidden relative">
+            <div className="w-full h-[40vh] lg:h-[90vh] overflow-hidden relative">
                 {/* Video */}
                 <video
-                    className="absolute md:top-[-10%] left-0 w-[110vw] md:h-full lg:object-cover"
+                    className="absolute top-0 left-0 w-full h-full object-cover lg:object-fill"
                     autoPlay
                     muted
                     playsInline
@@ -32,39 +32,40 @@ const Video = () => {
                     Tu navegador no soporta el elemento de video.
                 </video>
 
-                {/* Línea gris con texto */}
-                <div
-                    className="w-full flex justify-center items-center z-10 relative mt-[35%] lg:mt-[35%] lg:mb-[3.5vh] md:mb-[20vh] md:absolute md:bottom-0 md:left-0"
-                >
-                    <div className="relative w-full md:h-40 h-12 flex items-center justify-center">
-                        <div
-                            className="absolute w-full h-full bg-gradient-to-t"
-                            style={{
-                                background:
-                                    "linear-gradient(to top, transparent 5%, black 20%, black 80%, transparent 95%)",
-                            }}
-                        ></div>
-                        <span className="relative text-transparent bg-clip-text bg-gradient-to-r from-white via-yellow-400 to-white px-2 md:text-6xl text-sm font-bold">
-                            Invierte en bienes inmuebles en Madrid
-                        </span>
-                    </div>
-                </div>
-
-
-                {/* Botón centrado dentro del video:
-            - En móviles/tablets (default): top-1/4 (25% desde arriba)
-            - En PC (a partir de md): top-1/2 (centrado verticalmente) */}
-                <div className="p-3 bg-white/40 rounded-full absolute top-[10vh] md:top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+                {/* Botón centrado */}
+                <div className="absolute top-[25%] lg:top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-full flex justify-center items-center">
                     <Link
-                        className="rounded-full border border-transparent transition-colors flex items-center justify-center bg-amarillo text-black gap-2 hover:bg-black hover:text-white text-sm sm:text-lg h-10 sm:h-12 px-4 sm:px-5 font-bold"
                         href="https://valuation.lystos.com?clientId=cd55b10c-5ba6-4f65-854e-5c8adaf88a34"
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-black/50 
+                            px-4 sm:px-6 lg:px-8 
+                            py-2 sm:py-2.5 lg:py-3 
+                            transition-all duration-300 hover:bg-black/70 backdrop-blur-sm
+                            max-w-[90%] sm:max-w-[80%] lg:max-w-none"
+                        whileHover={{ scale: 1.05 }}
+                        transition={{ duration: 0.3 }}
                     >
-                        Valora el precio de tu propiedad
+                        <span className="relative text-sm sm:text-base lg:text-lg font-semibold text-white whitespace-normal text-center">
+                            Valora el precio de tu propiedad
+                        </span>
+                        <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-amarillo via-black to-amarillo transition-transform duration-300 group-hover:translate-x-full"></span>
                     </Link>
                 </div>
-                
+            </div>
+
+            {/* Línea gris con texto - Ahora fuera del contenedor del video */}
+            <div className="w-full flex justify-end items-center">
+                <div className="w-full h-12 lg:h-40 mt-[-10vh] sm:mt-[-1vh] md:mt-[-5vh] lg:mt-[-10vh] flex items-center justify-center">
+                    <div
+                        className="absolute w-full h-[10vh]  lg:h-[20vh] md:h-[10vh] sm:h-[10vh] bg-gradient-to-t"
+                        style={{
+                            background:
+                                "linear-gradient(to top, transparent 5%, black 20%, black 80%, transparent 95%)",
+                        }}
+                    ></div>
+                    <span className="relative text-transparent bg-clip-text bg-gradient-to-r from-white via-yellow-400 to-white px-2 text-sm lg:text-6xl font-bold">
+                        Invierte en bienes inmuebles en Madrid
+                    </span>
+                </div>
             </div>
         </AnimatedOnScroll>
     );
