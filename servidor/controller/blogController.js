@@ -76,9 +76,6 @@ const blogController = {
           res.status(500).json({ message: "No se pudo subir la imagen" });
         }
       }
-      
-
-
 }
 
 module.exports = blogController;

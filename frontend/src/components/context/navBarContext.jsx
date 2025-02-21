@@ -11,23 +11,23 @@ export const NavbarProvider = ({ children }) => {
     return false;
   });
 
-  const [dropdownVisible, setDropdownVisible] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('dropdownVisible') === 'true';
-    }
-    return false;
+  // Cambiar a un objeto para manejar múltiples dropdowns
+  const [dropdownVisible, setDropdownVisible] = useState({
+    vender: false,
+    servicios: false,
+    serviciosMobile: false
   });
 
   // Función para cambiar el estado del menú
   const toggleMenu = () => setMenuVisible(prev => !prev);
 
-  // toggleDropdown acepta un parámetro booleano; si se pasa, lo establece; si no, invierte el estado
-  const toggleDropdown = (val) => {
-    if (typeof val === 'boolean') {
-      setDropdownVisible(val);
-    } else {
-      setDropdownVisible(prev => !prev);
-    }
+  const toggleDropdown = (menu, value) => {
+    setDropdownVisible(prev => ({
+      ...prev,
+      vender: menu === 'vender' ? value : false,
+      servicios: menu === 'servicios' ? value : false,
+      serviciosMobile: menu === 'serviciosMobile' ? value : false
+    }));
   };
 
   // Actualizamos localStorage cada vez que cambian los estados
