@@ -31,7 +31,7 @@ export default function ExpRealty({ videoId, title }) {
                     <h2 className="italic text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-black via-blue-900 to-blue-800 text-center p-18">La Inmobiliaria Digital Nº1 en el Mundo</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-0 mt-0 min-h-[40vh] md:min-h-[60vh]">
                         <div
-                            className="bg-gradient-to-tr dark:text-white from-blue-950/90 via-black/90 to-amarillo/90 p-6 sm:p-10 text-base sm:text-xl font-bold z-20 grid grid-cols-1 border border-black  gap-0"
+                            className="bg-gradient-to-tr dark:text-white from-blue-950/90 to-black p-6 sm:p-10 text-base sm:text-xl font-bold z-20 grid grid-cols-1 border border-black  gap-0"
                             style={{ textShadow: "2px 2px 3px rgba(65,105,225,0.7)" }}
                         >
                             <h2 className="text-4xl sm:text-6xl flex pt-10 justify-center italic">
@@ -157,7 +157,7 @@ export default function ExpRealty({ videoId, title }) {
                             />
                         </div>
                         <div
-                            className="bg-gradient-to-tl dark:text-white from-blue-950/90 via-black/90 to-amarillo/90 p-6 sm:p-10 text-base sm:text-xl font-bold z-20 grid grid-cols-1 border border-black  gap-0"
+                            className="bg-gradient-to-tl dark:text-white from-blue-950/90 to-black p-6 sm:p-10 text-base sm:text-xl font-bold z-20 grid grid-cols-1 border border-black  gap-0"
                             style={{ textShadow: "2px 2px 3px rgba(65,105,225,0.7)" }}
                         >
                             <h2 className="text-4xl sm:text-6xl flex justify-center italic pt-10">
