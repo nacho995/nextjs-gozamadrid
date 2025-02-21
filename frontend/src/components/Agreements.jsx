@@ -3,39 +3,46 @@ import AnimatedOnScroll from "./AnimatedScroll";
 export default function Agreements() {
     return (
         <AnimatedOnScroll>
-        <div className="relative w-full min-h-[80vh] pb-[10vh] overflow-hidden">
-            {/* Fondo opaco */}
-            <div className="absolute inset-0 z-0 opacity-10"
+        <div className="relative w-full min-h-[80vh] pb-[10vh] overflow-hidden bg-white">
+            {/* Fondo opaco con z-index más alto */}
+            <div className="absolute inset-0 z-[100] opacity-10"
                 style={{
                     background: `
-         repeating-linear-gradient(
-           40deg,
-           #ffffff,
-           #ffffff 10vh,
-           #000000 50vh,
-           #C7A336  80vh
-         )`
+                        repeating-linear-gradient(
+                            40deg,
+                            #ffffff,
+                            #ffffff 10vh,
+                            #000000 50vh,
+                            #C7A336 80vh
+                        )
+                    `,
+                    backgroundAttachment: "fixed"
                 }}>
             </div>
 
-
-
-
-            <div className="relative z-10 h-[40vh] flex flex-col bg-fixed bg-center justify-center items-center text-center px-4"
+            {/* Hero section con z-index más alto */}
+            <div className="relative z-[110] h-[40vh] flex flex-col bg-fixed bg-center justify-center items-center text-center px-4"
                 style={{ backgroundImage: "url('/acuerdosyconvenios.jpg')" }}>
-                <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-black/20 z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-black/20"></div>
 
-                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-amarillo mb-4 relative z-20" style={{ textShadow: "2px 2px 5px gray" }}>
+                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-amarillo mb-4 relative z-[120]" 
+                    style={{ textShadow: "2px 2px 5px gray" }}>
                     Acuerdos y Convenios
                 </h2>
             </div>
 
-            {/* Contenido */}
-            <div className="relative z-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 gap-y-[25vh] mt-[5%] p-4">
+            {/* Contenido con z-index más alto */}
+            <div className="relative z-[110] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 gap-y-[25vh]  p-4">
                 
                 <div className="flex flex-col items-center">
                     <img src="/exprealty.png" alt="eXp" className="w-[50vh] h-[25vh] object-cover" />
-                    <p className="m-[8%] text-center">Descripción de la foto 1</p>
+                    <p className="m-[8%] text-center text-sm sm:text-base lg:text-lg">
+                        eXp Realty es una innovadora inmobiliaria internacional que revoluciona el sector inmobiliario. 
+                        Como parte de esta red global, ofrecemos servicios integrales de compra, venta y alquiler de propiedades, 
+                        respaldados por tecnología de vanguardia y un equipo de más de 89.000 agentes en todo el mundo. 
+                        Nuestra plataforma virtual única permite brindar un servicio personalizado y eficiente, 
+                        garantizando las mejores oportunidades inmobiliarias para nuestros clientes.
+                    </p>
                 </div>
                 <div className="flex flex-col items-center">
                     <img src="/advan.png" alt="advancing" className="w-[50vh] h-[25vh] object-cover" />
@@ -62,12 +69,12 @@ export default function Agreements() {
                     <p className="m-[8%] text-center">Hemos establecido un acuerdo exclusivo para nuestros asociados, que les permite acceder a tarifas altamente competitivas para ofrecer servicios de gestión de impagos a los propietarios que alquilan sus viviendas.</p>
                 </div>
                 <div className="flex flex-col items-center">
-                    <img src="/ordennails.png" alt="ordennails" className="w-[50vh] h-[25vh] " />
+                    <img src="/ordennails.png" alt="ordennails" className="w-[50vh] h-[25vh]  " />
                     <p className="m-[8%] text-center">Nuestro servicio de Organización Profesional ofrece una amplia gama de soluciones para mejorar la funcionalidad y el orden en tu hogar o lugar de trabajo. Desde la organización general hasta la planificación de rutinas familiares, pasando por la preparación de espacios específicos como la habitación del bebé o el trastero, estamos aquí para ayudarte en cada paso del camino. También ofrecemos asistencia en el cambio de armario, la retirada de enseres de un ser querido fallecido, la gestión de archivos físicos o digitales, y la preparación y post-mudanza.</p>
                 </div>
                 <div className="flex flex-col items-center">
-                    <img src="/reformatek.png" alt="reformatek" className="w-[50vh] h-[40vh] mt-[-20%]" />
-                    <p className="mr-[8%] ml-[8%] text-center mt-[8%]">Nuestro equipo de expertos en arquitectura, diseño y construcción trabaja en estrecha colaboración con cada cliente para entender sus objetivos y convertir sus ideas en realidad. Ya sea una reforma completa de una vivienda, la renovación de un espacio comercial o la rehabilitación de un edificio histórico, en ReformaTek nos comprometemos a ofrecer resultados excepcionales que superen las expectativas.</p>
+                    <img src="/reformatek.png" alt="reformatek" className="w-[50vh] h-[25vh] mt-[0vh]" />
+                    <p className="mr-[8%] ml-[8%] text-center mt-[8%] ">Nuestro equipo de expertos en arquitectura, diseño y construcción trabaja en estrecha colaboración con cada cliente para entender sus objetivos y convertir sus ideas en realidad. Ya sea una reforma completa de una vivienda, la renovación de un espacio comercial o la rehabilitación de un edificio histórico, en ReformaTek nos comprometemos a ofrecer resultados excepcionales que superen las expectativas.</p>
                 </div>
                 <div className="flex flex-col items-center">
                     <img src="/suelosyparedes.png" alt="suelosyparedes" className="w-[50vh] h-[25vh]" />

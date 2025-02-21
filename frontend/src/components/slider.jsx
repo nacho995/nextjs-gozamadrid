@@ -44,14 +44,23 @@ export default function ImageSlider() {
           >
             {/* Texto superpuesto a la imagen */}
             <div
-              className={`absolute top-[30%] left-[10%] text-3xl font-bold z-10 transition-opacity duration-500 ${
-                index === 1
-                  ? "flex opacity-100 bg-black/70 p-3 rounded-xl text-white"
-                  : "flex opacity-100 bg-white/70 p-3 rounded-xl text-black"
-              }`}
+              className={`absolute 
+                top-[15%] md:top-[20%] lg:top-[15%] xl:top-[30%]
+                left-[10%] 
+                text-base sm:text-xl md:text-2xl lg:text-3xl 
+                font-bold z-10 
+                transition-opacity duration-500
+                ${index === 1
+                  ? "flex opacity-100 bg-black/40 sm:bg-black/50 md:bg-black/60 lg:bg-black/70 p-2 sm:p-3 rounded-lg sm:rounded-xl text-white"
+                  : "flex opacity-100 bg-white/40 sm:bg-white/50 md:bg-white/60 lg:bg-white/70 p-2 sm:p-3 rounded-lg sm:rounded-xl text-black"
+                }
+                max-w-[80%] sm:max-w-[70%] md:max-w-[45%] lg:max-w-[35%] xl:max-w-[40%]
+              `}
             >
-              ¿Quieres saber <br />
-              el valor de tu vivienda?
+              <span className="leading-tight">
+                ¿Quieres saber <br />
+                el valor de tu vivienda?
+              </span>
             </div>
 
             {/* Gradiente superpuesto (solo para la imagen en el índice 1) */}
@@ -78,15 +87,20 @@ export default function ImageSlider() {
       </div>
 
       {/* Botón centrado en la imagen */}
-      <div className="p-3 bg-white/40 rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
-        <a
-          href="https://valuation.lystos.com?clientId=cd55b10c-5ba6-4f65-854e-5c8adaf88a34"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="rounded-full border border-transparent transition-colors flex items-center justify-center bg-amarillo text-black gap-2 hover:bg-black hover:text-white text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 font-bold"
+      <div className="absolute top-[60%] md:top-[65%] lg:top-[60%] xl:top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+        <Link
+          href="/valuation"
+          className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-black/50 
+            px-4 sm:px-6 lg:px-8 
+            py-2 sm:py-2.5 lg:py-3 
+            transition-all duration-300 hover:bg-black/70 backdrop-blur-sm
+            max-w-[90%] sm:max-w-[80%] lg:max-w-none"
         >
-          Valora el precio de tu propiedad
-        </a>
+          <span className="relative text-sm sm:text-base lg:text-lg font-semibold text-white whitespace-normal text-center">
+            Valora el precio de tu propiedad
+          </span>
+          <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-amarillo via-black to-amarillo transition-transform duration-300 group-hover:translate-x-full"></span>
+        </Link>
       </div>
     </div>
     </AnimatedOnScroll>

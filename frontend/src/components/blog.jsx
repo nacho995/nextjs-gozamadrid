@@ -41,11 +41,19 @@ const BlogHome = (props) => {
             <p className="md:text-md">{description}</p>
           </div>
           <div className="hidden flex-wrap items-center justify-end md:block">
-           <Link href="/blog">
-            <Button {...button} className="hover:bg-amarillo hover:font-bold">
-              {button.title}
-            </Button>
-            </Link>
+           <Link
+            href="/blog"
+            className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-black/50 
+                px-4 sm:px-6 lg:px-8 
+                py-2 sm:py-2.5 lg:py-3 
+                transition-all duration-300 hover:bg-black/70 backdrop-blur-sm
+                max-w-[90%] sm:max-w-[80%] lg:max-w-none"
+          >
+              <span className="relative text-sm sm:text-base lg:text-lg font-semibold text-white whitespace-normal text-center">
+                  Ver todo
+              </span>
+              <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-amarillo via-black to-amarillo transition-transform duration-300 group-hover:translate-x-full"></span>
+          </Link>
           </div>
         </div>
 
