@@ -8,12 +8,6 @@ import ScaleInView from '../animations/ScaleInView';
 export default function Services() {
     return (
         <div className="container mx-auto py-4 mt-[5vh] mb-[20vh]">
-            <FadeInView>
-                <h2 className="text-4xl font-bold text-center">
-                    Nuestros Servicios
-                </h2>
-            </FadeInView>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
                 {/* Servicio 1 */}
                 <div className="flex flex-col items-center text-center p-4 hover:transform hover:scale-105 transition-transform duration-300 rounded-lg h-full">

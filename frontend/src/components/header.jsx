@@ -160,10 +160,20 @@ export default function ControlMenu() {
             className="relative whitespace-nowrap"
             onMouseEnter={() => toggleDropdown('servicios', true)}
           >
-            <Link href="/servicios" className="text-black hover:text-gray-700 flex items-center gap-2">
-              Servicios
-              <AiOutlineDown className={`transition-transform duration-300 ${dropdownVisible.servicios ? 'rotate-180' : ''}`} />
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link 
+                href="/servicios" 
+                className="text-black hover:text-gray-700"
+                onClick={(e) => e.stopPropagation()}
+              >
+                Servicios
+              </Link>
+              <div className="cursor-pointer">
+                <AiOutlineDown 
+                  className={`transition-transform duration-300 ${dropdownVisible.servicios ? 'rotate-180' : ''}`}
+                />
+              </div>
+            </div>
             {dropdownVisible.servicios && (
               <div
                 className="absolute bg-black bg-opacity-50 backdrop-blur-sm rounded-lg shadow-lg flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold"
