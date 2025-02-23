@@ -149,13 +149,28 @@ export default function DefaultPropertyContent({ property }) {
 
                                             <div className="space-y-4">
                                                 <Link href="/booking" className="block">
-                                                    <button className="w-full bg-black text-white hover:bg-gray-800 transition-colors duration-300 py-3 rounded-xl font-semibold flex items-center justify-center space-x-2">
-                                                        <span>Agendar Visita</span>
+                                                    <button className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-black/20 w-full
+                                                        px-4 sm:px-6 lg:px-8 
+                                                        py-2 sm:py-2.5 lg:py-3 
+                                                        transition-all duration-300 hover:bg-black/40 backdrop-blur-sm"
+                                                    >
+                                                        <span className="relative text-sm sm:text-base lg:text-lg font-semibold text-black whitespace-normal text-center w-full">
+                                                            Agendar Visita
+                                                        </span>
+                                                        <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-amarillo via-black to-amarillo transition-transform duration-300 group-hover:translate-x-full"></span>
                                                     </button>
                                                 </Link>
+                                                
                                                 <Link href="/offer" className="block">
-                                                    <button className="w-full bg-amarillo text-black hover:bg-amarillo/90 transition-colors duration-300 py-3 rounded-xl font-semibold flex items-center justify-center space-x-2">
-                                                        <span>Hacer Oferta</span>
+                                                    <button className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-black/20 w-full
+                                                        px-4 sm:px-6 lg:px-8 
+                                                        py-2 sm:py-2.5 lg:py-3 
+                                                        transition-all duration-300 hover:bg-black/40 backdrop-blur-sm"
+                                                    >
+                                                        <span className="relative text-sm sm:text-base lg:text-lg font-semibold text-black whitespace-normal text-center w-full">
+                                                            Hacer Oferta
+                                                        </span>
+                                                        <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-amarillo via-black to-amarillo transition-transform duration-300 group-hover:translate-x-full"></span>
                                                     </button>
                                                 </Link>
                                             </div>
@@ -166,8 +181,15 @@ export default function DefaultPropertyContent({ property }) {
                                                 ¿Tienes preguntas sobre esta propiedad?
                                             </h3>
                                             <Link href="/contact">
-                                                <button className="bg-black text-white hover:bg-gray-800 transition-colors duration-300 py-3 px-8 rounded-xl font-semibold">
-                                                    Contáctanos
+                                                <button className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-black/20
+                                                    px-4 sm:px-6 lg:px-8 
+                                                    py-2 sm:py-2.5 lg:py-3 
+                                                    transition-all duration-300 hover:bg-black/40 backdrop-blur-sm"
+                                                >
+                                                    <span className="relative text-sm sm:text-base lg:text-lg font-semibold text-black whitespace-normal text-center">
+                                                        Contáctanos
+                                                    </span>
+                                                    <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-amarillo via-black to-amarillo transition-transform duration-300 group-hover:translate-x-full"></span>
                                                 </button>
                                             </Link>
                                         </div>
