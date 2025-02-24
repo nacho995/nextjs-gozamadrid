@@ -129,7 +129,7 @@ export default function ExpRealtyMore({ videoId, title }) {
             </AnimatedOnScroll>
             <AnimatedOnScroll>
                 <div
-                    className="hidden md:grid grid-cols-7 w-full overflow-hidden items-center "
+                    className="z-20 relative hidden md:grid grid-cols-7 w-full overflow-hidden items-center"
                     style={{ backgroundImage: "url('/fondoblanco.jpg')" }}
                 >
                     {/* Primer h2 en la columna 2 */}
@@ -177,8 +177,10 @@ export default function ExpRealtyMore({ videoId, title }) {
                 </div>
 
                 {/* Versión Mobile/Tablet: Visible para pantallas menores a md */}
-                <div className="md:hidden w-full py-8"
-                    style={{ backgroundImage: "url('/fondoblanco.jpg')" }}>
+                <div 
+                    className="z-20 relative md:hidden w-full py-8"
+                    style={{ backgroundImage: "url('/fondoblanco.jpg')" }}
+                >
                     <div className="flex flex-col items-center justify-center space-y-4">
                         {/* Texto combinado en un solo párrafo */}
                         <p

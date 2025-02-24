@@ -28,14 +28,62 @@ export default function ExpRealty({ videoId, title }) {
 
             <AnimatedOnScroll>
                 <div className="mx-0 text-transparent bg-clip-text">
-                    <h2 className="italic text-6xl font-bold bg-clip-text text-transparent 
-                        bg-gradient-to-r from-black via-blue-900 to-blue-800 
+                    <h2 className="italic text-6xl md:text-7xl lg:text-8xl font-bold 
+                        bg-clip-text text-transparent 
+                        bg-gradient-to-r from-black via-blue-900 to-blue-800
                         text-center p-18
                         hover:scale-105 
                         transition-all duration-500
-                        drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)]"
+                        drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)]
+                        relative
+                        group
+                        before:content-['']
+                        before:absolute
+                        before:inset-x-0
+                        before:bottom-0
+                        before:h-1
+                        before:bg-gradient-to-r
+                        before:from-transparent
+                        before:via-blue-600/30
+                        before:to-transparent
+                        before:transform
+                        before:scale-x-0
+                        before:origin-center
+                        before:transition-transform
+                        before:duration-500
+                        hover:before:scale-x-100
+                        after:content-['']
+                        after:absolute
+                        after:-inset-1
+                        after:bg-gradient-to-r
+                        after:from-blue-900/0
+                        after:via-blue-900/5
+                        after:to-blue-900/0
+                        after:blur-lg
+                        after:opacity-0
+                        after:transition-opacity
+                        after:duration-500
+                        hover:after:opacity-100
+                        tracking-tight
+                        leading-tight
+                        max-w-7xl
+                        mx-auto"
                     >
-                        La Inmobiliaria Digital Nº1 en el Mundo
+                        <span className="bg-clip-text text-transparent 
+                            bg-gradient-to-r from-amarillo via-blue-900 to-amarillo
+                            hover:from-blue-900 hover:via-black hover:to-blue-900
+                            transition-all duration-500"
+                        >
+                            La Inmobiliaria Digital
+                        </span>
+                        <br />
+                        <span className="bg-clip-text text-transparent 
+                            bg-gradient-to-r from-blue-900 via-amarillo to-blue-900
+                            hover:from-black hover:via-amarillo hover:to-black
+                            transition-all duration-500"
+                        >
+                            Nº1 en el Mundo
+                        </span>
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-0 mt-0 min-h-[40vh] md:min-h-[60vh]">
                         <div className="relative flex items-center justify-start h-full w-full overflow-hidden">
@@ -131,7 +179,7 @@ export default function ExpRealty({ videoId, title }) {
             </AnimatedOnScroll>
             <AnimatedOnScroll>
                 <div
-                    className="hidden md:grid grid-cols-7 w-full overflow-hidden items-center"
+                    className="hidden md:grid grid-cols-7 w-full overflow-hidden items-center relative z-10"
                     style={{ backgroundImage: "url('/fondoblue.jpg')" }}
                 >
                     {/* Primer h2 en la columna 2 */}

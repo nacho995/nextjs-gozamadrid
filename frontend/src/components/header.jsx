@@ -150,7 +150,6 @@ export default function ControlMenu() {
           >
             <div ref={extraLinksRef} className="inline-flex gap-11">
               <Link href="/reformas" className="text-black hover:text-gray-700 whitespace-nowrap">Reformas</Link>
-              <Link href="/inversores" className="text-black hover:text-gray-700 whitespace-nowrap">Inversores</Link>
               <Link href="/blog" className="text-black hover:text-gray-700">Blog</Link>
             </div>
           </div>
@@ -216,13 +215,36 @@ export default function ControlMenu() {
                   </div>
                 </div>
 
-                <Link 
-                  href="/servicios/residentes-extranjero" 
-                  className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200"
-                >
-                  <FaChartLine className="mr-3 text-amarillo" />
-                  Residentes en el extranjero
-                </Link>
+                <div className="relative group">
+                  <Link 
+                    href="/servicios/residentes-extranjero" 
+                    className="flex items-center justify-between px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200"
+                  >
+                    <div className="flex items-center">
+                      <FaChartLine className="mr-3 text-amarillo" />
+                      Residentes en el extranjero
+                    </div>
+                    <AiOutlineRight className="ml-2 group-hover:rotate-90 transition-transform duration-200" />
+                  </Link>
+                  
+                  {/* Submenú de Residentes en el extranjero */}
+                  <div className="absolute left-full top-0 hidden group-hover:block bg-black bg-opacity-50 backdrop-blur-sm rounded-lg shadow-lg min-w-[200px]">
+                    <Link 
+                      href="/servicios/residentes-extranjero/impuesto-renta" 
+                      className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200 border-b border-white/10"
+                    >
+                      <FaChartLine className="mr-3 text-amarillo" />
+                      Impuesto no residentes
+                    </Link>
+                    <Link 
+                      href="/servicios/residentes-extranjero/guia-compra" 
+                      className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200"
+                    >
+                      <FaHandshake className="mr-3 text-amarillo" />
+                      Guía de compra
+                    </Link>
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -271,7 +293,6 @@ export default function ControlMenu() {
 
               <Link href="/exp-realty" className="text-black hover:text-gray-700">eXp Realty</Link>
               <Link href="/reformas" className="text-black hover:text-gray-700">Reformas</Link>
-              <Link href="/inversores" className="text-black hover:text-gray-700">Inversores</Link>
               <div className="relative whitespace-nowrap flex flex-col">
                 <div className="flex items-center justify-between">
                   <Link href="/servicios" className="text-black hover:text-gray-700">
@@ -312,13 +333,31 @@ export default function ControlMenu() {
                         Guía de compra
                       </Link>
                     </div>
-                    <Link
-                      href="/servicios/residentes-extranjero"
-                      className="text-xs flex items-center px-4 py-3 text-white hover:bg-white/10 transition-colors duration-200"
-                    >
-                      <FaChartLine className="mr-2 text-amarillo" />
-                      Residentes en el extranjero
-                    </Link>
+                    <div className="border-b border-white/10">
+                      <Link
+                        href="/servicios/residentes-extranjero"
+                        className="text-sm flex items-center px-4 py-3 text-white hover:bg-white/10 transition-colors duration-200"
+                      >
+                        <FaChartLine className="mr-2 text-amarillo" />
+                        Residentes extranjero
+                      </Link>
+                    </div>
+                    <div>
+                      <Link
+                        href="/servicios/residentes-extranjero/impuesto-renta"
+                        className="text-sm flex items-center px-8 py-2 text-white hover:bg-white/10 transition-colors duration-200"
+                      >
+                        <FaChartLine className="mr-2 text-amarillo" />
+                        Impuestos
+                      </Link>
+                      <Link
+                        href="/servicios/residentes-extranjero/guia-compra"
+                        className="text-sm flex items-center px-8 py-2 text-white hover:bg-white/10 transition-colors duration-200"
+                      >
+                        <FaHandshake className="mr-2 text-amarillo" />
+                        Guía de compra
+                      </Link>
+                    </div>
                   </div>
                 )}
               </div>
