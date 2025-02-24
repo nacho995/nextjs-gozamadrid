@@ -1,23 +1,16 @@
 // components/AnimatedOnScroll.js
 import React from 'react';
-import { useSpring, animated } from 'react-spring';
-import { useInView } from 'react-intersection-observer';
+import { motion } from 'framer-motion';
 
 export default function AnimatedOnScroll({ children }) {
-  const [ref, inView] = useInView({
-    threshold: 0,         // Detecta cualquier parte visible
-    triggerOnce: true,    // Se dispara solo una vez
-  });
-
-  const animation = useSpring({
-    opacity: inView ? 1 : 0,
-    transform: inView ? 'translateX(0px)' : 'translateX(-100px)',
-    config: { duration: 800 },
-  });
-
   return (
-    <animated.div ref={ref} style={animation}>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+    >
       {children}
-    </animated.div>
+    </motion.div>
   );
 }

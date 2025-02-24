@@ -78,7 +78,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="relative z-[90] w-full min-h-[50vh] bg-white">
+      <div className="relative z-50 w-full min-h-[50vh]">
         <Agreements />
       </div>
     </>

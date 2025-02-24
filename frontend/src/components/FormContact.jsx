@@ -1,217 +1,165 @@
-import { useState, useEffect } from "react";
+"use client";
 
-
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { FaUser, FaEnvelope, FaPhone, FaComments } from 'react-icons/fa';
 
 import CountryPrefix from "./CountryPrefix";
 import AnimatedOnScroll from "./AnimatedScroll";
 
 const RegisterForm = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [prefix, setPrefix] = useState("");
-  const [errorMessage, setErrorMessage] = useState('');
-  
-
-  // Estado para manejar errores de validación y animación
-  const [errors, setErrors] = useState({
-    name: false,
-    email: false,
-    phone: false,
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    message: ''
   });
 
-  // Estado para manejar la animación de shake
-  const [shake, setShake] = useState({
-    name: false,
-    email: false,
-    phone: false,
-  });
-
-  // Agregar el prefijo al número de teléfono automáticamente
-  useEffect(() => {
-    if (prefix) {
-      setPhone(prevPhone => prevPhone.replace(prefix, "")); // quitar el prefijo anterior
-    }
-  }, [prefix]);
-
-  const completePhone = prefix + phone;
-
-  // Validación del formulario usando useState con shake
-  const validateForm = () => {
-    const newErrors = {
-      name: !name.trim(),
-      email: !email.trim(),
-      phone: !phone.trim(),
-    };
-
-    setErrors(newErrors);
-
-    // Aplicar animación de shake a los campos con error
-    setShake(newErrors);
-
-    // Quitar la clase de shake después de la animación
-    setTimeout(() => {
-      setShake({
-        name: false,
-        email: false,
-        phone: false,
-      });
-    }, 500); // Duración de la animación
-
-    return !Object.values(newErrors).includes(true);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Lógica de envío del formulario
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      setErrorMessage('Por favor corrige los campos marcados en rojo.');
-      return;
-    }
-
-    try {
-      const newUser = {
-        name,
-        email,
-        phone: completePhone,
-      };
-
-      const userData = await createUser(newUser); // Enviar a la API
-      console.log("Usuario creado:", userData);
-
-      setErrorMessage('');
-      
-
-    } catch (err) {
-      console.error('Error al registrar al usuario', err);
-      setErrorMessage('Hubo un problema al registrar al usuario. Intenta de nuevo más tarde.');
-    }
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
   };
 
   return (
     <AnimatedOnScroll>
-    <main>
-      <div className="flex flex-col lg:grid lg:grid-cols-2 min-h-screen">
-        {/* Formulario */}
-        <div className="w-full flex justify-center items-center order-1 lg:order-1">
-          <form className="space-y-4 sm:space-y-6 border-2 p-6 sm:p-8 lg:p-14 border-gray-400 w-full max-w-xl" onSubmit={handleSubmit}>
-            {errorMessage && <p className="text-red-500">{errorMessage}</p>}
-            
-            <div className="text-left">
-              <h2 className="text-xl sm:text-2xl lg:text-2xl font-bold">Contáctenos</h2>
-            </div>
-
-            {/* Grid de 5 columnas para móvil y tablet */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-              {/* Nombre - 2 columnas */}
-              <div className="sm:col-span-2">
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nombre:</label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                  placeholder="Nombre"
-                  className={`mt-1 block w-full px-4 py-2 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-amarillo focus:border-amarillo sm:text-sm ${shake.name ? 'shake' : ''}`}
-                />
-                {errors.name && <p className="text-red-500 text-sm">El nombre es obligatorio</p>}
-              </div>
-
-              {/* Email - 2 columnas */}
-              <div className="sm:col-span-2">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email:</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  placeholder="Email"
-                  className={`mt-1 block w-full px-4 py-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-amarillo focus:border-amarillo sm:text-sm ${shake.email ? 'shake' : ''}`}
-                />
-                {errors.email && <p className="text-red-500 text-sm">El email es obligatorio</p>}
-              </div>
-
-              {/* País - 1 columna */}
-              <div className="sm:col-span-1">
-                <label htmlFor="country" className="block text-sm font-medium text-gray-700">País:</label>
-                <CountryPrefix onChange={prefix => setPrefix(prefix)} />
-              </div>
-
-              {/* Teléfono - 1 columna */}
-              <div className="sm:col-span-1">
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Teléfono:</label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={phone}
-                  onChange={e => setPhone(e.target.value)}
-                  placeholder="Teléfono"
-                  className={`mt-1 block w-full px-4 py-2 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-amarillo focus:border-amarillo sm:text-sm ${shake.phone ? 'shake' : ''}`}
-                />
-                {errors.phone && <p className="text-red-500 text-sm">El teléfono es obligatorio</p>}
-              </div>
-
-              {/* Asunto - 2 columnas */}
-              <div className="sm:col-span-2">
-                <label htmlFor="asunto" className="block text-sm font-medium text-gray-700">Asunto:</label>
-                <textarea
-                  id="asunto"
-                  name="asunto"
-                  placeholder="Escríbenos tus inquietudes"
-                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-amarillo focus:border-amarillo sm:text-sm"
-                  rows={4}
-                />
-              </div>
-            </div>
-
-            {/* Botón centrado */}
-            <div className="flex justify-center mt-6">
-              <button
-                type="submit"
-                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-black/50 
-                    px-4 sm:px-6 lg:px-8 
-                    py-2 sm:py-2.5 lg:py-3 
-                    transition-all duration-300 hover:bg-black/70 backdrop-blur-sm
-                    max-w-[90%] sm:max-w-[80%] lg:max-w-none"
+      <main className="min-h-screen flex items-center justify-center py-12">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col lg:flex-row gap-8 items-center justify-between">
+            {/* Columna del Formulario */}
+            <div className="w-full lg:w-1/2">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl shadow-2xl p-8"
               >
-                <span className="relative text-sm sm:text-base lg:text-lg font-semibold text-white whitespace-normal text-center">
-                    Enviar
-                </span>
-                <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-amarillo via-black to-amarillo transition-transform duration-300 group-hover:translate-x-full"></span>
-              </button>
+                <h2 className="text-3xl font-bold text-center mb-8 text-transparent bg-clip-text bg-gradient-to-r from-black via-amarillo to-black">
+                  Contacta con Nosotros
+                </h2>
+                
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="space-y-4">
+                    {/* Campo Nombre */}
+                    <div className="relative">
+                      <FaUser className="absolute top-1/2 left-4 transform -translate-y-1/2 text-amarillo" />
+                      <input
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        placeholder="Nombre completo"
+                        className="w-full pl-12 pr-4 py-3 rounded-lg bg-black/5 border border-gray-200 
+                          focus:border-amarillo focus:ring-2 focus:ring-amarillo/20 transition-all duration-300
+                          placeholder:text-gray-400"
+                        required
+                      />
+                    </div>
+
+                    {/* Campo Email */}
+                    <div className="relative">
+                      <FaEnvelope className="absolute top-1/2 left-4 transform -translate-y-1/2 text-amarillo" />
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        placeholder="Correo electrónico"
+                        className="w-full pl-12 pr-4 py-3 rounded-lg bg-black/5 border border-gray-200 
+                          focus:border-amarillo focus:ring-2 focus:ring-amarillo/20 transition-all duration-300
+                          placeholder:text-gray-400"
+                        required
+                      />
+                    </div>
+
+                    {/* Campo Teléfono */}
+                    <div className="relative">
+                      <FaPhone className="absolute top-1/2 left-4 transform -translate-y-1/2 text-amarillo" />
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        placeholder="Número de teléfono"
+                        className="w-full pl-12 pr-4 py-3 rounded-lg bg-black/5 border border-gray-200 
+                          focus:border-amarillo focus:ring-2 focus:ring-amarillo/20 transition-all duration-300
+                          placeholder:text-gray-400"
+                        required
+                      />
+                    </div>
+
+                    {/* Campo Mensaje */}
+                    <div className="relative">
+                      <FaComments className="absolute top-4 left-4 text-amarillo" />
+                      <textarea
+                        name="message"
+                        value={formData.message}
+                        onChange={handleChange}
+                        placeholder="¿En qué podemos ayudarte?"
+                        rows="4"
+                        className="w-full pl-12 pr-4 py-3 rounded-lg bg-black/5 border border-gray-200 
+                          focus:border-amarillo focus:ring-2 focus:ring-amarillo/20 transition-all duration-300
+                          placeholder:text-gray-400 resize-none"
+                        required
+                      ></textarea>
+                    </div>
+                  </div>
+
+                  {/* Botón de envío */}
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-black via-amarillo to-black text-white py-4 
+                      rounded-lg font-semibold shadow-lg hover:shadow-xl 
+                      transition-all duration-700 ease-in-out
+                      hover:from-amarillo hover:via-black hover:to-amarillo
+                      bg-[size:100%] hover:bg-[size:200%] bg-left hover:bg-right"
+                  >
+                    Enviar Mensaje
+                  </motion.button>
+
+                  <p className="text-sm text-gray-500 text-center mt-4">
+                    Nos pondremos en contacto contigo lo antes posible
+                  </p>
+                </form>
+              </motion.div>
             </div>
-          </form>
-        </div>
 
-        {/* Imagen */}
-        <div className="w-full flex justify-center items-center p-4 sm:p-6 order-2 lg:order-2">
-          <img 
-            src="/formFoto.jpeg" 
-            alt="Form Image" 
-            className="rounded-full shadow-md w-[200px] h-[200px] sm:w-[300px] sm:h-[300px] lg:w-[400px] lg:h-[400px] object-cover"
-          />
+            {/* Columna de la Imagen */}
+            <div className="w-full lg:w-1/2">
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="relative h-[600px] rounded-2xl overflow-hidden"
+              >
+                <div
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{
+                    backgroundImage: "url('/formFoto.jpeg')",
+                    
+                  }}
+                ></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent">
+                  <div className="absolute bottom-0 left-0 p-8 text-white">
+                    <h3 className="text-2xl font-bold mb-2">¿Necesitas ayuda?</h3>
+                    <p className="text-lg">
+                      Nuestro equipo de expertos está aquí para ayudarte en cada paso
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </div>
         </div>
-      </div>
-
-      {/* Estilos para la animación de shake */}
-      <style>
-        {`
-          @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-            100% { transform: translateX(0); }
-          }
-          .shake {
-            animation: shake 0.3s ease-in-out;
-          }
-        `}
-      </style>
-    </main>
+      </main>
     </AnimatedOnScroll>
   );
 };

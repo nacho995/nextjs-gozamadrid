@@ -9,7 +9,7 @@ import ExpRealtyMore from "./ExpRealty2";
 export default function ExpPage() {
     return (
         <div className="m-0 p-0">
-            <ExpRealty videoId="UHx6yIrI5UY" title="Exp Realty" />
+            <ExpRealty videoId="4NDjtS50SC4" title="Exp Realty" />
             <ExpCountries />
             <RegisterForm />
             <ExpRealtyMore />

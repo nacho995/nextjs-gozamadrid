@@ -49,7 +49,7 @@ export default function GuiaCompraInmuebles() {
             {/* Pasos del Proceso */}
             <div className="mb-20">
                 <h2 
-                    className="text-3xl font-bold text-center mb-12"
+                    className="text-3xl font-bold text-center mb-12 hover:scale-105 transition-all duration-300"
                     style={textShadowStyle}
                 >
                     Proceso de Compra Paso a Paso
@@ -92,7 +92,7 @@ export default function GuiaCompraInmuebles() {
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.1 }}
-                            className="bg-white/5 backdrop-blur-sm p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300"
+                            className="bg-white/5 backdrop-blur-sm p-8 rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300"
                         >
                             <div className="flex flex-col items-center text-center">
                                 <div className="mb-4 transform hover:scale-110 transition-transform duration-300">
@@ -122,7 +122,7 @@ export default function GuiaCompraInmuebles() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
-                className="relative rounded-2xl overflow-hidden mb-20"
+                className="relative rounded-2xl overflow-hidden mb-20 hover:scale-105 transition-all duration-300"
             >
                 <Image
                     src="/beneficioscompra.png"
@@ -147,7 +147,7 @@ export default function GuiaCompraInmuebles() {
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-white">
                             <FadeInView direction="left" delay={0.4}>
-                                <div>
+                                <div className="hover:scale-105 transition-all duration-300">
                                     <h3 className="text-xl font-bold mb-3" style={textShadowStyle}>
                                         Experiencia Comprobada
                                     </h3>
@@ -158,7 +158,7 @@ export default function GuiaCompraInmuebles() {
                                 </div>
                             </FadeInView>
                             <FadeInView direction="right" delay={0.6}>
-                                <div>
+                                <div className="hover:scale-105 transition-all duration-300">
                                     <h3 className="text-xl font-bold mb-3" style={textShadowStyle}>
                                         Servicio Integral
                                     </h3>
@@ -176,7 +176,7 @@ export default function GuiaCompraInmuebles() {
             {/* Sección Final CTA con animación */}
             <FadeInView direction="up" className="text-center max-w-3xl mx-auto">
                 <h2 
-                    className="text-3xl font-bold mb-6"
+                    className="text-3xl font-bold mb-6 hover:scale-105 transition-all duration-300"
                     style={textShadowStyle}
                 >
                     Comienza tu Proceso de Compra
@@ -186,7 +186,7 @@ export default function GuiaCompraInmuebles() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.2 }}
-                    className="text-xl mb-8"
+                    className="text-xl mb-8 hover:scale-105 transition-all duration-300"
                     style={textShadowLightStyle}
                 >
                     Nuestro equipo de expertos está listo para ayudarte a encontrar 
