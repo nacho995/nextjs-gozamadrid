@@ -6,6 +6,7 @@ import Layout from '../components/layout';
 import '../globals.css';
 import ControlMenu from '@/components/header';
 import { NavbarProvider } from '@/components/context/navBarContext';
+import { Toaster } from 'react-hot-toast';
 
 
 function MyApp({ Component, pageProps }) {
@@ -44,6 +45,28 @@ function MyApp({ Component, pageProps }) {
             
             <Component {...pageProps} />
           </Layout>
+          <Toaster 
+            position="top-right"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: '#333',
+                color: '#fff',
+              },
+              success: {
+                duration: 3000,
+                theme: {
+                  primary: '#4CAF50',
+                },
+              },
+              error: {
+                duration: 3000,
+                theme: {
+                  primary: '#E53E3E',
+                },
+              },
+            }}
+          />
         </NavbarProvider>
       )}
     </>

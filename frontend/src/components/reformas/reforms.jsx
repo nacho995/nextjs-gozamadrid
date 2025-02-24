@@ -66,7 +66,7 @@ export default function Reforms() {
                 "Mobiliario a medida",
                 "Optimización del espacio"
             ],
-            image: "/reformas/salon.jpg",
+            image: "/salon.jpg",
             icon: <FaHome />
         },
         {
@@ -78,7 +78,7 @@ export default function Reforms() {
                 "Pavimentos silenciosos",
                 "Iluminación ambiental"
             ],
-            image: "/reformas/dormitorio.jpg",
+            image: "/dormitorios.jpg",
             icon: <FaBed />
         },
         {
@@ -90,7 +90,7 @@ export default function Reforms() {
                 "Cortinas de vidrio",
                 "Moquetas vinílicas"
             ],
-            image: "/reformas/exterior.jpg",
+            image: "/exteriorReforma.jpg",
             icon: <FaTree />
         }
     ];
@@ -185,7 +185,7 @@ export default function Reforms() {
                         </p>
                         <div className="relative h-48 rounded-lg overflow-hidden">
                             <Image
-                                src="/reformas/paredes.jpg"
+                                src="/paredes.jpg"
                                 alt="Renovación de paredes"
                                 fill
                                 className="object-cover"
@@ -207,7 +207,7 @@ export default function Reforms() {
                         </p>
                         <div className="relative h-48 rounded-lg overflow-hidden">
                             <Image
-                                src="/reformas/suelos.jpg"
+                                src="/suelos.jpg"
                                 alt="Suelos innovadores"
                                 fill
                                 className="object-cover"
@@ -243,7 +243,7 @@ export default function Reforms() {
                         </div>
                         <div className="relative h-64 rounded-lg overflow-hidden">
                             <Image
-                                src="/reformas/exterior.jpg"
+                                src="/exteriores.jpg"
                                 alt="Reformas en exteriores"
                                 fill
                                 className="object-cover"

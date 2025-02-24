@@ -16,6 +16,8 @@
   "description": "",
   "dependencies": {
     "@next/font": "^14.2.15",
+    "nodemailer": "^6.10.0",
+    "react-hot-toast": "^2.5.2",
     "tailwindcss-textshadow": "^2.1.3"
   }
 }
