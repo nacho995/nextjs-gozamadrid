@@ -1,14 +1,60 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { HiMiniSquare3Stack3D } from "react-icons/hi2"
 import { MdMeetingRoom } from "react-icons/md";
 import { FaRestroom } from "react-icons/fa";
 import Link from "next/link";
 import Image from "next/image";
 import AnimatedOnScroll from "../AnimatedScroll";
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css";
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaCalendarAlt, FaClock, FaHandshake } from 'react-icons/fa';
+import { addDays, setHours, setMinutes } from 'date-fns';
+import es from 'date-fns/locale/es';
+import { toast } from 'react-hot-toast';
 
 export default function DefaultPropertyContent({ property }) {
     const [current, setCurrent] = useState(0);
+    const [showCalendar, setShowCalendar] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(null);
+    const [selectedTime, setSelectedTime] = useState(null);
+    const calendarRef = useRef(null);
+    const [showOfferPanel, setShowOfferPanel] = useState(false);
+    const [selectedOffer, setSelectedOffer] = useState(null);
+    const offerPanelRef = useRef(null);
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (calendarRef.current && !calendarRef.current.contains(event.target)) {
+                setShowCalendar(false);
+            }
+        }
+
+        if (showCalendar) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showCalendar]);
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (offerPanelRef.current && !offerPanelRef.current.contains(event.target)) {
+                setShowOfferPanel(false);
+            }
+        }
+
+        if (showOfferPanel) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showOfferPanel]);
 
     if (!property.images || property.images.length === 0) {
         return (
@@ -23,8 +69,102 @@ export default function DefaultPropertyContent({ property }) {
         );
     }
 
+    // Filtrar fechas pasadas y fines de semana
+    const filterAvailableDates = (date) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // Solo permitir fechas futuras y días de semana (L-V)
+        return date >= today && date.getDay() !== 0 && date.getDay() !== 6;
+    };
+
+    // Horarios disponibles (de 9:00 a 18:00)
+    const availableTimes = Array.from({ length: 10 }, (_, i) => {
+        return setHours(setMinutes(new Date(), 0), i + 9);
+    });
+
+    const handleSubmit = async () => {
+        if (selectedDate && selectedTime) {
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notifications`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        type: 'visit',
+                        data: {
+                            date: selectedDate,
+                            time: selectedTime.getHours(),
+                            propertyId: property.id,
+                            propertyAddress: property.address,
+                        }
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    toast.success('Visita agendada correctamente');
+                    setShowCalendar(false);
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                toast.error('Error al agendar la visita');
+                console.error('Error:', error);
+            }
+        }
+    };
+
+    const handleOfferSubmit = async () => {
+        if (selectedOffer) {
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notifications`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        type: 'offer',
+                        data: {
+                            offerAmount: selectedOffer.value,
+                            originalPrice: property.price,
+                            propertyId: property.id,
+                            propertyAddress: property.address,
+                        }
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    toast.success('Oferta enviada correctamente');
+                    setShowOfferPanel(false);
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                toast.error('Error al enviar la oferta');
+                console.error('Error:', error);
+            }
+        }
+    };
+
+    // Función para generar rangos de precios
+    const generateOfferRanges = (price) => {
+        const ranges = [
+            { percentage: 95, label: '5% menos', value: price * 0.95 },
+            { percentage: 90, label: '10% menos', value: price * 0.90 },
+            { percentage: 85, label: '15% menos', value: price * 0.85 },
+            { percentage: 80, label: '20% menos', value: price * 0.80 },
+            { percentage: 75, label: '25% menos', value: price * 0.75 },
+        ];
+        return ranges;
+    };
+
     return (
-        <div className="relative w-full min-h-screen">
+        <div className="relative w-full min-h-fit pb-32">
             <div
                 className="fixed inset-0 z-0 opacity-10 h-full"
                 style={{
@@ -148,31 +288,203 @@ export default function DefaultPropertyContent({ property }) {
                                             </div>
 
                                             <div className="space-y-4">
-                                                <Link href="/booking" className="block">
-                                                    <button className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-black/20 w-full
-                                                        px-4 sm:px-6 lg:px-8 
-                                                        py-2 sm:py-2.5 lg:py-3 
-                                                        transition-all duration-300 hover:bg-black/40 backdrop-blur-sm"
+                                                <div className="relative">
+                                                    <button
+                                                        onClick={() => setShowCalendar(!showCalendar)}
+                                                        className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-black/20 w-full
+                                                            px-4 sm:px-6 lg:px-8 
+                                                            py-2 sm:py-2.5 lg:py-3 
+                                                            transition-all duration-300 hover:bg-black/40 backdrop-blur-sm"
                                                     >
                                                         <span className="relative text-sm sm:text-base lg:text-lg font-semibold text-black whitespace-normal text-center w-full">
                                                             Agendar Visita
                                                         </span>
                                                         <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-amarillo via-black to-amarillo transition-transform duration-300 group-hover:translate-x-full"></span>
                                                     </button>
-                                                </Link>
+
+                                                    <AnimatePresence>
+                                                        {showCalendar && (
+                                                            <motion.div
+                                                                ref={calendarRef}
+                                                                initial={{ opacity: 0, y: -20 }}
+                                                                animate={{ opacity: 1, y: 0 }}
+                                                                exit={{ opacity: 0, y: -20 }}
+                                                                className="absolute z-50 mt-2 w-full bg-white rounded-xl shadow-xl p-4"
+                                                            >
+                                                                <div className="mb-4">
+                                                                    <h3 className="text-lg font-semibold mb-2 flex items-center">
+                                                                        <FaCalendarAlt className="mr-2 text-amarillo" />
+                                                                        Selecciona una fecha
+                                                                    </h3>
+                                                                    <DatePicker
+                                                                        selected={selectedDate}
+                                                                        onChange={(date) => setSelectedDate(date)}
+                                                                        filterDate={filterAvailableDates}
+                                                                        minDate={new Date()}
+                                                                        locale={es}
+                                                                        dateFormat="dd/MM/yyyy"
+                                                                        className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-amarillo focus:border-transparent"
+                                                                        placeholderText="Selecciona una fecha"
+                                                                        inline
+                                                                        showMonthDropdown
+                                                                        showYearDropdown
+                                                                        dropdownMode="select"
+                                                                        yearItemNumber={6}
+                                                                    />
+                                                                </div>
+
+                                                                {selectedDate && (
+                                                                    <motion.div
+                                                                        initial={{ opacity: 0 }}
+                                                                        animate={{ opacity: 1 }}
+                                                                        className="mb-4"
+                                                                    >
+                                                                        <h3 className="text-lg font-semibold mb-2 flex items-center">
+                                                                            <FaClock className="mr-2 text-amarillo" />
+                                                                            Horario disponible
+                                                                        </h3>
+                                                                        <div className="grid grid-cols-3 gap-2">
+                                                                            {availableTimes.map((time) => (
+                                                                                <button
+                                                                                    key={time.getTime()}
+                                                                                    onClick={() => setSelectedTime(time)}
+                                                                                    className={`p-2 rounded-lg text-sm transition-all duration-300 
+                                                                                        ${selectedTime?.getTime() === time.getTime()
+                                                                                            ? 'bg-amarillo text-white'
+                                                                                            : 'bg-gray-100 hover:bg-gray-200'
+                                                                                        }`}
+                                                                                >
+                                                                                    {time.getHours()}:00
+                                                                                </button>
+                                                                            ))}
+                                                                        </div>
+                                                                    </motion.div>
+                                                                )}
+
+                                                                {selectedDate && selectedTime && (
+                                                                    <motion.div
+                                                                        initial={{ opacity: 0 }}
+                                                                        animate={{ opacity: 1 }}
+                                                                        className="flex justify-end gap-2"
+                                                                    >
+                                                                        <button
+                                                                            onClick={() => setShowCalendar(false)}
+                                                                            className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-all duration-300"
+                                                                        >
+                                                                            Cancelar
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={handleSubmit}
+                                                                            className="px-4 py-2 rounded-lg bg-amarillo text-white hover:bg-amarillo/80 transition-all duration-300"
+                                                                        >
+                                                                            Confirmar Visita
+                                                                        </button>
+                                                                    </motion.div>
+                                                                )}
+                                                            </motion.div>
+                                                        )}
+                                                    </AnimatePresence>
+                                                </div>
                                                 
-                                                <Link href="/offer" className="block">
-                                                    <button className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-black/20 w-full
-                                                        px-4 sm:px-6 lg:px-8 
-                                                        py-2 sm:py-2.5 lg:py-3 
-                                                        transition-all duration-300 hover:bg-black/40 backdrop-blur-sm"
+                                                <div className="relative">
+                                                    <button
+                                                        onClick={() => setShowOfferPanel(!showOfferPanel)}
+                                                        className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-black/20 w-full
+                                                            px-4 sm:px-6 lg:px-8 
+                                                            py-2 sm:py-2.5 lg:py-3 
+                                                            transition-all duration-300 hover:bg-black/40 backdrop-blur-sm"
                                                     >
                                                         <span className="relative text-sm sm:text-base lg:text-lg font-semibold text-black whitespace-normal text-center w-full">
                                                             Hacer Oferta
                                                         </span>
                                                         <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-amarillo via-black to-amarillo transition-transform duration-300 group-hover:translate-x-full"></span>
                                                     </button>
-                                                </Link>
+
+                                                    <AnimatePresence>
+                                                        {showOfferPanel && (
+                                                            <motion.div
+                                                                ref={offerPanelRef}
+                                                                initial={{ opacity: 0, y: -20 }}
+                                                                animate={{ opacity: 1, y: 0 }}
+                                                                exit={{ opacity: 0, y: -20 }}
+                                                                className="absolute z-50 mt-2 w-full bg-white rounded-xl shadow-xl p-4"
+                                                                style={{
+                                                                    maxHeight: '80vh',
+                                                                    overflowY: 'auto',
+                                                                    marginBottom: '2rem'
+                                                                }}
+                                                            >
+                                                                <div className="mb-4">
+                                                                    <h3 className="text-lg font-semibold mb-4 flex items-center justify-between">
+                                                                        <span className="flex items-center">
+                                                                            <FaHandshake className="mr-2 text-amarillo" />
+                                                                            Selecciona tu oferta
+                                                                        </span>
+                                                                        <span className="text-sm text-gray-500">
+                                                                            Precio actual: {property.price.toLocaleString()}€
+                                                                        </span>
+                                                                    </h3>
+                                                                    <div className="space-y-2">
+                                                                        {generateOfferRanges(property.price).map((range, index) => (
+                                                                            <motion.button
+                                                                                key={index}
+                                                                                initial={{ opacity: 0, x: -20 }}
+                                                                                animate={{ opacity: 1, x: 0 }}
+                                                                                transition={{ delay: index * 0.1 }}
+                                                                                onClick={() => setSelectedOffer(range)}
+                                                                                className={`w-full p-3 rounded-lg transition-all duration-300 flex justify-between items-center
+                                                                                    ${selectedOffer?.percentage === range.percentage 
+                                                                                        ? 'bg-amarillo text-white' 
+                                                                                        : 'bg-gray-100 hover:bg-gray-200'}`}
+                                                                            >
+                                                                                <span>{range.label}</span>
+                                                                                <span className="font-semibold">
+                                                                                    {Math.round(range.value).toLocaleString()}€
+                                                                                </span>
+                                                                            </motion.button>
+                                                                        ))}
+                                                                        
+                                                                        <div className="mt-6 pt-4 border-t">
+                                                                            <p className="text-sm text-gray-600 mb-2">
+                                                                                ¿Tienes otra oferta en mente?
+                                                                            </p>
+                                                                            <input
+                                                                                type="number"
+                                                                                placeholder="Introduce tu oferta"
+                                                                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-amarillo focus:border-transparent mb-4"
+                                                                                onChange={(e) => setSelectedOffer({
+                                                                                    value: parseInt(e.target.value),
+                                                                                    label: 'Oferta personalizada'
+                                                                                })}
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                {selectedOffer && (
+                                                                    <motion.div
+                                                                        initial={{ opacity: 0 }}
+                                                                        animate={{ opacity: 1 }}
+                                                                        className="flex justify-end gap-2"
+                                                                    >
+                                                                        <button
+                                                                            onClick={() => setShowOfferPanel(false)}
+                                                                            className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-all duration-300"
+                                                                        >
+                                                                            Cancelar
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={handleOfferSubmit}
+                                                                            className="px-4 py-2 rounded-lg bg-amarillo text-white hover:bg-amarillo/80 transition-all duration-300"
+                                                                        >
+                                                                            Enviar Oferta
+                                                                        </button>
+                                                                    </motion.div>
+                                                                )}
+                                                            </motion.div>
+                                                        )}
+                                                    </AnimatePresence>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -180,11 +492,11 @@ export default function DefaultPropertyContent({ property }) {
                                             <h3 className="text-2xl font-semibold text-gray-800 mb-6">
                                                 ¿Tienes preguntas sobre esta propiedad?
                                             </h3>
-                                            <Link href="/contact">
-                                                <button className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-black/20
+                                            <Link href="/contacto">
+                                                <button className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-white/20
                                                     px-4 sm:px-6 lg:px-8 
                                                     py-2 sm:py-2.5 lg:py-3 
-                                                    transition-all duration-300 hover:bg-black/40 backdrop-blur-sm"
+                                                    transition-all duration-300 hover:bg-white/40 backdrop-blur-sm"
                                                 >
                                                     <span className="relative text-sm sm:text-base lg:text-lg font-semibold text-black whitespace-normal text-center">
                                                         Contáctanos
@@ -198,8 +510,10 @@ export default function DefaultPropertyContent({ property }) {
                             </div>
                         </div>
                     </div>
+
+                    {showOfferPanel && <div className="h-[500px]" />}
                 </article>
             </AnimatedOnScroll>
-        </div >
+        </div>
     );
 }
