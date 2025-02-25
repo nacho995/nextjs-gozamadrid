@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import Layout from '../components/layout';
 import '../globals.css';
 import ControlMenu from '@/components/header';
-import { NavbarProvider } from '@/components/context/navBarContext';
+import { NavbarProvider } from '../components/context/navBarContext';
 import { Toaster } from 'react-hot-toast';
 
 
@@ -35,40 +35,41 @@ function MyApp({ Component, pageProps }) {
         <meta name="description" content="Descripción de mi sitio web" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
-      {loading ? (
-        <div className="flex justify-center items-center h-screen w-full bg-white">
-          <p className="text-2xl font-bold">Cargando...</p>
-        </div>
-      ) : (
-        <NavbarProvider>
-          <Layout>
-            
-            <Component {...pageProps} />
-          </Layout>
-          <Toaster 
-            position="top-right"
-            toastOptions={{
-              duration: 3000,
-              style: {
-                background: '#333',
-                color: '#fff',
-              },
-              success: {
+      <NavbarProvider>
+        {loading ? (
+          <div className="flex justify-center items-center h-screen w-full bg-white">
+            <p className="text-2xl font-bold">Cargando...</p>
+          </div>
+        ) : (
+          <>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+            <Toaster 
+              position="top-right"
+              toastOptions={{
                 duration: 3000,
-                theme: {
-                  primary: '#4CAF50',
+                style: {
+                  background: '#333',
+                  color: '#fff',
                 },
-              },
-              error: {
-                duration: 3000,
-                theme: {
-                  primary: '#E53E3E',
+                success: {
+                  duration: 3000,
+                  theme: {
+                    primary: '#4CAF50',
+                  },
                 },
-              },
-            }}
-          />
-        </NavbarProvider>
-      )}
+                error: {
+                  duration: 3000,
+                  theme: {
+                    primary: '#E53E3E',
+                  },
+                },
+              }}
+            />
+          </>
+        )}
+      </NavbarProvider>
     </>
   );
 }

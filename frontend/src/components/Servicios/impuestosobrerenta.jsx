@@ -15,7 +15,7 @@ export default function ImpuestoSobreRenta() {
             <FadeInView direction="down" className="mb-16">
                 <div className="relative h-[60vh] rounded-2xl overflow-hidden hover:scale-[1.02] transition-all duration-300">
                     <Image
-                        src="/impuestos.jpg"
+                        src="/impuesto.jpg"
                         alt="Impuestos No Residentes"
                         fill
                         priority

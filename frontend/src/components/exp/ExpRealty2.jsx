@@ -420,7 +420,63 @@ export default function ExpRealtyMore({ videoId, title }) {
                     </div>
                 </div>
             </AnimatedOnScroll>
+            <AnimatedOnScroll>
+                <div className="container mx-auto py-16 relative z-20">
+                    <div className="text-center mb-12">
+                        <h3 
+                            className="text-4xl font-bold mb-4 
+                                bg-clip-text text-white
+                                drop-shadow-[0_2px_2px_rgba(255,255,255,0.3)]
+                                hover:scale-105 transition-all duration-300"
+                            style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.3)" }}
+                        >
+                            Conoce a nuestro equipo de eXp Realty
+                        </h3>
+                    </div>
 
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        {[1, 2, 3, 4].map((num) => (
+                            <div key={num} 
+                                className="group relative overflow-hidden rounded-xl shadow-lg 
+                                    hover:shadow-2xl transition-all duration-500 
+                                    transform hover:-translate-y-2"
+                            >
+                                {/* Contenedor de la imagen con efecto hover */}
+                                <div className="relative overflow-hidden aspect-square">
+                                    <img
+                                        src={`/${num}.png`}
+                                        alt={`Beneficio ${num}`}
+                                        className="w-full h-full object-cover transform 
+                                            group-hover:scale-110 transition-transform duration-500"
+                                    />
+                                    {/* Overlay gradiente */}
+                                    <div className="absolute inset-0 bg-gradient-to-t 
+                                        from-black/60 via-black/30 to-transparent 
+                                        group-hover:from-black/70 group-hover:via-black/40 
+                                        transition-all duration-500">
+                                    </div>
+                                </div>
+
+                                {/* Bordes decorativos que aparecen en hover */}
+                                <div className="absolute inset-[2px] border-2 border-white/0 rounded-lg 
+                                    scale-90 opacity-0 group-hover:scale-100 group-hover:opacity-100 
+                                    transition-all duration-700">
+                                </div>
+
+                                {/* Efectos de luz en las esquinas */}
+                                <div className="absolute -top-20 -right-20 w-40 h-40 
+                                    bg-blue-500/20 rounded-full blur-[100px] 
+                                    group-hover:bg-blue-400/30 transition-all duration-500">
+                                </div>
+                                <div className="absolute -bottom-20 -left-20 w-40 h-40 
+                                    bg-blue-600/20 rounded-full blur-[100px] 
+                                    group-hover:bg-blue-500/30 transition-all duration-500">
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </AnimatedOnScroll>
         </>
     );
 }

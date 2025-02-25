@@ -7,7 +7,7 @@ import Footer3 from './footer';
 
 const Layout = ({ children }) => (
   <>
-   <ControlMenu />
+   <ControlMenu className="z-50" />
     <main>{children}</main>
     <Footer3 />
   </>

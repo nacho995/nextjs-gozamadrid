@@ -10,7 +10,7 @@ export default function ExpCountries() {
         {
             name: "México",
             image: "/mexico.jpg",
-            link: "https://www.gob.mx/", // URL para México
+            link: "https://gozamerida.com/", // URL para México
             description: "Descubre las oportunidades..."
         },
         {
