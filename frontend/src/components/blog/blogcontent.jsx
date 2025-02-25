@@ -34,6 +34,7 @@ export default function DefaultBlogContent({ blog }) {
                   : blog.images[0].alt || blog.title
               }
               fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover transition-transform duration-300 hover:scale-105"
             />
           </figure>

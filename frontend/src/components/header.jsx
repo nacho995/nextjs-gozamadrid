@@ -74,10 +74,10 @@ export default function ControlMenu() {
   };
 
   return (
-    <div className="relative w-full z-50">
+    <div className="relative w-full z-[9999]">
       {/* Botón de menú para móviles */}
       {!menuVisible && (
-        <div className="lg:hidden fixed left-4 top-4 z-50 text-amarillo bg-gray-600 p-2 rounded">
+        <div className="lg:hidden fixed left-4 top-4 z-[9999] text-amarillo bg-gray-600 p-2 rounded">
           <button onClick={toggleMenu} className="text-amarillo hover:text-gray-700 flex items-center space-x-2">
             {menuVisible ? <AiOutlineMenuFold size={30} /> : <AiOutlineMenuUnfold size={30} />}
           </button>
@@ -86,7 +86,7 @@ export default function ControlMenu() {
 
       {/* Menú Principal */}
       <header
-        className={`relative z-10 flex-col items-center px-24 p-4 ${isExpRealty
+        className={`relative z-[9999] flex-col items-center px-24 p-4 ${isExpRealty
           ? 'bg-gradient-to-r from-blue-900/40 via-amarillo/40 to-blue-900/40'
           : 'bg-white bg-opacity-40'
           } w-max mx-auto rounded-full shadow-2xl hidden lg:flex`}
@@ -127,7 +127,7 @@ export default function ControlMenu() {
             </Link>
             {dropdownVisible.vender && (
               <div
-                className="absolute bg-black bg-opacity-50 backdrop-blur-sm rounded-lg shadow-lg flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold"
+                className="absolute bg-black bg-opacity-50 backdrop-blur-sm rounded-lg shadow-lg flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold z-[9998]"
                 style={{
                   top: "calc(100% + 18px)",
                   left: "50%",
@@ -183,7 +183,7 @@ export default function ControlMenu() {
             </div>
             {dropdownVisible.servicios && (
               <div
-                className="absolute bg-black bg-opacity-50 backdrop-blur-sm rounded-lg shadow-lg flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold"
+                className="absolute bg-black bg-opacity-50 backdrop-blur-sm rounded-lg shadow-lg flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold z-[9998]"
                 style={{
                   top: "calc(100% + 18px)",
                   left: "50%",
@@ -205,7 +205,7 @@ export default function ControlMenu() {
                   </Link>
 
                   {/* Submenú de Residentes en España */}
-                  <div className="absolute left-full top-0 hidden group-hover:block bg-black bg-opacity-50 backdrop-blur-sm rounded-lg shadow-lg min-w-[200px]">
+                  <div className="absolute left-full top-0 hidden group-hover:block bg-black bg-opacity-50 backdrop-blur-sm rounded-lg shadow-lg min-w-[200px] z-[9997]">
                     <Link
                       href={routes.residentes_espana_alquiler}
                       className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200 border-b border-white/10"
@@ -236,7 +236,7 @@ export default function ControlMenu() {
                   </Link>
 
                   {/* Submenú de Residentes en el extranjero */}
-                  <div className="absolute left-full top-0 hidden group-hover:block bg-black bg-opacity-50 backdrop-blur-sm rounded-lg shadow-lg min-w-[200px]">
+                  <div className="absolute left-full top-0 hidden group-hover:block bg-black bg-opacity-50 backdrop-blur-sm rounded-lg shadow-lg min-w-[200px] z-[9997]">
                     <Link
                       href={routes.residentes_extranjero_impuesto}
                       className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200 border-b border-white/10"
@@ -263,7 +263,7 @@ export default function ControlMenu() {
 
       {/* Menú Lateral para dispositivos móviles */}
       {menuVisible && (
-        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-20 lg:hidden">
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-[9999] lg:hidden">
           <div className="bg-white bg-opacity-50 w-64 max-h-screen shadow-lg flex flex-col p-4">
             <div className="flex justify-between items-center">
               <Image src="/logo.png" alt="Logo" width={100} height={20} />
@@ -317,7 +317,7 @@ export default function ControlMenu() {
                   </button>
                 </div>
                 {dropdownVisible.servicios && (
-                  <div className="ml-4 mt-2 flex flex-col bg-black bg-opacity-50 backdrop-blur-sm rounded-lg overflow-hidden">
+                  <div className="ml-4 mt-2 flex flex-col bg-black bg-opacity-50 backdrop-blur-sm rounded-lg overflow-hidden z-[9998]">
                     <div className="border-b border-white/10">
                       <Link
                         href={routes.residentes_espana}

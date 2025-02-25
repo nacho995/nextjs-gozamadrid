@@ -40,10 +40,10 @@ const RegisterForm = () => {
           >
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="bg-white bg-opacity-20 backdrop-blur-lg rounded-xl p-8 shadow-lg">
-                <h2 className="text-2xl font-bold text-center text-gray-700 mb-6">Contacta con nosotros</h2>
+                <h2 className="text-2xl font-bold text-center text-black mb-6">Contacta con nosotros</h2>
                 <div className="space-y-4">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="name" className="block text-sm font-medium text-black mb-1">
                       Nombre completo
                     </label>
                     <div className="relative">
@@ -54,7 +54,7 @@ const RegisterForm = () => {
                         id="name"
                         value={formData.name}
                         onChange={handleChange}
-                        className="pl-12 w-full p-3 bg-white bg-opacity-20 rounded-lg border border-white border-opacity-20 focus:border-amarillo focus:ring-2 focus:ring-amarillo text-gray-700 placeholder-gray-300"
+                        className="pl-12 w-full p-3 bg-white bg-opacity-20 rounded-lg border border-white border-opacity-20 focus:border-amarillo focus:ring-2 focus:ring-amarillo text-black placeholder-gray-300"
                         placeholder="Tu nombre"
                         required
                       />
@@ -62,7 +62,7 @@ const RegisterForm = () => {
                   </div>
 
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="email" className="block text-sm font-medium text-black mb-1">
                       Correo electrónico
                     </label>
                     <div className="relative">
@@ -73,7 +73,7 @@ const RegisterForm = () => {
                         id="email"
                         value={formData.email}
                         onChange={handleChange}
-                        className="pl-12 w-full p-3 bg-white bg-opacity-20 rounded-lg border border-white border-opacity-20 focus:border-amarillo focus:ring-2 focus:ring-amarillo text-gray-700 placeholder-gray-300"
+                        className="pl-12 w-full p-3 bg-white bg-opacity-20 rounded-lg border border-white border-opacity-20 focus:border-amarillo focus:ring-2 focus:ring-amarillo text-black placeholder-gray-300"
                         placeholder="tu@email.com"
                         required
                       />
@@ -81,7 +81,7 @@ const RegisterForm = () => {
                   </div>
 
                   <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="phone" className="block text-sm font-medium text-black mb-1">
                       Teléfono
                     </label>
                     <div className="relative flex gap-2">
@@ -89,7 +89,7 @@ const RegisterForm = () => {
                         value={formData.prefix}
                         onChange={(value) => setFormData(prev => ({ ...prev, prefix: value }))}
                         className="w-1/4 p-3 bg-white bg-opacity-20 rounded-lg border border-white border-opacity-20 
-                          focus:border-amarillo focus:ring-2 focus:ring-amarillo text-gray-700 text-sm"
+                          focus:border-amarillo focus:ring-2 focus:ring-amarillo text-black text-sm"
                       />
                       <div className="relative flex-1">
                         <FaPhone className="absolute top-1/2 left-4 transform -translate-y-1/2 text-amarillo" />
@@ -100,7 +100,7 @@ const RegisterForm = () => {
                           value={formData.phone}
                           onChange={handleChange}
                           className="w-[15vw] pl-12 p-3 bg-white bg-opacity-20 rounded-lg border border-white border-opacity-20 
-                            focus:border-amarillo focus:ring-2 focus:ring-amarillo text-gray-700 placeholder-gray-300"
+                            focus:border-amarillo focus:ring-2 focus:ring-amarillo text-black placeholder-gray-300"
                           placeholder="Número de teléfono"
                           required
                         />
@@ -109,7 +109,7 @@ const RegisterForm = () => {
                   </div>
 
                   <div>
-                    <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="message" className="block text-sm font-medium text-black mb-1">
                       Mensaje
                     </label>
                     <div className="relative">
@@ -120,7 +120,7 @@ const RegisterForm = () => {
                         value={formData.message}
                         onChange={handleChange}
                         rows="4"
-                        className="pl-12 w-full p-3 bg-white bg-opacity-20 rounded-lg border border-white border-opacity-20 focus:border-amarillo focus:ring-2 focus:ring-amarillo text-gray-700 placeholder-gray-300"
+                        className="pl-12 w-full p-3 bg-white bg-opacity-20 rounded-lg border border-white border-opacity-20 focus:border-amarillo focus:ring-2 focus:ring-amarillo text-black placeholder-gray-300"
                         placeholder="¿En qué podemos ayudarte?"
                         required
                       ></textarea>
