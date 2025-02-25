@@ -1,5 +1,5 @@
-const property = require('../models/propertySchema'); // Usamos el modelo unificado
-const path = require('path');
+import property from '../models/propertySchema.js';
+
 
 const propertyController = {
     // Obtiene la lista de properties para previsualización
@@ -63,22 +63,19 @@ const propertyController = {
 
     uploadImage: async (req, res) => {
         try {
-          if (!req.file) {
-            return res.status(400).json({ message: "No se subió ninguna imagen" });
-          }
-          console.log("Archivo recibido:", req.file); // Debug: Verifica los detalles del archivo subido
+            if (!req.file) {
+                return res.status(400).json({ message: "No se subió ninguna imagen" });
+            }
+            console.log("Archivo recibido:", req.file); // Debug: Verifica los detalles del archivo subido
       
-          const serverUrl = process.env.API_BASE_URL || "http://localhost:3000";
-          const imageUrl = `${serverUrl}/uploads/${req.file.filename}`;
-          res.json({ imageUrl });
+            const serverUrl = process.env.API_BASE_URL || "http://localhost:3000";
+            const imageUrl = `${serverUrl}/uploads/${req.file.filename}`;
+            res.json({ imageUrl });
         } catch (err) {
-          console.log("Error uploading image:", err);
-          res.status(500).json({ message: "No se pudo subir la imagen" });
+            console.log("Error uploading image:", err);
+            res.status(500).json({ message: "No se pudo subir la imagen" });
         }
-      }
-      
+    }
+};
 
-
-}
-
-module.exports = propertyController;
+export default propertyController;

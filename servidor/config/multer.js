@@ -1,26 +1,39 @@
-const multer = require('multer');
+import multer from 'multer';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
-// Configuración de almacenamiento para Multer
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Configuración del almacenamiento
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/'); // Carpeta donde se guardarán los archivos
-  },
-  filename: function (req, file, cb) {
-    // Puedes personalizar el nombre del archivo; aquí se antepone la fecha
-    cb(null, Date.now() + '-' + file.originalname);
-  }
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, '../uploads'));
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + '-' + file.originalname);
+    }
 });
 
-// Filtro para aceptar solo archivos de imagen
+// Filtro de archivos
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image/')) {
-    cb(null, true);
-  } else {
-    cb(new Error('El archivo no es una imagen'), false);
-  }
+    // Acepta solo imágenes
+    if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+    } else {
+        cb(new Error('No es un archivo de imagen válido'), false);
+    }
 };
 
-// Inicializamos Multer con la configuración
-const upload = multer({ storage, fileFilter });
+// Configuración de multer
+const upload = multer({
+    storage: storage,
+    fileFilter: fileFilter,
+    limits: {
+        fileSize: 5 * 1024 * 1024 // 5MB máximo
+    }
+});
 
-module.exports = upload;
+export default upload;
