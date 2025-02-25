@@ -7,16 +7,9 @@ export default function Contact() {
     return (
         <>
             <div className="relative w-full min-h-[80vh] pb-[10vh] overflow-hidden">
-                <div className="fixed inset-0 z-0 w-full h-full opacity-10"
+                <div className="fixed inset-0 z-0 w-full h-full opacity-100"
                     style={{
-                        background: `
-         repeating-linear-gradient(
-           140deg,
-           #ffffff,
-           #ffffff 10vh,
-           #000000 50vh,
-           #C7A336  80vh
-         )`
+                        backgroundImage: "url('/gozamadridwp.jpg')",
                     }}>
                 </div>
                 <RegisterForm />

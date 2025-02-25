@@ -13,7 +13,7 @@ export default {
         sans: ["Chakra Petch", "sans-serif"],
       },
       colors: {
-        customColors: "#73FAFA",
+        gold: "#D5AB6F",
         bluecolor: "#000752",
         amarillo: "#C7A336",
         background: "var(--background)",

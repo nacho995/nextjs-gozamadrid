@@ -19,14 +19,14 @@ import Agreements from "./Agreements";
 
 export default function Home() {
   const gradientStyle = {
-    background: "repeating-linear-gradient(40deg, #000000, #000000 5vh, #ffffff 20vh, #C7A336 30vh)",
+    backgroundImage: "url('/gozamadridwp.jpg')",
     backgroundAttachment: "fixed",
   };
 
   return (
     <>
       <div className="">
-        <div className="fixed inset-0 z-0 opacity-10" style={gradientStyle}></div>
+        <div className="fixed inset-0 z-0 opacity-100" style={gradientStyle}></div>
 
         <div className="absolute top-0 left-0 w-full z-1">
           <Video />

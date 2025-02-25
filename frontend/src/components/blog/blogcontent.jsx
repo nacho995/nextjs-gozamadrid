@@ -6,6 +6,13 @@ import Image from 'next/image';
 export default function DefaultBlogContent({ blog }) {
   return (
     <AnimatedOnScroll>
+      <div
+                className="fixed inset-0 z-0 opacity-100"
+                style={{
+                    backgroundImage: "url('/gozamadridwp.jpg')",
+                    backgroundAttachment: "fixed",
+                }}
+            ></div>
       <article className="max-w-3xl mx-auto bg-white shadow rounded-xl overflow-hidden">
         {/* Encabezado */}
         <div className="p-6 border-b border-gray-200 text-center">
