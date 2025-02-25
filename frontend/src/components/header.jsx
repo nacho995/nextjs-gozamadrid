@@ -4,7 +4,7 @@ import Image from "next/image";
 import { FaFacebook, FaInstagram, FaPhone, FaHome, FaHandshake, FaChartLine } from "react-icons/fa";
 import { AiOutlineMenuUnfold, AiOutlineMenuFold, AiOutlineDown, AiOutlineRight } from "react-icons/ai";
 import Link from "next/link";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavbar } from './context/navBarContext'; // Asegúrate de que la ruta sea correcta
 
 export default function ControlMenu() {
@@ -74,7 +74,7 @@ export default function ControlMenu() {
   };
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full z-50">
       {/* Botón de menú para móviles */}
       {!menuVisible && (
         <div className="lg:hidden fixed left-4 top-4 z-50 text-amarillo bg-gray-600 p-2 rounded">
