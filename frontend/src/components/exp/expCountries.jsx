@@ -106,6 +106,7 @@ export default function ExpCountries() {
                             src={country.image}
                             alt={country.name}
                             className="w-full h-[40vh] object-cover rounded-s"
+                            
                         />
                         <div className="absolute inset-0 bg-black/50 rounded-s">
                             <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -120,6 +121,8 @@ export default function ExpCountries() {
                                     className="px-4 py-2 bg-gold text-black rounded-full 
                                         text-sm font-semibold transition-all duration-300 
                                         hover:bg-white hover:scale-105"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                 >
                                     Pincha aquí
                                 </a>
