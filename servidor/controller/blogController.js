@@ -12,7 +12,7 @@ const blogController = {
         try {
             // Selecciona solo los campos necesarios para la previsualización.
             // Por ejemplo, no incluimos "content" ni "tags"
-            const blogs = await Blog.find().select('title excerpt image tags createdAt updatedAt');
+            const blogs = await Blog.find().select('title description author category readTime button image tags createdAt updatedAt');
             res.json(blogs);
         } catch (err) {
             console.log("Error fetching blogs:", err);
