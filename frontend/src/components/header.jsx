@@ -63,6 +63,16 @@ export default function ControlMenu() {
     return null;
   }
 
+  // Verifica que todas estas rutas existan en tu proyecto
+  const routes = {
+    residentes_espana: "/servicios/residentes-espana",
+    residentes_espana_alquiler: "/servicios/residentes-espana/alquiler",
+    residentes_espana_guia: "/servicios/residentes-espana/guia-compra",
+    residentes_extranjero: "/servicios/residentes-extranjero",
+    residentes_extranjero_impuesto: "/servicios/residentes-extranjero/impuesto-renta",
+    residentes_extranjero_guia: "/servicios/residentes-extranjero/guia-compra"
+  };
+
   return (
     <div className="relative w-full">
       {/* Botón de menú para móviles */}
@@ -96,9 +106,7 @@ export default function ControlMenu() {
           <Link href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">
             <FaInstagram size={25} className="hover:text-gray-700 text-pink-600" />
           </Link>
-          <Link href="tel:+34919012103">
-            <FaPhone size={25} className="hover:text-gray-700" />
-          </Link>
+          <FaPhone size={25} className="hover:text-gray-700" />
           <span className="hover:text-gray-700 text-black text-2xl">+34 919 012 103</span>
         </div>
 
@@ -128,8 +136,8 @@ export default function ControlMenu() {
                 }}
                 onMouseLeave={() => toggleDropdown('vender', false)}
               >
-                <Link 
-                  href="/vender/comprar" 
+                <Link
+                  href="/vender/comprar"
                   className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200"
                 >
                   <FaHome className="mr-3 text-amarillo" />
@@ -160,15 +168,15 @@ export default function ControlMenu() {
             onMouseEnter={() => toggleDropdown('servicios', true)}
           >
             <div className="flex items-center gap-2">
-              <Link 
-                href="/servicios" 
+              <Link
+                href="/servicios"
                 className="text-black hover:text-gray-700"
                 onClick={(e) => e.stopPropagation()}
               >
                 Servicios
               </Link>
               <div className="cursor-pointer">
-                <AiOutlineDown 
+                <AiOutlineDown
                   className={`transition-transform duration-300 ${dropdownVisible.servicios ? 'rotate-180' : ''}`}
                 />
               </div>
@@ -185,8 +193,8 @@ export default function ControlMenu() {
                 onMouseLeave={() => toggleDropdown('servicios', false)}
               >
                 <div className="relative group">
-                  <Link 
-                    href="/servicios/residentes-espana" 
+                  <Link
+                    href={routes.residentes_espana}
                     className="flex items-center justify-between px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200 border-b border-white/10"
                   >
                     <div className="flex items-center">
@@ -195,18 +203,18 @@ export default function ControlMenu() {
                     </div>
                     <AiOutlineRight className="ml-2 group-hover:rotate-90 transition-transform duration-200" />
                   </Link>
-                  
+
                   {/* Submenú de Residentes en España */}
                   <div className="absolute left-full top-0 hidden group-hover:block bg-black bg-opacity-50 backdrop-blur-sm rounded-lg shadow-lg min-w-[200px]">
-                    <Link 
-                      href="/servicios/residentes-espana/alquiler" 
+                    <Link
+                      href={routes.residentes_espana_alquiler}
                       className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200 border-b border-white/10"
                     >
                       <FaHome className="mr-3 text-amarillo" />
                       Alquiler
                     </Link>
-                    <Link 
-                      href="/servicios/residentes-espana/guia-compra" 
+                    <Link
+                      href={routes.residentes_espana_guia}
                       className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200"
                     >
                       <FaHandshake className="mr-3 text-amarillo" />
@@ -216,8 +224,8 @@ export default function ControlMenu() {
                 </div>
 
                 <div className="relative group">
-                  <Link 
-                    href="/servicios/residentes-extranjero" 
+                  <Link
+                    href={routes.residentes_extranjero}
                     className="flex items-center justify-between px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200"
                   >
                     <div className="flex items-center">
@@ -226,18 +234,18 @@ export default function ControlMenu() {
                     </div>
                     <AiOutlineRight className="ml-2 group-hover:rotate-90 transition-transform duration-200" />
                   </Link>
-                  
+
                   {/* Submenú de Residentes en el extranjero */}
                   <div className="absolute left-full top-0 hidden group-hover:block bg-black bg-opacity-50 backdrop-blur-sm rounded-lg shadow-lg min-w-[200px]">
-                    <Link 
-                      href="/servicios/residentes-extranjero/impuesto-renta" 
+                    <Link
+                      href={routes.residentes_extranjero_impuesto}
                       className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200 border-b border-white/10"
                     >
                       <FaChartLine className="mr-3 text-amarillo" />
                       Impuesto no residentes
                     </Link>
-                    <Link 
-                      href="/servicios/residentes-extranjero/guia-compra" 
+                    <Link
+                      href={routes.residentes_extranjero_guia}
                       className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200"
                     >
                       <FaHandshake className="mr-3 text-amarillo" />
@@ -312,21 +320,21 @@ export default function ControlMenu() {
                   <div className="ml-4 mt-2 flex flex-col bg-black bg-opacity-50 backdrop-blur-sm rounded-lg overflow-hidden">
                     <div className="border-b border-white/10">
                       <Link
-                        href="/servicios/residentes-espana"
+                        href={routes.residentes_espana}
                         className="text-sm flex items-center px-4 py-3 text-white hover:bg-white/10 transition-colors duration-200"
                       >
                         <FaHandshake className="mr-2 text-amarillo" />
                         Residentes en España
                       </Link>
                       <Link
-                        href="/servicios/residentes-espana/alquiler"
+                        href={routes.residentes_espana_alquiler}
                         className="text-sm flex items-center px-8 py-2 text-white hover:bg-white/10 transition-colors duration-200"
                       >
                         <FaHome className="mr-2 text-amarillo" />
                         Alquiler
                       </Link>
                       <Link
-                        href="/servicios/residentes-espana/guia-compra"
+                        href={routes.residentes_espana_guia}
                         className="text-sm flex items-center px-8 py-2 text-white hover:bg-white/10 transition-colors duration-200"
                       >
                         <FaHandshake className="mr-2 text-amarillo" />
@@ -335,7 +343,7 @@ export default function ControlMenu() {
                     </div>
                     <div className="border-b border-white/10">
                       <Link
-                        href="/servicios/residentes-extranjero"
+                        href={routes.residentes_extranjero}
                         className="text-sm flex items-center px-4 py-3 text-white hover:bg-white/10 transition-colors duration-200"
                       >
                         <FaChartLine className="mr-2 text-amarillo" />
@@ -344,14 +352,14 @@ export default function ControlMenu() {
                     </div>
                     <div>
                       <Link
-                        href="/servicios/residentes-extranjero/impuesto-renta"
+                        href={routes.residentes_extranjero_impuesto}
                         className="text-sm flex items-center px-8 py-2 text-white hover:bg-white/10 transition-colors duration-200"
                       >
                         <FaChartLine className="mr-2 text-amarillo" />
                         Impuestos
                       </Link>
                       <Link
-                        href="/servicios/residentes-extranjero/guia-compra"
+                        href={routes.residentes_extranjero_guia}
                         className="text-sm flex items-center px-8 py-2 text-white hover:bg-white/10 transition-colors duration-200"
                       >
                         <FaHandshake className="mr-2 text-amarillo" />

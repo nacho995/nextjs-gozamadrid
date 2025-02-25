@@ -55,21 +55,6 @@ export default function BlogPage() {
     return (
 
         <>
-
-            {/* Fondo absoluto con gradiente y opacidad 50 */}
-            < div className="fixed inset-0 z-0 opacity-10"
-                style={{
-                    background: `
-                    repeating-linear-gradient(
-                        40deg,
-                        #000000,
-                        #000000 5vh,
-                        #ffffff 20vh,
-                        #C7A336  30vh
-                        )`, backgroundAttachment: "fixed"
-                }
-                }>
-            </div >
             <div className="relative min-h-screen py-8">
                 <AnimatedOnScroll>
 
@@ -78,20 +63,6 @@ export default function BlogPage() {
                         {/* Encabezado */}
                         <header className="mb-8 text-center">
                             <div className="relative inline-block">
-                                {/* Fondo: este div se posiciona absolutamente y tiene la opacidad deseada */}
-                                <div className="absolute inset-0 opacity-30 rounded-lg"
-                                    style={{
-                                        background: `
-                 repeating-linear-gradient(
-                   30deg,
-                   #000000,
-                   #C7A336  10vh,
-                   #000000 15vh,
-                   #C7A336  25vh
-                 )`
-                                    }}
-                                ></div>
-
                                 {/* Texto: este elemento se posiciona relativo para estar sobre el fondo */}
                                 <h1 className="relative text-gray-700 inline-block text-lg font-bold px-4 py-2">
                                     Lee e infórmate con nuestros blogs
@@ -99,7 +70,7 @@ export default function BlogPage() {
 
                             </div>
 
-                            <p className="text-4xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-yellow-900 ">
+                            <p className="text-4xl font-bold mb-2 text-black ">
                                 Descubre nuestros artículos y últimas noticias.
                             </p>
 

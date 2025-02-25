@@ -166,9 +166,9 @@ export default function DefaultPropertyContent({ property }) {
     return (
         <div className="relative w-full min-h-fit pb-32">
             <div
-                className="fixed inset-0 z-0 opacity-10 h-full"
+                className="fixed inset-0 z-0 opacity-100 h-full"
                 style={{
-                    background: `repeating-linear-gradient(40deg, #000000, #000000 5vh, #ffffff 20vh, #C7A336 30vh)`,
+                    backgroundImage: "url('/gozamadridwp.jpg')",
                     backgroundAttachment: "fixed",
                 }}
             ></div>

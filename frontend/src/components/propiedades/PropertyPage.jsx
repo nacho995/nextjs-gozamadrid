@@ -16,7 +16,7 @@ const Pagination = ({ totalPages, currentPage, onPageChange }) => {
     const delta = 2; // Número de páginas a mostrar antes y después de la página actual
     const range = [];
     const rangeWithDots = [];
-
+    // Generar array de páginas a mostrar
     for (let i = 1; i <= totalPages; i++) {
       if (
         i === 1 ||
@@ -26,7 +26,7 @@ const Pagination = ({ totalPages, currentPage, onPageChange }) => {
         range.push(i);
       }
     }
-
+    // Generar array de páginas con puntos suspensivos
     let l;
     for (let i of range) {
       if (l) {
@@ -84,7 +84,7 @@ const Pagination = ({ totalPages, currentPage, onPageChange }) => {
                     onClick={() => handlePageChange(pageNumber)}
                     className={`w-10 h-10 inline-flex justify-center items-center mx-1 rounded-full
                       ${pageNumber === currentPage
-                        ? 'text-white bg-amarillo'
+                        ? 'text-white bg-black hover:bg-gold'
                         : 'text-slate-400 bg-white hover:text-white hover:bg-amarillo'} 
                       transition-colors shadow-sm`}
                   >
@@ -119,6 +119,8 @@ export default function PropertyPage() {
   const [properties, setProperties] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+
+  
   const propertiesPerPage = 9; // Número de propiedades por página
   const totalPages = Math.ceil(properties.length / propertiesPerPage);
 
@@ -157,9 +159,9 @@ export default function PropertyPage() {
     <>
       {/* Fondo absoluto con gradiente */}
       <div
-        className="fixed inset-0 z-0 opacity-10"
+        className="fixed inset-0 z-0 opacity-100 bg-cover bg-center"
         style={{
-          background: `repeating-linear-gradient(40deg, #000000, #000000 5vh, #ffffff 20vh, #C7A336 30vh)`,
+          backgroundImage: "url('/gozamadridwp2.jpg')",
           backgroundAttachment: "fixed",
         }}
       ></div>
@@ -198,7 +200,7 @@ export default function PropertyPage() {
                       <Link
                         key={index}
                         href={`/property/${item._id}`}
-                        className="group block rounded-xl dark:text-white dark:hover:text-black bg-white dark:bg-slate-900 shadow hover:bg-amarillo dark:hover:shadow-xl dark:shadow-gray-700 dark:hover:shadow-gray-700 overflow-hidden ease-in-out duration-500"
+                        className="group block rounded-xl dark:text-white dark:hover:text-black bg-white dark:bg-slate-900 shadow hover:bg-gold dark:hover:shadow-xl dark:shadow-gray-700 dark:hover:shadow-gray-700 overflow-hidden ease-in-out duration-500"
                       >
                         <div className="relative">
                           <Image

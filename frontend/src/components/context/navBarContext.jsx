@@ -3,22 +3,14 @@ import { createContext, useContext, useState, useEffect } from 'react';
 const NavbarContext = createContext();
 
 export const NavbarProvider = ({ children }) => {
-  // Inicializamos el estado leyendo de localStorage si está disponible
-  const [menuVisible, setMenuVisible] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('menuVisible') === 'true';
-    }
-    return false;
-  });
+  const [menuVisible, setMenuVisible] = useState(false);
 
-  // Cambiar a un objeto para manejar múltiples dropdowns
   const [dropdownVisible, setDropdownVisible] = useState({
     vender: false,
     servicios: false,
     serviciosMobile: false
   });
 
-  // Función para cambiar el estado del menú
   const toggleMenu = () => setMenuVisible(prev => !prev);
 
   const toggleDropdown = (menu, value) => {
@@ -30,18 +22,31 @@ export const NavbarProvider = ({ children }) => {
     }));
   };
 
-  // Actualizamos localStorage cada vez que cambian los estados
+  // Modificar los useEffect para manejar correctamente el localStorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('menuVisible', menuVisible);
+      try {
+        const savedMenuState = localStorage.getItem('menuVisible');
+        if (savedMenuState !== null) {
+          setMenuVisible(savedMenuState === 'true');
+        }
+      } catch (error) {
+        console.error('Error reading from localStorage:', error);
+      }
     }
-  }, [menuVisible]);
+  }, []);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('dropdownVisible', dropdownVisible);
+      try {
+        localStorage.setItem('menuVisible', menuVisible.toString());
+      } catch (error) {
+        console.error('Error writing to localStorage:', error);
+      }
     }
-  }, [dropdownVisible]);
+  }, [menuVisible]);
+
+  // Eliminar el useEffect para dropdownVisible ya que no necesitamos persistirlo
 
   return (
     <NavbarContext.Provider value={{ menuVisible, toggleMenu, dropdownVisible, toggleDropdown }}>
@@ -50,4 +55,10 @@ export const NavbarProvider = ({ children }) => {
   );
 };
 
-export const useNavbar = () => useContext(NavbarContext);
+export const useNavbar = () => {
+  const context = useContext(NavbarContext);
+  if (!context) {
+    throw new Error('useNavbar must be used within a NavbarProvider');
+  }
+  return context;
+};

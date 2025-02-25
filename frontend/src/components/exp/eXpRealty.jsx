@@ -18,10 +18,9 @@ export default function ExpRealty({ videoId, title }) {
         <>
             {/* Fondo absoluto con gradiente y opacidad */}
             <div
-                className="fixed inset-0 z-0 opacity-10"
+                className="fixed inset-0 z-0 opacity-100"
                 style={{
-                    background:
-                        "repeating-linear-gradient(40deg, #000000, #000000 5vh, #ffffff 20vh, #C7A336 30vh)",
+                    backgroundImage: "url('/exp.jpg')",
                     backgroundAttachment: "fixed",
                 }}
             ></div>
@@ -69,17 +68,15 @@ export default function ExpRealty({ videoId, title }) {
                         max-w-7xl
                         mx-auto"
                     >
-                        <span className="bg-clip-text text-transparent 
-                            bg-gradient-to-r from-amarillo via-blue-900 to-amarillo
+                        <span className="bg-clip-text text-gold
                             hover:from-blue-900 hover:via-black hover:to-blue-900
                             transition-all duration-500"
                         >
                             La Inmobiliaria Digital
                         </span>
                         <br />
-                        <span className="bg-clip-text text-transparent 
-                            bg-gradient-to-r from-blue-900 via-amarillo to-blue-900
-                            hover:from-black hover:via-amarillo hover:to-black
+                        <span className="bg-clip-text text-gold
+                            hover:from-black hover:via-gold hover:to-black
                             transition-all duration-500"
                         >
                             Nº1 en el Mundo
@@ -210,17 +207,26 @@ export default function ExpRealty({ videoId, title }) {
                         </h2>
                     </div>
 
-
-
                     {/* Enlace: Ocupa toda la fila */}
                     <div className="col-span-7 flex justify-center py-8">
                         <Link
-                            className="bg-white rounded-xl p-5 text-3xl font-bold hover:bg-black hover:text-white"
+                            className="group/link relative inline-flex items-center gap-2 overflow-hidden 
+                                rounded-full bg-white/20 px-8 py-3 
+                                transition-all duration-300 
+                                hover:bg-white/30 
+                                backdrop-blur-sm"
                             href="https://landing.expglobalspain.com/modelo-de-negocio-exp-spain"
                             target="_blank"
                             rel="noopener noreferrer"
                         >
-                            Apúntate
+                            <span className="relative text-lg font-semibold text-white">
+                                Apúntate
+                            </span>
+                            <span className="absolute bottom-0 left-0 h-1 w-full transform 
+                                bg-gradient-to-r from-blue-400 via-white to-blue-400 
+                                transition-transform duration-300 
+                                group-hover/link:translate-x-full">
+                            </span>
                         </Link>
                     </div>
                 </div>
@@ -255,18 +261,23 @@ export default function ExpRealty({ videoId, title }) {
                         
                         <div className="flex justify-center py-8">
                             <Link
-                                className="bg-gradient-to-r from-white to-blue-50
-                                    hover:from-blue-100 hover:to-white
-                                    rounded-xl p-5 text-2xl font-bold
-                                    text-blue-900
-                                    transform hover:-translate-y-1
-                                    transition-all duration-300
-                                    shadow-lg hover:shadow-xl"
+                                className="group/link relative inline-flex items-center gap-2 overflow-hidden 
+                                    rounded-full bg-white/20 px-8 py-3 
+                                    transition-all duration-300 
+                                    hover:bg-white/30 
+                                    backdrop-blur-sm"
                                 href="https://landing.expglobalspain.com/modelo-de-negocio-exp-spain"
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
-                                Apúntate
+                                <span className="relative text-lg font-semibold text-white">
+                                    Apúntate
+                                </span>
+                                <span className="absolute bottom-0 left-0 h-1 w-full transform 
+                                    bg-gradient-to-r from-blue-400 via-white to-blue-400 
+                                    transition-transform duration-300 
+                                    group-hover/link:translate-x-full">
+                                </span>
                             </Link>
                         </div>
                     </div>

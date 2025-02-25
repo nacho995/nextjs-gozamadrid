@@ -164,20 +164,31 @@ export default function ExpRealtyMore({ videoId, title }) {
 
 
                     {/* Enlace: Ocupa toda la fila */}
-                    <div className="col-span-7 flex justify-center py-18">
-                        <Link
-                            className="bg-black text-white rounded-xl p-5 text-3xl font-bold hover:bg-bluecolor hover:text-gray-300"
+                    <div className="col-span-7 flex justify-center py-8">
+                        <a
+                            className="group/link relative inline-flex items-center gap-2 overflow-hidden 
+                                rounded-full bg-black/20 px-8 py-3 
+                                transition-all duration-300 
+                                hover:bg-black/30 
+                                backdrop-blur-sm"
                             href="https://docs.google.com/presentation/d/e/2PACX-1vTiStw1c6obJyNIIDP1W03vm6xg_34FPlvYSaletdiIOhKvWK7aDHKdVvM8McZWxQ/pub?start=false&loop=false&delayms=3000&slide=id.p1"
                             target="_blank"
                             rel="noopener noreferrer"
                         >
+                            <span className="relative text-lg font-semibold text-black">
                             Presentación de eXp Realty
-                        </Link>
+                            </span>
+                            <span className="absolute bottom-0 left-0 h-1 w-full transform 
+                                bg-gradient-to-r from-blue-400 via-white to-blue-400 
+                                transition-transform duration-300 
+                                group-hover/link:translate-x-full">
+                            </span>
+                        </a>
                     </div>
                 </div>
 
                 {/* Versión Mobile/Tablet: Visible para pantallas menores a md */}
-                <div 
+                <div
                     className="z-20 relative md:hidden w-full py-8"
                     style={{ backgroundImage: "url('/fondoblanco.jpg')" }}
                 >
@@ -196,14 +207,25 @@ export default function ExpRealtyMore({ videoId, title }) {
                         ></div>
                         {/* Enlace */}
                         <div className="flex justify-center py-8">
-                            <Link
-                                className="bg-white rounded-xl p-5 text-2xl font-bold hover:bg-black hover:text-white"
-                                href="https://landing.expglobalspain.com/modelo-de-negocio-exp-spain"
+                            <a
+                                className="group/link relative inline-flex items-center gap-2 overflow-hidden 
+                                    rounded-full bg-black/20 px-8 py-3 
+                                    transition-all duration-300 
+                                    hover:bg-black/30 
+                                    backdrop-blur-sm"
+                                href="https://docs.google.com/presentation/d/e/2PACX-1vTiStw1c6obJyNIIDP1W03vm6xg_34FPlvYSaletdiIOhKvWK7aDHKdVvM8McZWxQ/pub?start=false&loop=false&delayms=3000&slide=id.p1"
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
-                                Presentación de eXp Realty
-                            </Link>
+                                <span className="relative text-lg font-semibold text-black">
+                                    Presentación de eXp Realty
+                                </span>
+                                <span className="absolute bottom-0 left-0 h-1 w-full transform 
+                                    bg-gradient-to-r from-blue-400 via-white to-blue-400 
+                                    transition-transform duration-300 
+                                    group-hover/link:translate-x-full">
+                                </span>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -299,6 +321,55 @@ export default function ExpRealtyMore({ videoId, title }) {
                     </div>
                 </div>
             </AnimatedOnScroll>
+            <div className="relative w-full bg-gradient-to-r from-blue-900/60 via-black/40 to-blue-800/50 
+                            backdrop-blur-lg p-8 rounded-xl shadow-lg 
+                            hover:from-blue-800/60 hover:via-black/40 hover:to-blue-900/50
+                            transition-all duration-500 
+                            group
+                            overflow-hidden"
+                        >
+                            {/* Efectos de luz */}
+                            <div className="absolute -top-20 -right-20 w-40 h-40 bg-blue-500/20 rounded-full 
+                                group-hover:bg-blue-400/30 transition-all duration-500">
+                            </div>
+                            <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-blue-600/20 rounded-full 
+                                group-hover:bg-blue-500/30 transition-all duration-500">
+                            </div>
+
+                            <div className="relative z-10 flex flex-col items-center justify-center gap-6">
+                                <img 
+                                    src="/exprealty.png" 
+                                    alt="eXp Realty"
+                                    className="w-48 h-auto rounded-full object-contain mb-4 
+                                        group-hover:scale-105 transition-transform duration-500"
+                                />
+                                
+                                <a 
+                                    href="/ModeloExpEspaña.pdf"
+                                    target="_blank"
+                                    rel="noopener noreferrer" 
+                                    className="group/link relative inline-flex items-center gap-2 overflow-hidden 
+                                        rounded-full bg-white/20 px-8 py-3 
+                                        transition-all duration-300 
+                                        hover:bg-white/30 
+                                        backdrop-blur-sm"
+                                >
+                                    <span className="relative text-lg font-semibold text-white">
+                                        Ver nuestro modelo de negocio
+                                    </span>
+                                    <span className="absolute bottom-0 left-0 h-1 w-full transform 
+                                        bg-gradient-to-r from-blue-400 via-white to-blue-400 
+                                        transition-transform duration-300 
+                                        group-hover/link:translate-x-full">
+                                    </span>
+                                </a>
+                            </div>
+
+                            {/* Bordes animados */}
+                            <div className="absolute inset-[2px] border border-blue-400/20 rounded-lg scale-[0.99] opacity-0
+                                group-hover:scale-100 group-hover:opacity-100 transition-all duration-700">
+                            </div>
+                        </div>
             <AnimatedOnScroll>
                 <div
                     className="relative w-full bg-cover bg-center pb-10 h-[80vh] md:h-[80vh]"
@@ -346,7 +417,7 @@ export default function ExpRealtyMore({ videoId, title }) {
                                 Conviértete en agente
                             </Link>
                         </div>
-                        º                </div>
+                    </div>
                 </div>
             </AnimatedOnScroll>
 

@@ -1,5 +1,7 @@
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+
 export async function getCountryPrefix() {
-  const response = await fetch('http://localhost:3000/prefix', {
+  const response = await fetch(`${API_URL}/prefix`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json'
@@ -21,7 +23,7 @@ export async function getCountryPrefix() {
 }
 // src/pages/api/index.js
 export async function getBlogPosts() {
-  const response = await fetch('http://localhost:3000/blog', {
+  const response = await fetch(`${API_URL}/blog`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json'
@@ -43,17 +45,16 @@ export async function getBlogPosts() {
 }
 
 export async function deleteBlogPost(id) {
-  const response = await fetch(`http://localhost:3000/blog/${id}`, {
-      method: 'DELETE',
-  })
+  const response = await fetch(`${API_URL}/blog/${id}`, {
+    method: 'DELETE',
+  });
 
-  return response.json()
+  return response.json();
 }
-
 
 export async function getBlogById(id) {
   // Usamos el puerto 3001, si ese es el puerto donde corre tu API Express
-  const response = await fetch(`http://localhost:3000/blog/${id}`, {
+  const response = await fetch(`${API_URL}/blog/${id}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json'
@@ -66,7 +67,7 @@ export async function getBlogById(id) {
   return data;
 }
 export async function getPropertyPosts() {
-  const response = await fetch(`http://localhost:3000/property`)
+  const response = await fetch(`${API_URL}/property`);
 
   if (!response.ok) {
     const errorData = await response.json()
@@ -76,7 +77,7 @@ export async function getPropertyPosts() {
   return response.json()
 }
 export async function getPropertyById(id) {
-  const response = await fetch(`http://localhost:3000/property/${id}`)
+  const response = await fetch(`${API_URL}/property/${id}`);
 
   if (!response.ok) {
     const errorData = await response.json()
