@@ -1,37 +1,33 @@
 import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
-const blogSchema = new Schema({
-    title: {
-        type: String,
-        required: true
-    },
-    content: {
-        type: String,
-        required: true
-    },
-    excerpt: {
-        type: String,
-        required: true
-    },
+const blogSchema = new mongoose.Schema({
+    title: { type: String, required: true, trim: true },
+    description: { type: String, required: true },
+    url: { type: String },
+    author: { type: String, required: true },
+    category: { type: String, required: true },
+    content: { type: String, required: true },
+    tags: [String],
     image: {
-        type: String,
-        required: true
+      src: { type: String },
+      alt: { type: String },
     },
-    tags: [{
-        type: String
-    }],
-    createdAt: {
-        type: Date,
-        default: Date.now
+    readTime: { type: String },
+    button: {
+      title: { type: String },
+      variant: { type: String },
+      size: { type: String },
+      iconRight: { type: String },
     },
-    updatedAt: {
-        type: Date,
-        default: Date.now
-    }
-});
-
-const Blog = mongoose.model('Blog', blogSchema);
-
-export default Blog;
+    // Nuevo campo para definir la plantilla a usar
+    template: {
+      type: String,
+      default: "default",  // Valor predeterminado
+    },
+  }, {
+    timestamps: true,
+  });
+  
+export default mongoose.model('Blog', blogSchema);
   

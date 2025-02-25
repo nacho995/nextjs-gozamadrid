@@ -1,53 +1,31 @@
 import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
-const propertySchema = new Schema({
-    typeProperty: {
-        type: String,
-        required: true
-    },
-    address: {
-        type: String,
-        required: true
-    },
-    price: {
-        type: Number,
-        required: true
-    },
-    description: {
-        type: String,
-        required: true
-    },
-    piso: {
-        type: Number,
-        required: true
-    },
-    wc: {
-        type: Number,
-        required: true
-    },
-    m2: {
-        type: Number,
-        required: true
-    },
-    rooms: {
-        type: Number,
-        required: true
-    },
+const propertySchema = new mongoose.Schema({
+    typeProperty: { type: String, required: true, trim: true },
+    address: { type: String, required: true },
+    description: { type: String, required: true },
+    m2: { type: String },
+    priceM2: { type: String },
+    rooms: { type: String, required: true },
+    wc: { type: String, required: true },
+    piso: { type: String, required: true },
+    tags: [String],
+    // Cambiamos "image" a "images" para permitir múltiples imágenes
     images: [{
-        type: String
+      src: { type: String },
+      alt: { type: String },
     }],
-    createdAt: {
-        type: Date,
-        default: Date.now
+    price: { type: String, required: true },
+    template: {
+      type: String,
+      default: "default",
     },
-    updatedAt: {
-        type: Date,
-        default: Date.now
-    }
-});
-
-const Property = mongoose.model('Property', propertySchema);
+  }, {
+    timestamps: true,
+  });
+  
+  const Property = mongoose.model('Property', propertySchema);
 
 export default Property;
   
