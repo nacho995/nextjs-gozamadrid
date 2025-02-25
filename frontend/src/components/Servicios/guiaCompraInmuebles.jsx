@@ -16,29 +16,28 @@ export default function GuiaCompraInmuebles() {
             {/* Hero Section con animación */}
             <FadeInView direction="down" className="mb-16">
                 <div className="relative h-[60vh] rounded-2xl overflow-hidden hover:scale-[1.02] transition-all duration-300">
-                    <Image
-                        src="/guiacompra.png"
-                        alt="Guía de Compra"
-                        fill
-                        className="object-cover"
-                    />
+                    {/* Imagen de fondo con z-index bajo */}
+                    <div className="absolute inset-0 z-[1]">
+                        <Image
+                            src="/guiacompra.png"
+                            alt="Guía de Compra"
+                            fill
+                            className="object-cover"
+                        />
+                    </div>
+                    {/* Gradiente y contenido con z-index más alto */}
                     <motion.div 
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 1 }}
-                        className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent flex items-center"
+                        className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent flex items-center z-[2]"
                     >
-                        <div className="text-white ml-12 max-w-2xl">
-                            <h1 
-                                className="text-5xl font-bold mb-4 hover:scale-105 transition-transform duration-300 inline-block"
-                                style={textShadowStyle}
-                            >
+                        <div className="text-white ml-12 max-w-2xl relative z-[3]">
+                            <h1 className="text-5xl font-bold mb-4 hover:scale-105 transition-transform duration-300 inline-block"
+                                style={textShadowStyle}>
                                 Guía Completa para Comprar tu Inmueble
                             </h1>
-                            <p 
-                                className="text-xl"
-                                style={textShadowLightStyle}
-                            >
+                            <p className="text-xl" style={textShadowLightStyle}>
                                 Te acompañamos en cada paso del proceso de compra con asesoramiento experto y personalizado
                             </p>
                         </div>
@@ -124,21 +123,25 @@ export default function GuiaCompraInmuebles() {
                 transition={{ duration: 0.8 }}
                 className="relative rounded-2xl overflow-hidden mb-20 hover:scale-105 transition-all duration-300"
             >
-                <Image
-                    src="/beneficioscompra.png"
-                    alt="Beneficios"
-                    width={1200}
-                    height={400}
-                    className="object-cover w-full h-[400px]"
-                />
+                {/* Imagen de fondo con z-index bajo */}
+                <div className="absolute inset-0 z-[1]">
+                    <Image
+                        src="/beneficioscompra.png"
+                        alt="Beneficios"
+                        width={1200}
+                        height={400}
+                        className="object-cover w-full h-[400px]"
+                    />
+                </div>
+                {/* Overlay y contenido con z-index más alto */}
                 <motion.div 
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.3 }}
-                    className="absolute inset-0 bg-black/60 flex items-center justify-center"
+                    className="absolute inset-0 bg-black/60 flex items-center justify-center z-[2]"
                 >
-                    <div className="max-w-4xl text-center p-8">
+                    <div className="max-w-4xl text-center p-8 relative z-[3]">
                         <h2 
                             className="text-4xl font-bold text-white mb-6"
                             style={textShadowStyle}
@@ -174,62 +177,64 @@ export default function GuiaCompraInmuebles() {
             </motion.div>
 
             {/* Sección Final CTA con animación */}
-            <FadeInView direction="up" className="text-center max-w-3xl mx-auto">
-                <h2 
-                    className="text-3xl font-bold mb-6 hover:scale-105 transition-all duration-300"
-                    style={textShadowStyle}
-                >
-                    Comienza tu Proceso de Compra
-                </h2>
-                <motion.p 
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.2 }}
-                    className="text-xl mb-8 hover:scale-105 transition-all duration-300"
-                    style={textShadowLightStyle}
-                >
-                    Nuestro equipo de expertos está listo para ayudarte a encontrar 
-                    y adquirir la propiedad perfecta. Contacta con nosotros para una 
-                    consulta personalizada y descubre cómo podemos hacer tu proceso 
-                    de compra más fácil y seguro.
-                </motion.p>
-                <motion.div 
-                    className="flex flex-col items-center gap-6"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.4 }}
-                >
-                    <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        transition={{ duration: 0.3 }}
+            <FadeInView direction="up" className="text-center max-w-3xl mx-auto relative z-[2]">
+                <div className="relative z-[3] bg-white/5 backdrop-blur-sm p-8 rounded-xl">
+                    <h2 
+                        className="text-3xl font-bold mb-6 hover:scale-105 transition-all duration-300"
+                        style={textShadowStyle}
                     >
-                        <Link 
-                            href="/contacto" 
-                            className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-black/10 px-8 py-3 transition-all duration-300 hover:bg-black/20 backdrop-blur-sm"
+                        Comienza tu Proceso de Compra
+                    </h2>
+                    <motion.p 
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.2 }}
+                        className="text-xl mb-8 hover:scale-105 transition-all duration-300"
+                        style={textShadowLightStyle}
+                    >
+                        Nuestro equipo de expertos está listo para ayudarte a encontrar 
+                        y adquirir la propiedad perfecta. Contacta con nosotros para una 
+                        consulta personalizada y descubre cómo podemos hacer tu proceso 
+                        de compra más fácil y seguro.
+                    </motion.p>
+                    <motion.div 
+                        className="flex flex-col items-center gap-6"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.4 }}
+                    >
+                        <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            <Link 
+                                href="/contacto" 
+                                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-black/10 px-8 py-3 transition-all duration-300 hover:bg-black/20 backdrop-blur-sm"
+                            >
+                                <span className="relative text-lg font-semibold text-black">
+                                    Solicitar Asesoramiento
+                                </span>
+                                <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-amarillo via-black to-amarillo transition-transform duration-300 group-hover:translate-x-full"></span>
+                            </Link>
+                        </motion.div>
+
+                        <motion.a 
+                            href="https://martalopezpedroza.exp-spain.com/1/descarga-de-guia-de-venta?t=20230526084141"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mb-[10vh] group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-black/10 px-8 py-3 transition-all duration-300 hover:bg-black/20 backdrop-blur-sm"
+                            whileHover={{ scale: 1.05 }}
+                            transition={{ duration: 0.3 }}
                         >
                             <span className="relative text-lg font-semibold text-black">
-                                Solicitar Asesoramiento
+                                Ver Guía Completa
                             </span>
                             <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-amarillo via-black to-amarillo transition-transform duration-300 group-hover:translate-x-full"></span>
-                        </Link>
+                        </motion.a>
                     </motion.div>
-
-                    <motion.a 
-                        href="https://martalopezpedroza.exp-spain.com/1/descarga-de-guia-de-venta?t=20230526084141"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mb-[10vh] group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-black/10 px-8 py-3 transition-all duration-300 hover:bg-black/20 backdrop-blur-sm"
-                        whileHover={{ scale: 1.05 }}
-                        transition={{ duration: 0.3 }}
-                    >
-                        <span className="relative text-lg font-semibold text-black">
-                            Ver Guía Completa
-                        </span>
-                        <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-amarillo via-black to-amarillo transition-transform duration-300 group-hover:translate-x-full"></span>
-                    </motion.a>
-                </motion.div>
+                </div>
             </FadeInView>
         </div>
     );
