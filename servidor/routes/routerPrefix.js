@@ -1,12 +1,10 @@
-const express = require("express")
-const prefixRouter = express.Router()
+import express from 'express';
+import { getCountryPrefix } from '../controller/prefixController.js';
 
-const prefixController = require("/home/nacho/Documentos/Programación/nextjs-gozamadrid/servidor/controller/countryPrefix")
+const prefixRouter = express.Router();
 
 // prefix
 
+prefixRouter.get('/', getCountryPrefix);
 
-prefixRouter.get("/", prefixController.getCountryPrefix)
-
-
-module.exports = prefixRouter;
+export default prefixRouter;

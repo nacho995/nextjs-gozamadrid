@@ -1,8 +1,9 @@
-const express = require("express");
+import express from 'express';
+import userController from '../controller/userContentController.js';
+import upload from '../config/multer.js'; // Usamos la configuración centralizada de multer
+import { verifyToken, isAdmin } from '../middlewares/auth.js';
+
 const userRouter = express.Router();
-const upload = require("../config/multer"); // Usamos la configuración centralizada de multer
-const userController = require("../controller/userContentController");
-const { verifyToken, isAdmin } = require("../middlewares/auth");
 
 userRouter.get("/", verifyToken, isAdmin, userController.getUser);
 userRouter.get("/me", userController.getMe);
@@ -14,4 +15,10 @@ userRouter.post("/reset-password", userController.executePasswordReset); // Endp
 
 userRouter.patch("/update-profile", verifyToken, upload.single("profilePic"), userController.changeUserPerfil);
 
-module.exports = userRouter;
+userRouter.get('/', userController.getData);
+userRouter.get('/:id', userController.getDataById);
+userRouter.post('/', userController.addData);
+userRouter.delete('/:id', userController.deleteData);
+userRouter.patch('/:id', userController.updateData);
+
+export default userRouter;

@@ -1,5 +1,10 @@
-const Blog = require('../models/blogSchema'); // Usamos el modelo unificado
-const path = require('path');
+import Blog from '../models/blogSchema.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const blogController = {
     // Obtiene la lista de blogs para previsualización
@@ -7,7 +12,7 @@ const blogController = {
         try {
             // Selecciona solo los campos necesarios para la previsualización.
             // Por ejemplo, no incluimos "content" ni "tags"
-            const blogs = await Blog.find().select('title description url author category image readTime button createdAt updatedAt');
+            const blogs = await Blog.find().select('title excerpt image tags createdAt updatedAt');
             res.json(blogs);
         } catch (err) {
             console.log("Error fetching blogs:", err);
@@ -19,8 +24,8 @@ const blogController = {
     getDataById: async (req, res) => {
         try {
             const { id } = req.params;
-            const blog = await Blog.findById(id);
-            res.json(blog);
+            const foundBlog = await Blog.findById(id);
+            res.json(foundBlog);
         } catch (err) {
             console.log("Error fetching blog by ID:", err);
             res.status(500).json({ message: "No se pudo obtener el blog" });
@@ -63,19 +68,17 @@ const blogController = {
 
     uploadImage: async (req, res) => {
         try {
-          if (!req.file) {
-            return res.status(400).json({ message: "No se subió ninguna imagen" });
-          }
-          console.log("Archivo recibido:", req.file); // Debug: Verifica los detalles del archivo subido
-      
-          const serverUrl = process.env.API_BASE_URL || "http://localhost:3000";
-          const imageUrl = `${serverUrl}/uploads/${req.file.filename}`;
-          res.json({ imageUrl });
-        } catch (err) {
-          console.log("Error uploading image:", err);
-          res.status(500).json({ message: "No se pudo subir la imagen" });
-        }
-      }
-}
+            if (!req.file) {
+                return res.status(400).json({ message: "No se subió ninguna imagen" });
+            }
 
-module.exports = blogController;
+            const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+            res.json({ imageUrl });
+        } catch (err) {
+            console.log("Error uploading image:", err);
+            res.status(500).json({ message: "No se pudo subir la imagen" });
+        }
+    }
+};
+
+export default blogController;

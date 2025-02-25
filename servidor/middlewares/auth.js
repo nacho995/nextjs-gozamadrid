@@ -1,34 +1,38 @@
-const jwt = require("jsonwebtoken");
+import jwt from 'jsonwebtoken';
+import User from '../models/userSchema.js';
 
-const authObj = {
-  verifyToken: (req, res, next) => {
-    // Se obtiene el header "Authorization"
-    const authHeader = req.headers["authorization"];
-    // Se espera que el header tenga el formato "Bearer <token>"
-    const token = authHeader && authHeader.split(" ")[1];
-    if (!token) {
-      return res.status(401).json({ message: "No token provided" });
-    }
+export const verifyToken = async (req, res, next) => {
     try {
-      // Verifica el token utilizando la clave secreta definida en las variables de entorno
-      const tokenDecoded = jwt.verify(token, process.env.JWT_SECRET);
-      // Se asigna el token decodificado a req.decodedToken para que otros middlewares o controladores lo puedan usar
-      req.decodedToken = tokenDecoded;
-      next();
-    } catch (error) {
-      console.error('Error verifying token:', error);
-      return res.status(401).json({ message: "Invalid token", reason: error.message });
-    }
-  },
+        const token = req.header('Authorization')?.replace('Bearer ', '');
+        
+        if (!token) {
+            return res.status(401).json({ message: "No token provided" });
+        }
 
-  isAdmin: (req, res, next) => {
-    // Verifica que se haya definido req.decodedToken y que tenga la propiedad role
-    if (req.decodedToken && req.decodedToken.role === "ADMIN") {
-      next();
-    } else {
-      return res.status(401).json({ message: "Unauthorized" });
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded;
+        req.decodedToken = decoded; // Para mantener compatibilidad
+        
+        next();
+    } catch (error) {
+        res.status(401).json({ message: "Invalid token" });
     }
-  }
 };
 
-module.exports = authObj;
+export const isAdmin = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user.id);
+        
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if (user.role !== 'admin') {
+            return res.status(403).json({ message: "Access denied. Admin role required" });
+        }
+
+        next();
+    } catch (error) {
+        res.status(500).json({ message: "Error checking admin status" });
+    }
+};
