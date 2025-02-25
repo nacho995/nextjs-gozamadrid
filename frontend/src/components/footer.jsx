@@ -29,7 +29,7 @@ export default function Footer3(props) {
       {
         links: [
           { title: "Inicio", url: "/" },
-          { title: "Propiedades", url: "/propiedades" },
+          { title: "Propiedades", url: "/vender/comprar" },
           { title: "Servicios", url: "/servicios" },
           { title: "Reformas", url: "/reformas" },
           { title: "Blog", url: "/blog" },
