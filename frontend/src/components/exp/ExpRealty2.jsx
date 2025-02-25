@@ -435,31 +435,76 @@ export default function ExpRealtyMore({ videoId, title }) {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {[1, 2, 3, 4].map((num) => (
-                            <div key={num} 
+                        {[
+                            {
+                                id: 1,
+                                name: "Eduardo Sánchez",
+                                role: "CEO & Headhunter inmobiliario",
+                                description: "Líder y fundador del equipo eXp en Madrid. Especializado en el desarrollo de agentes inmobiliarios y expansión de equipos comerciales. Experto en el mercado de lujo.",
+                                image: "/1.png"
+                            },
+                            {
+                                id: 2,
+                                name: "Masha Tyagunova",
+                                role: "Headhunter inmobiliario",
+                                description: "Especialista en reclutamiento y formación de agentes inmobiliarios. Experta en desarrollo de talento y creación de equipos de alto rendimiento en el sector inmobiliario.",
+                                image: "/2.png"
+                            },
+                            {
+                                id: 3,
+                                name: "Rodrigo Pinto",
+                                role: "Broker inmobiliario",
+                                description: "Broker especializado en operaciones de alto valor. Experto en el mercado residencial premium y gestión de carteras exclusivas en Madrid.",
+                                image: "/3.png"
+                            },
+                            {
+                                id: 4,
+                                name: "Marta López",
+                                role: "Headhunter inmobiliario",
+                                description: "Especialista en captación y desarrollo de talento inmobiliario. Enfocada en el crecimiento y formación de equipos comerciales de alto rendimiento.",
+                                image: "/4.png"
+                            }
+                        ].map((member) => (
+                            <div key={member.id} 
                                 className="group relative overflow-hidden rounded-xl shadow-lg 
                                     hover:shadow-2xl transition-all duration-500 
                                     transform hover:-translate-y-2"
                             >
-                                {/* Contenedor de la imagen con efecto hover */}
-                                <div className="relative overflow-hidden aspect-square">
+                                {/* Contenedor de la imagen */}
+                                <div className="relative overflow-hidden">
                                     <img
-                                        src={`/${num}.png`}
-                                        alt={`Beneficio ${num}`}
-                                        className="w-full h-full object-cover transform 
-                                            group-hover:scale-110 transition-transform duration-500"
+                                        src={member.image}
+                                        alt={member.name}
+                                        className="w-full aspect-square object-cover transform 
+                                            group-hover:scale-105 transition-transform duration-500"
                                     />
-                                    {/* Overlay gradiente */}
-                                    <div className="absolute inset-0 bg-gradient-to-t 
-                                        from-black/60 via-black/30 to-transparent 
-                                        group-hover:from-black/70 group-hover:via-black/40 
+                                    {/* Overlay gradiente suave */}
+                                    <div className="absolute inset-0 bg-gradient-to-b 
+                                        from-transparent to-black/10 
+                                        group-hover:to-black/20 
                                         transition-all duration-500">
                                     </div>
                                 </div>
 
-                                {/* Bordes decorativos que aparecen en hover */}
+                                {/* Información del miembro - Ahora fuera del contenedor de la imagen */}
+                                <div className="p-6 bg-white/10 backdrop-blur-sm">
+                                    <h4 className="text-white text-xl font-bold mb-2 
+                                        group-hover:text-blue-200 transition-colors duration-300">
+                                        {member.name}
+                                    </h4>
+                                    <p className="text-white/90 text-sm font-medium mb-3">
+                                        {member.role}
+                                    </p>
+                                    <p className="text-white/80 text-sm leading-relaxed 
+                                        transform opacity-80 group-hover:opacity-100 
+                                        transition-all duration-300">
+                                        {member.description}
+                                    </p>
+                                </div>
+
+                                {/* Bordes decorativos */}
                                 <div className="absolute inset-[2px] border-2 border-white/0 rounded-lg 
-                                    scale-90 opacity-0 group-hover:scale-100 group-hover:opacity-100 
+                                    scale-90 opacity-0 group-hover:scale-100 group-hover:opacity-20 
                                     transition-all duration-700">
                                 </div>
 
