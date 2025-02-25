@@ -468,16 +468,19 @@ export default function ExpRealtyMore({ videoId, title }) {
                             <div key={member.id} 
                                 className="group relative overflow-hidden rounded-xl shadow-lg 
                                     hover:shadow-2xl transition-all duration-500 
-                                    transform hover:-translate-y-2"
+                                    transform hover:-translate-y-2 mb-6
+                                    flex flex-col h-full"
                             >
                                 {/* Contenedor de la imagen */}
-                                <div className="relative overflow-hidden">
-                                    <img
-                                        src={member.image}
-                                        alt={member.name}
-                                        className="w-full aspect-square object-cover transform 
-                                            group-hover:scale-105 transition-transform duration-500"
-                                    />
+                                <div className="relative w-full">
+                                    <div className="aspect-square w-full">
+                                        <img
+                                            src={member.image}
+                                            alt={member.name}
+                                            className="w-full h-full object-cover transform 
+                                                group-hover:scale-105 transition-transform duration-500"
+                                        />
+                                    </div>
                                     {/* Overlay gradiente suave */}
                                     <div className="absolute inset-0 bg-gradient-to-b 
                                         from-transparent to-black/10 
@@ -486,8 +489,8 @@ export default function ExpRealtyMore({ videoId, title }) {
                                     </div>
                                 </div>
 
-                                {/* Información del miembro - Ahora fuera del contenedor de la imagen */}
-                                <div className="p-6 bg-white/10 backdrop-blur-sm">
+                                {/* Información del miembro */}
+                                <div className="p-6 pb-8 bg-white/10 backdrop-blur-sm flex-grow flex flex-col">
                                     <h4 className="text-white text-xl font-bold mb-2 
                                         group-hover:text-blue-200 transition-colors duration-300">
                                         {member.name}
