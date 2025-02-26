@@ -95,7 +95,8 @@ export default function DefaultPropertyContent({ property }) {
                 email,
                 name,
                 phone,
-                property: property._id
+                property: property._id,
+                propertyAddress: property.address
             };
 
             const response = await sendPropertyEmail(formData);
@@ -125,7 +126,8 @@ export default function DefaultPropertyContent({ property }) {
                 email,
                 name,
                 phone,
-                property: property._id
+                property: property._id,
+                propertyAddress: property.address
             };
 
             const response = await sendPropertyEmail(formData);
