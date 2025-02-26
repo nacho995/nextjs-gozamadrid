@@ -28,15 +28,37 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Middlewares
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use(express.json());
+// Lista de dominios permitidos
+const allowedOrigins = [
+    'https://goza-madrid-qbw9.onrender.com',  // Tu dominio de frontend en producción
+    'http://localhost:3000',                   // Para desarrollo local
+    'http://localhost:3001'                    // Para desarrollo local
+];
+
+// Configuración CORS
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001'],
-    methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    origin: function(origin, callback) {
+        // Permitir peticiones sin origin (como las peticiones mobile o postman)
+        if (!origin) return callback(null, true);
+        
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('No permitido por CORS'));
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     credentials: true
 }));
+
+app.use(express.json());
+
+// Middleware para debugging
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url}`);
+    next();
+});
 
 // Configuración de Cloudinary
 cloudinary.v2.config({
