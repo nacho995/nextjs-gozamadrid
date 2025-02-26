@@ -9,13 +9,15 @@ import { dirname } from 'path';
 import cloudinary from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import multer from 'multer';
+import { notificationRouter } from './routes/notificationRoutes.js';  // Importación nombrada
+import propertyNotificationRoutes from './routes/propertyNotificationRoutes.js';
+
 
 // Para usar __dirname en ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Importar rutas (convertir a import)
-import dataClientRouter from "./routes/router.js";
 import prefixRouter from "./routes/routerPrefix.js";
 import blogRouter from "./routes/blogRouter.js";
 import userRouter from "./routes/userContentRouter.js";
@@ -30,8 +32,10 @@ const port = process.env.PORT || 3000;
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.json());
 app.use(cors({
-  origin: process.env.FRONTEND_URL,
-  credentials: true
+  origin: ['http://localhost:3000', 'http://localhost:3001'],
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
 }));
 
 // Configuración de Cloudinary
@@ -55,16 +59,27 @@ const storage = new CloudinaryStorage({
 const upload = multer({ storage: storage });
 
 // Rutas
-app.use("/emails", dataClientRouter);
+app.use("/property-notification", propertyRouter);
+app.use('/api', notificationRouter);
 app.use("/prefix", prefixRouter);
 app.use("/blog", blogRouter);
 app.use("/user", userRouter);
 app.use("/property", propertyRouter);
+app.use('/api/property-notification', propertyNotificationRoutes);
 
 // Conexión a MongoDB
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("Connected to BBDD"))
   .catch(error => console.log("Error trying to connect to BBDD:", error));
+
+// Manejador de errores
+app.use((err, req, res, next) => {
+    console.error('Error en el servidor:', err);
+    res.status(500).json({
+        success: false,
+        message: err.message || 'Error interno del servidor'
+    });
+});
 
 // Iniciar servidor
 app.listen(port, () => {

@@ -86,14 +86,54 @@ export async function getPropertyById(id) {
 
   return response.json()
 }
-export async function sendEmail(emailData) {
-  const response = await fetch(`${API_URL}/emails`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(emailData)
-  });
 
-  return response.json();
+export async function sendEmail(emailData) {
+  try {
+      const response = await fetch(`${API_URL}/api/contact`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+              type: 'contact',
+              data: emailData
+          })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+          throw new Error(data.message || 'Error en la respuesta del servidor');
+      }
+
+      return data;
+  } catch (error) {
+      console.error('Error al enviar email:', error);
+      throw new Error(error.message || 'Error al enviar el mensaje');
+  }
 }
+
+export const sendPropertyEmail = async (formData) => {
+    try {
+        const response = await fetch(`${API_URL}/api/property-notification`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.message || 'Error al procesar la solicitud');
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Error al enviar email:', error);
+        throw new Error(error.message || 'Error al enviar el mensaje');
+    }
+};
