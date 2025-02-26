@@ -122,7 +122,7 @@ const BlogHome = (props) => {
 const Blog44Defaults = {
   tagline: "Goza Madrid",
   heading: "Ver detalles inmobiliarios",
-  description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+  description: "Blogs de Goza Madrid.",
   button: { title: "Ver todo", variant: "secondary" },
   blogPosts: [
     {
