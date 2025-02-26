@@ -174,104 +174,109 @@ export default function AlquilerTuristico() {
             </div>
 
             {/* Nueva Sección de Tarjetas Giratorias */}
-            <div className="mt-20 mb-16">
-                <h2 
-                    className="text-3xl font-bold text-center mb-12"
-                    style={textShadowStyle}
-                >
-                    Ventajas del Alquiler Turístico
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {[
-                        {
-                            title: "Rentabilidad Superior",
-                            text: "Los alquileres vacacionales pueden generar hasta un 30% más de ingresos que los alquileres tradicionales, especialmente en ubicaciones turísticas premium."
-                        },
-                        {
-                            title: "Flexibilidad Total",
-                            text: "Decide cuándo quieres alquilar tu propiedad y cuándo usarla tú mismo. Mantén el control total sobre tu calendario y disponibilidad."
-                        },
-                        {
-                            title: "Gestión Profesional",
-                            text: "Nuestro equipo se encarga de todo: desde la limpieza y mantenimiento hasta la atención 24/7 a los huéspedes."
-                        },
-                        {
-                            title: "Marketing Digital",
-                            text: "Promocionamos tu propiedad en las principales plataformas de alquiler vacacional, optimizando su visibilidad y ocupación."
-                        },
-                        {
-                            title: "Precio Dinámico",
-                            text: "Ajustamos los precios según la temporada, eventos especiales y demanda del mercado para maximizar tus beneficios."
-                        },
-                        {
-                            title: "Seguridad Garantizada",
-                            text: "Verificamos cuidadosamente a todos los huéspedes y contamos con seguros específicos para alquiler vacacional."
-                        }
-                    ].map((card, index) => (
-                        <div 
-                            key={index}
-                            className="relative h-[400px] group [perspective:1000px]"
-                            onClick={() => handleCardClick(index)}
-                        >
-                            <div className={`absolute inset-0 w-full h-full transition-all duration-500 [transform-style:preserve-3d] 
-                                ${flippedCards[index] ? '[transform:rotateY(180deg)]' : ''} 
-                                lg:group-hover:[transform:rotateY(180deg)]`}
+            <div className="relative mt-20 mb-16 z-[9997]">
+                <div className="relative z-[9998] bg-gradient-to-b from-transparent via-white/5 to-transparent py-8">
+                    <h2 
+                        className="relative text-5xl font-bold text-center mb-12 z-[9999]"
+                        style={{
+                            ...textShadowStyle,
+                            position: 'relative',
+                        }}
+                    >
+                        Ventajas del Alquiler Turístico
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {[
+                            {
+                                title: "Rentabilidad Superior",
+                                text: "Los alquileres vacacionales pueden generar hasta un 30% más de ingresos que los alquileres tradicionales, especialmente en ubicaciones turísticas premium."
+                            },
+                            {
+                                title: "Flexibilidad Total",
+                                text: "Decide cuándo quieres alquilar tu propiedad y cuándo usarla tú mismo. Mantén el control total sobre tu calendario y disponibilidad."
+                            },
+                            {
+                                title: "Gestión Profesional",
+                                text: "Nuestro equipo se encarga de todo: desde la limpieza y mantenimiento hasta la atención 24/7 a los huéspedes."
+                            },
+                            {
+                                title: "Marketing Digital",
+                                text: "Promocionamos tu propiedad en las principales plataformas de alquiler vacacional, optimizando su visibilidad y ocupación."
+                            },
+                            {
+                                title: "Precio Dinámico",
+                                text: "Ajustamos los precios según la temporada, eventos especiales y demanda del mercado para maximizar tus beneficios."
+                            },
+                            {
+                                title: "Seguridad Garantizada",
+                                text: "Verificamos cuidadosamente a todos los huéspedes y contamos con seguros específicos para alquiler vacacional."
+                            }
+                        ].map((card, index) => (
+                            <div 
+                                key={index}
+                                className="relative h-[400px] group [perspective:1000px]"
+                                onClick={() => handleCardClick(index)}
                             >
-                                {/* Cara Frontal */}
-                                <div className="absolute inset-0 w-full h-full">
-                                    <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl">
-                                        <Image
-                                            src="/fondoamarillo.jpg"
-                                            alt={card.title}
-                                            fill
-                                            className="object-cover"
-                                        />
-                                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                                            <h3 
-                                                className="text-2xl font-bold text-white text-center px-6"
-                                                style={textShadowStyle}
-                                            >
-                                                {card.title}
-                                            </h3>
-                                        </div>
-                                        <div 
-                                            className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-sm lg:hidden"
-                                            style={textShadowLightStyle}
-                                        >
-                                            Toca para más info
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Cara Trasera */}
-                                <div className="absolute inset-0 w-full h-full [transform:rotateY(180deg)] [backface-visibility:hidden]">
-                                    <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl">
-                                        <Image
-                                            src="/fondonegro.jpg"
-                                            alt="Background"
-                                            fill
-                                            className="object-cover"
-                                            quality={100}
-                                        />
-                                        <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center p-8">
-                                            <p 
-                                                className="text-white text-lg md:text-xl text-center font-medium"
-                                                style={textShadowStyle}
-                                            >
-                                                {card.text}
-                                            </p>
-                                            <span 
-                                                className="mt-4 text-white/80 text-sm lg:hidden"
+                                <div className={`absolute inset-0 w-full h-full transition-all duration-500 [transform-style:preserve-3d] 
+                                    ${flippedCards[index] ? '[transform:rotateY(180deg)]' : ''} 
+                                    lg:group-hover:[transform:rotateY(180deg)]`}
+                                >
+                                    {/* Cara Frontal */}
+                                    <div className="absolute inset-0 w-full h-full">
+                                        <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl">
+                                            <Image
+                                                src="/fondoamarillo.jpg"
+                                                alt={card.title}
+                                                fill
+                                                className="object-cover"
+                                            />
+                                            <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                                                <h3 
+                                                    className="text-2xl font-bold text-white text-center px-6"
+                                                    style={textShadowStyle}
+                                                >
+                                                    {card.title}
+                                                </h3>
+                                            </div>
+                                            <div 
+                                                className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-sm lg:hidden"
                                                 style={textShadowLightStyle}
                                             >
-                                                Toca para volver
-                                            </span>
+                                                Toca para más info
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Cara Trasera */}
+                                    <div className="absolute inset-0 w-full h-full [transform:rotateY(180deg)] [backface-visibility:hidden]">
+                                        <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl">
+                                            <Image
+                                                src="/fondonegro.jpg"
+                                                alt="Background"
+                                                fill
+                                                className="object-cover"
+                                                quality={100}
+                                            />
+                                            <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center p-8">
+                                                <p 
+                                                    className="text-white text-lg md:text-xl text-center font-medium"
+                                                    style={textShadowStyle}
+                                                >
+                                                    {card.text}
+                                                </p>
+                                                <span 
+                                                    className="mt-4 text-white/80 text-sm lg:hidden"
+                                                    style={textShadowLightStyle}
+                                                >
+                                                    Toca para volver
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>
