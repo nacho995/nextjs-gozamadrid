@@ -9,7 +9,7 @@ import AnimatedOnScroll from "../AnimatedScroll";
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaCalendarAlt, FaClock, FaHandshake } from 'react-icons/fa';
+import { FaCalendarAlt, FaClock, FaHandshake, FaEnvelope, FaUser } from 'react-icons/fa';
 import { addDays, setHours, setMinutes } from 'date-fns';
 import es from 'date-fns/locale/es';
 import { toast } from 'react-hot-toast';
@@ -23,6 +23,9 @@ export default function DefaultPropertyContent({ property }) {
     const [showOfferPanel, setShowOfferPanel] = useState(false);
     const [selectedOffer, setSelectedOffer] = useState(null);
     const offerPanelRef = useRef(null);
+    const [email, setEmail] = useState('');
+    const [name, setName] = useState('');
+    const [phone, setPhone] = useState('');
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -83,42 +86,25 @@ export default function DefaultPropertyContent({ property }) {
         return setHours(setMinutes(new Date(), 0), i + 9);
     });
 
-    const handleSubmit = async () => {
-        if (selectedDate && selectedTime) {
-            try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notifications`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        type: 'visit',
-                        data: {
-                            date: selectedDate,
-                            time: selectedTime.getHours(),
-                            propertyId: property.id,
-                            propertyAddress: property.address,
-                        }
-                    }),
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    toast.success('Visita agendada correctamente');
-                    setShowCalendar(false);
-                } else {
-                    throw new Error(data.message);
-                }
-            } catch (error) {
-                toast.error('Error al agendar la visita');
-                console.error('Error:', error);
-            }
-        }
+    const handleSubmit = () => {
+        console.log({
+            date: selectedDate,
+            time: selectedTime,
+            email,
+            name,
+            phone
+        });
+        
+        setSelectedDate(null);
+        setSelectedTime(null);
+        setEmail('');
+        setName('');
+        setPhone('');
+        setShowCalendar(false);
     };
 
     const handleOfferSubmit = async () => {
-        if (selectedOffer) {
+        if (selectedOffer && email && name && phone) {
             try {
                 const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notifications`, {
                     method: 'POST',
@@ -132,6 +118,11 @@ export default function DefaultPropertyContent({ property }) {
                             originalPrice: property.price,
                             propertyId: property.id,
                             propertyAddress: property.address,
+                            contactInfo: {
+                                email,
+                                name,
+                                phone
+                            }
                         }
                     }),
                 });
@@ -141,6 +132,11 @@ export default function DefaultPropertyContent({ property }) {
                 if (data.success) {
                     toast.success('Oferta enviada correctamente');
                     setShowOfferPanel(false);
+                    // Resetear los campos
+                    setEmail('');
+                    setName('');
+                    setPhone('');
+                    setSelectedOffer(null);
                 } else {
                     throw new Error(data.message);
                 }
@@ -309,7 +305,12 @@ export default function DefaultPropertyContent({ property }) {
                                                                 initial={{ opacity: 0, y: -20 }}
                                                                 animate={{ opacity: 1, y: 0 }}
                                                                 exit={{ opacity: 0, y: -20 }}
-                                                                className="absolute z-50 mt-2 w-full bg-white rounded-xl shadow-xl p-4"
+                                                                className="absolute z-[500] mt-2 w-full bg-white rounded-xl shadow-xl p-4"
+                                                                style={{
+                                                                    maxHeight: '80vh',
+                                                                    overflowY: 'auto',
+                                                                    marginBottom: '2rem'
+                                                                }}
                                                             >
                                                                 <div className="mb-4">
                                                                     <h3 className="text-lg font-semibold mb-2 flex items-center">
@@ -362,6 +363,55 @@ export default function DefaultPropertyContent({ property }) {
                                                                 )}
 
                                                                 {selectedDate && selectedTime && (
+                                                                    <motion.div
+                                                                        initial={{ opacity: 0 }}
+                                                                        animate={{ opacity: 1 }}
+                                                                        className="mb-4"
+                                                                    >
+                                                                        <h3 className="text-lg font-semibold mb-2 flex items-center">
+                                                                            <FaEnvelope className="mr-2 text-amarillo" />
+                                                                            Email de contacto
+                                                                        </h3>
+                                                                        <input
+                                                                            type="email"
+                                                                            value={email}
+                                                                            onChange={(e) => setEmail(e.target.value)}
+                                                                            placeholder="Introduce tu email"
+                                                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-amarillo focus:border-transparent"
+                                                                        />
+                                                                    </motion.div>
+                                                                )}
+
+                                                                {selectedDate && selectedTime && email && (
+                                                                    <motion.div
+                                                                        initial={{ opacity: 0 }}
+                                                                        animate={{ opacity: 1 }}
+                                                                        className="mb-4"
+                                                                    >
+                                                                        <h3 className="text-lg font-semibold mb-2 flex items-center">
+                                                                            <FaUser className="mr-2 text-amarillo" />
+                                                                            Datos personales
+                                                                        </h3>
+                                                                        <div className="space-y-3">
+                                                                            <input
+                                                                                type="text"
+                                                                                value={name}
+                                                                                onChange={(e) => setName(e.target.value)}
+                                                                                placeholder="Nombre completo"
+                                                                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-amarillo focus:border-transparent"
+                                                                            />
+                                                                            <input
+                                                                                type="tel"
+                                                                                value={phone}
+                                                                                onChange={(e) => setPhone(e.target.value)}
+                                                                                placeholder="Teléfono"
+                                                                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-amarillo focus:border-transparent"
+                                                                            />
+                                                                        </div>
+                                                                    </motion.div>
+                                                                )}
+
+                                                                {selectedDate && selectedTime && email && name && phone && (
                                                                     <motion.div
                                                                         initial={{ opacity: 0 }}
                                                                         animate={{ opacity: 1 }}
@@ -462,24 +512,63 @@ export default function DefaultPropertyContent({ property }) {
                                                                 </div>
 
                                                                 {selectedOffer && (
-                                                                    <motion.div
-                                                                        initial={{ opacity: 0 }}
-                                                                        animate={{ opacity: 1 }}
-                                                                        className="flex justify-end gap-2"
-                                                                    >
-                                                                        <button
-                                                                            onClick={() => setShowOfferPanel(false)}
-                                                                            className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-all duration-300"
+                                                                    <>
+                                                                        <motion.div
+                                                                            initial={{ opacity: 0 }}
+                                                                            animate={{ opacity: 1 }}
+                                                                            className="mt-6 space-y-4 border-t pt-4"
                                                                         >
-                                                                            Cancelar
-                                                                        </button>
-                                                                        <button
-                                                                            onClick={handleOfferSubmit}
-                                                                            className="px-4 py-2 rounded-lg bg-amarillo text-white hover:bg-amarillo/80 transition-all duration-300"
-                                                                        >
-                                                                            Enviar Oferta
-                                                                        </button>
-                                                                    </motion.div>
+                                                                            <h3 className="text-lg font-semibold mb-2 flex items-center">
+                                                                                <FaUser className="mr-2 text-amarillo" />
+                                                                                Datos de contacto
+                                                                            </h3>
+                                                                            
+                                                                            <div className="space-y-3">
+                                                                                <input
+                                                                                    type="email"
+                                                                                    value={email}
+                                                                                    onChange={(e) => setEmail(e.target.value)}
+                                                                                    placeholder="Email de contacto"
+                                                                                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-amarillo focus:border-transparent"
+                                                                                />
+                                                                                <input
+                                                                                    type="text"
+                                                                                    value={name}
+                                                                                    onChange={(e) => setName(e.target.value)}
+                                                                                    placeholder="Nombre completo"
+                                                                                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-amarillo focus:border-transparent"
+                                                                                />
+                                                                                <input
+                                                                                    type="tel"
+                                                                                    value={phone}
+                                                                                    onChange={(e) => setPhone(e.target.value)}
+                                                                                    placeholder="Teléfono"
+                                                                                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-amarillo focus:border-transparent"
+                                                                                />
+                                                                            </div>
+                                                                        </motion.div>
+
+                                                                        {email && name && phone && (
+                                                                            <motion.div
+                                                                                initial={{ opacity: 0 }}
+                                                                                animate={{ opacity: 1 }}
+                                                                                className="flex justify-end gap-2 mt-4"
+                                                                            >
+                                                                                <button
+                                                                                    onClick={() => setShowOfferPanel(false)}
+                                                                                    className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-all duration-300"
+                                                                                >
+                                                                                    Cancelar
+                                                                                </button>
+                                                                                <button
+                                                                                    onClick={handleOfferSubmit}
+                                                                                    className="px-4 py-2 rounded-lg bg-amarillo text-white hover:bg-amarillo/80 transition-all duration-300"
+                                                                                >
+                                                                                    Enviar Oferta
+                                                                                </button>
+                                                                            </motion.div>
+                                                                        )}
+                                                                    </>
                                                                 )}
                                                             </motion.div>
                                                         )}
