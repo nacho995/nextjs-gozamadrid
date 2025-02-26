@@ -46,11 +46,11 @@ export default function Footer3(props) {
       },
     ],
     socialMediaLinks: [
-      { url: "https://facebook.com/gozamadrid", icon: <BiLogoFacebookCircle className="size-6" /> },
-      { url: "https://instagram.com/gozamadrid", icon: <BiLogoInstagram className="size-6" /> },
-      { url: "https://twitter.com/gozamadrid", icon: <FaXTwitter className="size-6 p-0.5" /> },
-      { url: "https://linkedin.com/company/gozamadrid", icon: <BiLogoLinkedinSquare className="size-6" /> },
-      { url: "https://youtube.com/@gozamadrid", icon: <BiLogoYoutube className="size-6" /> },
+      { url: "https://www.facebook.com/GozaMadridAI?locale=es_ES", icon: <BiLogoFacebookCircle className="size-6" /> },
+      { url: "https://instagram.com/Gozamadrid54", icon: <BiLogoInstagram className="size-6" /> },
+      { url: "https://x.com/Marta12857571", icon: <FaXTwitter className="size-6 p-0.5" /> },
+      { url: "https://www.linkedin.com/in/marta-l%C3%B3pez-55516099/", icon: <BiLogoLinkedinSquare className="size-6" /> },
+      { url: "https://www.youtube.com/@gozamadrid2410", icon: <BiLogoYoutube className="size-6" /> },
     ],
     footerText: "© 2024 Goza Madrid. Todos los derechos reservados.",
     footerLinks: [

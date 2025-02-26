@@ -100,10 +100,10 @@ export default function ControlMenu() {
         </div>
 
         <div className="absolute top-5 right-10 flex space-x-4 mt-4 mr-4">
-          <Link href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
+          <Link href="https://www.facebook.com/GozaMadridAI?locale=es_ES" target="_blank" rel="noopener noreferrer">
             <FaFacebook size={25} className="hover:text-gray-700 text-blue-600" />
           </Link>
-          <Link href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">
+          <Link href="https://www.instagram.com/Gozamadrid54" target="_blank" rel="noopener noreferrer">
             <FaInstagram size={25} className="hover:text-gray-700 text-pink-600" />
           </Link>
           <FaPhone size={25} className="hover:text-gray-700" />
