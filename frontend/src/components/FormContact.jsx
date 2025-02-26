@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaUser, FaEnvelope, FaPhone, FaComments } from 'react-icons/fa';
+import { sendEmail } from '../pages/api';
 
 import CountryPrefix from "./CountryPrefix";
 import AnimatedOnScroll from "./AnimatedScroll";
@@ -16,9 +17,12 @@ const RegisterForm = () => {
     message: ''
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Lógica de envío del formulario
+    const response = await sendEmail(formData);
+    console.log(response);
+    
+    
   };
 
   const handleChange = (e) => {
