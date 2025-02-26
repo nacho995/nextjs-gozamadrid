@@ -68,7 +68,7 @@ app.use("/property", propertyRouter);
 app.use('/api/property-notification', propertyNotificationRoutes);
 
 // Conexión a MongoDB
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log("Connected to BBDD"))
   .catch(error => console.log("Error trying to connect to BBDD:", error));
 
