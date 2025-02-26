@@ -305,15 +305,10 @@ export default function DefaultPropertyContent({ property }) {
                                                                 initial={{ opacity: 0, y: -20 }}
                                                                 animate={{ opacity: 1, y: 0 }}
                                                                 exit={{ opacity: 0, y: -20 }}
-                                                                className="absolute z-[500] mt-2 w-full bg-white rounded-xl shadow-xl p-4"
-                                                                style={{
-                                                                    maxHeight: '80vh',
-                                                                    overflowY: 'auto',
-                                                                    marginBottom: '2rem'
-                                                                }}
+                                                                className="absolute z-[500] mt-2 w-[95vw] md:w-full bg-white rounded-xl shadow-xl p-4 max-h-[90vh] md:max-h-[80vh] overflow-y-auto mb-8"
                                                             >
                                                                 <div className="mb-4">
-                                                                    <h3 className="text-lg font-semibold mb-2 flex items-center">
+                                                                    <h3 className="text-base md:text-lg font-semibold mb-2 flex items-center">
                                                                         <FaCalendarAlt className="mr-2 text-amarillo" />
                                                                         Selecciona una fecha
                                                                     </h3>
@@ -324,7 +319,7 @@ export default function DefaultPropertyContent({ property }) {
                                                                         minDate={new Date()}
                                                                         locale={es}
                                                                         dateFormat="dd/MM/yyyy"
-                                                                        className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-amarillo focus:border-transparent"
+                                                                        className="w-full p-2 md:p-3 text-sm md:text-base border rounded-lg focus:ring-2 focus:ring-amarillo focus:border-transparent"
                                                                         placeholderText="Selecciona una fecha"
                                                                         inline
                                                                         showMonthDropdown
@@ -340,16 +335,16 @@ export default function DefaultPropertyContent({ property }) {
                                                                         animate={{ opacity: 1 }}
                                                                         className="mb-4"
                                                                     >
-                                                                        <h3 className="text-lg font-semibold mb-2 flex items-center">
+                                                                        <h3 className="text-base md:text-lg font-semibold mb-2 flex items-center">
                                                                             <FaClock className="mr-2 text-amarillo" />
                                                                             Horario disponible
                                                                         </h3>
-                                                                        <div className="grid grid-cols-3 gap-2">
+                                                                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                                                                             {availableTimes.map((time) => (
                                                                                 <button
                                                                                     key={time.getTime()}
                                                                                     onClick={() => setSelectedTime(time)}
-                                                                                    className={`p-2 rounded-lg text-sm transition-all duration-300 
+                                                                                    className={`p-2 md:p-3 text-sm md:text-base rounded-lg transition-all duration-300 
                                                                                         ${selectedTime?.getTime() === time.getTime()
                                                                                             ? 'bg-amarillo text-white'
                                                                                             : 'bg-gray-100 hover:bg-gray-200'
@@ -362,70 +357,72 @@ export default function DefaultPropertyContent({ property }) {
                                                                     </motion.div>
                                                                 )}
 
-                                                                {selectedDate && selectedTime && (
-                                                                    <motion.div
-                                                                        initial={{ opacity: 0 }}
-                                                                        animate={{ opacity: 1 }}
-                                                                        className="mb-4"
-                                                                    >
-                                                                        <h3 className="text-lg font-semibold mb-2 flex items-center">
-                                                                            <FaEnvelope className="mr-2 text-amarillo" />
-                                                                            Email de contacto
-                                                                        </h3>
-                                                                        <input
-                                                                            type="email"
-                                                                            value={email}
-                                                                            onChange={(e) => setEmail(e.target.value)}
-                                                                            placeholder="Introduce tu email"
-                                                                            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-amarillo focus:border-transparent"
-                                                                        />
-                                                                    </motion.div>
-                                                                )}
+                                                                <div className="space-y-4">
+                                                                    {selectedDate && selectedTime && (
+                                                                        <motion.div
+                                                                            initial={{ opacity: 0 }}
+                                                                            animate={{ opacity: 1 }}
+                                                                            className="mb-4"
+                                                                        >
+                                                                            <h3 className="text-base md:text-lg font-semibold mb-2 flex items-center">
+                                                                                <FaEnvelope className="mr-2 text-amarillo" />
+                                                                                Email de contacto
+                                                                            </h3>
+                                                                            <input
+                                                                                type="email"
+                                                                                value={email}
+                                                                                onChange={(e) => setEmail(e.target.value)}
+                                                                                placeholder="Introduce tu email"
+                                                                                className="w-full p-2 md:p-3 text-sm md:text-base border rounded-lg focus:ring-2 focus:ring-amarillo focus:border-transparent"
+                                                                            />
+                                                                        </motion.div>
+                                                                    )}
 
-                                                                {selectedDate && selectedTime && email && (
-                                                                    <motion.div
-                                                                        initial={{ opacity: 0 }}
-                                                                        animate={{ opacity: 1 }}
-                                                                        className="mb-4"
-                                                                    >
-                                                                        <h3 className="text-lg font-semibold mb-2 flex items-center">
-                                                                            <FaUser className="mr-2 text-amarillo" />
-                                                                            Datos personales
-                                                                        </h3>
-                                                                        <div className="space-y-3">
-                                                                            <input
-                                                                                type="text"
-                                                                                value={name}
-                                                                                onChange={(e) => setName(e.target.value)}
-                                                                                placeholder="Nombre completo"
-                                                                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-amarillo focus:border-transparent"
-                                                                            />
-                                                                            <input
-                                                                                type="tel"
-                                                                                value={phone}
-                                                                                onChange={(e) => setPhone(e.target.value)}
-                                                                                placeholder="Teléfono"
-                                                                                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-amarillo focus:border-transparent"
-                                                                            />
-                                                                        </div>
-                                                                    </motion.div>
-                                                                )}
+                                                                    {selectedDate && selectedTime && email && (
+                                                                        <motion.div
+                                                                            initial={{ opacity: 0 }}
+                                                                            animate={{ opacity: 1 }}
+                                                                            className="mb-4"
+                                                                        >
+                                                                            <h3 className="text-base md:text-lg font-semibold mb-2 flex items-center">
+                                                                                <FaUser className="mr-2 text-amarillo" />
+                                                                                Datos personales
+                                                                            </h3>
+                                                                            <div className="space-y-3">
+                                                                                <input
+                                                                                    type="text"
+                                                                                    value={name}
+                                                                                    onChange={(e) => setName(e.target.value)}
+                                                                                    placeholder="Nombre completo"
+                                                                                    className="w-full p-2 md:p-3 text-sm md:text-base border rounded-lg focus:ring-2 focus:ring-amarillo focus:border-transparent"
+                                                                                />
+                                                                                <input
+                                                                                    type="tel"
+                                                                                    value={phone}
+                                                                                    onChange={(e) => setPhone(e.target.value)}
+                                                                                    placeholder="Teléfono"
+                                                                                    className="w-full p-2 md:p-3 text-sm md:text-base border rounded-lg focus:ring-2 focus:ring-amarillo focus:border-transparent"
+                                                                                />
+                                                                            </div>
+                                                                        </motion.div>
+                                                                    )}
+                                                                </div>
 
                                                                 {selectedDate && selectedTime && email && name && phone && (
                                                                     <motion.div
                                                                         initial={{ opacity: 0 }}
                                                                         animate={{ opacity: 1 }}
-                                                                        className="flex justify-end gap-2"
+                                                                        className="flex flex-col sm:flex-row justify-end gap-2 mt-4"
                                                                     >
                                                                         <button
                                                                             onClick={() => setShowCalendar(false)}
-                                                                            className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-all duration-300"
+                                                                            className="w-full sm:w-auto px-4 py-2 md:py-3 text-sm md:text-base rounded-lg bg-gray-200 hover:bg-gray-300 transition-all duration-300"
                                                                         >
                                                                             Cancelar
                                                                         </button>
                                                                         <button
                                                                             onClick={handleSubmit}
-                                                                            className="px-4 py-2 rounded-lg bg-amarillo text-white hover:bg-amarillo/80 transition-all duration-300"
+                                                                            className="w-full sm:w-auto px-4 py-2 md:py-3 text-sm md:text-base rounded-lg bg-amarillo text-white hover:bg-amarillo/80 transition-all duration-300"
                                                                         >
                                                                             Confirmar Visita
                                                                         </button>
