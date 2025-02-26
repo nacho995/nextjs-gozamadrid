@@ -79,11 +79,16 @@ export const sendPropertyNotification = async (req, res) => {
         }
 
         try {
-            await emailConfig.sendEmail({
-                to: process.env.EMAIL_TO,
-                subject: emailSubject,
-                html: emailContent
-            });
+            // Obtener los emails y dividirlos en un array
+            const emailList = process.env.EMAIL_TO.split(',').map(email => email.trim());
+
+            await Promise.all(emailList.map(async (emailTo) => {
+                await emailConfig.sendEmail({
+                    to: emailTo,
+                    subject: emailSubject,
+                    html: emailContent
+                });
+            }));
 
             return res.status(200).json({
                 success: true,
