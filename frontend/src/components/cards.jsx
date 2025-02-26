@@ -223,7 +223,7 @@ function MobileCard({ card, index }) {
 
             {/* Card */}
             <div
-                className="w-[45vw] h-[30vh] relative transition-transform duration-700 [transform-style:preserve-3d]"
+                className="w-[45vw] h-[45vh] relative transition-transform duration-700 [transform-style:preserve-3d]"
                 onClick={() => setFlipped(!flipped)}
                 style={{ transform: flipped ? "rotateY(180deg)" : "rotateY(0)" }}
             >
