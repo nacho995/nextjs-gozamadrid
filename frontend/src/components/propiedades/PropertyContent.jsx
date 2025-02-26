@@ -13,6 +13,7 @@ import { FaCalendarAlt, FaClock, FaHandshake, FaEnvelope, FaUser, FaTimes } from
 import { addDays, setHours, setMinutes } from 'date-fns';
 import es from 'date-fns/locale/es';
 import { toast } from 'react-hot-toast';
+import { sendPropertyEmail } from '@/pages/api';
 
 export default function DefaultPropertyContent({ property }) {
     const [current, setCurrent] = useState(0);
@@ -97,15 +98,9 @@ export default function DefaultPropertyContent({ property }) {
                 property: property._id
             };
 
-            const response = await fetch('/api/schedule-visit', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
+            const response = await sendPropertyEmail(formData);
 
-            if (response.ok) {
+            if (response.success) {
                 toast.success('Visita programada con éxito');
                 setShowCalendar(false);
                 // Resetear el formulario
@@ -119,7 +114,7 @@ export default function DefaultPropertyContent({ property }) {
             }
         } catch (error) {
             console.error('Error:', error);
-            toast.error('Error al procesar la solicitud');
+            toast.error(error.message || 'Error al procesar la solicitud');
         }
     };
 
@@ -133,15 +128,9 @@ export default function DefaultPropertyContent({ property }) {
                 property: property._id
             };
 
-            const response = await fetch('/api/submit-offer', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
+            const response = await sendPropertyEmail(formData);
 
-            if (response.ok) {
+            if (response.success) {
                 toast.success('Oferta enviada con éxito');
                 setShowOfferPanel(false);
                 // Resetear el formulario
@@ -154,7 +143,7 @@ export default function DefaultPropertyContent({ property }) {
             }
         } catch (error) {
             console.error('Error:', error);
-            toast.error('Error al procesar la oferta');
+            toast.error(error.message || 'Error al procesar la oferta');
         }
     };
 

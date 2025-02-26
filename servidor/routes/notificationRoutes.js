@@ -1,8 +1,10 @@
-const express = require('express');
+import express from 'express';
+import { sendNotification } from '../controller/notificationController.js';
+
 const router = express.Router();
-const { sendNotification } = require('../controllers/notificationController');
-const { protect } = require('../middleware/authMiddleware');
 
-router.post('/send', protect, sendNotification);
+// Si no estás usando autenticación por ahora, puedes quitar el middleware 'protect'
+router.post('/contact', sendNotification);
 
-module.exports = router; 
+// Cambiamos la forma de exportar
+export { router as notificationRouter }; 
