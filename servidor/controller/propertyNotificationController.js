@@ -5,10 +5,10 @@ export const sendPropertyNotification = async (req, res) => {
         // Asegurarse que la respuesta sea JSON
         res.setHeader('Content-Type', 'application/json');
         
-        const { date, time, email, name, phone, property, offer } = req.body;
+        const { date, time, email, name, phone, property, propertyAddress, offer } = req.body;
 
         // Validar que se recibieron los datos necesarios
-        if (!email || !name || !phone || !property) {
+        if (!email || !name || !phone || !property || !propertyAddress) {
             return res.status(400).json({
                 success: false,
                 message: 'Faltan datos requeridos'
@@ -32,7 +32,7 @@ export const sendPropertyNotification = async (req, res) => {
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                     <h2 style="color: #333;">Nueva Oferta de Propiedad</h2>
                     <div style="background-color: #f5f5f5; padding: 20px; border-radius: 5px;">
-                        <p><strong>ID de Propiedad:</strong> ${property}</p>
+                        <p><strong>Propiedad:</strong> ${propertyAddress}</p>
                         <p><strong>Oferta:</strong> ${offer}€</p>
                         <p><strong>Nombre:</strong> ${name}</p>
                         <p><strong>Email:</strong> ${email}</p>
@@ -40,7 +40,7 @@ export const sendPropertyNotification = async (req, res) => {
                     </div>
                 </div>
             `;
-            emailSubject = `Nueva oferta para propiedad ${property}`;
+            emailSubject = `Nueva oferta para ${propertyAddress}`;
         } 
         // Si hay fecha y hora, es una solicitud de visita
         else if (date && time) {
@@ -54,7 +54,7 @@ export const sendPropertyNotification = async (req, res) => {
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                     <h2 style="color: #333;">Nueva Solicitud de Visita</h2>
                     <div style="background-color: #f5f5f5; padding: 20px; border-radius: 5px;">
-                        <p><strong>ID de Propiedad:</strong> ${property}</p>
+                        <p><strong>Propiedad:</strong> ${propertyAddress}</p>
                         <p><strong>Fecha:</strong> ${formattedDate}</p>
                         <p><strong>Hora:</strong> ${formattedTime}</p>
                         <p><strong>Nombre:</strong> ${name}</p>
@@ -63,7 +63,7 @@ export const sendPropertyNotification = async (req, res) => {
                     </div>
                 </div>
             `;
-            emailSubject = `Nueva solicitud de visita para propiedad ${property}`;
+            emailSubject = `Nueva solicitud de visita para ${propertyAddress}`;
         } else {
             return res.status(400).json({
                 success: false,
