@@ -99,12 +99,11 @@ function DesktopCards({ card, index }) {
             {/* Contenedor principal fijo */}
             <div
                 className="relative w-[40vw] h-[40vh] group [perspective:1000px] transform transition duration-300 hover:scale-105"
-
             >
                 <div className="h-full w-[19vw] transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
                     {/* Cara frontal */}
                     <div
-                        className="absolute inset-0 bg-yellow-300 text-black shadow-lg rounded-lg p-2 flex items-center justify-center [backface-visibility:hidden] overflow-hidden"
+                        className="absolute inset-0 bg-yellow-300 text-black shadow-lg rounded-lg p-6 flex flex-col items-center justify-center [backface-visibility:hidden] overflow-hidden"
                         aria-hidden="true"
                     >
                         <div
@@ -113,7 +112,45 @@ function DesktopCards({ card, index }) {
                         >
                             <div className="absolute inset-0 bg-white opacity-15 rounded-lg"></div>
                         </div>
-                        <h2 className="text-3xl font-bold text-center text-black z-20"
+                        
+                        {/* Imagen correspondiente según el índice */}
+                        {index === 0 && (
+                            <img
+                                src="/analisis.png"
+                                alt="Análisis"
+                                className="mb-4 rounded-full h-[12vh] w-[12vh] object-cover border-2 border-black/20 shadow-xl transform transition-transform duration-300 group-hover:scale-110"
+                            />
+                        )}
+                        {index === 1 && (
+                            <img
+                                src="/agenteinmo.png"
+                                alt="Agente Inmobiliario"
+                                className="mb-4 rounded-full h-[12vh] w-[12vh] object-cover border-2 border-black/20 shadow-xl transform transition-transform duration-300 group-hover:scale-110"
+                            />
+                        )}
+                        {index === 2 && (
+                            <img
+                                src="/analisisdemercado.jpeg"
+                                alt="Análisis de Mercado"
+                                className="mb-4 rounded-full h-[12vh] w-[12vh] object-cover border-2 border-black/20 shadow-xl transform transition-transform duration-300 group-hover:scale-110"
+                            />
+                        )}
+                        {index === 3 && (
+                            <img
+                                src="/agentesinmobiliarios.jpeg"
+                                alt="Agentes Inmobiliarios"
+                                className="mb-4 rounded-full h-[12vh] w-[12vh] object-cover border-2 border-black/20 shadow-xl transform transition-transform duration-300 group-hover:scale-110"
+                            />
+                        )}
+                        {index === 4 && (
+                            <img
+                                src="/formFoto.jpeg"
+                                alt="Formulario"
+                                className="mb-4 rounded-full h-[12vh] w-[12vh] object-cover border-2 border-black/20 shadow-xl transform transition-transform duration-300 group-hover:scale-110"
+                            />
+                        )}
+                        
+                        <h2 className="text-3xl font-bold text-center text-black z-20 mt-2"
                             style={{ textShadow: "2px 2px 3px rgba(255,255,225,1)" }}>
                             {card.front}
                         </h2>
@@ -320,10 +357,30 @@ export default function Cards() {
             >
                 <div
                     className="grid grid-cols-5 grid-rows-5 gap-4 w-full h-[70vh]"
-
                 >
                     {cardData.map((card, index) => (
-                        <div key={index} style={{ gridColumnStart: index + 1, gridRowStart: index + 1 }}>
+                        <div key={index} style={{ 
+                            gridColumnStart: (() => {
+                                switch(index) {
+                                    case 0: return 1; // Primera columna
+                                    case 1: return 2; // Segunda columna
+                                    case 2: return 3; // Tercera columna
+                                    case 3: return 4; // Cuarta columna
+                                    case 4: return 5; // Quinta columna
+                                    default: return index + 1;
+                                }
+                            })(),
+                            gridRowStart: (() => {
+                                switch(index) {
+                                    case 0: return 4; // Última fila
+                                    case 1: return 1; // Primera fila
+                                    case 2: return 4; // Última fila
+                                    case 3: return 1; // Primera fila
+                                    case 4: return 3; // Fila del medio
+                                    default: return index + 1;
+                                }
+                            })()
+                        }}>
                             <DesktopCards key={index} card={card} index={index} />
                         </div>
                     ))}

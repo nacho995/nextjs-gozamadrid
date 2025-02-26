@@ -10,9 +10,9 @@ const textShadowStyle = { textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' };
 
 export default function ImpuestoSobreRenta() {
     return (
-        <div className="container mx-auto py-8">
+        <div className="container mx-auto py-8 relative z-[1]">
             {/* Hero Section */}
-            <FadeInView direction="down" className="mb-16">
+            <FadeInView direction="down" className="mb-16 relative z-[2]">
                 <div className="relative h-[60vh] rounded-2xl overflow-hidden hover:scale-[1.02] transition-all duration-300">
                     <Image
                         src="/impuesto.jpg"
@@ -25,7 +25,7 @@ export default function ImpuestoSobreRenta() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 1 }}
-                        className="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent flex items-center"
+                        className="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent flex items-center z-[2]"
                     >
                         <div className="text-white ml-12 max-w-2xl">
                             <h1 
@@ -43,7 +43,7 @@ export default function ImpuestoSobreRenta() {
             </FadeInView>
 
             {/* Información Principal */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16 relative z-[2]">
                 <motion.div 
                     initial={{ opacity: 0, x: -50 }}
                     whileInView={{ opacity: 1, x: 0 }}
@@ -79,7 +79,7 @@ export default function ImpuestoSobreRenta() {
             </div>
 
             {/* Servicios Específicos */}
-            <div className="mb-16">
+            <div className="mb-16 relative z-[2]">
                 <h2 className="text-3xl font-bold text-center mb-12 hover:scale-105 transition-all duration-300">
                     Nuestros Servicios de Asesoramiento Fiscal
                 </h2>
@@ -119,7 +119,7 @@ export default function ImpuestoSobreRenta() {
             </div>
 
             {/* CTA Final */}
-            <FadeInView direction="up">
+            <FadeInView direction="up" className="relative z-[2]">
                 <div className="text-center max-w-3xl mx-auto mb-[10vh]">
                     <h2 className="text-3xl font-bold mb-6 hover:scale-105 transition-all duration-300">
                         Optimiza tu Tributación

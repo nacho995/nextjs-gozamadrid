@@ -4,7 +4,7 @@ export default function ImpuestoRenta() {
     return (
         <>
             <div
-                className="fixed inset-0 z-0 opacity-100 bg-cover "
+                className="fixed inset-0 z-0 opacity-100 bg-cover"
                 style={{
                     backgroundImage: "url('/gozamadridwp.jpg')",
                     backgroundAttachment: "fixed",

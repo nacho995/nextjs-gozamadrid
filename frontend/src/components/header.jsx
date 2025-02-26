@@ -118,7 +118,7 @@ export default function ControlMenu() {
           {/* Contenedor para "Vende tu propiedad" */}
           <div
             ref={venderRef}
-            className="relative whitespace-nowrap"
+            className="relative whitespace-nowrap group"
             onMouseEnter={() => toggleDropdown('vender', true)}
           >
             <Link href="/vender" className="text-black hover:text-gray-700 flex items-center gap-2">
@@ -126,24 +126,34 @@ export default function ControlMenu() {
               <AiOutlineDown className={`transition-transform duration-300 ${dropdownVisible.vender ? 'rotate-180' : ''}`} />
             </Link>
             {dropdownVisible.vender && (
-              <div
-                className="absolute bg-black bg-opacity-50 backdrop-blur-sm rounded-lg shadow-lg flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold z-[9998]"
-                style={{
-                  top: "calc(100% + 18px)",
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  minWidth: "300px"
-                }}
-                onMouseLeave={() => toggleDropdown('vender', false)}
-              >
-                <Link
-                  href="/vender/comprar"
-                  className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200"
+              <>
+                {/* Área invisible para mantener el menú abierto */}
+                <div
+                  className="absolute h-[20px] w-full"
+                  style={{
+                    top: "100%",
+                    left: 0
+                  }}
+                />
+                <div
+                  className="absolute bg-black bg-opacity-50 backdrop-blur-sm rounded-lg shadow-lg flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold z-[9998]"
+                  style={{
+                    top: "calc(100% + 18px)",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    minWidth: "300px"
+                  }}
+                  onMouseLeave={() => toggleDropdown('vender', false)}
                 >
-                  <FaHome className="mr-3 text-amarillo" />
-                  Compra tu propiedad
-                </Link>
-              </div>
+                  <Link
+                    href="/vender/comprar"
+                    className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200"
+                  >
+                    <FaHome className="mr-3 text-amarillo" />
+                    Compra tu propiedad
+                  </Link>
+                </div>
+              </>
             )}
           </div>
 
@@ -163,10 +173,7 @@ export default function ControlMenu() {
           </div>
 
           {/* Servicios con submenú */}
-          <div
-            className="relative whitespace-nowrap"
-            onMouseEnter={() => toggleDropdown('servicios', true)}
-          >
+          <div className="relative group/servicios" onMouseEnter={() => toggleDropdown('servicios', true)}>
             <div className="flex items-center gap-2">
               <Link
                 href="/servicios"
@@ -182,78 +189,78 @@ export default function ControlMenu() {
               </div>
             </div>
             {dropdownVisible.servicios && (
-              <div
-                className="absolute bg-black bg-opacity-50 backdrop-blur-sm rounded-lg shadow-lg flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold z-[9998]"
-                style={{
-                  top: "calc(100% + 18px)",
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  minWidth: "300px"
-                }}
-                onMouseLeave={() => toggleDropdown('servicios', false)}
-              >
-                <div className="relative group">
-                  <Link
-                    href={routes.residentes_espana}
-                    className="flex items-center justify-between px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200 border-b border-white/10"
-                  >
-                    <div className="flex items-center">
-                      <FaHandshake className="mr-3 text-amarillo" />
-                      Residentes en España
-                    </div>
-                    <AiOutlineRight className="ml-2 group-hover:rotate-90 transition-transform duration-200" />
-                  </Link>
+              <>
+                <div className="absolute h-[20px] w-full" style={{ top: "100%", left: 0 }} />
+                <div className="absolute bg-black bg-opacity-50 backdrop-blur-sm rounded-lg shadow-lg flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold z-[9998]"
+                  style={{
+                    top: "calc(100% + 18px)",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    minWidth: "300px"
+                  }}
+                  onMouseLeave={() => toggleDropdown('servicios', false)}
+                >
+                  <div className="relative group/espana">
+                    <Link
+                      href={routes.residentes_espana}
+                      className="w-[25vw] flex items-center justify-between px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200 border-b border-white/10"
+                    >
+                      <div className="flex items-center ">
+                        <FaHandshake className="mr-3  text-amarillo" />
+                        Residentes en España
+                      </div>
+                      <AiOutlineRight className="ml-2 group-hover/espana:rotate-90 transition-transform duration-200" />
+                    </Link>
 
-                  {/* Submenú de Residentes en España */}
-                  <div className="absolute left-full top-0 hidden group-hover:block bg-black bg-opacity-50 backdrop-blur-sm rounded-lg shadow-lg min-w-[200px] z-[9997]">
+                    <div className="absolute left-full top-0 hidden group-hover/espana:block bg-black bg-opacity-50 backdrop-blur-sm rounded-lg shadow-lg min-w-[200px] z-[9997]">
+                      <Link
+                        href={routes.residentes_espana_alquiler}
+                        className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200 border-b border-white/10"
+                      >
+                        <FaHome className="mr-3 text-amarillo" />
+                        Alquiler
+                      </Link>
+                      <Link
+                        href={routes.residentes_espana_guia}
+                        className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200"
+                      >
+                        <FaHandshake className="mr-3 text-amarillo" />
+                        Guía de compra
+                      </Link>
+                    </div>
+                  </div>
+
+                  <div className="relative group/extranjero">
                     <Link
-                      href={routes.residentes_espana_alquiler}
-                      className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200 border-b border-white/10"
+                      href={routes.residentes_extranjero}
+                      className="w-[25vw] flex items-center justify-between px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200"
                     >
-                      <FaHome className="mr-3 text-amarillo" />
-                      Alquiler
+                      <div className="flex items-center">
+                        <FaChartLine className="mr-3  text-amarillo" />
+                        Residentes en el extranjero
+                      </div>
+                      <AiOutlineRight className="ml-2 group-hover/extranjero:rotate-90 transition-transform duration-200" />
                     </Link>
-                    <Link
-                      href={routes.residentes_espana_guia}
-                      className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200"
-                    >
-                      <FaHandshake className="mr-3 text-amarillo" />
-                      Guía de compra
-                    </Link>
+
+                    <div className="absolute left-full top-0 hidden group-hover/extranjero:block bg-black bg-opacity-50 backdrop-blur-sm rounded-lg shadow-lg min-w-[200px] z-[9997]">
+                      <Link
+                        href={routes.residentes_extranjero_impuesto}
+                        className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200 border-b border-white/10"
+                      >
+                        <FaChartLine className="mr-3 text-amarillo" />
+                        Impuesto no residentes
+                      </Link>
+                      <Link
+                        href={routes.residentes_extranjero_guia}
+                        className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200"
+                      >
+                        <FaHandshake className="mr-3 text-amarillo" />
+                        Guía de compra
+                      </Link>
+                    </div>
                   </div>
                 </div>
-
-                <div className="relative group">
-                  <Link
-                    href={routes.residentes_extranjero}
-                    className="flex items-center justify-between px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200"
-                  >
-                    <div className="flex items-center">
-                      <FaChartLine className="mr-3 text-amarillo" />
-                      Residentes en el extranjero
-                    </div>
-                    <AiOutlineRight className="ml-2 group-hover:rotate-90 transition-transform duration-200" />
-                  </Link>
-
-                  {/* Submenú de Residentes en el extranjero */}
-                  <div className="absolute left-full top-0 hidden group-hover:block bg-black bg-opacity-50 backdrop-blur-sm rounded-lg shadow-lg min-w-[200px] z-[9997]">
-                    <Link
-                      href={routes.residentes_extranjero_impuesto}
-                      className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200 border-b border-white/10"
-                    >
-                      <FaChartLine className="mr-3 text-amarillo" />
-                      Impuesto no residentes
-                    </Link>
-                    <Link
-                      href={routes.residentes_extranjero_guia}
-                      className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200"
-                    >
-                      <FaHandshake className="mr-3 text-amarillo" />
-                      Guía de compra
-                    </Link>
-                  </div>
-                </div>
-              </div>
+              </>
             )}
           </div>
 
