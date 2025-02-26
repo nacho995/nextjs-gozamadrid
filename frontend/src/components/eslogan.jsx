@@ -14,7 +14,7 @@ const Eslogan = () => {
                         <div 
                             className="text-center lg:text-left p-8 rounded-lg border-b-2 border-r-4 border-black relative"
                             style={{
-                                background: "linear-gradient(to right, transparent -8%, #C7A336 10%, white 90%, transparent 100%)",
+                                background: "linear-gradient(to right, transparent -8%, #D5AB6F 10%, #C7A336 80%, transparent 100%)",
                             }}
                         >
                             <div className="relative text-black z-20">
