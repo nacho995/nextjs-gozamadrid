@@ -16,19 +16,19 @@ export default function ExpCountries() {
         {
             name: "Portugal",
             image: "/portugal.jpg",
-            link: "https://www.portugal.gov.pt/", // URL para Portugal
+            link: "https://search.app/m1UY4QxWgqK1grma6", // URL para Portugal
             description: "Explora el encanto..."
         },
         {
             name: "Miami",
             image: "/miami.jpg",
-            link: "https://www.miamigov.com/", // URL para Miami
+            link: "https://search.app/w2k6WEabMDTpiNdM9", // URL para Miami
             description: "Vive el sueño..."
         },
         {
             name: "Dubai",
             image: "/dubai.jpg",
-            link: "https://www.dubai.ae/", // URL para Dubai
+            link: "https://www.propertyfinder.ae/en/broker/exp-real-estate-br-of-exp-international-holdings-inc-dubai-branch-6166", // URL para Dubai
             description: "Experimenta el lujo..."
         }
     ];
@@ -118,13 +118,22 @@ export default function ExpCountries() {
                                 <p className="text-white text-sm font-bold">{country.description}</p>
                                 <a 
                                     href={country.link}
-                                    className="px-4 py-2 bg-gold text-black rounded-full 
-                                        text-sm font-semibold transition-all duration-300 
-                                        hover:bg-white hover:scale-105"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
+                                    className="group/link relative inline-flex items-center gap-2 overflow-hidden 
+                                        rounded-full bg-white/20 px-8 py-3 
+                                        transition-all duration-300 
+                                        hover:bg-white/30 
+                                        backdrop-blur-sm"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                 >
-                                    Pincha aquí
+                                    <span className="relative text-lg font-semibold text-white">
+                                        Pincha aquí
+                                    </span>
+                                    <span className="absolute bottom-0 left-0 h-1 w-full transform 
+                                        bg-gradient-to-r from-blue-400 via-white to-blue-400 
+                                        transition-transform duration-300 
+                                        group-hover/link:translate-x-full">
+                                    </span>
                                 </a>
                             </div>
                         </div>
