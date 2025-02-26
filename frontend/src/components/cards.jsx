@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import AnimatedOnScroll from "./AnimatedScroll";
+import Image from "next/image";
 
 const cardData = [
     {
@@ -240,6 +241,13 @@ function MobileCard({ card, index }) {
                     <h2 className="text-lg font-bold text-center text-black z-20 px-1 break-words">
                         {card.front}
                     </h2>
+                    {/* Texto informativo frontal */}
+                    <div 
+                        className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-black/70 text-xs lg:hidden"
+                        style={{ textShadow: '1px 1px 2px rgba(255, 255, 255, 0.8)' }}
+                    >
+                        Toca para más info
+                    </div>
                 </div>
                 {/* Cara trasera */}
                 <div
@@ -254,6 +262,13 @@ function MobileCard({ card, index }) {
                         <ol className="list-decimal list-inside text-left text-white">
                             {card.back.props.children}
                         </ol>
+                        {/* Texto informativo trasero */}
+                        <span 
+                            className="block mt-4 text-white/80 text-xs lg:hidden"
+                            style={{ textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)' }}
+                        >
+                            Toca para volver
+                        </span>
                     </div>
                 </div>
             </div>
@@ -265,7 +280,6 @@ function TabletCard({ card, index }) {
     const [flipped, setFlipped] = useState(false);
 
     return (
-
         <div className="flex flex-col items-center p-2">
             <div
                 className="w-[30vw] h-[55vh] relative transition-transform duration-700 [transform-style:preserve-3d]"
@@ -286,6 +300,13 @@ function TabletCard({ card, index }) {
                     <h2 className="text-lg font-bold text-center text-black z-20 px-1 break-words">
                         {card.front}
                     </h2>
+                    {/* Texto informativo frontal */}
+                    <div 
+                        className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-black/70 text-xs lg:hidden"
+                        style={{ textShadow: '1px 1px 2px rgba(255, 255, 255, 0.8)' }}
+                    >
+                        Toca para más info
+                    </div>
                 </div>
                 {/* Cara trasera */}
                 <div
@@ -300,6 +321,13 @@ function TabletCard({ card, index }) {
                         <ol className="list-decimal list-inside text-left text-white">
                             {card.back.props.children}
                         </ol>
+                        {/* Texto informativo trasero */}
+                        <span 
+                            className="block mt-4 text-white/80 text-xs lg:hidden"
+                            style={{ textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)' }}
+                        >
+                            Toca para volver
+                        </span>
                     </div>
                 </div>
             </div>
@@ -340,7 +368,6 @@ function TabletCard({ card, index }) {
                 />
             )}
         </div>
-
     );
 }
 
