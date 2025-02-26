@@ -12,12 +12,12 @@ const Eslogan = () => {
                 <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-16 lg:gap-32 xl:gap-40">
                     <FadeInView direction="left" className="w-full lg:w-[55%] lg:pl-0 lg:-ml-8">
                         <div 
-                            className="text-center lg:text-left p-8 rounded-lg border-b-2 border-r-4 border-black relative"
+                            className="text-center lg:text-left p-8 rounded-lg border-b-2 border-r-4 border-black dark:border-black relative"
                             style={{
                                 background: "linear-gradient(to right, transparent -8%, #D5AB6F 10%, #C7A336 80%, transparent 100%)",
                             }}
                         >
-                            <div className="relative text-black z-20">
+                            <div className="relative text-black dark:text-black z-20">
                                 <h2 className="text-4xl font-bold mt-4 mb-8">
                                     Cada propiedad, cada historia, <br /> un método único.
                                 </h2>
@@ -60,16 +60,25 @@ const Eslogan = () => {
                         </div>
                         <Link
                             href="/contacto"
-                            className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-black/50 
+                            className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full 
+                                bg-black/50 dark:bg-white/50
                                 px-4 sm:px-6 lg:px-8 
                                 py-2 sm:py-2.5 lg:py-3 
-                                transition-all duration-300 hover:bg-black/70 backdrop-blur-sm
+                                transition-all duration-300 
+                                hover:bg-black/70 dark:hover:bg-white/70 
+                                backdrop-blur-sm
                                 max-w-[90%] sm:max-w-[80%] lg:max-w-none"
                         >
-                            <span className="relative text-sm sm:text-base lg:text-lg font-semibold text-white whitespace-normal text-center">
+                            <span className="relative text-sm sm:text-base lg:text-lg font-semibold 
+                                text-white dark:text-black whitespace-normal text-center"
+                            >
                                 Contáctenos
                             </span>
-                            <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-amarillo via-black to-amarillo transition-transform duration-300 group-hover:translate-x-full"></span>
+                            <span className="absolute bottom-0 left-0 h-1 w-full transform 
+                                bg-gradient-to-r from-amarillo via-black to-amarillo 
+                                dark:from-amarillo dark:via-white dark:to-amarillo 
+                                transition-transform duration-300 group-hover:translate-x-full">
+                            </span>
                         </Link>
                     </ScaleInView>
                 </div>

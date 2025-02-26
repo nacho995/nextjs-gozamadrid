@@ -17,111 +17,79 @@ export default function ExpRealtyMore({ videoId, title }) {
     return (
         <>
             <AnimatedOnScroll>
-                <div className="mx-0 text-transparent bg-clip-text ">
+                <div className="mx-0 text-transparent bg-clip-text">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-0 mt-0 min-h-[40vh] md:min-h-[60vh]">
+                        {/* Contenedor del video */}
                         <div className="relative w-full h-auto min-h-[35vh]">
                             <iframe
                                 ref={iframeRef}
                                 src={isPlaying ? youtubeUrl : `https://www.youtube.com/embed/${videoId}`}
                                 title={title}
-                                className=" w-full h-full"
+                                className="w-full h-full"
                                 frameBorder="0"
                                 allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                                 allowFullScreen
                                 onClick={handlePlay}
                             />
                         </div>
+
+                        {/* Contenedor del texto */}
                         <div className="relative flex items-center justify-start h-full w-full overflow-hidden">
-                            <div className="bg-gradient-to-tr from-blue-900/70 via-black/50 to-blue-950/60 
-                                backdrop-blur-lg 
-                                w-full 
-                                h-full
-                                min-h-[60vh]
-                                text-center 
-                                flex flex-col 
-                                gap-8
-                                justify-center
-                                items-center
-                                px-8 sm:px-12 lg:px-20
-                                relative
-                                group
-                                hover:from-blue-800/70 hover:via-black/50 hover:to-blue-900/60
-                                transition-all duration-500
-                                before:content-['']
-                                before:absolute
-                                before:inset-0
-                                before:border-2
-                                before:border-blue-400/20
-                                before:scale-95
-                                before:opacity-0
-                                before:group-hover:scale-100
-                                before:group-hover:opacity-100
-                                before:transition-all
-                                before:duration-500
-                                after:content-['']
-                                after:absolute
-                                after:inset-0
-                                after:bg-gradient-to-b
-                                after:from-transparent
-                                after:via-blue-500/5
-                                after:to-transparent
-                                after:opacity-0
-                                after:group-hover:opacity-100
-                                after:transition-opacity
-                                after:duration-500"
+                            <div className="bg-gradient-to-tr from-blue-950/60 via-black/40 to-blue-800/50 
+                                dark:from-blue-950/60 dark:via-black/40 dark:to-blue-800/50
+                                backdrop-blur-lg w-full h-full min-h-[60vh]
+                                text-center flex flex-col gap-8 justify-center items-center
+                                px-8 sm:px-12 lg:px-20 relative"
                             >
-                                {/* Efectos de luz con posición diferente */}
-                                <div className="absolute top-1/4 -right-20 w-40 h-40 bg-blue-400/20 rounded-full blur-[120px] group-hover:bg-blue-300/30 transition-all duration-500"></div>
-                                <div className="absolute bottom-1/4 -left-20 w-40 h-40 bg-blue-500/20 rounded-full blur-[120px] group-hover:bg-blue-400/30 transition-all duration-500"></div>
+                                {/* Efectos de luz en las esquinas */}
+                                <div className="absolute -top-20 -right-20 w-40 h-40 
+                                    bg-blue-500/20 dark:bg-blue-500/20 rounded-full blur-[100px] 
+                                    group-hover:bg-blue-400/30 dark:group-hover:bg-blue-400/30 
+                                    transition-all duration-500">
+                                </div>
+                                <div className="absolute -bottom-20 -left-20 w-40 h-40 
+                                    bg-blue-600/20 dark:bg-blue-600/20 rounded-full blur-[100px] 
+                                    group-hover:bg-blue-500/30 dark:group-hover:bg-blue-500/30 
+                                    transition-all duration-500">
+                                </div>
 
                                 <h2 className="text-4xl sm:text-6xl flex pt-10 justify-center italic font-bold
-                                    bg-clip-text text-transparent 
-                                    bg-gradient-to-r from-white via-blue-100 to-white
-                                    drop-shadow-[0_2px_2px_rgba(0,0,0,0.4)]
+                                    text-white dark:text-white
+                                    drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]
                                     group-hover:scale-105 
                                     transition-transform duration-500
                                     relative z-10"
                                 >
-                                    ¿Por qué elegir eXp Realty?
+                                    Propiedades Sin Fronteras
                                 </h2>
 
-                                <p className="flex flex-col justify-center items-center gap-6 text-blue-50/95
-                                    style={{ fontSize: 'clamp(0.8rem, 2vw, 1.2rem)' }}
-                                    leading-relaxed
-                                    tracking-wide
-                                    mt-8
-                                    relative z-10
-                                    group-hover:translate-y-[-3px]
-                                    transition-all duration-500
-                                    max-w-3xl"
+                                <p className="flex flex-col justify-center m-0 
+                                    text-white/90 dark:text-white/90
+                                    text-base leading-relaxed tracking-wide mt-8
+                                    relative z-10"
                                 >
-                                    <span className="text-xl text-blue-200 font-semibold">
-                                        Exposición internacional para cada propiedad
+                                    <span className="mb-6">
+                                        Gracias a nuestra plataforma tecnológica, los inmuebles no solo se promocionan
+                                        localmente, sino que traspasan fronteras, llegando a clientes en mercados clave
+                                        como México, Estados Unidos, Portugal, Dubái y muchos más.
                                     </span>
 
-                                    <span className="text-lg">
-                                        Plataforma digital avanzada sin límites geográficos
+                                    <span className="text-blue-200 dark:text-blue-200 font-semibold text-lg sm:text-xl mb-4">
+                                        Más de 90.000 agentes en el mundo
                                     </span>
 
-                                    <span className="text-blue-200 font-semibold text-lg">
-                                        Red de más de 90.000 agentes que trabajan en equipo
-                                    </span>
-
-                                    <span className="text-lg">
-                                        Enfoque estratégico para seleccionar las mejores propiedades y garantizar ventas exitosas
+                                    <span className="text-white/90 dark:text-white/90">
+                                        Nuestra red global de agentes inmobiliarios trabaja de forma colaborativa,
+                                        utilizando herramientas avanzadas como el metaverso, donde podemos mostrar
+                                        propiedades, reunirnos con clientes y cerrar operaciones de forma ágil y efectiva.
                                     </span>
                                 </p>
 
-                                {/* Decoración circular */}
-                                <div className="absolute inset-0 border-4 border-blue-400/10 rounded-full scale-0 
-                                    group-hover:scale-100 transition-transform duration-700 ease-out"
-                                ></div>
-
-                                {/* Línea decorativa con estilo diferente */}
-                                <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 
-                                    w-16 h-1 bg-blue-400/20 rounded-full
-                                    group-hover:w-32 transition-all duration-500"
-                                ></div>
+                                {/* Línea decorativa inferior */}
+                                <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 w-1/4 h-[2px]
+                                    bg-gradient-to-r from-transparent via-blue-300/40 dark:via-blue-300/40 to-transparent
+                                    group-hover:w-1/3 transition-all duration-500">
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -129,7 +129,7 @@ export default function GuiaCompraInmuebles() {
                             bg-gradient-to-br from-black/80 to-black/40 backdrop-blur-md shadow-2xl"
                     >
                         {/* Contenedor de la imagen */}
-                        <div className="relative h-[50vh] sm:h-[45vh] md:h-[40vh] lg:h-[55vh] xl:h-[50vh] w-full">
+                        <div className="relative h-[60vh] sm:h-[55vh] md:h-[40vh] lg:h-[55vh] xl:h-[50vh] w-full">
                             <Image
                                 src="/beneficioscompra.png"
                                 alt="Beneficios"
