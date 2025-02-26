@@ -34,8 +34,8 @@ export default function Home() {
 
         <div className="relative z-1">
           <div className="w-full 
-            mt-[100vh]                 /* móvil por defecto */
-            sm:mt-[100vh]              /* tablets pequeñas */
+            mt-[130vh]                 /* móvil por defecto */
+            sm:mt-[130vh]              /* tablets pequeñas */
             md:mt-[80vh]              /* tablets */
             lg:mt-[100vh]             /* desktop */
             sm:mb-[90vh] 
