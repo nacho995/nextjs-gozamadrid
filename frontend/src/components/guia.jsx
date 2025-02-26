@@ -19,19 +19,20 @@ export default function Guide() {
                 />
 
                 {/* Capa de overlay más transparente */}
-                <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30" />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30 
+                    dark:from-black/60 dark:to-black/30" />
 
                 {/* Contenedor del contenido centrado */}
                 <div className="relative h-full flex flex-col justify-center items-center text-center px-4 z-10">
                     
                     <h2 
-                        className="text-xl sm:text-xl lg:text-6xl font-bold text-amarillo mb-8" 
-                        style={{ textShadow: "2px 2px 5px gray" }}
+                        className="text-xl sm:text-xl lg:text-6xl font-bold text-amarillo dark:text-amarillo mb-8" 
+                        style={{ textShadow: "2px 2px 5px rgba(128, 128, 128, 0.8)" }}
                     >
                         Guía para vender una propiedad
                     </h2>
 
-                    <p className="text-sm sm:text-md lg:text-3xl text-white max-w-4xl mb-12">
+                    <p className="text-sm sm:text-md lg:text-3xl text-white dark:text-white max-w-4xl mb-12">
                         Aquí te presentamos un resumen conciso de los aspectos clave que debes considerar al comprar una propiedad.
                         Al final, tendrás la oportunidad de descargar nuestra guía completa «Cómo Comprar una Vivienda en España»,
                         que te llevará paso a paso a través de todo el proceso. ¡Descúbrelo ahora!
@@ -40,19 +41,22 @@ export default function Guide() {
                     <Link
                         href="/servicios/residentes-espana/guia-compra"
                         className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full 
-                            bg-white/20 px-8 py-3 
+                            bg-white/20 dark:bg-white/20 px-8 py-3 
                             transition-all duration-300 
-                            hover:bg-white/30 
+                            hover:bg-white/30 dark:hover:bg-white/30 
                             backdrop-blur-sm"
                     >
-                        <span className="relative text-sm sm:text-base lg:text-lg font-semibold text-white">
+                        <span className="relative text-sm sm:text-base lg:text-lg font-semibold 
+                            text-white dark:text-white"
+                        >
                             Ver guía
                         </span>
                         <span className="absolute bottom-0 left-0 h-1 w-full transform 
                             bg-gradient-to-r from-amarillo via-black to-amarillo 
+                            dark:from-amarillo dark:via-black dark:to-amarillo 
                             transition-transform duration-300 
                             group-hover:translate-x-full"
-                        >Ver guía</span>
+                        ></span>
                     </Link>
                 </div>
             </div>

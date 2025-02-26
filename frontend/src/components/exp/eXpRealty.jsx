@@ -28,55 +28,23 @@ export default function ExpRealty({ videoId, title }) {
             <AnimatedOnScroll>
                 <div className="mx-0 text-transparent bg-clip-text">
                     <h2 className="italic text-6xl md:text-7xl lg:text-8xl font-bold 
-                        bg-clip-text text-transparent 
-                        bg-gradient-to-r from-black via-blue-900 to-blue-800
+                        text-gold
                         text-center p-18
                         hover:scale-105 
                         transition-all duration-500
                         drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)]
                         relative
-                        group
-                        before:content-['']
-                        before:absolute
-                        before:inset-x-0
-                        before:bottom-0
-                        before:h-1
-                        before:bg-gradient-to-r
-                        before:from-transparent
-                        before:via-blue-600/30
-                        before:to-transparent
-                        before:transform
-                        before:scale-x-0
-                        before:origin-center
-                        before:transition-transform
-                        before:duration-500
-                        hover:before:scale-x-100
-                        after:content-['']
-                        after:absolute
-                        after:-inset-1
-                        after:bg-gradient-to-r
-                        after:from-blue-900/0
-                        after:via-blue-900/5
-                        after:to-blue-900/0
-                        after:blur-lg
-                        after:opacity-0
-                        after:transition-opacity
-                        after:duration-500
-                        hover:after:opacity-100
-                        tracking-tight
-                        leading-tight
-                        max-w-7xl
-                        mx-auto"
+                        group"
                     >
-                        <span className="bg-clip-text text-gold
-                            hover:from-blue-900 hover:via-black hover:to-blue-900
+                        <span className="text-gold dark:text-gold
+                            hover:text-blue-900 dark:hover:text-blue-900
                             transition-all duration-500"
                         >
                             La Inmobiliaria Digital
                         </span>
                         <br />
-                        <span className="bg-clip-text text-gold
-                            hover:from-black hover:via-gold hover:to-black
+                        <span className="text-gold dark:text-gold
+                            hover:text-black dark:hover:text-black
                             transition-all duration-500"
                         >
                             Nº1 en el Mundo
@@ -85,6 +53,7 @@ export default function ExpRealty({ videoId, title }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-0 mt-0 min-h-[40vh] md:min-h-[60vh]">
                         <div className="relative flex items-center justify-start h-full w-full overflow-hidden">
                             <div className="bg-gradient-to-tr from-blue-950/60 via-black/40 to-blue-800/50
+                                dark:from-blue-950/60 dark:via-black/40 dark:to-blue-800/50
                                 backdrop-blur-lg
                                 w-full 
                                 h-full
@@ -121,12 +90,16 @@ export default function ExpRealty({ videoId, title }) {
                                 duration-500"
                             >
                                 {/* Efecto de brillo en las esquinas */}
-                                <div className="absolute top-0 left-0 w-20 h-20 bg-blue-400/20 blur-[100px] group-hover:blur-[120px] transition-all duration-500"></div>
+                                <div className="absolute top-0 left-0 w-20 h-20 
+                                    bg-blue-400/20 dark:bg-blue-400/20 
+                                    blur-[100px] 
+                                    group-hover:blur-[120px] 
+                                    transition-all duration-500">
+                                </div>
                                 <div className="absolute bottom-0 right-0 w-20 h-20 bg-blue-400/20 blur-[100px] group-hover:blur-[120px] transition-all duration-500"></div>
 
                                 <h2 className="text-4xl sm:text-6xl flex pt-10 justify-center italic font-bold
-                                    bg-clip-text text-transparent 
-                                    bg-gradient-to-r from-white via-blue-100 to-white
+                                    text-white dark:text-white
                                     drop-shadow-[0_2px_2px_rgba(0,0,0,0.4)]
                                     group-hover:scale-105 
                                     transition-transform duration-500"
@@ -134,19 +107,19 @@ export default function ExpRealty({ videoId, title }) {
                                     Innovación inmobiliaria
                                 </h2>
 
-                                <p className="text-white/90 text-sm sm:text-base md:text-lg px-6 max-w-4xl
+                                <p className="text-white/90 dark:text-white/90 
+                                    text-sm sm:text-base md:text-lg px-6 max-w-4xl
                                     leading-relaxed
                                     tracking-wide
-                                    drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)]
-                                    transform
-                                    group-hover:translate-y-[-5px]
-                                    transition-transform duration-500"
+                                    drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)]"
                                 >
                                     En eXp Realty transformamos la manera de vender propiedades a través de la innovación y la tecnología. 
                                     Somos la inmobiliaria digital más grande del mundo, operando en más de 25 países y conectando 
                                     compradores y vendedores a nivel global.
                                     <br /><br />
-                                    <span className="font-semibold text-blue-200">100% Digital, 100% Global</span>
+                                    <span className="font-semibold text-blue-200 dark:text-blue-200">
+                                        100% Digital, 100% Global
+                                    </span>
                                     <br />
                                     Todo nuestro sistema está en la nube, lo que nos permite ofrecer máxima visibilidad y 
                                     alcance internacional para cada propiedad.
@@ -157,6 +130,26 @@ export default function ExpRealty({ videoId, title }) {
                                     bg-gradient-to-r from-transparent via-blue-400/30 to-transparent
                                     group-hover:w-1/2 transition-all duration-500"
                                 ></div>
+
+                                {/* Botones y enlaces */}
+                                <Link
+                                    className="group/link relative inline-flex items-center gap-2 overflow-hidden 
+                                        rounded-full bg-white/20 dark:bg-white/20 px-8 py-3 
+                                        transition-all duration-300 
+                                        hover:bg-white/30 dark:hover:bg-white/30 
+                                        backdrop-blur-sm"
+                                    href="/"
+                                >
+                                    <span className="relative text-lg font-semibold text-white dark:text-white">
+                                        Apúntate
+                                    </span>
+                                    <span className="absolute bottom-0 left-0 h-1 w-full transform 
+                                        bg-gradient-to-r from-blue-400 via-white to-blue-400 
+                                        dark:from-blue-400 dark:via-white dark:to-blue-400
+                                        transition-transform duration-300 
+                                        group-hover/link:translate-x-full">
+                                    </span>
+                                </Link>
                             </div>
                         </div>
                         <div className="relative w-full h-auto min-h-[35vh]">

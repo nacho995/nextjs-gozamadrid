@@ -65,13 +65,16 @@ const Video = () => {
             <div className="w-full flex justify-end items-center">
                 <div className="w-full h-12 lg:h-40 mt-[-10vh] sm:mt-[-1vh] md:mt-[-5vh] lg:mt-[-10vh] flex items-center justify-center">
                     <div
-                        className="absolute w-full h-[10vh]  lg:h-[20vh] md:h-[10vh] sm:h-[10vh] bg-gradient-to-t"
+                        className="absolute w-full h-[10vh] lg:h-[20vh] md:h-[10vh] sm:h-[10vh] bg-gradient-to-t"
                         style={{
-                            background:
-                                "linear-gradient(to top, transparent 5%, black 20%, black 80%, transparent 95%)",
+                            background: "linear-gradient(to top, transparent 5%, black 20%, black 80%, transparent 95%)",
                         }}
                     ></div>
-                    <span className="relative text-transparent bg-clip-text bg-gradient-to-r from-white via-yellow-400 to-white px-2 text-sm lg:text-6xl font-bold">
+                    <span className="relative text-transparent bg-clip-text bg-gradient-to-r 
+                        from-white via-amarillo to-white 
+                        dark:from-white dark:via-amarillo dark:to-white 
+                        px-2 text-sm lg:text-6xl font-bold"
+                    >
                         Invierte en bienes inmuebles en Madrid
                     </span>
                 </div>

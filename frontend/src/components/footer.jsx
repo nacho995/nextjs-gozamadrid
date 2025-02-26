@@ -61,66 +61,93 @@ export default function Footer3(props) {
   };
 
   return (
-    <footer id="relume" className="px-[5%] py-12 md:py-18 lg:py-20 bg-gradient-to-r from-amarillo to-black text-white z-50 relative">
-      <div className="container">
-        <div className="grid grid-cols-1 gap-x-[4vw] gap-y-12 pb-12 md:gap-y-16 md:pb-18 lg:grid-cols-[1fr_0.5fr] lg:gap-y-4 lg:pb-20">
-          <div>
-            <div className="rb-6 mb-6 md:mb-8">
-              <Link href={footerData.logo.url}>
-                <Image
-                  src={footerData.logo.src}
-                  alt={footerData.logo.alt}
-                  width={100}
-                  height={40}
-                  className="inline-block"
-                />
-              </Link>
+    <footer id="relume" className="px-[5%] py-12 md:py-18 lg:py-20 
+        bg-gradient-to-r from-amarillo to-black 
+        dark:from-amarillo dark:to-black 
+        text-white dark:text-white z-50 relative"
+    >
+        <div className="container">
+            <div className="grid grid-cols-1 gap-x-[4vw] gap-y-12 pb-12 md:gap-y-16 md:pb-18 lg:grid-cols-[1fr_0.5fr] lg:gap-y-4 lg:pb-20">
+                <div>
+                    <div className="rb-6 mb-6 md:mb-8">
+                        <Link href={footerData.logo.url}>
+                            <Image
+                                src={footerData.logo.src}
+                                alt={footerData.logo.alt}
+                                width={100}
+                                height={40}
+                                className="inline-block"
+                            />
+                        </Link>
+                    </div>
+                    <div className="rb-6 mb-6 md:mb-8">
+                        <div>
+                            <p className="mb-1 text-sm font-semibold text-white dark:text-white">
+                                {footerData.address.label}
+                            </p>
+                            <p className="mb-5 text-sm md:mb-6 text-white dark:text-white">
+                                {footerData.address.value}
+                            </p>
+                        </div>
+                        <div>
+                            <p className="mb-1 text-sm font-semibold text-white dark:text-white">
+                                {footerData.contact.label}
+                            </p>
+                            <p className="flex flex-col text-sm underline decoration-white dark:decoration-white 
+                                underline-offset-1 md:mb-6 text-white dark:text-white"
+                            >
+                                <Link href={`tel:${footerData.contact.phone}`}>{footerData.contact.phone}</Link>
+                                <Link href={`mailto:${footerData.contact.email}`}>{footerData.contact.email}</Link>
+                            </p>
+                        </div>
+                    </div>
+                    <div className="grid grid-flow-col grid-cols-[max-content] items-start justify-start gap-x-3">
+                        {footerData.socialMediaLinks.map((link, index) => (
+                            <Link key={index} href={link.url} target="_blank" rel="noopener noreferrer" 
+                                className="text-white dark:text-white hover:text-amarillo dark:hover:text-amarillo 
+                                    transition-colors duration-300"
+                            >
+                                {link.icon}
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 items-start gap-x-6 gap-y-10 md:grid-cols-2 md:gap-x-8 md:gap-y-4">
+                    {footerData.columnLinks.map((column, index) => (
+                        <ul key={index}>
+                            {column.links.map((link, linkIndex) => (
+                                <li key={linkIndex} className="py-2 text-sm font-semibold">
+                                    <Link href={link.url} className="text-white dark:text-white 
+                                        hover:text-amarillo dark:hover:text-amarillo transition-colors duration-300"
+                                    >
+                                        {link.title}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    ))}
+                </div>
             </div>
-            <div className="rb-6 mb-6 md:mb-8">
-              <div>
-                <p className="mb-1 text-sm font-semibold">{footerData.address.label}</p>
-                <p className="mb-5 text-sm md:mb-6">{footerData.address.value}</p>
-              </div>
-              <div>
-                <p className="mb-1 text-sm font-semibold">{footerData.contact.label}</p>
-                <p className="flex flex-col text-sm underline decoration-white underline-offset-1 md:mb-6">
-                  <Link href={`tel:${footerData.contact.phone}`}>{footerData.contact.phone}</Link>
-                  <Link href={`mailto:${footerData.contact.email}`}>{footerData.contact.email}</Link>
-                </p>
-              </div>
+            <div className="h-px w-full bg-white dark:bg-white" />
+            <div className="flex flex-col-reverse items-start justify-between pb-4 pt-6 text-sm 
+                md:flex-row md:items-center md:pb-0 md:pt-8"
+            >
+                <p className="mt-8 md:mt-0 text-white dark:text-white">{footerData.footerText}</p>
+                <ul className="grid grid-flow-row grid-cols-[max-content] justify-center gap-y-4 text-sm 
+                    md:grid-flow-col md:gap-x-6 md:gap-y-0"
+                >
+                    {footerData.footerLinks.map((link, index) => (
+                        <li key={index} className="underline">
+                            <Link href={link.url} className="text-white dark:text-white 
+                                hover:text-amarillo dark:hover:text-amarillo transition-colors duration-300"
+                            >
+                                {link.title}
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
             </div>
-            <div className="grid grid-flow-col grid-cols-[max-content] items-start justify-start gap-x-3">
-              {footerData.socialMediaLinks.map((link, index) => (
-                <Link key={index} href={link.url} target="_blank" rel="noopener noreferrer">
-                  {link.icon}
-                </Link>
-              ))}
-            </div>
-          </div>
-          <div className="grid grid-cols-1 items-start gap-x-6 gap-y-10 md:grid-cols-2 md:gap-x-8 md:gap-y-4">
-            {footerData.columnLinks.map((column, index) => (
-              <ul key={index}>
-                {column.links.map((link, linkIndex) => (
-                  <li key={linkIndex} className="py-2 text-sm font-semibold">
-                    <Link href={link.url}>{link.title}</Link>
-                  </li>
-                ))}
-              </ul>
-            ))}
-          </div>
         </div>
-        <div className="h-px w-full bg-white" />
-        <div className="flex flex-col-reverse items-start justify-between pb-4 pt-6 text-sm md:flex-row md:items-center md:pb-0 md:pt-8">
-          <p className="mt-8 md:mt-0">{footerData.footerText}</p>
-          <ul className="grid grid-flow-row grid-cols-[max-content] justify-center gap-y-4 text-sm md:grid-flow-col md:gap-x-6 md:gap-y-0">
-            {footerData.footerLinks.map((link, index) => (
-              <li key={index} className="underline">
-                <Link href={link.url}>{link.title}</Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
     </footer>
   );
 }
