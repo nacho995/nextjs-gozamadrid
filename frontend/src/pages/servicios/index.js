@@ -5,13 +5,13 @@ import Services from "@/components/Servicios/servicios";
 export default function ResidentesEspaña() {
     return (
         <>
-        <div
-        className="fixed inset-0 z-0 opacity-100 bg-cover bg-center"
+       <div
+        className="fixed inset-0 z-0 opacity-100"
         style={{
-            backgroundImage: "url('/gozamadridwp2.jpg')",
-            backgroundAttachment: "fixed",
+          backgroundImage: "url('/gozamadridwp2.jpg')",
+          backgroundAttachment: "fixed",
         }}
-    ></div>
+      ></div>
     <AnimatedOnScroll>
         <div className="min-h-screen relative">
             <div className="text-center py-12">
