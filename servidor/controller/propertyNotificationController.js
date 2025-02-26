@@ -8,10 +8,17 @@ export const sendPropertyNotification = async (req, res) => {
         const { date, time, email, name, phone, property, propertyAddress, offer } = req.body;
 
         // Validar que se recibieron los datos necesarios
-        if (!email || !name || !phone || !property || !propertyAddress) {
+        if (!email || !name || !phone) {
             return res.status(400).json({
                 success: false,
-                message: 'Faltan datos requeridos'
+                message: 'Faltan datos de contacto requeridos'
+            });
+        }
+
+        if (!property || !propertyAddress) {
+            return res.status(400).json({
+                success: false,
+                message: 'Faltan datos de la propiedad'
             });
         }
 

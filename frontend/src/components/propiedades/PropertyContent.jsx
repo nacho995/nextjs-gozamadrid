@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { HiMiniSquare3Stack3D } from "react-icons/hi2"
 import { MdMeetingRoom } from "react-icons/md";
-import { FaRestroom } from "react-icons/fa";
+import { FaRestroom, FaBuilding, FaEuroSign } from "react-icons/fa";
 import Link from "next/link";
 import Image from "next/image";
 import AnimatedOnScroll from "../AnimatedScroll";
@@ -89,6 +89,12 @@ export default function DefaultPropertyContent({ property }) {
 
     const handleSubmit = async () => {
         try {
+            // Verificar que tenemos todos los datos necesarios
+            if (!property || !property._id || !property.address) {
+                toast.error('Error: Datos de propiedad incompletos');
+                return;
+            }
+
             const formData = {
                 date: selectedDate,
                 time: selectedTime,
@@ -96,8 +102,10 @@ export default function DefaultPropertyContent({ property }) {
                 name,
                 phone,
                 property: property._id,
-                propertyAddress: property.address
+                propertyAddress: property.address || property.typeProperty // Usar typeProperty como respaldo
             };
+
+            console.log('Enviando datos:', formData); // Para debugging
 
             const response = await sendPropertyEmail(formData);
 
@@ -121,14 +129,22 @@ export default function DefaultPropertyContent({ property }) {
 
     const handleOfferSubmit = async () => {
         try {
+            // Verificar que tenemos todos los datos necesarios
+            if (!property || !property._id || !property.address) {
+                toast.error('Error: Datos de propiedad incompletos');
+                return;
+            }
+
             const formData = {
                 offer: selectedOffer.value,
                 email,
                 name,
                 phone,
                 property: property._id,
-                propertyAddress: property.address
+                propertyAddress: property.address || property.typeProperty // Usar typeProperty como respaldo
             };
+
+            console.log('Enviando datos:', formData); // Para debugging
 
             const response = await sendPropertyEmail(formData);
 
@@ -214,7 +230,7 @@ export default function DefaultPropertyContent({ property }) {
                         </h1>
 
                         {/* Detalles principales */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
                             <div className="flex items-center gap-2 text-black dark:text-white">
                                 <HiMiniSquare3Stack3D className="text-amarillo dark:text-amarillo text-xl" />
                                 <span>{property.m2} m²</span>
@@ -229,8 +245,16 @@ export default function DefaultPropertyContent({ property }) {
                             </div>
                             <div className="flex items-center gap-2">
                                 <span className="text-2xl font-bold text-amarillo dark:text-amarillo">
-                                    {property.price}€
+                                    {property.price.toLocaleString()}€
                                 </span>
+                            </div>
+                            <div className="flex items-center gap-2 text-black dark:text-white">
+                                <FaBuilding className="text-amarillo dark:text-amarillo text-xl" />
+                                <span>{property.floor}º Planta</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-black dark:text-white">
+                                <FaEuroSign className="text-amarillo dark:text-amarillo text-xl" />
+                                <span>{property.priceM2.toLocaleString()}€/m²</span>
                             </div>
                         </div>
 
