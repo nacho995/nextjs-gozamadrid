@@ -26,7 +26,7 @@ export default function Home() {
   return (
     <>
       <div className="">
-        <div className="fixed inset-0 z-0 opacity-100 bg-contain bg-center" style={gradientStyle}></div>
+        <div className="fixed inset-0 z-0 opacity-100 bg-cover bg-center" style={gradientStyle}></div>
 
         <div className="absolute top-0 left-0 w-full z-1">
           <Video />
