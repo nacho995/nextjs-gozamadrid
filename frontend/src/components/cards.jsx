@@ -97,14 +97,11 @@ function DesktopCards({ card, index }) {
 
     return (
         <AnimatedOnScroll>
-            {/* Contenedor principal fijo */}
-            <div
-                className="relative w-[40vw] h-[40vh] group [perspective:1000px] transform transition duration-300 hover:scale-105"
-            >
-                <div className="h-full w-[19vw] transition-all duration-700 [transform-style:preserve-3d] [-webkit-transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+            <div className="relative w-[40vw] h-[40vh] group [perspective:1000px] transform transition duration-300 hover:scale-105">
+                <div className="h-full w-[19vw] transition-all duration-700 card-flip group-hover:[transform:rotateY(180deg)]">
                     {/* Cara frontal */}
                     <div
-                        className="absolute inset-0 bg-yellow-300 text-black shadow-lg rounded-lg p-6 flex flex-col items-center justify-center [backface-visibility:hidden] [-webkit-backface-visibility:hidden] overflow-hidden"
+                        className="absolute inset-0 bg-yellow-300 text-black shadow-lg rounded-lg p-6 flex flex-col items-center justify-center card-flip overflow-hidden"
                         aria-hidden="true"
                     >
                         <div
@@ -158,7 +155,7 @@ function DesktopCards({ card, index }) {
                     </div>
                     {/* Cara trasera */}
                     <div
-                        className="absolute inset-0 font-bold text-black shadow-lg rounded-lg p-2 flex items-center justify-center text-center [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)] overflow-hidden"
+                        className="absolute inset-0 font-bold text-black shadow-lg rounded-lg p-2 flex items-center justify-center text-center [transform:rotateY(180deg)] card-flip overflow-hidden"
                         aria-hidden="true"
                     >
                         <div

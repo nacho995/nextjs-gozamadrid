@@ -17,4 +17,5 @@ body {
   backface-visibility: hidden;
   transform-style: preserve-3d;
   -webkit-transform-style: preserve-3d;
+  will-change: transform;
 } 
