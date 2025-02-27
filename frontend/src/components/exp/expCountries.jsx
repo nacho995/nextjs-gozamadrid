@@ -47,6 +47,12 @@ export default function ExpCountries() {
     `;
 
     const commonTitleStyles = `
+        text-2xl font-bold text-white italic mb-4
+        [text-shadow:2px_2px_3px_rgba(65,105,225,0.7)]
+    `;
+
+    // Nuevo estilo específico para los títulos de España
+    const spainTitleStyles = `
         absolute inset-0 flex items-center justify-center 
         text-2xl font-bold text-white italic
         [text-shadow:2px_2px_3px_rgba(65,105,225,0.7)]
@@ -71,7 +77,7 @@ export default function ExpCountries() {
                         className={commonImageStyles}
                     />
                     <div className={commonOverlayStyles}></div>
-                    <h3 className={commonTitleStyles}>
+                    <h3 className={spainTitleStyles}>
                         Andalucía
                     </h3>
                 </div>
@@ -83,7 +89,7 @@ export default function ExpCountries() {
                         className={commonImageStyles}
                     />
                     <div className={commonOverlayStyles}></div>
-                    <h3 className={commonTitleStyles}>
+                    <h3 className={spainTitleStyles}>
                         Madrid
                     </h3>
                 </div>
@@ -95,7 +101,7 @@ export default function ExpCountries() {
                         className={commonImageStyles}
                     />
                     <div className={commonOverlayStyles}></div>
-                    <h3 className={commonTitleStyles}>
+                    <h3 className={spainTitleStyles}>
                         Cataluña
                     </h3>
                 </div>
@@ -107,7 +113,7 @@ export default function ExpCountries() {
                         className={commonImageStyles}
                     />
                     <div className={commonOverlayStyles}></div>
-                    <h3 className={commonTitleStyles}>
+                    <h3 className={spainTitleStyles}>
                         Valencia
                     </h3>
                 </div>
@@ -121,11 +127,11 @@ export default function ExpCountries() {
                             className={commonImageStyles}
                         />
                         <div className={commonOverlayStyles}>
-                            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                            <div className="absolute inset-0 flex flex-col items-center justify-center p-4 space-y-4">
                                 <h3 className={commonTitleStyles}>
                                     {country.name}
                                 </h3>
-                                <p className="text-white text-sm font-bold dark:text-white">
+                                <p className="text-white text-sm font-bold text-center">
                                     {country.description}
                                 </p>
                                 <a 
@@ -134,7 +140,7 @@ export default function ExpCountries() {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
-                                    <span className="relative text-lg font-semibold text-white dark:text-white">
+                                    <span className="relative text-lg font-semibold text-white">
                                         Pincha aquí
                                     </span>
                                     <span className="absolute bottom-0 left-0 h-1 w-full transform 
