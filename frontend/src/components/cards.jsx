@@ -98,79 +98,80 @@ function DesktopCards({ card, index }) {
     return (
         <AnimatedOnScroll>
             <div className="relative w-[40vw] h-[40vh] group [perspective:1000px] transform transition duration-300 hover:scale-105">
-                <div className="h-full w-[19vw] transition-all duration-700 card-flip group-hover:[transform:rotateY(180deg)]">
-                    {/* Cara frontal */}
-                    <div
-                        className="absolute inset-0 bg-yellow-300 text-black shadow-lg rounded-lg p-6 flex flex-col items-center justify-center card-flip overflow-hidden"
-                        aria-hidden="true"
-                    >
-                        <div
-                            className="absolute inset-0 bg-cover bg-center rounded-lg"
-                            style={{ backgroundImage: "url('/fondoamarillo.jpg')" }}
-                        >
-                            <div className="absolute inset-0 bg-white opacity-15 rounded-lg"></div>
+                <div className="h-full w-[19vw] transition-all duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+                    {/* Cara Frontal */}
+                    <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
+                        <div className="absolute inset-0 bg-yellow-300 text-black shadow-lg rounded-lg p-6 flex flex-col items-center justify-center overflow-hidden">
+                            <div
+                                className="absolute inset-0 bg-cover bg-center rounded-lg"
+                                style={{ backgroundImage: "url('/fondoamarillo.jpg')" }}
+                            >
+                                <div className="absolute inset-0 bg-white opacity-15 rounded-lg"></div>
+                            </div>
+                            
+                            {/* Imagen correspondiente según el índice */}
+                            {index === 0 && (
+                                <img
+                                    src="/analisis.png"
+                                    alt="Análisis"
+                                    className="mb-4 rounded-full h-[12vh] w-[12vh] object-cover border-2 border-black/20 shadow-xl transform transition-transform duration-300 group-hover:scale-110"
+                                />
+                            )}
+                            {index === 1 && (
+                                <img
+                                    src="/agenteinmo.png"
+                                    alt="Agente Inmobiliario"
+                                    className="mb-4 rounded-full h-[12vh] w-[12vh] object-cover border-2 border-black/20 shadow-xl transform transition-transform duration-300 group-hover:scale-110"
+                                />
+                            )}
+                            {index === 2 && (
+                                <img
+                                    src="/analisisdemercado.jpeg"
+                                    alt="Análisis de Mercado"
+                                    className="mb-4 rounded-full h-[12vh] w-[12vh] object-cover border-2 border-black/20 shadow-xl transform transition-transform duration-300 group-hover:scale-110"
+                                />
+                            )}
+                            {index === 3 && (
+                                <img
+                                    src="/agentesinmobiliarios.jpeg"
+                                    alt="Agentes Inmobiliarios"
+                                    className="mb-4 rounded-full h-[12vh] w-[12vh] object-cover border-2 border-black/20 shadow-xl transform transition-transform duration-300 group-hover:scale-110"
+                                />
+                            )}
+                            {index === 4 && (
+                                <img
+                                    src="/formFoto.jpeg"
+                                    alt="Formulario"
+                                    className="mb-4 rounded-full h-[12vh] w-[12vh] object-cover border-2 border-black/20 shadow-xl transform transition-transform duration-300 group-hover:scale-110"
+                                />
+                            )}
+                            
+                            <h2 className="text-3xl font-bold text-center text-black z-20 mt-2"
+                                style={{ textShadow: "2px 2px 3px rgba(255,255,225,1)" }}>
+                                {card.front}
+                            </h2>
                         </div>
-                        
-                        {/* Imagen correspondiente según el índice */}
-                        {index === 0 && (
-                            <img
-                                src="/analisis.png"
-                                alt="Análisis"
-                                className="mb-4 rounded-full h-[12vh] w-[12vh] object-cover border-2 border-black/20 shadow-xl transform transition-transform duration-300 group-hover:scale-110"
-                            />
-                        )}
-                        {index === 1 && (
-                            <img
-                                src="/agenteinmo.png"
-                                alt="Agente Inmobiliario"
-                                className="mb-4 rounded-full h-[12vh] w-[12vh] object-cover border-2 border-black/20 shadow-xl transform transition-transform duration-300 group-hover:scale-110"
-                            />
-                        )}
-                        {index === 2 && (
-                            <img
-                                src="/analisisdemercado.jpeg"
-                                alt="Análisis de Mercado"
-                                className="mb-4 rounded-full h-[12vh] w-[12vh] object-cover border-2 border-black/20 shadow-xl transform transition-transform duration-300 group-hover:scale-110"
-                            />
-                        )}
-                        {index === 3 && (
-                            <img
-                                src="/agentesinmobiliarios.jpeg"
-                                alt="Agentes Inmobiliarios"
-                                className="mb-4 rounded-full h-[12vh] w-[12vh] object-cover border-2 border-black/20 shadow-xl transform transition-transform duration-300 group-hover:scale-110"
-                            />
-                        )}
-                        {index === 4 && (
-                            <img
-                                src="/formFoto.jpeg"
-                                alt="Formulario"
-                                className="mb-4 rounded-full h-[12vh] w-[12vh] object-cover border-2 border-black/20 shadow-xl transform transition-transform duration-300 group-hover:scale-110"
-                            />
-                        )}
-                        
-                        <h2 className="text-3xl font-bold text-center text-black z-20 mt-2"
-                            style={{ textShadow: "2px 2px 3px rgba(255,255,225,1)" }}>
-                            {card.front}
-                        </h2>
                     </div>
-                    {/* Cara trasera */}
-                    <div
-                        className="absolute inset-0 font-bold text-black shadow-lg rounded-lg p-2 flex items-center justify-center text-center [transform:rotateY(180deg)] card-flip overflow-hidden"
-                        aria-hidden="true"
-                    >
-                        <div
-                            className="absolute inset-0 bg-cover bg-center rounded-lg"
-                            style={{ backgroundImage: "url('/fondonegro.jpg')" }}
-                        ></div>
-                        <div className="relative z-10 text-center overflow-hidden whitespace-normal break-words text-sm sm:text-base md:text-lg lg:text-base">
-                            <ol className="list-decimal list-inside text-left text-white">
-                                {card.back.props.children}
-                            </ol>
+
+                    {/* Cara Trasera */}
+                    <div className="absolute inset-0 w-full h-full [transform:rotateY(180deg)] [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
+                        <div className="relative w-full h-full rounded-lg overflow-hidden shadow-xl">
+                            <div
+                                className="absolute inset-0 bg-cover bg-center rounded-lg"
+                                style={{ backgroundImage: "url('/fondonegro.jpg')" }}
+                            ></div>
+                            <div className="relative z-10 flex items-center justify-center h-full p-4">
+                                <div className="text-center overflow-hidden whitespace-normal break-words text-sm sm:text-base md:text-lg lg:text-base">
+                                    <ol className="list-decimal list-inside text-left text-white">
+                                        {card.back.props.children}
+                                    </ol>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </AnimatedOnScroll >
+        </AnimatedOnScroll>
     );
 }
 

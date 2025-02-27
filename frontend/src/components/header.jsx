@@ -270,7 +270,15 @@ export default function ControlMenu() {
 
       {/* Menú Lateral para dispositivos móviles */}
       {menuVisible && (
-        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-[9999] lg:hidden">
+        <div 
+          className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-[9999] lg:hidden"
+          onClick={(e) => {
+            // Si el clic fue en el fondo oscuro (overlay) y no en el menú
+            if (e.target === e.currentTarget) {
+              toggleMenu();
+            }
+          }}
+        >
           <div className="bg-white bg-opacity-50 w-64 max-h-screen shadow-lg flex flex-col p-4">
             <div className="flex justify-between items-center">
               <Image src="/logo.png" alt="Logo" width={100} height={20} />
