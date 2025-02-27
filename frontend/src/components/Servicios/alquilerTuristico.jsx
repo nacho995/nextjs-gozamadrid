@@ -222,7 +222,7 @@ export default function AlquilerTuristico() {
                                     lg:group-hover:[transform:rotateY(180deg)]`}
                                 >
                                     {/* Cara Frontal */}
-                                    <div className="absolute inset-0 w-full h-full">
+                                    <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
                                         <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl">
                                             <Image
                                                 src="/fondoamarillo.jpg"
@@ -248,7 +248,7 @@ export default function AlquilerTuristico() {
                                     </div>
 
                                     {/* Cara Trasera */}
-                                    <div className="absolute inset-0 w-full h-full [transform:rotateY(180deg)] [backface-visibility:hidden]">
+                                    <div className="absolute inset-0 w-full h-full [transform:rotateY(180deg)] [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
                                         <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl">
                                             <Image
                                                 src="/fondonegro.jpg"
