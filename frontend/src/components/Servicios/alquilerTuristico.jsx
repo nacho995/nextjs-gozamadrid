@@ -29,15 +29,15 @@ export default function AlquilerTuristico() {
                     className="object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent flex items-center">
-                    <div className="text-white ml-12 max-w-2xl">
+                    <div className="text-white ml-4 sm:ml-8 md:ml-12 max-w-2xl">
                         <h1 
-                            className="text-5xl font-bold mb-4 hover:scale-105 transition-transform duration-300 inline-block"
+                            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-4 hover:scale-105 transition-transform duration-300 inline-block"
                             style={textShadowStyle}
                         >
                             Alquiler Turístico en España
                         </h1>
                         <p 
-                            className="text-xl"
+                            className="text-sm sm:text-base md:text-lg lg:text-xl"
                             style={textShadowLightStyle}
                         >
                             Maximiza el potencial de tu propiedad con nuestra gestión integral de alquileres vacacionales
@@ -79,8 +79,8 @@ export default function AlquilerTuristico() {
                         className="bg-white/5 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
                     >
                         <div className="mb-4 hover:scale-110 transition-transform duration-300">{item.icon}</div>
-                        <h3 className="text-xl font-semibold mb-2" style={textShadowStyle}>{item.title}</h3>
-                        <p className="text-gray-600" style={textShadowLightStyle}>{item.desc}</p>
+                        <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2" style={textShadowStyle}>{item.title}</h3>
+                        <p className="text-xs sm:text-sm md:text-base" style={textShadowLightStyle}>{item.desc}</p>
                     </motion.div>
                 ))}
             </div>
@@ -145,7 +145,7 @@ export default function AlquilerTuristico() {
             </div>
 
             {/* Sección Final */}
-            <div className="relative h-[50vh] rounded-2xl overflow-hidden hover:scale-[1.02] transition-all duration-300">
+            <div className="relative h-[80vh] rounded-2xl overflow-hidden hover:scale-[1.02] transition-all duration-300">
                 <Image
                     src="/AlquilerTuristicoEspaña.jpg"
                     alt="Alquiler Turístico en España"
@@ -155,13 +155,13 @@ export default function AlquilerTuristico() {
                 <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center text-center p-8">
                     <div className="max-w-3xl">
                         <h2 
-                            className="text-4xl font-bold text-white mb-4 hover:scale-105 transition-transform duration-300 inline-block"
+                            className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 sm:mb-4 hover:scale-105 transition-transform duration-300 inline-block"
                             style={textShadowStyle}
                         >
                             Maximiza el Potencial de tu Propiedad
                         </h2>
                         <p 
-                            className="text-xl text-white/90"
+                            className="text-sm sm:text-base md:text-lg lg:text-xl text-white/90"
                             style={textShadowLightStyle}
                         >
                             Nuestro equipo de expertos se encarga de todo el proceso, desde la 
@@ -177,7 +177,7 @@ export default function AlquilerTuristico() {
             <div className="relative mt-20 mb-16 z-[9997]">
                 <div className="relative z-[9998] bg-gradient-to-b from-transparent via-white/5 to-transparent py-8">
                     <h2 
-                        className="relative text-5xl font-bold text-center mb-12 z-[9999]"
+                        className="relative text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-6 sm:mb-8 md:mb-12 z-[9999]"
                         style={{
                             ...textShadowStyle,
                             position: 'relative',
@@ -232,14 +232,14 @@ export default function AlquilerTuristico() {
                                             />
                                             <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
                                                 <h3 
-                                                    className="text-2xl font-bold text-white text-center px-6"
+                                                    className="text-xl sm:text-2xl font-bold text-white text-center px-4 sm:px-6"
                                                     style={textShadowStyle}
                                                 >
                                                     {card.title}
                                                 </h3>
                                             </div>
                                             <div 
-                                                className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-sm lg:hidden"
+                                                className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-xs sm:text-sm lg:hidden"
                                                 style={textShadowLightStyle}
                                             >
                                                 Toca para más info
@@ -259,13 +259,13 @@ export default function AlquilerTuristico() {
                                             />
                                             <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center p-8">
                                                 <p 
-                                                    className="text-white text-lg md:text-xl text-center font-medium"
+                                                    className="text-white text-sm sm:text-base md:text-lg lg:text-xl text-center font-medium"
                                                     style={textShadowStyle}
                                                 >
                                                     {card.text}
                                                 </p>
                                                 <span 
-                                                    className="mt-4 text-white/80 text-sm lg:hidden"
+                                                    className="mt-2 sm:mt-4 text-white/80 text-xs sm:text-sm lg:hidden"
                                                     style={textShadowLightStyle}
                                                 >
                                                     Toca para volver
