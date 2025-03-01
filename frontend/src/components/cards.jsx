@@ -161,8 +161,8 @@ function DesktopCards({ card, index }) {
                         </div>
                     </div>
 
-                    {/* Cara Trasera */}
-                    <div className="absolute inset-0 w-full h-full [transform:rotateY(180deg)] [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
+                    {/* Cara Trasera - mejorada */}
+                    <div className="absolute inset-0 w-full h-full [transform:rotateY(180deg)] [backface-visibility:hidden] [-webkit-backface-visibility:hidden] z-10">
                         <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl">
                             <Image
                                 src="/fondonegro.jpg"
@@ -210,7 +210,7 @@ function MobileCard({ card, index }) {
     
     return (
         <div 
-            className=" relative w-[90vw] h-[50vh] group [perspective:1000px] transform transition duration-300 hover:scale-105"
+            className="relative w-[90vw] h-[50vh] group [perspective:1000px] transform transition duration-300 hover:scale-105"
             onClick={handleCardClick}
         >
             <div className={`h-full w-full transition-all duration-500 [transform-style:preserve-3d] ${isFlipped ? '[transform:rotateY(180deg)]' : ''}`}>
@@ -256,10 +256,9 @@ function MobileCard({ card, index }) {
                     </div>
                 </div>
 
-                {/* Cara Trasera */}
-                <div className="absolute inset-0 w-full h-full [transform:rotateY(180deg)] [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
+                {/* Cara Trasera - mejorada */}
+                <div className="absolute inset-0 w-full h-full [transform:rotateY(180deg)] [backface-visibility:hidden] [-webkit-backface-visibility:hidden] z-10">
                     <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl">
-                        {/* Fondo con estilo alquilerTuristico */}
                         <Image
                             src="/fondonegro.jpg"
                             alt="Background"
@@ -311,7 +310,7 @@ function TabletCard({ card, index }) {
                 {/* Cara frontal */}
                 <div
                     className="absolute w-full h-full shadow-lg rounded-2xl p-2 flex items-center justify-center [backface-visibility:hidden] [-webkit-backface-visibility:hidden] overflow-hidden"
-                    aria-hidden="true"
+                    aria-hidden={flipped}
                 >
                     {/* Reemplazando el fondo con el mismo estilo del mobile card */}
                     <div className="absolute inset-0 bg-white/5 backdrop-blur-sm rounded-xl">
@@ -352,10 +351,10 @@ function TabletCard({ card, index }) {
                     </div>
                 </div>
                 
-                {/* Cara trasera */}
+                {/* Cara trasera - mejorada */}
                 <div
-                    className="absolute w-full h-full shadow-lg rounded-2xl p-2 flex items-center justify-center text-center [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)] overflow-hidden"
-                    aria-hidden="true"
+                    className="absolute w-full h-full shadow-lg rounded-2xl p-2 flex items-center justify-center text-center [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)] overflow-hidden z-20"
+                    aria-hidden={!flipped}
                 >
                     <Image
                         src="/fondonegro.jpg"
