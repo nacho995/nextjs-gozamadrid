@@ -108,7 +108,7 @@ function DesktopCards({ card, index }) {
                             >
                                 <div className="absolute inset-0 bg-white opacity-15 rounded-lg"></div>
                             </div>
-                            
+
                             {/* Imagen correspondiente según el índice */}
                             {index === 0 && (
                                 <img
@@ -145,7 +145,7 @@ function DesktopCards({ card, index }) {
                                     className="mb-4 rounded-full h-[12vh] w-[12vh] object-cover border-2 border-black/20 shadow-xl transform transition-transform duration-300 group-hover:scale-110"
                                 />
                             )}
-                            
+
                             <h2 className="text-3xl font-bold text-center text-black z-20 mt-2"
                                 style={{ textShadow: "2px 2px 3px rgba(255,255,225,1)" }}>
                                 {card.front}
@@ -179,94 +179,80 @@ function DesktopCards({ card, index }) {
    Mobile/Tablet Version (2 columns)
    ============================ */
 function MobileCard({ card, index }) {
-    const [flipped, setFlipped] = useState(false);
-    return (
-        <div className="flex flex-col items-center p-2">
-            {/* Imagen sobre la card */}
-            {index === 0 && (
-                <img
-                    src="/analisis.png"
-                    alt="Image for Card 1"
-                    className="mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
-                />
-            )}
-            {index === 1 && (
-                <img
-                    src="/agenteinmo.png"
-                    alt="Image for Card 2"
-                    className="mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
-                />
-            )}
-            {index === 2 && (
-                <img
-                    src="/analisisdemercado.jpeg"
-                    alt="Image for Card 3"
-                    className="mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
-                />
-            )}
-            {index === 3 && (
-                <img
-                    src="/agentesinmobiliarios.jpeg"
-                    alt="Image for Card 4"
-                    className="mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
-                />
-            )}
-            {index === 4 && (
-                <img
-                    src="/formFoto.jpeg"
-                    alt="Image for Card 5"
-                    className="mt-4 rounded-full h-[15vh] w-[15vh] object-cover"
-                />
-            )}
+    const [isFlipped, setIsFlipped] = useState(false);
 
-            {/* Card */}
-            <div
-                className="w-[45vw] h-[45vh] relative transition-transform duration-700 [transform-style:preserve-3d]"
-                onClick={() => setFlipped(!flipped)}
-                style={{ transform: flipped ? "rotateY(180deg)" : "rotateY(0)" }}
-            >
-                {/* Cara frontal */}
-                <div
-                    className="absolute w-full h-full bg-amarillo text-black shadow-lg rounded-lg p-2 flex items-center justify-center [backface-visibility:hidden] [-webkit-backface-visibility:hidden] overflow-hidden"
-                    aria-hidden="true"
-                >
-                    <div
-                        className="absolute inset-0 bg-cover bg-center rounded-lg"
-                        style={{ backgroundImage: "url('/fondoamarillo.jpg')" }}
-                    >
-                        <div className="absolute inset-0 bg-white opacity-15 rounded-lg"></div>
-                    </div>
-                    <h2 className="text-lg font-bold text-center text-black z-20 px-1 break-words">
-                        {card.front}
-                    </h2>
-                    {/* Texto informativo frontal */}
-                    <div 
-                        className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-black/70 text-xs lg:hidden"
-                        style={{ textShadow: '1px 1px 2px rgba(255, 255, 255, 0.8)' }}
-                    >
-                        Toca para más info
+    const handleCardClick = () => {
+        setIsFlipped(!isFlipped);
+    };
+
+    // Función para determinar qué imagen mostrar según el índice
+    const getCardImage = () => {
+        switch (index) {
+            case 0: return "/analisis.png";
+            case 1: return "/agenteinmo.png";
+            case 2: return "/analisisdemercado.jpeg";
+            case 3: return "/agentesinmobiliarios.jpeg";
+            case 4: return "/formFoto.jpeg";
+            default: return "/analisis.png";
+        }
+    };
+
+    return (
+        <div
+            className="relative w-[65vw] h-[40vh] group [perspective:1000px] transform transition duration-300 hover:scale-105"
+            onClick={handleCardClick}
+        >
+            <div className={`w-full h-full transition-all duration-500 [transform-style:preserve-3d] [-webkit-transform-style:preserve-3d] ${isFlipped ? '[transform:rotateY(180deg)]' : ''}`}>
+                {/* Cara Frontal */}
+                <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
+                    <div className="absolute inset-0 rounded-lg shadow-lg p-4 flex flex-col items-center justify-start">
+                        <div
+                            className="absolute inset-0 bg-cover bg-center rounded-lg"
+                            style={{ backgroundImage: "url('/fondoamarillo.jpg')" }}
+                        >
+                            <div className="absolute inset-0 bg-white opacity-15 rounded-lg"></div>
+                        </div>
+                        <div className="relative z-10 flex flex-col items-center w-full h-full">
+                            {/* Imagen dentro de la tarjeta */}
+                            <div className="mt-2 mb-2">
+                                <img
+                                    src={getCardImage()}
+                                    alt={`Imagen para ${card.front}`}
+                                    className="rounded-full h-[8vh] w-[8vh] object-cover border-2 border-white shadow-md"
+                                />
+                            </div>
+
+                            {/* Contenido de texto */}
+                            <div className="flex-1 flex flex-col justify-center items-center text-center p-2">
+                                <h2 className="text-lg font-bold text-black">{card.front}</h2>
+                                <div className="mt-2 text-black text-xs">
+                                    Toca para más info
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                {/* Cara trasera */}
-                <div
-                    className="absolute w-full h-full font-bold text-black shadow-lg rounded-lg p-2 flex items-center justify-center text-center [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)] overflow-hidden"
-                    aria-hidden="true"
-                >
-                    <div
-                        className="absolute inset-0 bg-cover bg-center rounded-lg"
-                        style={{ backgroundImage: "url('/fondonegro.jpg')" }}
-                    ></div>
-                    <div className="relative z-10 text-center whitespace-normal break-words overflow-hidden text-xs sm:text-xs md:text-base lg:text-lg">
-                        <ol className="list-decimal list-inside text-left text-white">
-                            {card.back.props.children}
-                        </ol>
-                        {/* Texto informativo trasero */}
-                        <span 
-                            className="block mt-4 text-white/80 text-xs lg:hidden"
-                            style={{ textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)' }}
-                        >
-                            Toca para volver
-                        </span>
+
+                {/* Cara Trasera */}
+                <div className="absolute inset-0 w-full h-full [transform:rotateY(180deg)] [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
+                    <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl">
+                        <Image
+                            src="/fondonegro.jpg"
+                            alt="Background"
+                            fill
+                            className="object-cover"
+                            quality={100}
+                        />
+                        <div className="relative z-10 inset-0 flex items-center justify-center h-full p-3">
+                            <div className="text-center overflow-hidden whitespace-normal break-words text-xs">
+                                <ol className="list-decimal list-inside text-left text-white">
+                                    {card.back.props.children}
+                                </ol>
+                                <div className="mt-2 text-white text-xs">
+                                    Toca para volver
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -276,6 +262,17 @@ function MobileCard({ card, index }) {
 
 function TabletCard({ card, index }) {
     const [flipped, setFlipped] = useState(false);
+
+    const getCardImage = () => {
+        switch (index) {
+            case 0: return "/analisis.png";
+            case 1: return "/agenteinmo.png";
+            case 2: return "/analisisdemercado.jpeg";
+            case 3: return "/agentesinmobiliarios.jpeg";
+            case 4: return "/formFoto.jpeg";
+            default: return "/analisis.png";
+        }
+    };
 
     return (
         <div className="flex flex-col items-center p-2">
@@ -295,15 +292,23 @@ function TabletCard({ card, index }) {
                     >
                         <div className="absolute inset-0 bg-white opacity-15 rounded-lg"></div>
                     </div>
-                    <h2 className="text-lg font-bold text-center text-black z-20 px-1 break-words">
-                        {card.front}
-                    </h2>
-                    {/* Texto informativo frontal */}
-                    <div 
-                        className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-black/70 text-xs lg:hidden"
-                        style={{ textShadow: '1px 1px 2px rgba(255, 255, 255, 0.8)' }}
-                    >
-                        Toca para más info
+                    <div className="relative z-10 flex flex-col items-center w-full h-full">
+                        {/* Imagen dentro de la tarjeta */}
+                        <div className="mt-2 ">
+                            <img
+                                src={getCardImage()}
+                                alt={`Imagen para ${card.front}`}
+                                className="rounded-full h-[20vh] w-[20vh] object-cover border-2 border-white shadow-md"
+                            />
+                        </div>
+
+                        {/* Contenido de texto */}
+                        <div className="mt-[-10vh] flex-1 flex flex-col justify-center items-center text-center ">
+                            <h2 className="text-lg font-bold text-black">{card.front}</h2>
+                            <div className="mt-2 text-black text-xs">
+                                Toca para más info
+                            </div>
+                        </div>
                     </div>
                 </div>
                 {/* Cara trasera */}
@@ -320,7 +325,7 @@ function TabletCard({ card, index }) {
                             {card.back.props.children}
                         </ol>
                         {/* Texto informativo trasero */}
-                        <span 
+                        <span
                             className="block mt-4 text-white/80 text-xs lg:hidden"
                             style={{ textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)' }}
                         >
@@ -329,42 +334,7 @@ function TabletCard({ card, index }) {
                     </div>
                 </div>
             </div>
-            {/* Imágenes debajo de la tarjeta según el índice */}
-            {index === 0 && (
-                <img
-                    src="/analisis.png"
-                    alt="Image for Card 1"
-                    className="mt-4 rounded-full h-[20vh] w-[20vh] object-cover"
-                />
-            )}
-            {index === 1 && (
-                <img
-                    src="/agenteinmo.png"
-                    alt="Image for Card 2"
-                    className="mt-4 rounded-full h-[20vh] w-[20vh] object-cover"
-                />
-            )}
-            {index === 2 && (
-                <img
-                    src="/analisisdemercado.jpeg"
-                    alt="Image for Card 3"
-                    className="mt-4 rounded-full h-[20vh] w-[20vh] object-cover"
-                />
-            )}
-            {index === 3 && (
-                <img
-                    src="/agentesinmobiliarios.jpeg"
-                    alt="Image for Card 4"
-                    className="mt-4 rounded-full h-[20vh] w-[20vh] object-cover"
-                />
-            )}
-            {index === 4 && (
-                <img
-                    src="/formFoto.jpeg"
-                    alt="Image for Card 5"
-                    className="mt-4 rounded-full h-[20vh] w-[20vh] object-cover"
-                />
-            )}
+
         </div>
     );
 }
@@ -384,9 +354,9 @@ export default function Cards() {
                     className="grid grid-cols-5 grid-rows-5 gap-4 w-full h-[70vh]"
                 >
                     {cardData.map((card, index) => (
-                        <div key={index} style={{ 
+                        <div key={index} style={{
                             gridColumnStart: (() => {
-                                switch(index) {
+                                switch (index) {
                                     case 0: return 1; // Primera columna
                                     case 1: return 2; // Segunda columna
                                     case 2: return 3; // Tercera columna
@@ -396,7 +366,7 @@ export default function Cards() {
                                 }
                             })(),
                             gridRowStart: (() => {
-                                switch(index) {
+                                switch (index) {
                                     case 0: return 4; // Última fila
                                     case 1: return 1; // Primera fila
                                     case 2: return 4; // Última fila
@@ -420,16 +390,14 @@ export default function Cards() {
                 </div>
             </div>
 
-            {/* Mobile Version (visible para pantallas <768px) */}
-           
+            {/* Mobile Version (visible para pantallas <768px) - Modificada para una columna */}
             <div className="md:hidden flex justify-center items-start w-full p-5">
-                <div className="grid grid-cols-2 gap-4 w-full max-w-xl">
+                <div className="grid grid-cols-1 gap-6 w-full max-w-md">
                     {cardData.map((card, index) => (
                         <MobileCard key={index} card={card} index={index} />
                     ))}
                 </div>
             </div>
-
 
         </AnimatedOnScroll>
     );
