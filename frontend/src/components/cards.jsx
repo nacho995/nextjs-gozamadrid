@@ -204,7 +204,7 @@ function MobileCard({ card, index }) {
         >
             <div className={`w-full h-full transition-all duration-500 [transform-style:preserve-3d] [-webkit-transform-style:preserve-3d] ${isFlipped ? '[transform:rotateY(180deg)]' : ''}`}>
                 {/* Cara Frontal */}
-                <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
+                <div className="bg-white absolute inset-0 w-full h-full [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
                     <div className="absolute inset-0 rounded-lg shadow-lg p-4 flex flex-col items-center justify-start [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
                         <div
                             className="absolute inset-0 bg-cover bg-center rounded-lg [backface-visibility:hidden] [-webkit-backface-visibility:hidden]"
@@ -234,7 +234,7 @@ function MobileCard({ card, index }) {
                 </div>
 
                 {/* Cara Trasera */}
-                <div className="absolute inset-0 w-full h-full [transform:rotateY(180deg)] [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
+                <div className="bg-black rounded-lg absolute inset-0 w-full h-full [transform:rotateY(180deg)] [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
                     <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
                         <div
                             className="absolute inset-0 bg-cover bg-center rounded-lg [backface-visibility:hidden] [-webkit-backface-visibility:hidden]"
