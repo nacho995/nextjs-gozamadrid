@@ -198,34 +198,34 @@ function MobileCard({ card, index }) {
     };
 
     return (
-        <div
+        <div 
             className="relative w-[65vw] h-[40vh] group [perspective:1000px] transform transition duration-300 hover:scale-105"
             onClick={handleCardClick}
         >
             <div className={`w-full h-full transition-all duration-500 [transform-style:preserve-3d] [-webkit-transform-style:preserve-3d] ${isFlipped ? '[transform:rotateY(180deg)]' : ''}`}>
                 {/* Cara Frontal */}
                 <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
-                    <div className="absolute inset-0 rounded-lg shadow-lg p-4 flex flex-col items-center justify-start">
+                    <div className="absolute inset-0 rounded-lg shadow-lg p-4 flex flex-col items-center justify-start [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
                         <div
-                            className="absolute inset-0 bg-cover bg-center rounded-lg"
+                            className="absolute inset-0 bg-cover bg-center rounded-lg [backface-visibility:hidden] [-webkit-backface-visibility:hidden]"
                             style={{ backgroundImage: "url('/fondoamarillo.jpg')" }}
                         >
-                            <div className="absolute inset-0 bg-white opacity-15 rounded-lg"></div>
+                            <div className="absolute inset-0 bg-white opacity-15 rounded-lg [backface-visibility:hidden] [-webkit-backface-visibility:hidden]"></div>
                         </div>
-                        <div className="relative z-10 flex flex-col items-center w-full h-full">
+                        <div className="relative z-10 flex flex-col items-center w-full h-full [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
                             {/* Imagen dentro de la tarjeta */}
-                            <div className="mt-2 mb-2">
+                            <div className="mt-2 mb-2 [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
                                 <img
                                     src={getCardImage()}
                                     alt={`Imagen para ${card.front}`}
-                                    className="rounded-full h-[8vh] w-[8vh] object-cover border-2 border-white shadow-md"
+                                    className="rounded-full h-[8vh] w-[8vh] object-cover border-2 border-white shadow-md [backface-visibility:hidden] [-webkit-backface-visibility:hidden]"
                                 />
                             </div>
-
+                            
                             {/* Contenido de texto */}
-                            <div className="flex-1 flex flex-col justify-center items-center text-center p-2">
-                                <h2 className="text-lg font-bold text-black">{card.front}</h2>
-                                <div className="mt-2 text-black text-xs">
+                            <div className="flex-1 flex flex-col justify-center items-center text-center p-2 [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
+                                <h2 className="text-lg font-bold text-black [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">{card.front}</h2>
+                                <div className="mt-2 text-black text-xs [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
                                     Toca para más info
                                 </div>
                             </div>
@@ -235,20 +235,17 @@ function MobileCard({ card, index }) {
 
                 {/* Cara Trasera */}
                 <div className="absolute inset-0 w-full h-full [transform:rotateY(180deg)] [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
-                    <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl">
-                        <Image
-                            src="/fondonegro.jpg"
-                            alt="Background"
-                            fill
-                            className="object-cover"
-                            quality={100}
-                        />
-                        <div className="relative z-10 inset-0 flex items-center justify-center h-full p-3">
-                            <div className="text-center overflow-hidden whitespace-normal break-words text-xs">
-                                <ol className="list-decimal list-inside text-left text-white">
+                    <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
+                        <div
+                            className="absolute inset-0 bg-cover bg-center rounded-lg [backface-visibility:hidden] [-webkit-backface-visibility:hidden]"
+                            style={{ backgroundImage: "url('/fondonegro.jpg')" }}
+                        ></div>
+                        <div className="relative z-10 flex items-center justify-center h-full p-3 [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
+                            <div className="text-center overflow-hidden whitespace-normal break-words text-xs [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
+                                <ol className="list-decimal list-inside text-left text-white [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
                                     {card.back.props.children}
                                 </ol>
-                                <div className="mt-2 text-white text-xs">
+                                <div className="mt-2 text-white text-xs [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
                                     Toca para volver
                                 </div>
                             </div>
