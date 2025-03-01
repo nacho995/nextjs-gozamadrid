@@ -38,10 +38,10 @@ export default function Home() {
             sm:mt-[130vh]              /* tablets pequeñas */
             md:mt-[80vh]              /* tablets */
             lg:mt-[100vh]             /* desktop */
-            sm:mb-[90vh] 
+            sm:mb-[155vh] 
             md:mb-[-60vh] 
             lg:mb-[30vh] 
-            mb-[90vh]
+            mb-[145vh]
             h-[50vh] 
             md:h-[100vh] 
             flex justify-center items-center"
