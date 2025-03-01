@@ -161,8 +161,8 @@ function DesktopCards({ card, index }) {
                         </div>
                     </div>
 
-                    {/* Cara Trasera - mejorada */}
-                    <div className="absolute inset-0 w-full h-full [transform:rotateY(180deg)] [backface-visibility:hidden] [-webkit-backface-visibility:hidden] z-10">
+                    {/* Cara Trasera */}
+                    <div className="absolute inset-0 w-full h-full [transform:rotateY(180deg)] [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
                         <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl">
                             <Image
                                 src="/fondonegro.jpg"
@@ -210,7 +210,7 @@ function MobileCard({ card, index }) {
     
     return (
         <div 
-            className="relative w-[90vw] h-[50vh] group [perspective:1000px] transform transition duration-300 hover:scale-105"
+            className=" relative w-[90vw] h-[50vh] group [perspective:1000px] transform transition duration-300 hover:scale-105"
             onClick={handleCardClick}
         >
             <div className={`h-full w-full transition-all duration-500 [transform-style:preserve-3d] ${isFlipped ? '[transform:rotateY(180deg)]' : ''}`}>
@@ -240,14 +240,14 @@ function MobileCard({ card, index }) {
                             </div>
                             
                             <h2 
-                                className="text-xs sm:text-sm md:text-xl font-bold mb-2 text-white"
+                                className="text-sm sm:text-lg md:text-xl font-bold mb-2 text-white"
                                 style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}
                             >
                                 {card.front}
                             </h2>
                             
                             <div 
-                                className="mt-2 text-white/80 text-[10px] sm:text-xs"
+                                className="mt-2 text-white/80 text-[10px] sm:text-sm"
                                 style={{ textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)' }}
                             >
                                 Toca para más info
@@ -256,9 +256,10 @@ function MobileCard({ card, index }) {
                     </div>
                 </div>
 
-                {/* Cara Trasera - mejorada */}
-                <div className="absolute inset-0 w-full h-full [transform:rotateY(180deg)] [backface-visibility:hidden] [-webkit-backface-visibility:hidden] z-10">
+                {/* Cara Trasera */}
+                <div className="absolute inset-0 w-full h-full [transform:rotateY(180deg)] [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
                     <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl">
+                        {/* Fondo con estilo alquilerTuristico */}
                         <Image
                             src="/fondonegro.jpg"
                             alt="Background"
@@ -268,11 +269,11 @@ function MobileCard({ card, index }) {
                         />
                         <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center p-8">
                             <div className="text-center overflow-hidden whitespace-normal break-words">
-                                <ol className="list-decimal list-inside text-left text-white text-xs sm:text-sm md:text-base">
+                                <ol className="list-decimal list-inside text-left text-white text-xs sm:text-base md:text-base">
                                     {card.back.props.children}
                                 </ol>
                                 <span 
-                                    className="mt-4 text-white/80 text-[10px] sm:text-xs block"
+                                    className="mt-4 text-white/80 text-[10px] sm:text-base block"
                                     style={{ textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)' }}
                                 >
                                     Toca para volver
@@ -310,7 +311,7 @@ function TabletCard({ card, index }) {
                 {/* Cara frontal */}
                 <div
                     className="absolute w-full h-full shadow-lg rounded-2xl p-2 flex items-center justify-center [backface-visibility:hidden] [-webkit-backface-visibility:hidden] overflow-hidden"
-                    aria-hidden={flipped}
+                    aria-hidden="true"
                 >
                     {/* Reemplazando el fondo con el mismo estilo del mobile card */}
                     <div className="absolute inset-0 bg-white/5 backdrop-blur-sm rounded-xl">
@@ -351,10 +352,10 @@ function TabletCard({ card, index }) {
                     </div>
                 </div>
                 
-                {/* Cara trasera - mejorada */}
+                {/* Cara trasera */}
                 <div
-                    className="absolute w-full h-full shadow-lg rounded-2xl p-2 flex items-center justify-center text-center [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)] overflow-hidden z-20"
-                    aria-hidden={!flipped}
+                    className="absolute w-full h-full shadow-lg rounded-2xl p-2 flex items-center justify-center text-center [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)] overflow-hidden"
+                    aria-hidden="true"
                 >
                     <Image
                         src="/fondonegro.jpg"
