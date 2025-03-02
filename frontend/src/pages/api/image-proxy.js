@@ -1,25 +1,34 @@
+import { NextResponse } from 'next/server';
+
+export const config = {
+  api: {
+    responseLimit: false,
+  },
+};
+
 export default async function handler(req, res) {
-  const { url } = req.query;
-  
-  if (!url) {
-    return res.status(400).json({ error: 'URL no proporcionada' });
-  }
-  
   try {
-    const imageResponse = await fetch(url);
-    const imageBuffer = await imageResponse.arrayBuffer();
+    const { url } = req.query;
     
-    // Obtener el tipo de contenido
-    const contentType = imageResponse.headers.get('content-type');
+    if (!url) {
+      return res.status(400).json({ error: 'URL parameter is required' });
+    }
     
-    // Configurar cabeceras de respuesta
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`Error fetching image: ${response.status}`);
+    }
+    
+    const contentType = response.headers.get('content-type');
+    const buffer = await response.arrayBuffer();
+    
     res.setHeader('Content-Type', contentType);
-    res.setHeader('Cache-Control', 'public, max-age=86400'); // Cachear por 24 horas
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.send(Buffer.from(buffer));
     
-    // Enviar la imagen
-    res.status(200).send(Buffer.from(imageBuffer));
   } catch (error) {
-    console.error('Error al obtener imagen:', error);
-    res.status(500).json({ error: 'Error al obtener la imagen' });
+    console.error('Error proxying image:', error);
+    res.redirect('/placeholder.jpg');
   }
 } 

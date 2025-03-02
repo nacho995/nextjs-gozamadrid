@@ -59,69 +59,46 @@ function getDefaultCountryPrefixes() {
 // src/pages/api/index.js
 export async function getBlogPosts() {
   try {
-    console.log("Intentando obtener blogs de la API local:", `${API_URL}/blog`);
+    // Primero intentar con WordPress
+    console.log("Intentando obtener blogs desde WordPress...");
+    const wpResponse = await fetch(
+      "https://realestategozamadrid.com/wp-json/wp/v2/posts?_embed"
+    );
     
-    // Usar AbortController para evitar bloqueos largos
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 segundos timeout
-    
-    const response = await fetch(`${API_URL}/blog`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      signal: controller.signal
-    });
-    
-    clearTimeout(timeoutId);
-
-    // Si la API local funciona, usar esos datos
-    if (response.ok) {
-      const contentType = response.headers.get('content-type');
+    if (wpResponse.ok) {
+      const contentType = wpResponse.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
-        const blogData = await response.json();
-        console.log("Blogs obtenidos exitosamente:", blogData.length);
+        const blogData = await wpResponse.json();
+        console.log("Blogs obtenidos de WordPress:", blogData.length);
         return blogData;
       }
     }
     
-    // Si la API local falla, intentar con WordPress
-    console.log("API local falló, intentando con WordPress...");
-    const wpResponse = await fetch(
-      "https://realestategozamadrid.com/wp-json/wp/v2/posts?_embed&per_page=10"
-    );
+    // Si WordPress falla, intentar con la API local
+    console.log("WordPress falló o sin datos, intentando con API local...");
+    const response = await fetch(`${API_URL}/blog`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
     
-    if (wpResponse.ok) {
-      const wpBlogs = await wpResponse.json();
-      console.log("Blogs obtenidos de WordPress:", wpBlogs.length);
-      return wpBlogs;
+    if (response.ok) {
+      const localBlogData = await response.json();
+      console.log("Blogs obtenidos de API local:", localBlogData.length);
+      return localBlogData;
     }
     
-    // Como último recurso, generar blogs de demostración
-    console.log("Todas las fuentes de blogs fallaron, usando datos de demostración");
-    return generateDemoBlogs();
+    // Si ambas fallan, devolver array vacío
+    return [];
     
   } catch (error) {
     console.error("Error al obtener blogs:", error.message);
-    // Siempre devolver algo en caso de error
-    return generateDemoBlogs();
+    return [];
   }
 }
 
-// Función auxiliar para generar blogs de demostración
-function generateDemoBlogs(count = 6) {
-  return Array(count).fill().map((_, index) => ({
-    id: `demo-blog-${index + 1}`,
-    title: { rendered: `Artículo de Blog de Demostración ${index + 1}` },
-    content: { rendered: "<p>Este es un artículo de blog de demostración creado para mostrar la interfaz mientras se desarrolla el sitio.</p><p>Aquí iría el contenido real del blog cuando esté disponible desde WordPress.</p>" },
-    excerpt: { rendered: "Este es un extracto del artículo de blog de demostración..." },
-    date: new Date(Date.now() - index * 86400000).toISOString(),
-    jetpack_featured_media_url: "/blog-placeholder.jpg",
-    _embedded: {
-      author: [{ name: "Goza Madrid" }]
-    }
-  }));
-}
+
 
 export async function deleteBlogPost(id) {
   const response = await fetch(`${API_URL}/blog/${id}`, {
@@ -131,20 +108,46 @@ export async function deleteBlogPost(id) {
   return response.json();
 }
 
-export async function getBlogById(id) {
-  // Usamos el puerto 3001, si ese es el puerto donde corre tu API Express
-  const response = await fetch(`${API_URL}/blog/${id}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
+export const getBlogById = async (id) => {
+  console.log("Llamando a getBlogById con ID:", id);
+  
+  try {
+    // Verificar que el ID sea válido
+    if (!id) {
+      console.error("ID de blog no proporcionado");
+      return null;
     }
-  });
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    
+    // Convertir a string si es necesario
+    const blogId = String(id);
+    
+    // Obtener todos los blogs primero
+    const allBlogs = await getBlogPosts();
+    
+    if (!Array.isArray(allBlogs)) {
+      console.error("No se pudieron obtener los blogs");
+      return null;
+    }
+    
+    // Buscar el blog por ID o _id (podría ser cualquiera de los dos)
+    const foundBlog = allBlogs.find(blog => 
+      (blog.id && blog.id.toString() === blogId) || 
+      (blog._id && blog._id.toString() === blogId)
+    );
+    
+    if (!foundBlog) {
+      console.log(`No se encontró ningún blog con ID: ${id}`);
+      return null;
+    }
+    
+    console.log(`Blog encontrado con ID ${id}:`, foundBlog.title);
+    return foundBlog;
+  } catch (error) {
+    console.error("Error en getBlogById:", error);
+    return null;
   }
-  const data = await response.json();
-  return data;
-}
+};
+
 export async function getPropertyPosts() {
   const response = await fetch(`${API_URL}/property`);
 
