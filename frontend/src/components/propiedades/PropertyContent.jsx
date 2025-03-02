@@ -208,15 +208,16 @@ export default function DefaultPropertyContent({ property }) {
         property: property.id,
         propertyAddress: location,
         offerPrice: Math.round(selectedOffer.value),
-        offerPercentage: selectedOffer.percentage,
+        offerPercentage: selectedOffer.percentage || 'Personalizada',
         email,
         name,
         phone,
+        type: 'offer' // Para diferenciar del email de solicitud de visita
       };
 
       console.log("Enviando oferta:", formData);
 
-      const response = { success: true, message: "Oferta enviada (simulada)" };
+      const response = await sendPropertyEmail(formData);
 
       if (response.success) {
         toast.success("Oferta enviada con éxito");
@@ -230,7 +231,7 @@ export default function DefaultPropertyContent({ property }) {
       }
     } catch (error) {
       console.error("Error:", error);
-      toast.error(error.message || "Error al procesar la solicitud");
+      toast.error(error.message || "Error al procesar la oferta");
     }
   };
 
