@@ -88,9 +88,9 @@ const processHTMLContent = (content) => {
         attributes += ' loading="lazy"';
       }
       
-      // Añadir el atributo de manejo de errores
+      // Añadir el atributo de manejo de errores para ocultar la imagen en lugar de mostrar una por defecto
       if (!attributes.includes('onerror=')) {
-        attributes += ` onerror="this.onerror=null; this.src='${DEFAULT_IMAGE}'; this.style.maxHeight='300px';"`;
+        attributes += ` onerror="this.style.display='none'; console.log('Imagen no disponible');"`;
       }
       
       return `<img${attributes}>`;
@@ -128,10 +128,18 @@ const processHTMLContent = (content) => {
     }
   );
   
-  // Mejorar los headings
+  // Mejorar los headings - pero excluir los que contienen imágenes
   processedContent = processedContent.replace(
     /<h2([^>]*)>([\s\S]*?)<\/h2>/gi,
-    '<h2$1><span class="relative inline-block pb-2 after:content-[\'\'] after:absolute after:bottom-0 after:left-0 after:w-full after:h-1 after:bg-gradient-to-r after:from-amber-500 after:to-transparent after:rounded-full">$2</span></h2>'
+    (match, attributes, content) => {
+      // Si el contenido tiene una imagen, no añadir el span decorativo
+      if (content.includes('<img')) {
+        return `<h2${attributes}>${content}</h2>`;
+      }
+      
+      // Para texto normal, añadir el span decorativo
+      return `<h2${attributes}><span class="relative inline-block pb-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-1 after:bg-gradient-to-r after:from-amber-500 after:to-transparent after:rounded-full">${content}</span></h2>`;
+    }
   );
   
   // Mejorar las imágenes
