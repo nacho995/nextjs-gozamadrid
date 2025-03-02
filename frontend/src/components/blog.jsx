@@ -2,9 +2,10 @@
 import { useState, useEffect } from "react";
 import { Button } from "@relume_io/relume-ui";
 import { RxChevronRight } from "react-icons/rx";
-import { getBlogPosts } from "../pages/api";
+
 import Link from "next/link";
 import AnimatedOnScroll from "./AnimatedScroll";
+import { getBlogPosts } from "@/pages/api";
 
 
 // Componente BlogHome
@@ -89,10 +90,10 @@ const BlogHome = (props) => {
                   <div className="flex w-full flex-col items-start justify-start">
                     {post.title && (
                       <h2 className="mb-2 text-xl font-bold md:text-2xl">
-                        {post.title}
+                        {post.title.rendered || post.title}
                       </h2>
                     )}
-                    {post.description && <p>{post.description}</p>}
+                    {post.description && <p>{post.description.rendered || post.description}</p>}
                     {post.button && (
                       <Button
                         {...post.button}
