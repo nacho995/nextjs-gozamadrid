@@ -400,9 +400,17 @@ export default function DefaultPropertyContent({ property }) {
 
             {/* Descripción con responsive */}
             <div 
-              className="prose prose-lg max-w-none text-black dark:text-white 
-                prose-p:dark:text-white prose-headings:dark:text-white 
-                prose-li:dark:text-white prose-strong:dark:text-white" 
+              className="prose prose-lg max-w-none 
+                text-black dark:text-white 
+                dark:prose-headings:text-white 
+                dark:prose-h1:text-white dark:prose-h2:!text-white dark:prose-h3:text-white
+                dark:prose-p:text-white 
+                dark:prose-li:text-white 
+                dark:prose-strong:!text-white
+                dark:prose-a:text-amarillo
+                dark:prose-code:text-white
+                dark:prose-figcaption:text-white
+                dark:prose-blockquote:text-white" 
               dangerouslySetInnerHTML={{ __html: content }} 
             />
 
