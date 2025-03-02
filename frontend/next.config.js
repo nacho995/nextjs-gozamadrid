@@ -1,24 +1,26 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  
+  reactStrictMode: true,
   images: {
-    domains: ['res.cloudinary.com', 'images.pexels.com'],
+    domains: ['realestategozamadrid.com'],
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'res.cloudinary.com',
+        hostname: 'realestategozamadrid.com',
         port: '',
-        pathname: '/dv31mt6pd/image/upload/**',
+        pathname: '/wp-content/uploads/**',
       },
-      {
-        protocol: 'https',
-        hostname: 'images.pexels.com',
-        port: '',
-        pathname: '/photos/**',
-      },
+      // Añadir otros patrones si es necesario
     ],
   },
-  // ... resto de tu configuración
-};
+  async rewrites() {
+    return [
+      {
+        source: '/imageproxy/:path*',
+        destination: 'https://realestategozamadrid.com/:path*',
+      },
+    ];
+  },
+}
 
 module.exports = nextConfig; 
