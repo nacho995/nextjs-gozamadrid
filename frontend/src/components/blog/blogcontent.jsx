@@ -121,7 +121,7 @@ const processHTMLContent = (content) => {
       
       // Cada séptimo párrafo tendrá un fondo
       if (paragraphCount % 7 === 0) {
-        return `<p${attributes} class="p-4 bg-amber-50 rounded-lg border-l-4 border-amber-500">${content}</p>`;
+        return `<p${attributes} class="p-4 rounded-lg border-l-4 border-amber-500">${content}</p>`;
       }
       
       return match;
@@ -449,102 +449,44 @@ const BlogContent = ({ slug }) => {
     : (image?.src || '/img/default-image.jpg');
 
   return (
-    <article className="max-w-4xl mx-auto px-4 py-8">
-      {/* Añadir un decorador visual en la parte superior */}
-      <div className="mb-12 flex justify-center">
-        <div className="w-24 h-1 bg-gradient-to-r from-transparent via-amarillo to-transparent"></div>
-      </div>
-      
-      {/* Botón de regreso con diseño mejorado */}
-      <div className="mb-8">
-        <Link href="/blog" className="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-800 transition-colors">
-          <FaArrowLeft className="mr-2 text-amarillo" /> Volver a blogs
+    <article className="container mx-auto p-4 sm:p-6 lg:p-8 bg-white/90 dark:bg-black/90 backdrop-blur-md rounded-xl shadow-xl max-w-4xl">
+      <header className="mb-10">
+        {/* Botón volver con soporte dark mode */}
+        <Link href="/blog" className="inline-flex items-center mb-6 text-gray-600 dark:text-gray-300 hover:text-amarillo dark:hover:text-amarillo transition-colors">
+          <FaArrowLeft className="mr-2" />
+          <span>Volver al blog</span>
         </Link>
-      </div>
-
-      {/* Encabezado con diseño mejorado */}
-      <header className="mb-12 relative">
-        {/* Imagen destacada con overlay de textura */}
-        {imageSrc && (
-          <div className="relative w-full h-[350px] md:h-[500px] overflow-hidden rounded-2xl mb-12">
-            <Image 
-              src={imageSrc}
-              alt={typeof title === 'object' ? title.rendered : title}
-              fill
-              className="object-cover"
-              priority
-              unoptimized={!imageSrc.includes('realestategozamadrid.com')}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent mix-blend-multiply"></div>
-            
-            {/* Patrón de textura sutil */}
-            <div className="absolute inset-0 bg-[url('/img/texture-pattern.png')] opacity-10"></div>
-            
-            {/* Título sobre la imagen */}
-            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight text-white drop-shadow-lg">
-                {typeof title === 'object' ? title.rendered : title}
-              </h1>
-              
-              {/* Metadatos sobre la imagen */}
-              <div className="flex flex-wrap gap-4 text-sm text-white/90 mb-2">
-                {date && (
-                  <div className="flex items-center">
-                    <FaCalendarAlt className="mr-2 text-amarillo" />
-                    <span>{date}</span>
-                  </div>
-                )}
-                {author && (
-                  <div className="flex items-center">
-                    <FaUser className="mr-2 text-amarillo" />
-                    <span>{author}</span>
-                  </div>
-                )}
-                {category && (
-                  <div className="flex items-center">
-                    <FaTags className="mr-2 text-amarillo" />
-                    <span>{category}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
         
-        {/* Si no hay imagen, mostrar título normal */}
-        {!imageSrc && (
-          <>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight">
-              {typeof title === 'object' ? title.rendered : title}
-            </h1>
-            
-            {/* Metadatos */}
-            <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-6">
-              {date && (
-                <div className="flex items-center">
-                  <FaCalendarAlt className="mr-2 text-amarillo" />
-                  <span>{date}</span>
-                </div>
-              )}
-              {author && (
-                <div className="flex items-center">
-                  <FaUser className="mr-2 text-amarillo" />
-                  <span>{author}</span>
-                </div>
-              )}
-              {category && (
-                <div className="flex items-center">
-                  <FaTags className="mr-2 text-amarillo" />
-                  <span>{category}</span>
-                </div>
-              )}
+        {/* Título con soporte dark mode */}
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight text-gray-900 dark:text-white">
+          {typeof title === 'object' ? title.rendered : title}
+        </h1>
+        
+        {/* Metadatos con soporte dark mode */}
+        <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-300 mb-6">
+          {date && (
+            <div className="flex items-center">
+              <FaCalendarAlt className="mr-2 text-amarillo" />
+              <span>{date}</span>
             </div>
-          </>
-        )}
+          )}
+          {author && (
+            <div className="flex items-center">
+              <FaUser className="mr-2 text-amarillo" />
+              <span>{author}</span>
+            </div>
+          )}
+          {category && (
+            <div className="flex items-center">
+              <FaTags className="mr-2 text-amarillo" />
+              <span>{category}</span>
+            </div>
+          )}
+        </div>
 
-        {/* Extracto mejorado con efecto visual */}
+        {/* Extracto mejorado con soporte dark mode */}
         {excerpt && (
-          <div className="relative bg-amarillo/10 border-l-4 border-amarillo p-6 mb-8 text-lg italic rounded-r-xl">
+          <div className="relative bg-amarillo/10 dark:bg-amarillo/20 border-l-4 border-amarillo p-6 mb-8 text-lg italic rounded-r-xl text-gray-700 dark:text-gray-200">
             {/* Comillas decorativas */}
             <div className="absolute -top-6 -left-2 text-8xl text-amarillo/20 font-serif">"</div>
             <div dangerouslySetInnerHTML={{
@@ -556,33 +498,33 @@ const BlogContent = ({ slug }) => {
         )}
       </header>
 
-      {/* Contenido principal con estilos Tailwind */}
+      {/* Contenido principal con soporte para dark mode */}
       <div 
         className="
           prose prose-lg max-w-none mb-16
           
-          prose-p:mb-6 prose-p:text-gray-700 prose-p:leading-relaxed
+          prose-p:mb-6 prose-p:text-gray-700 dark:prose-p:text-gray-200 prose-p:leading-relaxed
           
           first-letter:float-left first-letter:text-6xl first-letter:font-bold 
           first-letter:mr-3 first-letter:text-amarillo first-letter:mt-0
           
-          prose-headings:font-bold prose-headings:text-gray-900
+          prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-white
           
           prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-2 
           prose-h2:border-b-2 prose-h2:border-amarillo/30 prose-h2:w-fit
           
           prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-4
-          prose-h3:bg-amarillo/10 prose-h3:inline-block 
+          prose-h3:bg-amarillo/10 dark:prose-h3:bg-amarillo/20 prose-h3:inline-block 
           prose-h3:px-3 prose-h3:py-1 prose-h3:rounded-md
           
           prose-img:rounded-xl prose-img:shadow-lg hover:prose-img:shadow-xl 
           prose-img:transition-all prose-img:mx-auto prose-img:my-8
           hover:prose-img:-translate-y-1
           
-          prose-blockquote:bg-amber-50 prose-blockquote:border-l-4 
+          prose-blockquote:bg-amber-50 dark:prose-blockquote:bg-amber-900/20 prose-blockquote:border-l-4 
           prose-blockquote:border-amarillo prose-blockquote:p-4 
           prose-blockquote:rounded-r-lg prose-blockquote:my-8
-          prose-blockquote:prose-p:italic prose-blockquote:prose-p:text-gray-700
+          prose-blockquote:prose-p:italic prose-blockquote:prose-p:text-gray-700 dark:prose-blockquote:prose-p:text-gray-200
           
           prose-a:text-amarillo prose-a:font-medium prose-a:no-underline
           hover:prose-a:text-white hover:prose-a:bg-amarillo
@@ -590,16 +532,17 @@ const BlogContent = ({ slug }) => {
           
           prose-li:mb-2 prose-ul:my-6 prose-ol:my-6
           prose-ul:list-disc prose-ol:list-decimal
+          prose-li:text-gray-700 dark:prose-li:text-gray-200
           
-          prose-strong:font-bold prose-strong:text-gray-900
-          prose-strong:bg-amarillo/10 prose-strong:px-1 prose-strong:rounded
+          prose-strong:font-bold prose-strong:text-gray-900 dark:prose-strong:text-white
+          prose-strong:bg-amarillo/10 dark:prose-strong:bg-amarillo/20 prose-strong:px-1 prose-strong:rounded
           
           prose-hr:border-none prose-hr:h-px prose-hr:bg-gradient-to-r
           prose-hr:from-transparent prose-hr:via-amarillo/50 prose-hr:to-transparent
           prose-hr:my-12
           
-          prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 
-          prose-code:rounded prose-code:text-sm
+          prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-code:px-1 prose-code:py-0.5 
+          prose-code:rounded prose-code:text-sm dark:prose-code:text-gray-200
           
           sm:prose-p:text-base sm:prose-h2:text-xl sm:prose-h3:text-lg"
         dangerouslySetInnerHTML={{
@@ -607,33 +550,29 @@ const BlogContent = ({ slug }) => {
         }}
       />
 
-      {/* Footer del artículo mejorado */}
-      <footer className="mt-16 pt-8 border-t border-gray-200">
-        
+      {/* Footer del artículo con soporte dark mode */}
+      <footer className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-700">
         {/* Separador decorativo */}
         <div className="w-full flex justify-center my-8">
           <div className="flex items-center w-full max-w-md">
-            <div className="h-[1px] flex-grow bg-gray-200"></div>
+            <div className="h-[1px] flex-grow bg-gray-200 dark:bg-gray-700"></div>
             <div className="mx-4">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-amarillo" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
               </svg>
             </div>
-            <div className="h-[1px] flex-grow bg-gray-200"></div>
+            <div className="h-[1px] flex-grow bg-gray-200 dark:bg-gray-700"></div>
           </div>
         </div>
 
-        {/* Compartir en redes sociales mejorado */}
-        <ShareButtons url={blogUrl} title={typeof title === 'object' ? title.rendered : title} />
-        
-        {/* Sección "Artículos relacionados" - esto sería ideal si tienes la información */}
-        <div className="mt-12 bg-gray-50 rounded-2xl p-8">
-          <h3 className="text-xl font-bold mb-6">También podría interesarte</h3>
+        {/* Sección "Artículos relacionados" con soporte dark mode */}
+        <div className="mt-12 bg-gray-50 dark:bg-gray-900 rounded-2xl p-8">
+          <h3 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">También podría interesarte</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Link href="/blog" className="group block">
-              <div className="bg-white rounded-xl overflow-hidden shadow hover:shadow-md transition-shadow p-4 h-full flex flex-col">
-                <h4 className="font-bold mb-2 group-hover:text-amarillo transition-colors">Explora más artículos</h4>
-                <p className="text-sm text-gray-500 mb-2">Descubre todos nuestros contenidos sobre inmobiliaria, inversiones y tendencias del mercado.</p>
+              <div className="bg-white dark:bg-black rounded-xl overflow-hidden shadow hover:shadow-md transition-shadow p-4 h-full flex flex-col">
+                <h4 className="font-bold mb-2 text-gray-900 dark:text-white group-hover:text-amarillo transition-colors">Explora más artículos</h4>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Descubre todos nuestros contenidos sobre inmobiliaria, inversiones y tendencias del mercado.</p>
                 <span className="mt-auto text-amarillo text-sm font-medium flex items-center">
                   Ver más artículos
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -644,9 +583,9 @@ const BlogContent = ({ slug }) => {
             </Link>
             
             <Link href="/contact" className="group block">
-              <div className="bg-white rounded-xl overflow-hidden shadow hover:shadow-md transition-shadow p-4 h-full flex flex-col">
-                <h4 className="font-bold mb-2 group-hover:text-amarillo transition-colors">¿Necesitas asesoramiento?</h4>
-                <p className="text-sm text-gray-500 mb-2">Nuestro equipo de expertos inmobiliarios está listo para ayudarte con cualquier consulta.</p>
+              <div className="bg-white dark:bg-black rounded-xl overflow-hidden shadow hover:shadow-md transition-shadow p-4 h-full flex flex-col">
+                <h4 className="font-bold mb-2 text-gray-900 dark:text-white group-hover:text-amarillo transition-colors">¿Necesitas asesoramiento?</h4>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Nuestro equipo de expertos inmobiliarios está listo para ayudarte con cualquier consulta.</p>
                 <span className="mt-auto text-amarillo text-sm font-medium flex items-center">
                   Contactar ahora
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -658,11 +597,6 @@ const BlogContent = ({ slug }) => {
           </div>
         </div>
       </footer>
-      
-      {/* Decorador final */}
-      <div className="mt-16 flex justify-center">
-        <div className="w-16 h-1 bg-gradient-to-r from-transparent via-amarillo to-transparent"></div>
-      </div>
     </article>
   );
 };

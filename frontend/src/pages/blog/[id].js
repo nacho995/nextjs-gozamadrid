@@ -201,81 +201,93 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
   };
 
   return (
-    // Si es un blog de WordPress, NO lo envuelvas con Layout ya que el componente interno probablemente ya tiene su propio Layout
-    source === 'wordpress' ? (
-      <>
-        <Head>
-          <title>{blog.title || 'Blog Post'} | Goza Madrid</title>
-          <meta 
-            name="description" 
-            content={typeof blog.content === 'string' 
-              ? blog.content.substring(0, 160).replace(/<[^>]*>?/gm, '')
-              : 'Artículo del blog de Goza Madrid'} 
-          />
-        </Head>
-        <BlogContentComponent 
-          slug={blog.slug} 
-          key={blog.slug}
-          isInPageWithLayout={true}
-        />
-        <script dangerouslySetInnerHTML={{
-          __html: `console.log("Renderizando BlogContent con slug: ${blog.slug}");`
-        }} />
-      </>
-    ) : (
-      // Para blogs no WordPress, usa el Layout como normalmente lo haces
-      <Layout>
-        <Head>
-          <title>{blog.title || 'Blog Post'} | Goza Madrid</title>
-          <meta 
-            name="description" 
-            content={typeof blog.content === 'string' 
-              ? blog.content.substring(0, 160).replace(/<[^>]*>?/gm, '')
-              : 'Artículo del blog de Goza Madrid'} 
-          />
-        </Head>
-        {/* Contenido normal para blogs no WordPress */}
-        <div className="pt-20 pb-12 bg-gray-50">
-          <article className="container mx-auto p-4 max-w-4xl">
-            <header className="mb-8">
-              <h1 className="text-3xl font-bold mb-4">
-                {safeRenderValue(blog.title)}
-              </h1>
-              <div className="flex items-center text-gray-600 mb-6">
-                <time dateTime={typeof blog.date === 'object' ? JSON.stringify(blog.date) : blog.date}>
-                  {safeRenderValue(blog.date)}
-                </time>
-                {blog.author && (
-                  <>
-                    <span className="mx-2">•</span>
-                    <span>{safeRenderValue(blog.author)}</span>
-                  </>
-                )}
-              </div>
-              
-              {/* Imagen destacada */}
-              <div className="relative h-96 w-full mb-8 rounded-lg overflow-hidden">
-                <DirectImage
-                  src={blog.imageUrl || blog.image?.src || DEFAULT_IMAGE}
-                  alt={typeof blog.title === 'object' ? blog.title.rendered : blog.title}
-                  className="object-cover w-full h-full"
-                  fallbackSrc={DEFAULT_IMAGE}
-                />
-              </div>
-            </header>
-            
-            {/* Contenido del blog */}
-            <div className="prose prose-lg max-w-none">
-              {typeof blog.content === 'string' ? (
-                <div dangerouslySetInnerHTML={{ __html: blog.content }} />
-              ) : (
-                <p>{safeRenderValue(blog.content)}</p>
-              )}
+    <>
+      {/* Fondo fijo común */}
+      <div
+        className="fixed inset-0 z-0 opacity-100"
+        style={{
+          backgroundImage: "url('/gozamadridwp.jpg')",
+          backgroundAttachment: "fixed",
+        }}
+      ></div>
+      
+      {/* Contenido existente */}
+      <div className="relative z-10">
+        {source === 'wordpress' ? (
+          <>
+            <Head>
+              <title>{blog.title || 'Blog Post'} | Goza Madrid</title>
+              <meta 
+                name="description" 
+                content={typeof blog.content === 'string' 
+                  ? blog.content.substring(0, 160).replace(/<[^>]*>?/gm, '')
+                  : 'Artículo del blog de Goza Madrid'} 
+              />
+            </Head>
+            <BlogContentComponent 
+              slug={blog.slug} 
+              key={blog.slug}
+              isInPageWithLayout={true}
+            />
+            <script dangerouslySetInnerHTML={{
+              __html: `console.log("Renderizando BlogContent con slug: ${blog.slug}");`
+            }} />
+          </>
+        ) : (
+          <Layout>
+            <Head>
+              <title>{blog.title || 'Blog Post'} | Goza Madrid</title>
+              <meta 
+                name="description" 
+                content={typeof blog.content === 'string' 
+                  ? blog.content.substring(0, 160).replace(/<[^>]*>?/gm, '')
+                  : 'Artículo del blog de Goza Madrid'} 
+              />
+            </Head>
+            {/* Contenido normal para blogs no WordPress */}
+            <div className="pt-20 pb-12 bg-gray-50">
+              <article className="container mx-auto p-4 max-w-4xl">
+                <header className="mb-8">
+                  <h1 className="text-3xl font-bold mb-4">
+                    {safeRenderValue(blog.title)}
+                  </h1>
+                  <div className="flex items-center text-gray-600 mb-6">
+                    <time dateTime={typeof blog.date === 'object' ? JSON.stringify(blog.date) : blog.date}>
+                      {safeRenderValue(blog.date)}
+                    </time>
+                    {blog.author && (
+                      <>
+                        <span className="mx-2">•</span>
+                        <span>{safeRenderValue(blog.author)}</span>
+                      </>
+                    )}
+                  </div>
+                  
+                  {/* Imagen destacada */}
+                  <div className="relative h-96 w-full mb-8 rounded-lg overflow-hidden">
+                    <DirectImage
+                      src={blog.imageUrl || blog.image?.src || DEFAULT_IMAGE}
+                      alt={typeof blog.title === 'object' ? blog.title.rendered : blog.title}
+                      className="object-cover w-full h-full"
+                      fallbackSrc={DEFAULT_IMAGE}
+                    />
+                  </div>
+                </header>
+                
+                {/* Contenido del blog */}
+                <div className="prose prose-lg max-w-none">
+                  {typeof blog.content === 'string' ? (
+                    <div dangerouslySetInnerHTML={{ __html: blog.content }} />
+                  ) : (
+                    <p>{safeRenderValue(blog.content)}</p>
+                  )}
+                </div>
+              </article>
             </div>
-          </article>
-        </div>
-      </Layout>
-    )
+          </Layout>
+        )}
+      </div>
+    </>
   );
 };
 
