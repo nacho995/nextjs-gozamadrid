@@ -292,34 +292,36 @@ export default function DefaultPropertyContent({ property }) {
                       onError={handleImageError}
                     />
                     
-                    {/* Botones de navegación */}
-                    {propertyImages.length > 1 && (
-                      <>
-                        <button
-                          onClick={prevImage}
-                          className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-all duration-300"
-                        >
-                          <FaChevronLeft size={18} />
-                        </button>
-                        <button
-                          onClick={nextImage}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-all duration-300"
-                        >
-                          <FaChevronRight size={18} />
-                        </button>
-                        
-                        <div className="absolute bottom-3 right-3 bg-black/50 text-white text-sm px-3 py-1 rounded-full backdrop-blur-sm">
-                          {current + 1} / {propertyImages.length}
-                        </div>
-                      </>
-                    )}
+                    {/* Botones de navegación mejorados */}
+                    <div className="absolute inset-0 flex items-center justify-between p-3">
+                      <button
+                        onClick={() => setCurrent((prev) => (prev === 0 ? propertyImages.length - 1 : prev - 1))}
+                        className="bg-black/50 hover:bg-black/70 text-white rounded-full p-3 backdrop-blur-sm transition-all duration-300"
+                        aria-label="Imagen anterior"
+                      >
+                        <FaChevronLeft className="text-xl" />
+                      </button>
+                      
+                      <button
+                        onClick={() => setCurrent((prev) => (prev === propertyImages.length - 1 ? 0 : prev + 1))}
+                        className="bg-black/50 hover:bg-black/70 text-white rounded-full p-3 backdrop-blur-sm transition-all duration-300"
+                        aria-label="Imagen siguiente"
+                      >
+                        <FaChevronRight className="text-xl" />
+                      </button>
+                    </div>
+                    
+                    {/* Indicador de posición para todos los tamaños de pantalla */}
+                    <div className="absolute bottom-3 right-3 bg-black/50 text-white text-sm px-3 py-1 rounded-full backdrop-blur-sm">
+                      {current + 1} / {propertyImages.length}
+                    </div>
                   </>
                 )}
               </div>
             </div>
             
-            {/* Miniaturas horizontales debajo */}
-            <div className="bg-gray-50 dark:bg-gray-900 p-2 rounded-lg">
+            {/* Miniaturas horizontales debajo - ocultas en móvil */}
+            <div className="bg-gray-50 dark:bg-gray-900 p-2 rounded-lg hidden sm:block">
               <div className="flex flex-wrap justify-center gap-2">
                 {propertyImages.map((image, index) => (
                   <button
@@ -347,45 +349,56 @@ export default function DefaultPropertyContent({ property }) {
 
           {/* Información principal */}
           <div className="mt-8 bg-white/80 dark:bg-black/80 backdrop-blur-sm rounded-xl shadow-lg p-6">
-            <h1 className="text-3xl font-bold mb-4 text-black dark:text-white">{title}</h1>
-            <div className="flex items-center mb-4 text-black/70 dark:text-white/70">
-              <FaMapMarkerAlt className="mr-2 text-amarillo" />
-              <span>{location}</span>
+            <div className="bg-black/50 backdrop-blur-sm rounded-xl p-4 md:p-6 mt-4">
+              {/* Título de la propiedad con responsive */}
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2">{title}</h1>
+              
+              {/* Ubicación con responsive */}
+              <div className="flex items-center gap-2 text-amber-400 mb-3">
+                <FaMapMarkerAlt className="text-sm sm:text-base" />
+                <p className="text-xs sm:text-sm md:text-base text-white/80">{location}</p>
+              </div>
+              
+              {/* Detalles de la propiedad con responsive */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mb-4">
+                <div className="flex items-center gap-2">
+                  <MdMeetingRoom className="text-amber-400 text-lg sm:text-xl" />
+                  <p className="text-xs sm:text-sm md:text-base text-white">{bedrooms} habitaciones</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FaRestroom className="text-amber-400 text-lg sm:text-xl" />
+                  <p className="text-xs sm:text-sm md:text-base text-white">{bathrooms} baños</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <HiMiniSquare3Stack3D className="text-amber-400 text-lg sm:text-xl" />
+                  <p className="text-xs sm:text-sm md:text-base text-white">{area} m²</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FaBuilding className="text-amber-400 text-lg sm:text-xl" />
+                  <p className="text-xs sm:text-sm md:text-base text-white">{propertyType}</p>
+                </div>
+              </div>
+              
+              {/* Precio con responsive */}
+              <div className="flex items-center gap-2">
+                <FaEuroSign className="text-amber-400 text-lg sm:text-xl" />
+                <p className="text-sm sm:text-base md:text-lg font-semibold text-white">{price}</p>
+              </div>
             </div>
 
-            {/* Características */}
-            <div className="flex flex-wrap gap-4 justify-around text-lg sm:text-xl mt-8">
-              <div className="flex items-center gap-2">
-                <MdMeetingRoom className="text-2xl text-amarillo" />
-                <p className="font-semibold text-white">{bedrooms} Habitaciones</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <FaRestroom className="text-2xl text-amarillo" />
-                <p className="font-semibold text-white">{bathrooms} Baños</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <HiMiniSquare3Stack3D className="text-2xl text-amarillo" />
-                <p className="font-semibold text-white">{area} m²</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <FaEuroSign className="text-2xl text-amarillo" />
-                <p className="font-semibold text-white">{price}</p>
-              </div>
-            </div>
-
-            {/* Descripción */}
-            <div className="text-white prose prose-lg prose-amarillo dark:prose-invert max-w-none mt-6">
+            {/* Descripción con responsive */}
+            <div className="text-white prose prose-sm sm:prose-base md:prose-lg prose-amarillo dark:prose-invert max-w-none mt-4 md:mt-6">
               <div dangerouslySetInnerHTML={{ __html: content }} />
             </div>
 
-            {/* Botones de acción */}
-            <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
+            {/* Botones de acción con responsive */}
+            <div className="flex flex-col sm:flex-row justify-center gap-3 md:gap-4 mb-6 md:mb-8">
               <button
                 onClick={() => setShowCalendar(true)}
-                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-white/20 dark:bg-white/20 px-8 py-3 transition-all duration-300 hover:bg-white/30 dark:hover:bg-white/30 backdrop-blur-sm"
+                className="group relative inline-flex items-center gap-1 sm:gap-2 overflow-hidden rounded-full bg-white/20 dark:bg-white/20 px-4 sm:px-6 md:px-8 py-2 sm:py-3 transition-all duration-300 hover:bg-white/30 dark:hover:bg-white/30 backdrop-blur-sm"
               >
-                <FaCalendarAlt className="text-lg text-white" />
-                <span className="relative text-lg font-semibold text-black dark:text-white">
+                <FaCalendarAlt className="text-base sm:text-lg text-white" />
+                <span className="relative text-sm sm:text-base md:text-lg font-semibold text-black dark:text-white">
                   Agendar una visita
                 </span>
                 <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-white via-amarillo to-white transition-transform duration-300 group-hover:translate-x-full"></span>
@@ -393,10 +406,10 @@ export default function DefaultPropertyContent({ property }) {
 
               <button
                 onClick={() => setShowOfferPanel(true)}
-                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-white/20 dark:bg-white/20 px-8 py-3 transition-all duration-300 hover:bg-white/30 dark:hover:bg-white/30 backdrop-blur-sm"
+                className="group relative inline-flex items-center gap-1 sm:gap-2 overflow-hidden rounded-full bg-white/20 dark:bg-white/20 px-4 sm:px-6 md:px-8 py-2 sm:py-3 transition-all duration-300 hover:bg-white/30 dark:hover:bg-white/30 backdrop-blur-sm"
               >
-                <FaHandshake className="text-lg text-white" />
-                <span className="relative text-lg font-semibold text-white">
+                <FaHandshake className="text-base sm:text-lg text-white" />
+                <span className="relative text-sm sm:text-base md:text-lg font-semibold text-white">
                   Hacer Oferta
                 </span>
                 <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-white via-amarillo to-white transition-transform duration-300 group-hover:translate-x-full"></span>
