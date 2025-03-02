@@ -25,6 +25,21 @@ export default function ControlMenu() {
     bottom: 0,
   });
 
+  // Cierra el menú móvil cuando cambia la ruta
+  const [previousPath, setPreviousPath] = useState(pathname);
+  
+  useEffect(() => {
+    // Verificar si la ruta cambió
+    if (previousPath !== pathname) {
+      // Solo cerrar si estamos en versión móvil y el menú está visible
+      if (menuVisible && window.innerWidth < 1024) { // 1024px es el breakpoint 'lg' en Tailwind
+        toggleMenu();
+      }
+      // Actualizar la ruta anterior
+      setPreviousPath(pathname);
+    }
+  }, [pathname, menuVisible, toggleMenu, previousPath]);
+
   // Cuando el componente se monta, marcamos mounted como true
   useEffect(() => {
     setMounted(true);

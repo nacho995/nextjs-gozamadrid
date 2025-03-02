@@ -2,7 +2,19 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['realestategozamadrid.com', 'images.unsplash.com'],
+    domains: ['realestategozamadrid.com'],
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 60,
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'realestategozamadrid.com',
+        port: '',
+        pathname: '/wp-content/uploads/**',
+      },
+    ],
     unoptimized: true,
   },
   async headers() {

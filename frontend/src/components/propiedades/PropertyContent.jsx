@@ -348,48 +348,63 @@ export default function DefaultPropertyContent({ property }) {
           </div>
 
           {/* Información principal */}
-          <div className="mt-8 bg-white/80 dark:bg-black/80 backdrop-blur-sm rounded-xl shadow-lg p-6">
+          <div className="mt-8 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-xl shadow-lg p-6">
             <div className="bg-black/50 backdrop-blur-sm rounded-xl p-4 md:p-6 mt-4">
               {/* Título de la propiedad con responsive */}
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2">{title}</h1>
+              <h1 className="text-3xl font-bold mb-2 text-black dark:text-white">{title}</h1>
               
               {/* Ubicación con responsive */}
               <div className="flex items-center gap-2 text-amber-400 mb-3">
                 <FaMapMarkerAlt className="text-sm sm:text-base" />
-                <p className="text-xs sm:text-sm md:text-base text-white/80">{location}</p>
+                <p className="text-lg text-gray-700 dark:text-white mb-4">{location}</p>
               </div>
               
               {/* Detalles de la propiedad con responsive */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mb-4">
-                <div className="flex items-center gap-2">
-                  <MdMeetingRoom className="text-amber-400 text-lg sm:text-xl" />
-                  <p className="text-xs sm:text-sm md:text-base text-white">{bedrooms} habitaciones</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                <div className="bg-white dark:bg-gray-900 p-4 rounded-lg flex items-center gap-3">
+                  <MdMeetingRoom className="text-amarillo text-xl" />
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-amarillo">Habitaciones</p>
+                    <p className="font-medium text-black dark:text-white">{bedrooms}</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <FaRestroom className="text-amber-400 text-lg sm:text-xl" />
-                  <p className="text-xs sm:text-sm md:text-base text-white">{bathrooms} baños</p>
+                <div className="bg-white dark:bg-gray-900 p-4 rounded-lg flex items-center gap-3">
+                  <FaRestroom className="text-amarillo text-xl" />
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-amarillo">Baños</p>
+                    <p className="font-medium text-black dark:text-white">{bathrooms}</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <HiMiniSquare3Stack3D className="text-amber-400 text-lg sm:text-xl" />
-                  <p className="text-xs sm:text-sm md:text-base text-white">{area} m²</p>
+                <div className="bg-white dark:bg-gray-900 p-4 rounded-lg flex items-center gap-3">
+                  <HiMiniSquare3Stack3D className="text-amarillo text-xl" />
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-amarillo">Área</p>
+                    <p className="font-medium text-black dark:text-white">{area} m²</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <FaBuilding className="text-amber-400 text-lg sm:text-xl" />
-                  <p className="text-xs sm:text-sm md:text-base text-white">{propertyType}</p>
+                <div className="bg-white dark:bg-gray-900 p-4 rounded-lg flex items-center gap-3">
+                  <FaBuilding className="text-amarillo text-xl" />
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-amarillo">Tipo</p>
+                    <p className="font-medium text-black dark:text-white">{propertyType}</p>
+                  </div>
                 </div>
               </div>
               
               {/* Precio con responsive */}
               <div className="flex items-center gap-2">
                 <FaEuroSign className="text-amber-400 text-lg sm:text-xl" />
-                <p className="text-sm sm:text-base md:text-lg font-semibold text-white">{price}</p>
+                <p className="text-sm sm:text-base md:text-lg font-semibold text-black dark:text-white">{price}</p>
               </div>
             </div>
 
             {/* Descripción con responsive */}
-            <div className="text-white prose prose-sm sm:prose-base md:prose-lg prose-amarillo dark:prose-invert max-w-none mt-4 md:mt-6">
-              <div dangerouslySetInnerHTML={{ __html: content }} />
-            </div>
+            <div 
+              className="prose prose-lg max-w-none text-black dark:text-white 
+                prose-p:dark:text-white prose-headings:dark:text-white 
+                prose-li:dark:text-white prose-strong:dark:text-white" 
+              dangerouslySetInnerHTML={{ __html: content }} 
+            />
 
             {/* Botones de acción con responsive */}
             <div className="flex flex-col sm:flex-row justify-center gap-3 md:gap-4 mb-6 md:mb-8">
@@ -397,7 +412,7 @@ export default function DefaultPropertyContent({ property }) {
                 onClick={() => setShowCalendar(true)}
                 className="group relative inline-flex items-center gap-1 sm:gap-2 overflow-hidden rounded-full bg-white/20 dark:bg-white/20 px-4 sm:px-6 md:px-8 py-2 sm:py-3 transition-all duration-300 hover:bg-white/30 dark:hover:bg-white/30 backdrop-blur-sm"
               >
-                <FaCalendarAlt className="text-base sm:text-lg text-white" />
+                <FaCalendarAlt className="text-base sm:text-lg text-black dark:text-white" />
                 <span className="relative text-sm sm:text-base md:text-lg font-semibold text-black dark:text-white">
                   Agendar una visita
                 </span>
@@ -408,8 +423,8 @@ export default function DefaultPropertyContent({ property }) {
                 onClick={() => setShowOfferPanel(true)}
                 className="group relative inline-flex items-center gap-1 sm:gap-2 overflow-hidden rounded-full bg-white/20 dark:bg-white/20 px-4 sm:px-6 md:px-8 py-2 sm:py-3 transition-all duration-300 hover:bg-white/30 dark:hover:bg-white/30 backdrop-blur-sm"
               >
-                <FaHandshake className="text-base sm:text-lg text-white" />
-                <span className="relative text-sm sm:text-base md:text-lg font-semibold text-white">
+                <FaHandshake className="text-base sm:text-lg text-black dark:text-white" />
+                <span className="relative text-sm sm:text-base md:text-lg font-semibold text-black dark:text-white">
                   Hacer Oferta
                 </span>
                 <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-white via-amarillo to-white transition-transform duration-300 group-hover:translate-x-full"></span>
@@ -420,8 +435,14 @@ export default function DefaultPropertyContent({ property }) {
           {/* Calendario de visitas */}
           {showCalendar && (
             <div className="fixed inset-0 bg-black/50 dark:bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-              <div ref={calendarRef} className="bg-white dark:bg-black rounded-xl p-8 max-w-md w-full mx-4">
-                <h3 className="text-2xl font-bold mb-6 text-black dark:text-white">Programar Visita</h3>
+              <div ref={calendarRef} className="bg-white dark:bg-gray-900 rounded-xl p-8 max-w-md w-full mx-4 shadow-lg">
+                <button
+                  onClick={() => setShowCalendar(false)}
+                  className="absolute top-4 right-4 text-black dark:text-white hover:text-amarillo dark:hover:text-amarillo transition-colors duration-300"
+                >
+                  <FaTimes className="text-xl" />
+                </button>
+                <h3 className="text-2xl font-bold mb-4 text-black dark:text-white">Agenda una visita</h3>
                 <div className="space-y-6">
                   <div>
                     <label className="block text-sm font-medium text-black dark:text-white mb-2">Selecciona un día</label>
@@ -433,7 +454,7 @@ export default function DefaultPropertyContent({ property }) {
                       maxDate={addDays(new Date(), 30)}
                       locale={es}
                       placeholderText="Selecciona una fecha"
-                      className="w-full p-2 border rounded-lg text-black bg-white dark:text-white dark:bg-black"
+                      className="w-full p-2 border rounded-lg text-black bg-white dark:text-white dark:bg-gray-800"
                       dateFormat="dd/MM/yyyy"
                       required
                     />
@@ -462,8 +483,8 @@ export default function DefaultPropertyContent({ property }) {
 
                   {selectedDate && selectedTime && (
                     <div>
-                      <h3 className="text-lg font-semibold mb-2 flex items-center">
-                        <FaUser className="mr-2 text-amarillo dark:text-amarillo" />
+                      <h3 className="text-lg font-semibold mb-2 flex items-center text-black dark:text-amarillo">
+                        <FaUser className="mr-2 text-amarillo" />
                         Datos de contacto
                       </h3>
                       <div className="space-y-3">
@@ -472,21 +493,21 @@ export default function DefaultPropertyContent({ property }) {
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder="Email de contacto"
-                          className="w-full p-2 border rounded-lg text-black bg-white dark:text-white dark:bg-black"
+                          className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-amarillo/70"
                         />
                         <input
                           type="text"
                           value={name}
                           onChange={(e) => setName(e.target.value)}
                           placeholder="Nombre completo"
-                          className="w-full p-2 border rounded-lg text-black bg-white dark:text-white dark:bg-black"
+                          className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-amarillo/70"
                         />
                         <input
                           type="tel"
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
                           placeholder="Teléfono"
-                          className="w-full p-2 border rounded-lg text-black bg-white dark:text-white dark:bg-black"
+                          className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-amarillo/70"
                         />
                       </div>
                     </div>
@@ -502,7 +523,7 @@ export default function DefaultPropertyContent({ property }) {
                       </button>
                       <button
                         onClick={handleSubmit}
-                        className="w-full sm:w-auto px-4 py-2 rounded-lg bg-amarillo text-white hover:bg-amarillo/80 transition-all duration-300 hover:scale-105"
+                        className="w-full sm:w-auto px-4 py-2 rounded-lg bg-amarillo text-black font-medium hover:bg-amarillo/90 transition-all duration-300 hover:scale-105"
                       >
                         Confirmar Visita
                       </button>
@@ -514,8 +535,8 @@ export default function DefaultPropertyContent({ property }) {
           )}
 
           {/* Mapa de Google */}
-          <div className="mt-8 bg-white/80 dark:bg-black/80 backdrop-blur-sm rounded-xl shadow-lg p-6">
-            <h2 className="text-2xl font-bold mb-4 text-black dark:text-white">Ubicación</h2>
+          <div className="mt-8 bg-white dark:bg-gray-900 backdrop-blur-sm rounded-xl shadow-lg p-6">
+            <h2 className="text-2xl font-bold mb-4 text-black dark:text-amarillo">Ubicación</h2>
             <div className="relative w-full h-[400px] rounded-lg overflow-hidden">
               <iframe
                 src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyAZAI0_oecmQkuzwZ4IM2H_NLynxD2Lkxo&q=${encodeURIComponent(
@@ -533,12 +554,15 @@ export default function DefaultPropertyContent({ property }) {
           </div>
 
           {/* Sección de preguntas */}
-          <div className="bg-gradient-to-br from-black/40 to-amarillo/40 dark:from-black/40 dark:to-amarillo/40 rounded-2xl shadow-lg p-8 text-center mt-8">
-            <h3 className="text-2xl font-semibold text-black dark:text-white mb-6">¿Tienes preguntas sobre esta propiedad?</h3>
+          <div className="bg-gradient-to-br from-amber-100 to-amber-200 dark:from-gray-900 dark:to-gray-800 rounded-2xl shadow-lg p-8 text-center mt-8">
+            <h3 className="text-2xl font-semibold text-black dark:text-amarillo mb-6">¿Tienes preguntas sobre esta propiedad?</h3>
             <Link href="/contacto">
-              <button className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-white/20 dark:bg-white/20 px-8 py-3 transition-all duration-300 hover:bg-white/30 dark:hover:bg-white/30 backdrop-blur-sm">
-                <span className="relative text-lg font-semibold text-black dark:text-white">Contáctanos</span>
-                <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-amarillo via-black to-amarillo dark:from-amarillo dark:via-white dark:to-amarillo transition-transform duration-300 group-hover:translate-x-full"></span>
+              <button className="group relative inline-flex items-center gap-1 sm:gap-2 overflow-hidden rounded-full bg-white/20 dark:bg-white/20 px-4 sm:px-6 md:px-8 py-2 sm:py-3 transition-all duration-300 hover:bg-white/30 dark:hover:bg-white/30 backdrop-blur-sm">
+                <FaEnvelope className="text-base sm:text-lg text-black dark:text-white" />
+                <span className="relative text-sm sm:text-base md:text-lg font-semibold text-black dark:text-white">
+                  Contáctanos
+                </span>
+                <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-white via-amarillo to-white transition-transform duration-300 group-hover:translate-x-full"></span>
               </button>
             </Link>
           </div>
@@ -563,7 +587,9 @@ export default function DefaultPropertyContent({ property }) {
                           key={index}
                           onClick={() => setSelectedOffer(range)}
                           className={`w-full p-3 rounded-lg transition-all duration-300 flex justify-between items-center ${
-                            selectedOffer?.percentage === range.percentage ? "bg-amarillo text-white" : "bg-gray-100 hover:bg-gray-200"
+                            selectedOffer?.percentage === range.percentage 
+                              ? "bg-amarillo text-black font-semibold"
+                              : "bg-gray-100 hover:bg-gray-200 text-black dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800"
                           }`}
                         >
                           <span>{range.label}</span>
@@ -577,7 +603,7 @@ export default function DefaultPropertyContent({ property }) {
                     <input
                       type="number"
                       placeholder="Introduce tu oferta"
-                      className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-black"
+                      className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-white/70"
                       onChange={(e) =>
                         setSelectedOffer({
                           value: parseInt(e.target.value),
@@ -589,8 +615,8 @@ export default function DefaultPropertyContent({ property }) {
                 </div>
                 {selectedOffer && (
                   <div className="mt-6 space-y-4 border-t pt-4">
-                    <h3 className="text-lg font-semibold mb-2 flex items-center">
-                      <FaUser className="mr-2 text-amarillo dark:text-amarillo" />
+                    <h3 className="text-lg font-semibold mb-2 flex items-center text-black dark:text-amarillo">
+                      <FaUser className="mr-2 text-amarillo" />
                       Datos de contacto
                     </h3>
                     <div className="space-y-3">
@@ -599,21 +625,21 @@ export default function DefaultPropertyContent({ property }) {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="Email de contacto"
-                        className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-black"
+                        className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-white/70"
                       />
                       <input
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="Nombre completo"
-                        className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-black"
+                        className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-white/70"
                       />
                       <input
                         type="tel"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         placeholder="Teléfono"
-                        className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-black"
+                        className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-white/70"
                       />
                     </div>
                   </div>
@@ -628,7 +654,7 @@ export default function DefaultPropertyContent({ property }) {
                     </button>
                     <button
                       onClick={handleOfferSubmit}
-                      className="px-4 py-2 rounded-lg bg-amarillo text-white hover:bg-amarillo/80 transition-all duration-300"
+                      className="px-4 py-2 rounded-lg bg-amarillo text-black font-medium hover:bg-amarillo/90 transition-all duration-300"
                     >
                       Enviar Oferta
                     </button>

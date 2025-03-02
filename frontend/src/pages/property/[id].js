@@ -24,9 +24,23 @@ const PropertyDetail = ({ property }) => {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <PropertyContentComponent property={property} />
-    </div>
+    <>
+      {/* Fondo fijo común */}
+      <div
+        className="fixed inset-0 z-0 opacity-100"
+        style={{
+          backgroundImage: "url('/gozamadridwp.jpg')",
+          backgroundAttachment: "fixed",
+        }}
+      ></div>
+      
+      {/* Contenido existente */}
+      <div className="relative z-10">
+        <div className="container mx-auto p-4">
+          <PropertyContentComponent property={property} />
+        </div>
+      </div>
+    </>
   );
 };
 
