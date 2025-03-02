@@ -2,8 +2,9 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['localhost','images.pexels.com'],// Agrega aquí los dominios de donde se sirven tus imágenes
+    domains: ['realestategozamadrid.com', 'images.unsplash.com'],
+    unoptimized: true,
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;

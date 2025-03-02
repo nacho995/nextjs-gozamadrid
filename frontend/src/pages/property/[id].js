@@ -31,15 +31,16 @@ const PropertyDetail = ({ property }) => {
 };
 
 PropertyDetail.getInitialProps = async ({ query }) => {
-  const { id } = query;
-  console.log("Parámetro id recibido:", id);
   try {
+    const { id } = query;
+    if (!id) return { property: null };
+    
+    // Usar la función modificada
     const property = await getPropertyById(id);
-    console.log("Datos de la propiedad:", property);
     return { property };
   } catch (error) {
-    console.error("Error fetching property content:", error);
-    return { property: null };
+    console.error("Error fetching property:", error);
+    return { property: null, error: 'No pudimos cargar esta propiedad' };
   }
 };
 
