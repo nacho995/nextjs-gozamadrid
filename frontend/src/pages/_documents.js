@@ -16,47 +16,47 @@ class MyDocument extends Document {
           {/* Meta viewport para hacer el sitio responsive */}
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           
-          {/* Estos meta tags no afectan otros navegadores */}
+          {/* Simplificación de meta tags - similar a BestFlat */}
           <meta name="color-scheme" content="light dark" />
-          <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: dark)" />
+          <meta name="theme-color" content="#ffffff" />
 
-          {/* Script específico SOLO para Samsung Internet en modo oscuro */}
+          {/* Script más sutil, similar al enfoque de BestFlat */}
           <script dangerouslySetInnerHTML={{
             __html: `
-              // Detector mejorado y específico para Samsung Internet
-              if (/SamsungBrowser\\/([0-9\\.]+)/.test(navigator.userAgent) && 
-                  window.matchMedia('(prefers-color-scheme: dark)').matches) {
+              (function() {
+                // Solo ejecutar una vez al cargar la página
+                var isSamsungBrowser = /SamsungBrowser/i.test(navigator.userAgent);
+                var isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
                 
-                // Solo crear el estilo si no existe ya
-                if (!document.getElementById('samsung-fix-style')) {
-                  var samsungStyle = document.createElement('style');
-                  samsungStyle.id = 'samsung-fix-style';
-                  samsungStyle.innerHTML = \`
-                    /* Estilos exclusivos para Samsung Internet en modo oscuro */
+                if (isSamsungBrowser && isDarkMode) {
+                  // Establecer atributos de tema en HTML
+                  document.documentElement.setAttribute('data-samsung-fix', 'true');
+                  
+                  // Insertar CSS específico pero más sutil
+                  var style = document.createElement('style');
+                  style.textContent = \`
+                    /* Solución específica para Samsung Internet */
+                    html[data-samsung-fix="true"] {
+                      background-color: #fff;
+                      color-scheme: light;
+                    }
+                    
                     @media (prefers-color-scheme: dark) {
-                      html, body {
-                        background-color: #ffffff !important;
-                        color: #000000 !important;
+                      html[data-samsung-fix="true"] body {
+                        background-color: #fff;
+                        color: #000;
+                        filter: brightness(1.05);
                       }
-                      * {
-                        background-color: initial !important;
-                        color: initial !important;
+                      
+                      /* Preservar elementos oscuros importantes */
+                      html[data-samsung-fix="true"] [data-preserve-dark="true"] {
+                        filter: none !important;
                       }
                     }
                   \`;
-                  document.head.appendChild(samsungStyle);
-                  
-                  // Overlay solo en Samsung modo oscuro
-                  document.addEventListener('DOMContentLoaded', function() {
-                    var overlay = document.createElement('div');
-                    overlay.id = 'samsung-fix-overlay';
-                    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.12);z-index:2147483647;pointer-events:none;mix-blend-mode:screen;';
-                    document.body.appendChild(overlay);
-                  });
-                  
-                  console.log('Aplicada corrección específica para Samsung Internet en modo oscuro');
+                  document.head.appendChild(style);
                 }
-              }
+              })();
             `
           }} />
 
