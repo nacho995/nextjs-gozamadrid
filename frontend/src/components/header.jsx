@@ -105,20 +105,20 @@ export default function ControlMenu() {
         border: '1px solid rgba(255, 255, 255, 0.18)'
       };
     } else {
-      // Estilo para otras páginas - amarillo y negro
+      // Estilo para otras páginas - amarillo dorado para contraste
       return {
         background: `
           linear-gradient(145deg, 
-          rgba(0, 0, 0, 0.8) 0%, 
-          rgba(0, 0, 0, 0.6) 25%,
-          rgba(254, 204, 27, 0.6) 50%, 
-          rgba(0, 0, 0, 0.6) 75%,
-          rgba(0, 0, 0, 0.8) 100%)
+          rgba(0, 0, 0, 0.9) 0%, 
+          rgba(0, 0, 0, 0.8) 30%,
+          rgba(184, 137, 0, 0.6) 50%, 
+          rgba(0, 0, 0, 0.8) 70%,
+          rgba(0, 0, 0, 0.9) 100%)
         `,
         boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.5)',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
-        border: '1px solid rgba(254, 204, 27, 0.25)'
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        border: '1px solid rgba(184, 137, 0, 0.2)'
       };
     }
   };
