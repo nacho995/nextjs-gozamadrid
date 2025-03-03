@@ -178,3 +178,19 @@ html, body {
   -webkit-filter: none !important;
   forced-color-adjust: none !important;
 }
+
+/* Solución específica para Samsung Internet */
+/* @media screen and (-webkit-min-device-pixel-ratio:0) {
+  @media (prefers-color-scheme: dark) {
+    html, body {
+      background-color: #ffffff !important;
+      color: #000000 !important;
+    }
+    
+    *:not(input):not(textarea) {
+      background-color: transparent !important;
+      color: inherit !important;
+      border-color: initial !important;
+    }
+  }
+} */
