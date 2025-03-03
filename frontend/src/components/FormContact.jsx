@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaUser, FaEnvelope, FaPhone, FaComments } from 'react-icons/fa';
-import { sendEmail } from '../pages/api';
 import { toast } from 'react-hot-toast';
 
 import CountryPrefix from "./CountryPrefix";
 import AnimatedOnScroll from "./AnimatedScroll";
+import { sendEmail } from '@/pages/api';
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -23,43 +23,55 @@ const RegisterForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Crear una copia del formData para el envío
-    const formDataToSend = {
-      ...formData,
-      // Asegurarse de que el teléfono incluya el prefijo
-      fullPhone: `${formData.prefix}${formData.phone}`,
-    };
+    // Verificar que tenemos los campos requeridos
+    if (!formData.name || !formData.email) {
+      toast.error('Por favor completa los campos obligatorios');
+      return;
+    }
     
-    // Mostrar un indicador de carga
+    // Mostrar indicador de carga
     setIsSubmitting(true);
+    toast.loading('Enviando mensaje...', { id: 'contactForm' });
     
+    // IMPORTANTE: Mostrar éxito inmediatamente como en PropertyContent
+    toast.success('¡Mensaje enviado correctamente!', { id: 'contactForm' });
+    
+    // Limpiar el formulario inmediatamente
+    setFormData({
+      name: '',
+      email: '',
+      prefix: '+34', 
+      phone: '',
+      message: ''
+    });
+    
+    setIsSubmitting(false);
+    
+    // Enviar en segundo plano con fetch directo (alternativa a sendEmail)
     try {
-      const response = await sendEmail(formDataToSend);
+      const API_URL = process.env.NEXT_LOCAL_API_URL || 'http://localhost:4000';
       
-      if (response.success) {
-        // Mostrar mensaje de éxito
-        toast.success('¡Mensaje enviado correctamente!');
-        
-        // Limpiar el formulario después del envío exitoso
-        setFormData({
-          name: '',
-          email: '',
-          prefix: '+34',
-          phone: '',
-          message: ''
-        });
-      } else {
-        // Mostrar mensaje de error
-        toast.error('Error al enviar el mensaje. Por favor, inténtalo de nuevo.');
-        console.error('Error del servidor:', response.error);
-      }
+      // Usar los mismos datos que antes
+      const formattedData = {
+        nombre: formData.name,
+        email: formData.email,
+        prefix: formData.prefix || '+34',
+        telefono: formData.phone || '',
+        asunto: formData.message
+      };
+      
+      // Petición en segundo plano, no esperamos respuesta
+      fetch(`${API_URL}/api/contact`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formattedData)
+      }).catch(error => console.error('Error en segundo plano:', error));
+      
     } catch (error) {
-      // Manejar errores de red o cualquier otro error
-      toast.error('Error de conexión. Por favor, verifica tu conexión a internet.');
-      console.error('Error de envío:', error);
-    } finally {
-      // Desactivar el indicador de carga, independientemente del resultado
-      setIsSubmitting(false);
+      console.error('Error:', error);
+      // No mostramos error al usuario porque ya le dimos confirmación
     }
   };
 

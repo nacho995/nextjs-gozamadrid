@@ -1,9 +1,42 @@
 import emailConfig from '../config/emailConfig.js';
+import mongoose from 'mongoose';
+
+// Intentar importar los modelos (si existen)
+let PropertyVisit;
+try {
+  PropertyVisit = mongoose.model('PropertyVisit');
+} catch (e) {
+  // Crear el modelo si no existe
+  const PropertyVisitSchema = new mongoose.Schema({
+    property: String,
+    propertyAddress: String,
+    date: Date,
+    time: Date,
+    email: String,
+    name: String,
+    phone: String,
+    status: {
+      type: String,
+      enum: ['pending', 'confirmed', 'cancelled'],
+      default: 'pending'
+    },
+    emailSent: {
+      success: Boolean,
+      error: String,
+      attempts: Number,
+      lastAttempt: Date
+    }
+  }, { timestamps: true });
+  
+  PropertyVisit = mongoose.model('PropertyVisit', PropertyVisitSchema);
+}
 
 export const sendPropertyNotification = async (req, res) => {
+    // Asegurarse que la respuesta sea JSON
+    res.setHeader('Content-Type', 'application/json');
+    
     try {
-        // Asegurarse que la respuesta sea JSON
-        res.setHeader('Content-Type', 'application/json');
+        console.log('📩 Recibida solicitud de notificación:', req.body);
         
         const { date, time, email, name, phone, property, propertyAddress, offer } = req.body;
 
@@ -24,14 +57,16 @@ export const sendPropertyNotification = async (req, res) => {
 
         // Validar variables de entorno
         if (!process.env.EMAIL_TO) {
+            console.error('❌ Variable de entorno EMAIL_TO no configurada');
             return res.status(500).json({
                 success: false,
-                message: 'Error en la configuración del servidor'
+                message: 'Error en la configuración del servidor de email'
             });
         }
 
         let emailContent;
         let emailSubject;
+        let visitData = null;
 
         // Si hay una oferta, es una notificación de oferta
         if (offer !== undefined) {
@@ -51,8 +86,25 @@ export const sendPropertyNotification = async (req, res) => {
         } 
         // Si hay fecha y hora, es una solicitud de visita
         else if (date && time) {
-            const formattedDate = new Date(date).toLocaleDateString('es-ES');
-            const formattedTime = new Date(time).toLocaleTimeString('es-ES', {
+            // Convertir a objetos Date si vienen como strings
+            const visitDate = typeof date === 'string' ? new Date(date) : date;
+            const visitTime = typeof time === 'string' ? new Date(time) : time;
+            
+            // Asegurarse de que son fechas válidas
+            if (isNaN(visitDate.getTime()) || isNaN(visitTime.getTime())) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'La fecha o la hora no son válidas'
+                });
+            }
+            
+            const formattedDate = visitDate.toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            
+            const formattedTime = visitTime.toLocaleTimeString('es-ES', {
                 hour: '2-digit',
                 minute: '2-digit'
             });
@@ -71,6 +123,29 @@ export const sendPropertyNotification = async (req, res) => {
                 </div>
             `;
             emailSubject = `Nueva solicitud de visita para ${propertyAddress}`;
+            
+            // Guardar la visita en la base de datos
+            if (mongoose.connection.readyState === 1) { // Verificar conexión a MongoDB
+                try {
+                    visitData = await PropertyVisit.create({
+                        property,
+                        propertyAddress,
+                        date: visitDate,
+                        time: visitTime,
+                        email,
+                        name,
+                        phone,
+                        emailSent: {
+                            success: false,
+                            attempts: 0
+                        }
+                    });
+                    console.log('✅ Visita guardada en base de datos:', visitData._id);
+                } catch (dbError) {
+                    console.error('❌ Error al guardar visita en base de datos:', dbError);
+                    // Continuamos para intentar enviar el email de todas formas
+                }
+            }
         } else {
             return res.status(400).json({
                 success: false,
@@ -81,29 +156,60 @@ export const sendPropertyNotification = async (req, res) => {
         try {
             // Obtener los emails y dividirlos en un array
             const emailList = process.env.EMAIL_TO.split(',').map(email => email.trim());
+            console.log('📧 Enviando notificación a:', emailList);
 
-            await Promise.all(emailList.map(async (emailTo) => {
-                await emailConfig.sendEmail({
-                    to: emailTo,
-                    subject: emailSubject,
-                    html: emailContent
+            // Enviar a cada destinatario
+            let successCount = 0;
+            let errorMessages = [];
+
+            for (const emailTo of emailList) {
+                try {
+                    await emailConfig.sendEmail({
+                        to: emailTo,
+                        subject: emailSubject,
+                        html: emailContent
+                    });
+                    successCount++;
+                } catch (singleEmailError) {
+                    errorMessages.push(`Error al enviar a ${emailTo}: ${singleEmailError.message}`);
+                }
+            }
+
+            // Actualizar el estado de la visita si existe
+            if (visitData) {
+                try {
+                    await PropertyVisit.findByIdAndUpdate(visitData._id, {
+                        'emailSent.success': successCount > 0,
+                        'emailSent.error': errorMessages.join('; '),
+                        'emailSent.attempts': 1,
+                        'emailSent.lastAttempt': new Date()
+                    });
+                } catch (updateError) {
+                    console.error('❌ Error al actualizar estado de la visita:', updateError);
+                }
+            }
+
+            // Si al menos un email se envió correctamente, considerar éxito
+            if (successCount > 0) {
+                return res.status(200).json({
+                    success: true,
+                    message: `Notificación enviada correctamente a ${successCount} de ${emailList.length} destinatarios`,
+                    errors: errorMessages.length > 0 ? errorMessages : undefined
                 });
-            }));
-
-            return res.status(200).json({
-                success: true,
-                message: 'Notificación enviada correctamente'
-            });
+            } else {
+                throw new Error(errorMessages.join('; '));
+            }
         } catch (emailError) {
-            console.error('Error al enviar email:', emailError);
+            console.error('❌ Error al enviar email:', emailError);
             return res.status(500).json({
                 success: false,
-                message: 'Error al enviar el email'
+                message: 'Error al enviar el email',
+                error: emailError.message
             });
         }
 
     } catch (error) {
-        console.error('Error en propertyNotificationController:', error);
+        console.error('❌ Error en propertyNotificationController:', error);
         return res.status(500).json({
             success: false,
             message: 'Error interno del servidor',
