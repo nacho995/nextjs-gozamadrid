@@ -340,31 +340,31 @@ export default function ExpRealtyMore({ videoId, videoId2, title }) {
                         </div>
             <AnimatedOnScroll>
                 <div
-                    className="relative w-full bg-cover bg-center pb-10 h-[80vh] md:h-[80vh]"
+                    className="relative w-full bg-cover bg-center pb-10 h-[80vh] md:h-[80vh] modal-preview-fix"
                     style={{ backgroundImage: "url('/agenteinmobiliario.jpg')" }}
                 >
                     <div
-                        className="absolute left-0 top-0 p-4 bg-black bg-opacity-50 border-2 border-white flex flex-row md:flex-col w-full md:w-1/3 h-auto md:h-[80vh]"
+                        className="absolute left-0 top-0 p-4 bg-black bg-opacity-50 border-2 border-white flex flex-row md:flex-col w-full md:w-1/3 h-auto md:h-[80vh] overflow-auto"
                     >
                         {/* Contenedor del título: en mobile ocupa la mitad, en md ocupa el 100% */}
                         <div className="flex border-2 border-white items-center mt-[5vh] justify-center w-1/2 md:w-full">
                             <h3
-                                className="text-center font-bold text-white"
+                                className="text-center font-bold text-white p-2 break-words"
                                 style={{
                                     textShadow: "2px 2px 3px rgba(65,105,225,0.7)",
-                                    fontSize: "clamp(1.5rem, 3vw, 3rem)"
+                                    fontSize: "clamp(1.25rem, 2vw, 2.5rem)"
                                 }}
                             >
                                 Rompe Barreras. Crece de manera digital.
                             </h3>
                         </div>
 
-                        <div className="flex flex-col items-center justify-center pt-[10vh] w-1/2 md:w-full">
+                        <div className="flex flex-col items-center justify-center pt-[5vh] w-1/2 md:w-full">
                             <p
-                                className="text-center font-bold text-white mb-4"
+                                className="text-center font-bold text-white mb-4 break-words"
                                 style={{
                                     textShadow: "2px 2px 3px rgba(65,105,225,0.7)",
-                                    fontSize: "clamp(1rem, 2vw, 1.5rem)",
+                                    fontSize: "clamp(0.875rem, 1.5vw, 1.25rem)",
                                     margin: 0,
                                     padding: "0.5rem"
                                 }}
@@ -372,14 +372,16 @@ export default function ExpRealtyMore({ videoId, videoId2, title }) {
                                 Derriba barreras en una de las inmobiliarias digitales de mayor crecimiento del mundo y descubre nuevas maneras de facturar, aprender y hacer crecer tu negocio
                             </p>
                             <Link
-                                className="mt-[5vh] bg-transparent border-2 border-white hover:bg-bluecolor inline-block rounded-xl font-bold"
+                                className="mt-[3vh] bg-transparent border-2 border-white hover:bg-bluecolor inline-block rounded-xl font-bold max-w-full"
                                 href="https://join.expglobal.partners/index.html"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 style={{
                                     color: "white",
-                                    fontSize: "clamp(1rem, 2vw, 1.5rem)",
-                                    padding: "0.5rem 1rem"
+                                    fontSize: "clamp(0.875rem, 1.5vw, 1.25rem)",
+                                    padding: "0.5rem 1rem",
+                                    whiteSpace: "normal",
+                                    wordBreak: "break-word"
                                 }}
                             >
                                 Conviértete en agente

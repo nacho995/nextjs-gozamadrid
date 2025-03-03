@@ -194,3 +194,23 @@ html, body {
     }
   }
 } */
+
+/* Ajustes específicos para visualización en modales */
+.modal-container .modal-preview-fix {
+  height: auto !important;
+  min-height: 60vh;
+  max-height: 80vh;
+}
+
+.modal-container .modal-preview-fix > div {
+  height: auto !important;
+  max-height: calc(80vh - 2rem);
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .modal-container .modal-preview-fix,
+  .modal-container .modal-preview-fix > div {
+    height: auto !important;
+  }
+}
