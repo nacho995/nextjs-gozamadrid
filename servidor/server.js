@@ -10,7 +10,7 @@ import cloudinary from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import multer from 'multer';
 import { notificationRouter } from './routes/notificationRoutes.js';  // Importación nombrada
-import propertyNotificationRoutes from './routes/propertyNotificationRoutes.js';
+
 
 
 // Para usar __dirname en ES modules
@@ -18,10 +18,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Importar rutas (convertir a import)
+import propertyNotificationRoutes from './routes/propertyNotificationRoutes.js';
 import prefixRouter from "./routes/routerPrefix.js";
 import blogRouter from "./routes/blogRouter.js";
 import userRouter from "./routes/userContentRouter.js";
 import propertyRouter from "./routes/propertyRouter.js";
+import propertyOfferRoutes from './routes/propertyOfferRoutes.js';
 
 dotenv.config();
 
@@ -88,6 +90,7 @@ app.use("/blog", blogRouter);
 app.use("/user", userRouter);
 app.use("/property", propertyRouter);
 app.use('/api/property-notification', propertyNotificationRoutes);
+app.use('/api/property-offer', propertyOfferRoutes); 
 
 // Conexión a MongoDB
 mongoose.connect(process.env.MONGODB_URI)

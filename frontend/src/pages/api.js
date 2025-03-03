@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_URL = process.env.NEXT_LOCAL_API_URL || 'http://localhost:4000';
 
 export async function getCountryPrefix() {
   try {
@@ -323,28 +323,60 @@ export async function sendEmail(emailData) {
   }
 }
 
-export const sendPropertyEmail = async (formData) => {
-    try {
-        const response = await fetch(`${API_URL}/api/property-notification`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(formData)
-        });
-
-        const data = await response.json();
-        
-        if (!response.ok) {
-            throw new Error(data.message || 'Error al procesar la solicitud');
-        }
-
-        return data;
-    } catch (error) {
-        console.error('Error al enviar email:', error);
-        throw new Error(error.message || 'Error al enviar el mensaje');
+export const sendPropertyEmail = async (data) => {
+  try {
+    // Usamos la constante API_URL que ya está definida en el archivo
+    let endpoint = `${API_URL}/api/property-notification`;
+    
+    // Si es una oferta, usar la nueva ruta
+    if (data.type === 'offer') {
+      endpoint = `${API_URL}/api/property-offer/create`;
+      
+      // Renombrar campos si es necesario para mantener compatibilidad
+      const { type, ...offerData } = data;
+    
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(offerData),
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error en respuesta:', errorText);
+        throw new Error('Error en la respuesta del servidor');
+      }
+      
+      return await response.json();
     }
+    
+    // Para otros tipos (visitas), usar la ruta original
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Error en respuesta:', errorText);
+      throw new Error('Error en la respuesta del servidor');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error al enviar email:', error);
+    return {
+      success: false,
+      message: error.message || 'Error al procesar la solicitud',
+    };
+  }
 };
 
 export default async function handler(req, res) {
