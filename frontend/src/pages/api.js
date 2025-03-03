@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_LOCAL_API_URL || 'http://localhost:4000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 export async function getCountryPrefix() {
   try {
@@ -322,7 +322,7 @@ export const sendEmail = async (data) => {
     }
     
     // Definir el endpoint para el contacto
-    const API_URL = process.env.NEXT_LOCAL_API_URL || 'http://localhost:4000';
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
     const endpoint = `${API_URL}/api/contact`;
     
     console.log("Datos a enviar al servidor:", formattedData);
