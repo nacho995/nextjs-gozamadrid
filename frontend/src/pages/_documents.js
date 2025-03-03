@@ -15,9 +15,10 @@ class MyDocument extends Document {
         <Head>
           {/* Meta viewport para hacer el sitio responsive */}
           <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <meta name="color-scheme" content="light" />
+          <meta name="color-scheme" content="light only" />
           <meta name="theme-color" content="#ffffff" />
           <meta name="forced-colors" content="none" />
+
           {/* Puedes agregar otras metaetiquetas o enlaces a fuentes, etc. */}
         </Head>
         <body>
