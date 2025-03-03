@@ -50,9 +50,9 @@ export default function ExpRealty({ videoId, title }) {
                             Nº1 en el Mundo
                         </span>
                     </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-0 mt-0 min-h-[40vh] md:min-h-[60vh]">
-                        <div className="relative flex items-center justify-start h-full w-full overflow-hidden">
-                            <div className="bg-gradient-to-tr from-blue-950/60 via-black/40 to-blue-800/50
+                    <div className="grid grid-cols-1  md:grid-cols-2 gap-0 mt-0 min-h-[40vh] md:min-h-[60vh]">
+                        <div className="relative  flex items-center justify-start h-full w-full overflow-hidden">
+                            <div className="pb-10 bg-gradient-to-tr from-blue-950/60 via-black/40 to-blue-800/50
                                 dark:from-blue-950/60 dark:via-black/40 dark:to-blue-800/50
                                 backdrop-blur-lg
                                 w-full 
@@ -131,38 +131,19 @@ export default function ExpRealty({ videoId, title }) {
                                     group-hover:w-1/2 transition-all duration-500"
                                 ></div>
 
-                                {/* Botones y enlaces */}
-                                <Link
-                                    className="group/link relative inline-flex items-center gap-2 overflow-hidden 
-                                        rounded-full bg-white/20 dark:bg-white/20 px-8 py-3 
-                                        transition-all duration-300 
-                                        hover:bg-white/30 dark:hover:bg-white/30 
-                                        backdrop-blur-sm"
-                                    href="/"
-                                >
-                                    <span className="relative text-lg font-semibold text-white dark:text-white">
-                                        Apúntate
-                                    </span>
-                                    <span className="absolute bottom-0 left-0 h-1 w-full transform 
-                                        bg-gradient-to-r from-blue-400 via-white to-blue-400 
-                                        dark:from-blue-400 dark:via-white dark:to-blue-400
-                                        transition-transform duration-300 
-                                        group-hover/link:translate-x-full">
-                                    </span>
-                                </Link>
+                                
                             </div>
                         </div>
                         <div className="relative w-full h-auto min-h-[35vh]">
-                            <iframe
-                                ref={iframeRef}
-                                src={isPlaying ? youtubeUrl : `https://www.youtube.com/embed/${videoId}`}
-                                title={title}
-                                className=" w-full h-full"
-                                frameBorder="0"
-                                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                                onClick={handlePlay}
-                            />
+                            <video
+                                className="w-full h-full object-cover absolute inset-0"
+                                controls
+                                preload="auto"
+                                playsInline
+                            >
+                                <source src="/videoExpIngles.mp4" type="video/mp4" />
+                                Tu navegador no soporta el elemento de video.
+                            </video>
                         </div>
                     </div>
                 </div>

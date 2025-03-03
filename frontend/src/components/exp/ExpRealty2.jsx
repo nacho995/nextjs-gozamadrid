@@ -5,11 +5,11 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import AnimatedOnScroll from "../AnimatedScroll";
 
-export default function ExpRealtyMore({ videoId, title }) {
+export default function ExpRealtyMore({ videoId, videoId2, title }) {
     const iframeRef = useRef(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const youtubeUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-
+    const youtubeUrl2 = `https://www.youtube.com/embed/${videoId2}?autoplay=1`;
     const handlePlay = () => {
         setIsPlaying(true);
     };
@@ -35,7 +35,7 @@ export default function ExpRealtyMore({ videoId, title }) {
 
                         {/* Contenedor del texto */}
                         <div className="relative flex items-center justify-start h-full w-full overflow-hidden">
-                            <div className="bg-gradient-to-tr from-blue-950/60 via-black/40 to-blue-800/50 
+                            <div className="pb-10 bg-gradient-to-tr from-blue-950/60 via-black/40 to-blue-800/50 
                                 dark:from-blue-950/60 dark:via-black/40 dark:to-blue-800/50
                                 backdrop-blur-lg w-full h-full min-h-[60vh]
                                 text-center flex flex-col gap-8 justify-center items-center
@@ -277,7 +277,7 @@ export default function ExpRealtyMore({ videoId, title }) {
                         <div className="relative w-full h-auto min-h-[35vh]">
                             <iframe
                                 ref={iframeRef}
-                                src={isPlaying ? youtubeUrl : `https://www.youtube.com/embed/${videoId}`}
+                                src={isPlaying ? youtubeUrl2 : `https://www.youtube.com/embed/${videoId2}`}
                                 title={title}
                                 className=" w-full h-full"
                                 frameBorder="0"
