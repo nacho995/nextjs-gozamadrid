@@ -16,42 +16,36 @@ class MyDocument extends Document {
           {/* Meta viewport para hacer el sitio responsive */}
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           
-          {/* Simplificación de meta tags - similar a BestFlat */}
-          <meta name="color-scheme" content="light dark" />
+          {/* Meta tag crucial según la documentación de Samsung */}
+          <meta name="color-scheme" content="light" />
           <meta name="theme-color" content="#ffffff" />
 
-          {/* Script más sutil, similar al enfoque de BestFlat */}
+          {/* Script optimizado basado en la documentación oficial de Samsung */}
           <script dangerouslySetInnerHTML={{
             __html: `
               (function() {
-                // Solo ejecutar una vez al cargar la página
+                // Detectar Samsung Internet en modo oscuro
                 var isSamsungBrowser = /SamsungBrowser/i.test(navigator.userAgent);
                 var isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
                 
                 if (isSamsungBrowser && isDarkMode) {
-                  // Establecer atributos de tema en HTML
-                  document.documentElement.setAttribute('data-samsung-fix', 'true');
-                  
-                  // Insertar CSS específico pero más sutil
+                  // Aplicar solución recomendada por Samsung
                   var style = document.createElement('style');
                   style.textContent = \`
-                    /* Solución específica para Samsung Internet */
-                    html[data-samsung-fix="true"] {
-                      background-color: #fff;
-                      color-scheme: light;
+                    /* Resetear colores específicamente para Samsung Internet */
+                    html, body {
+                      background-color: #ffffff !important;
+                      color-scheme: light !important;
                     }
                     
-                    @media (prefers-color-scheme: dark) {
-                      html[data-samsung-fix="true"] body {
-                        background-color: #fff;
-                        color: #000;
-                        filter: brightness(1.05);
-                      }
-                      
-                      /* Preservar elementos oscuros importantes */
-                      html[data-samsung-fix="true"] [data-preserve-dark="true"] {
-                        filter: none !important;
-                      }
+                    body {
+                      color: #000000 !important;
+                    }
+                    
+                    /* Forzar colores claros para textos y elementos */
+                    body * {
+                      background-color: initial;
+                      color: initial;
                     }
                   \`;
                   document.head.appendChild(style);
