@@ -33,13 +33,13 @@ const DirectImage = ({ src, alt, className, fallbackSrc, ...rest }) => {
         return url;
       }
       
-      // Si ya es un proxy, devolverlo tal cual
-      if (url.startsWith('/api?url=') || url.startsWith('/img-proxy?url=')) {
+      // Si ya es un proxy de image-proxy, devolverlo tal cual
+      if (url.startsWith('/api/image-proxy?url=')) {
         return url;
       }
       
-      // Usar nuevo endpoint de proxy
-      return `/img-proxy?url=${encodeURIComponent(url)}`;
+      // Usar exclusivamente image-proxy para todas las solicitudes
+      return `/api/image-proxy?url=${encodeURIComponent(url)}`;
     } catch (e) {
       console.error("Error procesando URL:", e);
       return fallbackSrc || fallbackSvg;
@@ -56,13 +56,13 @@ const DirectImage = ({ src, alt, className, fallbackSrc, ...rest }) => {
     const img = new Image();
     img.onload = () => setError(false);
     img.onerror = () => setError(true);
-    img.src = src;
+    img.src = imageUrl; // Usar imageUrl procesada en lugar de src directamente
     
     return () => {
       img.onload = null;
       img.onerror = null;
     };
-  }, [src]);
+  }, [src, imageUrl]);
   
   if (error || !src) {
     return (
@@ -77,7 +77,7 @@ const DirectImage = ({ src, alt, className, fallbackSrc, ...rest }) => {
   
   return (
     <img
-      src={src}
+      src={imageUrl} // Usar imageUrl procesada en lugar de src directamente
       alt={alt || "Imagen"}
       className={className}
       onError={() => setError(true)}
