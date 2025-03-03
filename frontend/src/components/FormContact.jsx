@@ -85,12 +85,49 @@ const RegisterForm = () => {
   return (
     <AnimatedOnScroll>
       <div className="flex justify-center items-center min-h-screen bg-transparent py-8 px-4 md:py-12">
-        <div className="container mx-auto flex flex-col md:flex-row items-center md:items-start justify-between gap-6 md:gap-8">
+        <div className="container mx-auto flex flex-col-reverse md:flex-row items-center md:items-start justify-between gap-6 md:gap-8">
+          
+          {/* Imagen - ahora con order-last en md para que aparezca a la derecha en desktop */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="w-full max-w-xl h-full mb-6 md:mb-0 md:order-last"
+          >
+            <div 
+              className="relative w-full h-[250px] sm:h-[300px] md:h-[500px] lg:h-[600px] rounded-2xl overflow-hidden shadow-2xl group"
+            >
+              {/* Contenedor de la imagen con efecto hover */}
+              <div
+                className="absolute inset-0 transition-transform duration-700 ease-in-out group-hover:scale-110"
+                style={{
+                  backgroundImage: "url('/formFoto.jpeg')",
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center'
+                }}
+              />
+              
+              {/* Overlay gradiente - mejorado para móviles */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent">
+                <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8">
+                  <h3 className="text-lg sm:text-xl md:text-3xl font-bold text-white mb-2 md:mb-4"
+                      style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.5)" }}>
+                    Contacta con nosotros
+                  </h3>
+                  <p className="text-white/90 text-xs sm:text-sm md:text-lg">
+                    Estamos aquí para ayudarte en todo lo que necesites
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Formulario - ahora con order-first en md para que aparezca a la izquierda en desktop */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="w-full max-w-md"
+            className="w-full max-w-md md:order-first"
           >
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="bg-white bg-opacity-20 backdrop-blur-lg rounded-xl p-5 md:p-8 shadow-lg">
@@ -209,41 +246,6 @@ const RegisterForm = () => {
                 </div>
               </div>
             </form>
-          </motion.div>
-
-          {/* Imagen a la derecha - también visible en tablets */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="hidden sm:block w-full max-w-xl h-full"
-          >
-            <div 
-              className="relative w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] rounded-2xl overflow-hidden shadow-2xl group"
-            >
-              {/* Contenedor de la imagen con efecto hover */}
-              <div
-                className="absolute inset-0 transition-transform duration-700 ease-in-out group-hover:scale-110"
-                style={{
-                  backgroundImage: "url('/formFoto.jpeg')",
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
-                }}
-              />
-              
-              {/* Overlay gradiente */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent">
-                <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8">
-                  <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 md:mb-4"
-                      style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.5)" }}>
-                    Contacta con nosotros
-                  </h3>
-                  <p className="text-white/90 text-sm sm:text-base md:text-lg">
-                    Estamos aquí para ayudarte en todo lo que necesites
-                  </p>
-                </div>
-              </div>
-            </div>
           </motion.div>
         </div>
       </div>
