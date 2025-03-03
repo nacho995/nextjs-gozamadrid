@@ -170,21 +170,68 @@ export default function DefaultPropertyContent({ property }) {
         time: selectedTime.toISOString(),
         email,
         name,
-        phone
+        phone,
+        contactPreference: "email" // Añadido para mejorar la comunicación
       };
 
       console.log("Enviando solicitud de visita en segundo plano:", formData);
 
-      // Enviar sin esperar la respuesta
-      sendPropertyEmail(formData).then(response => {
-        if (!response.success) {
-          console.error("Error al enviar solicitud:", response.message);
+      // Usar AbortController para limitar el tiempo máximo de espera
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 segundos máximo
+      
+      // Enviar la solicitud con manejo mejorado de errores
+      fetch(`${API_URL}/api/property-notification`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(formData),
+        signal: controller.signal
+      })
+      .then(response => {
+        clearTimeout(timeoutId);
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}`);
         }
-      }).catch(error => {
-        console.error("Error en solicitud:", error);
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+          console.log("✅ Solicitud enviada con éxito:", data.message);
+        } else {
+          // Guardar localmente para reintentar más tarde
+          saveLocalRequest(formData);
+        }
+      })
+      .catch(error => {
+        clearTimeout(timeoutId);
+        console.error("❌ Error de envío:", error.message);
+        // Guardar localmente para reintentar más tarde
+        saveLocalRequest(formData);
       });
+      
     } catch (error) {
-      console.error("Error:", error);
+      console.error("❌ Error:", error);
+      // Guardar localmente para reintentar más tarde
+      saveLocalRequest(formData);
+    }
+  };
+
+  // Función para guardar solicitudes localmente
+  const saveLocalRequest = (data) => {
+    try {
+      const pendingRequests = JSON.parse(localStorage.getItem('pendingRequests') || '[]');
+      pendingRequests.push({
+        type: 'propertyVisit',
+        data,
+        timestamp: new Date().toISOString()
+      });
+      localStorage.setItem('pendingRequests', JSON.stringify(pendingRequests));
+      console.log("�� Solicitud guardada localmente para reintento posterior");
+    } catch (e) {
+      console.error("❌ Error al guardar solicitud localmente:", e);
     }
   };
 

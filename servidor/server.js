@@ -30,31 +30,16 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Lista de dominios permitidos
-const allowedOrigins = [
-    'https://goza-madrid-qbw9.onrender.com',  // Tu dominio de frontend en producción
-    'http://localhost:3000',                   // Para desarrollo local
-    'http://localhost:3001'                    // Para desarrollo local
-];
-
-// Configuración CORS
+// Configuración CORS más permisiva para diagnóstico
 app.use(cors({
-    origin: function(origin, callback) {
-        // Permitir peticiones sin origin (como las peticiones mobile o postman)
-        if (!origin) return callback(null, true);
-        
-        if (allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(new Error('No permitido por CORS'));
-        }
-    },
+    origin: '*',  // Permitir todas las conexiones (SÓLO para diagnóstico)
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-    credentials: true
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
 }));
 
-app.use(express.json());
+// Middleware para asegurar que el body se parsea correctamente
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Middleware para debugging
 app.use((req, res, next) => {

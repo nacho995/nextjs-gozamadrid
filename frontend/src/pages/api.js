@@ -296,32 +296,79 @@ export async function getPropertyById(id) {
   }
 }
 
-export async function sendEmail(emailData) {
+// Función para enviar el formulario de contacto
+export const sendEmail = async (data) => {
   try {
-      const response = await fetch(`${API_URL}/api/contact`, {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-          },
-          body: JSON.stringify({
-              type: 'contact',
-              data: emailData
-          })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-          throw new Error(data.message || 'Error en la respuesta del servidor');
-      }
-
-      return data;
+    console.log("Enviando formulario de contacto:", data);
+    
+    // Reformatear los datos para adaptarse al formato esperado por la API
+    const formattedData = {
+      nombre: data.name,
+      email: data.email,
+      prefix: data.prefix || '+34',
+      telefono: data.phone || '',
+      asunto: data.message // El mensaje lo enviamos como asunto que es lo que espera el backend
+    };
+    
+    // Validación local actualizada para campos
+    if (!formattedData.nombre || !formattedData.email) {
+      console.error("Faltan datos obligatorios:", formattedData);
+      return {
+        success: false,
+        message: 'Faltan datos requeridos: nombre y email son obligatorios',
+        error: 'Validación local',
+        ok: false
+      };
+    }
+    
+    // Definir el endpoint para el contacto
+    const API_URL = process.env.NEXT_LOCAL_API_URL || 'http://localhost:4000';
+    const endpoint = `${API_URL}/api/contact`;
+    
+    console.log("Datos a enviar al servidor:", formattedData);
+    console.log("Endpoint:", endpoint);
+    
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formattedData),
+    });
+    
+    // Capturar la respuesta como texto para debugging
+    const responseText = await response.text();
+    console.log("Respuesta del servidor (texto):", responseText);
+    
+    // Intentar parsear la respuesta como JSON
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+    } catch (e) {
+      console.error("Respuesta no es JSON válido");
+      return {
+        success: false,
+        message: 'Formato de respuesta inválido',
+        error: 'El servidor no respondió con un formato válido',
+        ok: false
+      };
+    }
+    
+    // Agregar la propiedad ok para compatibilidad con el código existente
+    responseData.ok = response.ok;
+    
+    return responseData;
   } catch (error) {
-      console.error('Error al enviar email:', error);
-      throw new Error(error.message || 'Error al enviar el mensaje');
+    console.error("Error al enviar formulario:", error);
+    // Devolver un objeto con formato similar al de respuesta exitosa
+    return {
+      success: false,
+      message: 'Error de conexión',
+      error: error.message,
+      ok: false
+    };
   }
-}
+};
 
 export const sendPropertyEmail = async (data) => {
   try {
@@ -329,6 +376,8 @@ export const sendPropertyEmail = async (data) => {
     let endpoint = `${API_URL}/api/property-notification`;
     
     // Si es una oferta, usar la nueva ruta
+
+    
     if (data.type === 'offer') {
       endpoint = `${API_URL}/api/property-offer/create`;
       
