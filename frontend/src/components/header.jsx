@@ -88,6 +88,41 @@ export default function ControlMenu() {
     residentes_extranjero_guia: "/servicios/residentes-extranjero/guia-compra"
   };
 
+  // Define los estilos CSS dinámicos según la ruta
+  const getHeaderStyle = () => {
+    if (isExpRealty) {
+      // Estilo para eXp Realty - azul y amarillo
+      return {
+        background: `
+          linear-gradient(135deg, rgba(17, 24, 39, 0.6) 0%, 
+          rgba(59, 130, 246, 0.5) 30%, 
+          rgba(254, 204, 27, 0.5) 65%, 
+          rgba(30, 64, 175, 0.5) 100%)
+        `,
+        boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        border: '1px solid rgba(255, 255, 255, 0.18)'
+      };
+    } else {
+      // Estilo para otras páginas - amarillo y negro
+      return {
+        background: `
+          linear-gradient(145deg, 
+          rgba(0, 0, 0, 0.8) 0%, 
+          rgba(0, 0, 0, 0.6) 25%,
+          rgba(254, 204, 27, 0.6) 50%, 
+          rgba(0, 0, 0, 0.6) 75%,
+          rgba(0, 0, 0, 0.8) 100%)
+        `,
+        boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.5)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        border: '1px solid rgba(254, 204, 27, 0.25)'
+      };
+    }
+  };
+
   return (
     <div className="relative w-full z-[9999]">
       {/* Botón de menú para móviles */}
@@ -101,11 +136,9 @@ export default function ControlMenu() {
 
       {/* Menú Principal */}
       <header
-        className={`relative z-[9999] flex-col items-center px-24 p-4 ${
-          isExpRealty
-            ? 'bg-gradient-to-r from-blue-900/40 via-amarillo/40 to-blue-900/40'
-            : 'bg-black bg-opacity-40'
-          } w-max mx-auto rounded-full shadow-2xl hidden lg:flex`}
+        className={`relative z-[9999] flex-col items-center px-24 p-4 w-max mx-auto rounded-full shadow-2xl hidden lg:flex ${
+          isExpRealty ? 'header-gradient-exp' : 'header-gradient-default'
+        }`}
       >
         {/* Íconos sociales y botón de menú */}
         <div className="absolute left-1/4 top-1/2 flex space-x-4 mt-4 ml-4">

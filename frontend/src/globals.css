@@ -237,3 +237,93 @@ html, body {
     font-size: clamp(0.8rem, 1.3vw, 1rem) !important;
   }
 }
+
+/* Gradiente animado para el header principal - Amarillo y Negro */
+.header-gradient-default {
+  background: linear-gradient(145deg, 
+    rgba(0, 0, 0, 0.8) 0%, 
+    rgba(0, 0, 0, 0.6) 25%,
+    rgba(254, 204, 27, 0.6) 50%, 
+    rgba(0, 0, 0, 0.6) 75%,
+    rgba(0, 0, 0, 0.8) 100%);
+  background-size: 200% 200%;
+  animation: gradientMove 15s ease infinite;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(254, 204, 27, 0.25);
+}
+
+/* Gradiente para páginas eXp */
+.header-gradient-exp {
+  background: linear-gradient(135deg, 
+    rgba(17, 24, 39, 0.6) 0%, 
+    rgba(59, 130, 246, 0.5) 30%, 
+    rgba(254, 204, 27, 0.5) 65%, 
+    rgba(30, 64, 175, 0.5) 100%);
+  background-size: 200% 200%;
+  animation: gradientMove 15s ease infinite;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.header-premium-default {
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(254, 204, 27, 0.18);
+}
+
+.header-premium-default::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: 
+    radial-gradient(circle at 30% 50%, rgba(254, 204, 27, 0.4) 0%, rgba(254, 204, 27, 0) 25%),
+    radial-gradient(circle at 70% 50%, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 25%),
+    radial-gradient(circle at 50% 20%, rgba(254, 204, 27, 0.3) 0%, rgba(254, 204, 27, 0) 25%),
+    linear-gradient(to bottom right, rgba(0, 0, 0, 0.8), rgba(254, 204, 27, 0.5), rgba(0, 0, 0, 0.8));
+  z-index: -1;
+  animation: rotateGradient 20s linear infinite;
+}
+
+.header-premium-exp {
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(59, 130, 246, 0.18);
+}
+
+.header-premium-exp::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: 
+    radial-gradient(circle at 30% 50%, rgba(254, 204, 27, 0.4) 0%, rgba(254, 204, 27, 0) 25%),
+    radial-gradient(circle at 70% 50%, rgba(59, 130, 246, 0.4) 0%, rgba(59, 130, 246, 0) 25%),
+    radial-gradient(circle at 50% 20%, rgba(30, 64, 175, 0.3) 0%, rgba(30, 64, 175, 0) 25%),
+    linear-gradient(to bottom right, rgba(30, 64, 175, 0.7), rgba(254, 204, 27, 0.3), rgba(30, 64, 175, 0.7));
+  z-index: -1;
+  animation: rotateGradient 20s linear infinite;
+}
+
+@keyframes rotateGradient {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
