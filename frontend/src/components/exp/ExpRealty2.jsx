@@ -344,7 +344,7 @@ export default function ExpRealtyMore({ videoId, videoId2, title }) {
                     style={{ backgroundImage: "url('/agenteinmobiliario.jpg')" }}
                 >
                     <div
-                        className="absolute left-0 top-0 p-4 bg-black bg-opacity-50 border-2 border-white flex flex-row md:flex-col w-full md:w-1/3 h-auto md:h-[80vh] overflow-auto"
+                        className="absolute left-0 top-0 p-4 bg-black bg-opacity-50 border-2 border-white flex flex-row md:flex-col w-full md:w-1/3 h-auto md:h-[80vh] overflow-auto special-layout-range"
                     >
                         {/* Contenedor del título: en mobile ocupa la mitad, en md ocupa el 100% */}
                         <div className="flex border-2 border-white items-center mt-[5vh] justify-center w-1/2 md:w-full">

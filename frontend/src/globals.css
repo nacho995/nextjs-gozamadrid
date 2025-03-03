@@ -214,3 +214,26 @@ html, body {
     height: auto !important;
   }
 }
+
+/* Ajuste específico para el layout horizontal entre 801px y 858px */
+@media screen and (min-width: 801px) and (max-width: 858px) {
+  .special-layout-range {
+    flex-direction: row !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+  
+  /* Ajustes adicionales para los elementos hijos */
+  .special-layout-range > div {
+    width: 50% !important;
+  }
+  
+  /* Ajustes específicos para esta resolución */
+  .special-layout-range h3 {
+    font-size: clamp(1.1rem, 1.5vw, 1.3rem) !important;
+  }
+  
+  .special-layout-range p {
+    font-size: clamp(0.8rem, 1.3vw, 1rem) !important;
+  }
+}
