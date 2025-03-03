@@ -49,7 +49,7 @@ const RegisterForm = () => {
     
     // Enviar en segundo plano con fetch directo (alternativa a sendEmail)
     try {
-      const API_URL = process.env.NEXT_LOCAL_API_URL || 'http://localhost:4000';
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
       
       // Usar los mismos datos que antes
       const formattedData = {
