@@ -7,6 +7,7 @@ import '../globals.css';
 import { NavbarProvider } from '../components/context/navBarContext';
 import { Toaster } from 'react-hot-toast';
 import LoadingScreen from '../components/LoadingScreen';
+import SamsungThemeFix from '@/components/SamsungThemeFix';
 
 
 function MyApp({ Component, pageProps }) {
@@ -59,6 +60,7 @@ function MyApp({ Component, pageProps }) {
       
       {loading && <LoadingScreen />}
       
+      <SamsungThemeFix />
       <NavbarProvider>
         <Layout>
           <Component {...pageProps} />
