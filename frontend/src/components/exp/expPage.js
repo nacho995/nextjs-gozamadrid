@@ -12,7 +12,7 @@ export default function ExpPage() {
             <ExpRealty videoId="4NDjtS50SC4" title="Exp Realty" />
             <ExpCountries />
             <RegisterForm />
-            <ExpRealtyMore />
+            <ExpRealtyMore videoId2="X-fZBk5sDGQ" videoId="PYFThiRO9v8" title="Exp Realty" />
         </div>
     );
 }
