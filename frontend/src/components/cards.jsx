@@ -102,15 +102,18 @@ function DesktopCards({ card, index }) {
                     {/* Cara Frontal */}
                     <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
                         <div className="absolute inset-0 rounded-2xl shadow-lg overflow-hidden">
-                            {/* Reemplazando el fondo con el mismo estilo del mobile card */}
-                            <div className="absolute inset-0 bg-white/5 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
-                                <Image
-                                    src="/fondoamarillo.jpg" 
-                                    alt="Fondo"
-                                    fill
-                                    className="object-cover"
-                                />
-                                <div className="absolute inset-0 bg-black/30 rounded-xl"></div>
+                            {/* Modificación para solucionar el problema en Safari */}
+                            <div className="absolute inset-0 bg-white/5 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+                                <div className="relative w-full h-full">
+                                    <Image
+                                        src="/fondoamarillo.jpg" 
+                                        alt="Fondo"
+                                        fill
+                                        className="object-cover"
+                                        style={{ objectPosition: 'center' }}
+                                    />
+                                    <div className="absolute inset-0 bg-black/30 rounded-xl"></div>
+                                </div>
                             </div>
 
                             <div className="relative z-10 flex flex-col justify-center items-center p-6 text-center h-full">
@@ -217,16 +220,18 @@ function MobileCard({ card, index }) {
                 {/* Cara Frontal */}
                 <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
                     <div className="absolute inset-0 rounded-2xl shadow-lg overflow-hidden">
-                        {/* Reemplazando el fondo con el estilo de alquilerTuristico */}
-                        <div className="absolute inset-0 bg-white/5 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
-                            {/* Imagen de fondo con gradiente como en alquilerTuristico */}
-                            <Image
-                                src="/fondoamarillo.jpg" 
-                                alt="Fondo"
-                                fill
-                                className="object-cover"
-                            />
-                            <div className="absolute inset-0 bg-black/30 rounded-xl"></div>
+                        {/* Modificación para solucionar el problema en Safari */}
+                        <div className="absolute inset-0 bg-white/5 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+                            <div className="relative w-full h-full">
+                                <Image
+                                    src="/fondoamarillo.jpg" 
+                                    alt="Fondo"
+                                    fill
+                                    className="object-cover"
+                                    style={{ objectPosition: 'center' }}
+                                />
+                                <div className="absolute inset-0 bg-black/30 rounded-xl"></div>
+                            </div>
                         </div>
                         
                         <div className="relative z-10 flex flex-col justify-center items-center p-6 text-center h-full">
@@ -313,15 +318,18 @@ function TabletCard({ card, index }) {
                     className="absolute w-full h-full shadow-lg rounded-2xl p-2 flex items-center justify-center [backface-visibility:hidden] [-webkit-backface-visibility:hidden] overflow-hidden"
                     aria-hidden={flipped}
                 >
-                    {/* Reemplazando el fondo con el mismo estilo del mobile card */}
-                    <div className="absolute inset-0 bg-white/5 backdrop-blur-sm rounded-xl">
-                        <Image
-                            src="/fondoamarillo.jpg" 
-                            alt="Fondo"
-                            fill
-                            className="object-cover"
-                        />
-                        <div className="absolute inset-0 bg-black/30 rounded-xl"></div>
+                    {/* Modificación para solucionar el problema en Safari */}
+                    <div className="absolute inset-0 bg-white/5 backdrop-blur-sm rounded-xl overflow-hidden">
+                        <div className="relative w-full h-full">
+                            <Image
+                                src="/fondoamarillo.jpg" 
+                                alt="Fondo"
+                                fill
+                                className="object-cover"
+                                style={{ objectPosition: 'center' }}
+                            />
+                            <div className="absolute inset-0 bg-black/30 rounded-xl"></div>
+                        </div>
                     </div>
                     
                     <div className="relative z-10 flex flex-col items-center w-full h-full">
