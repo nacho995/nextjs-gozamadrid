@@ -137,15 +137,17 @@ const RegisterForm = () => {
                     <label htmlFor="name" className="block text-sm font-medium text-black mb-1">
                       Nombre completo
                     </label>
-                    <div className="relative">
-                      <FaUser className="absolute top-1/2 left-3 transform -translate-y-1/2 text-amarillo" />
+                    <div className="flex items-center">
+                      <div className="mr-3 text-amarillo">
+                        <FaUser />
+                      </div>
                       <input
                         type="text"
                         name="name"
                         id="name"
                         value={formData.name}
                         onChange={handleChange}
-                        className="pl-10 w-full p-2.5 md:p-3 bg-white bg-opacity-20 rounded-lg border border-white border-opacity-20 focus:border-amarillo focus:ring-2 focus:ring-amarillo text-black placeholder-gray-300 text-sm md:text-base"
+                        className="w-full p-2.5 md:p-3 bg-white bg-opacity-40 rounded-lg border border-white border-opacity-20 focus:border-amarillo focus:ring-2 focus:ring-amarillo text-black placeholder-gray-500 text-sm md:text-base"
                         placeholder="Tu nombre"
                         required
                       />
@@ -156,15 +158,17 @@ const RegisterForm = () => {
                     <label htmlFor="email" className="block text-sm font-medium text-black mb-1">
                       Correo electrónico
                     </label>
-                    <div className="relative">
-                      <FaEnvelope className="absolute top-1/2 left-3 transform -translate-y-1/2 text-amarillo" />
+                    <div className="flex items-center">
+                      <div className="mr-3 text-amarillo">
+                        <FaEnvelope />
+                      </div>
                       <input
                         type="email"
                         name="email"
                         id="email"
                         value={formData.email}
                         onChange={handleChange}
-                        className="pl-10 w-full p-2.5 md:p-3 bg-white bg-opacity-20 rounded-lg border border-white border-opacity-20 focus:border-amarillo focus:ring-2 focus:ring-amarillo text-black placeholder-gray-300 text-sm md:text-base"
+                        className="w-full p-2.5 md:p-3 bg-white bg-opacity-40 rounded-lg border border-white border-opacity-20 focus:border-amarillo focus:ring-2 focus:ring-amarillo text-black placeholder-gray-500 text-sm md:text-base"
                         placeholder="tu@email.com"
                         required
                       />
@@ -175,22 +179,23 @@ const RegisterForm = () => {
                     <label htmlFor="phone" className="block text-sm font-medium text-black mb-1">
                       Teléfono
                     </label>
-                    <div className="relative flex flex-col sm:flex-row gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <CountryPrefix
                         value={formData.prefix}
                         onChange={(value) => setFormData(prev => ({ ...prev, prefix: value }))}
                         className="w-full sm:w-1/3 md:w-1/4 mb-2 sm:mb-0"
                       />
-                      <div className="relative flex-1">
-                        <FaPhone className="absolute top-1/2 left-3 transform -translate-y-1/2 text-amarillo" />
+                      <div className="flex items-center flex-1">
+                        <div className="mr-3 text-amarillo">
+                          <FaPhone />
+                        </div>
                         <input
                           type="tel"
                           name="phone"
                           id="phone"
                           value={formData.phone}
                           onChange={handleChange}
-                          className="w-full pl-10 p-2.5 md:p-3 bg-white bg-opacity-20 rounded-lg border border-white border-opacity-20 
-                            focus:border-amarillo focus:ring-2 focus:ring-amarillo text-black placeholder-gray-300 text-sm md:text-base"
+                          className="w-full p-2.5 md:p-3 bg-white bg-opacity-40 rounded-lg border border-white border-opacity-20 focus:border-amarillo focus:ring-2 focus:ring-amarillo text-black placeholder-gray-500 text-sm md:text-base"
                           placeholder="Número (sin prefijo)"
                           required
                         />
@@ -202,15 +207,17 @@ const RegisterForm = () => {
                     <label htmlFor="message" className="block text-sm font-medium text-black mb-1">
                       Mensaje
                     </label>
-                    <div className="relative">
-                      <FaComments className="absolute top-4 left-3 transform -translate-y-1/2 text-amarillo" />
+                    <div className="flex items-start">
+                      <div className="mr-3 mt-3 text-amarillo">
+                        <FaComments />
+                      </div>
                       <textarea
                         name="message"
                         id="message"
                         value={formData.message}
                         onChange={handleChange}
                         rows="4"
-                        className="pl-10 w-full p-2.5 md:p-3 bg-white bg-opacity-20 rounded-lg border border-white border-opacity-20 focus:border-amarillo focus:ring-2 focus:ring-amarillo text-black placeholder-gray-300 text-sm md:text-base"
+                        className="w-full p-2.5 md:p-3 bg-white bg-opacity-40 rounded-lg border border-white border-opacity-20 focus:border-amarillo focus:ring-2 focus:ring-amarillo text-black placeholder-gray-500 text-sm md:text-base"
                         placeholder="¿En qué podemos ayudarte?"
                         required
                       ></textarea>
