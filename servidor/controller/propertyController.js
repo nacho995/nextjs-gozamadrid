@@ -1,64 +1,211 @@
-import property from '../models/propertySchema.js';
+import Property from '../models/propertySchema.js';
 
-
+// Controlador para propiedades
 const propertyController = {
-    // Obtiene la lista de properties para previsualización
-    getData: async (req, res) => {
+    // Obtener todas las propiedades
+    getAllProperties: async (req, res) => {
         try {
-            // Selecciona solo los campos necesarios para la previsualización.
-            // Por ejemplo, no incluimos "content" ni "tags"
-            const properties = await property.find().select('typeProperty address price description piso wc m2 rooms images createdAt updatedAt');
+            const properties = await Property.find();
+            console.log(`Obtenidas ${properties.length} propiedades`);
             res.json(properties);
-        } catch (err) {
-            console.log("Error fetching properties:", err);
-            res.status(500).json({ message: "No se pudieron obtener los properties" });
+        } catch (error) {
+            console.error('Error al obtener todas las propiedades:', error);
+            res.status(500).json({ message: 'Error al obtener propiedades', error: error.message });
         }
     },
 
-    // Obtiene el property completo por su ID
+    // Obtener datos por ID
     getDataById: async (req, res) => {
         try {
-            const { id } = req.params;
-            const foundProperty = await property.findById(id);
-            res.json(foundProperty);
-        } catch (err) {
-            console.log("Error fetching property by ID:", err);
-            res.status(500).json({ message: "No se pudo obtener el property" });
+            const property = await Property.findById(req.params.id);
+            if (!property) {
+                return res.status(404).json({ message: 'Propiedad no encontrada' });
+            }
+            res.json(property);
+        } catch (error) {
+            console.error('Error al obtener propiedad por ID:', error);
+            res.status(500).json({ message: 'Error al obtener propiedad', error: error.message });
         }
     },
 
-    // Agrega un nuevo property (se espera que req.body incluya todos los campos, incluido content y tags)
+    // Obtener datos (con posible filtrado)
+    getData: async (req, res) => {
+        try {
+            // Implementar filtros si es necesario
+            const filter = {};
+            
+            // Si hay parámetros de consulta, aplicarlos como filtros
+            if (req.query.typeProperty) {
+                filter.typeProperty = req.query.typeProperty;
+            }
+            
+            if (req.query.minPrice && req.query.maxPrice) {
+                filter.price = { 
+                    $gte: req.query.minPrice, 
+                    $lte: req.query.maxPrice 
+                };
+            } else if (req.query.minPrice) {
+                filter.price = { $gte: req.query.minPrice };
+            } else if (req.query.maxPrice) {
+                filter.price = { $lte: req.query.maxPrice };
+            }
+            
+            // Buscar propiedades con los filtros aplicados
+            const properties = await Property.find(filter);
+            console.log(`Obtenidas ${properties.length} propiedades con filtros:`, filter);
+            
+            // Agregar este log para ver qué propiedades se están devolviendo
+            if (properties.length > 0) {
+                console.log('Primera propiedad:', {
+                    id: properties[0]._id,
+                    title: properties[0].title,
+                    price: properties[0].price
+                });
+            }
+            
+            res.json(properties);
+        } catch (error) {
+            console.error('Error al obtener propiedades filtradas:', error);
+            res.status(500).json({ message: 'Error al obtener propiedades', error: error.message });
+        }
+    },
+
+    // Añadir nueva propiedad
     addData: async (req, res) => {
         try {
-            const newproperty = new property(req.body);
-            await newproperty.save();
-            res.json({ message: "property agregado" });
-        } catch (err) {
-            console.log("Error adding property:", err);
-            res.status(500).json({ message: "No se pudo agregar el property" });
+            const newProperty = new Property(req.body);
+            const savedProperty = await newProperty.save();
+            console.log('Nueva propiedad creada:', savedProperty._id);
+            res.status(201).json(savedProperty);
+        } catch (error) {
+            console.error('Error al crear propiedad:', error);
+            res.status(500).json({ message: 'Error al crear propiedad', error: error.message });
         }
     },
 
-    // Elimina un property por su ID
-    deleteData: async (req, res) => {
-        try {
-            await property.findByIdAndDelete(req.params.id);
-            res.json({ message: "property eliminado" });
-        } catch (err) {
-            console.log("Error deleting property:", err);
-            res.status(500).json({ message: "No se pudo eliminar el property" });
-        }
-    },
-
-    // Actualiza un property por su ID
+    // Actualizar propiedad existente
     updateData: async (req, res) => {
         try {
-            await property.findByIdAndUpdate(req.params.id, req.body);
-            res.json({ message: "property actualizado" });
-        } catch (err) {
-            console.log("Error updating property:", err);
-            res.status(500).json({ message: "No se pudo actualizar el property" });
+            const updatedProperty = await Property.findByIdAndUpdate(
+                req.params.id,
+                req.body,
+                { new: true }
+            );
+            
+            if (!updatedProperty) {
+                return res.status(404).json({ message: 'Propiedad no encontrada' });
+            }
+            
+            console.log('Propiedad actualizada:', updatedProperty._id);
+            res.json(updatedProperty);
+        } catch (error) {
+            console.error('Error al actualizar propiedad:', error);
+            res.status(500).json({ message: 'Error al actualizar propiedad', error: error.message });
         }
+    },
+
+    // Eliminar propiedad
+    deleteData: async (req, res) => {
+        try {
+            const deletedProperty = await Property.findByIdAndDelete(req.params.id);
+            
+            if (!deletedProperty) {
+                return res.status(404).json({ message: 'Propiedad no encontrada' });
+            }
+            
+            console.log('Propiedad eliminada:', req.params.id);
+            res.json({ message: 'Propiedad eliminada correctamente', id: req.params.id });
+        } catch (error) {
+            console.error('Error al eliminar propiedad:', error);
+            res.status(500).json({ message: 'Error al eliminar propiedad', error: error.message });
+        }
+    },
+
+    // Buscar propiedad por tipo de ID personalizado
+    findPropertyByCustomId: async (req, res) => {
+        try {
+            const { idType, idValue } = req.params;
+            let property;
+            
+            // Buscar según el tipo de ID
+            switch (idType) {
+                case 'mongodb':
+                    property = await Property.findById(idValue);
+                    break;
+                case 'reference':
+                    property = await Property.findOne({ reference: idValue });
+                    break;
+                case 'address':
+                    property = await Property.findOne({ 
+                        address: { $regex: new RegExp(idValue, 'i') } 
+                    });
+                    break;
+                default:
+                    return res.status(400).json({ 
+                        message: 'Tipo de ID no válido. Usar: mongodb, reference o address' 
+                    });
+            }
+            
+            if (!property) {
+                return res.status(404).json({ 
+                    message: `Propiedad no encontrada con ${idType}: ${idValue}` 
+                });
+            }
+            
+            res.json(property);
+        } catch (error) {
+            console.error('Error al buscar propiedad por ID personalizado:', error);
+            res.status(500).json({ 
+                message: 'Error al buscar propiedad', 
+                error: error.message 
+            });
+        }
+    },
+
+    // Crear notificación de propiedad
+    createNotification: async (req, res) => {
+        try {
+            // Implementación básica - se puede expandir según necesidades
+            const { propertyId, email, name, message, phone } = req.body;
+            
+            if (!propertyId || !email || !name) {
+                return res.status(400).json({ 
+                    message: 'Faltan datos requeridos: propertyId, email y name son obligatorios' 
+                });
+            }
+            
+            // Verificar que la propiedad existe
+            const property = await Property.findById(propertyId);
+            if (!property) {
+                return res.status(404).json({ message: 'Propiedad no encontrada' });
+            }
+            
+            // Aquí podrías guardar la notificación en una colección separada
+            // o enviar un email, etc.
+            
+            console.log('Notificación de propiedad recibida:', {
+                propertyId, email, name, message, phone
+            });
+            
+            res.status(201).json({ 
+                success: true, 
+                message: 'Notificación recibida correctamente' 
+            });
+        } catch (error) {
+            console.error('Error al crear notificación de propiedad:', error);
+            res.status(500).json({ 
+                message: 'Error al procesar la notificación', 
+                error: error.message 
+            });
+        }
+    },
+
+    // Obtener notificación por ID
+    getNotification: async (req, res) => {
+        // Implementación básica - se puede expandir según necesidades
+        res.status(501).json({ 
+            message: 'Funcionalidad no implementada' 
+        });
     },
 
     uploadImage: async (req, res) => {
@@ -74,6 +221,27 @@ const propertyController = {
         } catch (err) {
             console.log("Error uploading image:", err);
             res.status(500).json({ message: "No se pudo subir la imagen" });
+        }
+    },
+
+    // Obtener una propiedad por ID
+    getPropertyById: async (req, res) => {
+        try {
+            const { id } = req.params;
+            console.log(`Buscando propiedad con ID: ${id}`);
+            
+            const property = await Property.findById(id);
+            
+            if (!property) {
+                console.log(`No se encontró propiedad con ID: ${id}`);
+                return res.status(404).json({ message: "Propiedad no encontrada" });
+            }
+            
+            console.log(`Propiedad encontrada: ${property.title}`);
+            res.json(property);
+        } catch (error) {
+            console.error("Error al obtener propiedad por ID:", error);
+            res.status(500).json({ message: "Error al obtener la propiedad", error: error.message });
         }
     }
 };

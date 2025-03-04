@@ -2,21 +2,48 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const propertySchema = new mongoose.Schema({
-    typeProperty: { type: String, required: true, trim: true },
-    address: { type: String, required: true },
-    description: { type: String, required: true },
+    title: {
+      type: String,
+      required: true
+    },
+    description: {
+      type: String,
+      required: true
+    },
+    address: {
+      type: String,
+      required: true
+    },
+    price: {
+      type: String,
+      required: true
+    },
+    images: [{
+      src: String,
+      alt: String
+    }],
+    bedrooms: {
+      type: String,
+      default: "2"
+    },
+    bathrooms: {
+      type: String,
+      default: "1"
+    },
+    area: {
+      type: String,
+      default: "80"
+    },
+    typeProperty: {
+      type: String,
+      default: "Propiedad"
+    },
     m2: { type: String },
     priceM2: { type: String },
     rooms: { type: String, required: true },
     wc: { type: String, required: true },
     piso: { type: String, required: true },
     tags: [String],
-    // Cambiamos "image" a "images" para permitir múltiples imágenes
-    images: [{
-      src: { type: String },
-      alt: { type: String },
-    }],
-    price: { type: String, required: true },
     template: {
       type: String,
       default: "default",

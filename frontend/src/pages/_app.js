@@ -8,11 +8,14 @@ import { NavbarProvider } from '../components/context/navBarContext';
 import { Toaster } from 'react-hot-toast';
 import LoadingScreen from '../components/LoadingScreen';
 import SamsungInternetFix from '../components/SamsungInternetFix';
-
+import { useRouter } from 'next/router';
 
 function MyApp({ Component, pageProps }) {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [hideControlMenu, setHideControlMenu] = useState(false);
 
+  // Efecto para manejar la carga
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
@@ -32,6 +35,12 @@ function MyApp({ Component, pageProps }) {
       Router.events.off('routeChangeError', handleComplete);
     };
   }, []);
+
+  // Efecto separado para controlar la visibilidad del ControlMenu
+  useEffect(() => {
+    const isPropertyDetailPage = router.pathname === '/property/[id]';
+    setHideControlMenu(isPropertyDetailPage);
+  }, [router.pathname]);
 
   return (
     <>
@@ -63,7 +72,7 @@ function MyApp({ Component, pageProps }) {
       {loading && <LoadingScreen />}
       
       <NavbarProvider>
-        <Layout>
+        <Layout hideControlMenu={hideControlMenu}>
           <Component {...pageProps} />
         </Layout>
         <Toaster />

@@ -6,6 +6,8 @@ import { useRouter } from 'next/router';
 import { motion } from "framer-motion";
 import { FaBed, FaBath, FaRulerCombined, FaMapMarkerAlt, FaEuroSign } from "react-icons/fa";
 import AnimatedOnScroll from "../AnimatedScroll";
+import { getPropertyPosts } from "../../pages/api";
+import PropertyImage from './PropertyImage';
 
 // Estilos consistentes con el resto de la web
 const textShadowStyle = { textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' };
@@ -106,11 +108,97 @@ const getProxiedImageUrl = (url) => {
   return `https://images.weserv.nl/?url=${encodeURIComponent(url)}&output=webp`;
 };
 
+// Añadir esta función para corregir las ubicaciones
+const getCorrectLocation = (property) => {
+  // Si es una propiedad de MongoDB, usar la dirección tal cual
+  if (property._id && property.address) {
+    return property.address;
+  }
+  
+  // Para propiedades de WordPress
+  if (property.id) {
+    // Usar el nombre de la propiedad como dirección principal
+    const propertyName = property.name || '';
+    
+    // Si el nombre parece una dirección de Madrid, usarla
+    if (/calle|avenida|plaza|paseo/i.test(propertyName)) {
+      return propertyName + ', Madrid';
+    }
+    
+    // Si hay una dirección en los metadatos
+    if (property.meta_data) {
+      const addressMeta = property.meta_data.find(meta => 
+        meta.key === "direccion" || meta.key === "address" || meta.key === "location"
+      );
+      
+      if (addressMeta && addressMeta.value) {
+        // Si el valor es un objeto, intentar extraer la dirección
+        if (typeof addressMeta.value === 'object') {
+          // Intentar extraer campos comunes de dirección
+          const addressObj = addressMeta.value;
+          
+          // Verificar si es una dirección extranjera por país o ciudad
+          const isExtranjeraObj = 
+            (addressObj.country && addressObj.country !== 'Spain' && addressObj.country !== 'España') ||
+            (addressObj.country_short && addressObj.country_short !== 'ES') ||
+            (addressObj.city && ['Kardinya', 'Berlin', 'Northcote'].includes(addressObj.city)) ||
+            (addressObj.state && ['Western Australia', 'Victoria', 'WA', 'VIC'].includes(addressObj.state));
+          
+          // Si es extranjera, usar el nombre de la propiedad
+          if (isExtranjeraObj) {
+            return propertyName + ', Madrid';
+          }
+          
+          // Si tiene un campo 'address', verificar que no sea extranjera
+          if (addressObj.address && typeof addressObj.address === 'string') {
+            if (!addressObj.address.includes("Australia") && 
+                !addressObj.address.includes("Germany") && 
+                !addressObj.address.includes("USA") &&
+                !addressObj.address.includes("Loris Way") &&
+                !addressObj.address.includes("High St")) {
+              return addressObj.address;
+            } else {
+              return propertyName + ', Madrid';
+            }
+          }
+          
+          // Si todo falla, usar el nombre de la propiedad
+          return propertyName + ', Madrid';
+        } else {
+          // Es un valor simple, convertir a string
+          const addressValue = String(addressMeta.value);
+          
+          // Lista ampliada de términos extranjeros para filtrar
+          const terminosExtranjeros = [
+            "Australia", "Germany", "USA", "Loris Way", "High St", 
+            "Kardinya", "Berlin", "Northcote", "WA", "VIC"
+          ];
+          
+          // Verificar que no contenga ningún término extranjero
+          const esExtranjera = terminosExtranjeros.some(termino => 
+            addressValue.includes(termino)
+          );
+          
+          if (!esExtranjera) {
+            return addressValue;
+          } else {
+            return propertyName + ', Madrid';
+          }
+        }
+      }
+    }
+    
+    // Si todo falla, usar el nombre + Madrid
+    return propertyName + ', Madrid';
+  }
+  
+  return 'Madrid, España';
+};
+
 export default function PropertyPage() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [pageContent, setPageContent] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -131,34 +219,50 @@ export default function PropertyPage() {
       // Obtener el número de página actual de la URL
       const pageToLoad = router.query.page ? parseInt(router.query.page) : 1;
       
-      // Solo cargar si no estamos en la misma página o es la carga inicial
-      if (pageToLoad !== currentPage || properties.length === 0) {
+      // Actualizar el estado de la página actual
+      setCurrentPage(pageToLoad);
+      
+      // Cargar los datos
         setLoading(true);
         console.log(`Cargando página ${pageToLoad}...`);
         
         try {
-          const response = await fetch(
-            `https://realestategozamadrid.com/wp-json/wc/v3/products?consumer_key=ck_3efe242c61866209c650716bed69999cbf00a09c&consumer_secret=cs_d9a74b0a40175d14515e4f7663c126b82b09aa2d&page=${pageToLoad}&per_page=${propertiesPerPage}`
-          );
-          
-          if (!response.ok) {
-            throw new Error(`Error al cargar propiedades: ${response.status}`);
-          }
-          
-          const data = await response.json();
-          console.log(`Propiedades recibidas: ${data.length}`);
-          
-          setProperties(data);
-          setCurrentPage(pageToLoad); // Actualizar currentPage después de cargar los datos
-          
-          const totalPagesHeader = response.headers.get('X-WP-TotalPages');
-          setTotalPages(parseInt(totalPagesHeader) || 1);
+        // Usar getPropertyPosts en lugar del fetch directo
+        const data = await getPropertyPosts();
+        console.log(`Propiedades recibidas: ${data.length}`);
+        
+        // Verificar si hay propiedades de MongoDB
+        const mongoDBProperties = data.filter(p => p._id);
+        console.log(`Propiedades de MongoDB: ${mongoDBProperties.length}`);
+        if (mongoDBProperties.length > 0) {
+          console.log('Primera propiedad de MongoDB:', mongoDBProperties[0]);
+        }
+        
+        // Verificar si hay propiedades de WordPress
+        const wordPressProperties = data.filter(p => p.id && !p._id);
+        console.log(`Propiedades de WordPress: ${wordPressProperties.length}`);
+        if (wordPressProperties.length > 0) {
+          console.log('Primera propiedad de WordPress:', wordPressProperties[0].name);
+        }
+        
+        // Reordenar las propiedades para mostrar primero las de MongoDB
+        const reorderedData = [...mongoDBProperties, ...wordPressProperties];
+        
+        // Como getPropertyPosts no incluye paginación, tenemos que implementarla manualmente
+        const startIndex = (pageToLoad - 1) * propertiesPerPage;
+        const endIndex = startIndex + propertiesPerPage;
+        const paginatedData = reorderedData.slice(startIndex, endIndex);
+        
+        setProperties(paginatedData);
+        
+        // Calcular el número total de páginas
+        const calculatedTotalPages = Math.ceil(reorderedData.length / propertiesPerPage);
+        setTotalPages(calculatedTotalPages);
         } catch (error) {
           console.error("Error al cargar propiedades:", error);
           setError("No pudimos cargar las propiedades. Por favor, intenta de nuevo más tarde.");
         } finally {
           setLoading(false);
-        }
       }
     };
     
@@ -167,9 +271,10 @@ export default function PropertyPage() {
 
   // Filtrar propiedades asegurando que properties es un array
   const filteredProperties = Array.isArray(properties) 
-    ? properties.filter((property) =>
-        property.name?.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+    ? properties.filter((property) => {
+        const searchField = property.name || property.title || "";
+        return searchField.toLowerCase().includes(searchTerm.toLowerCase());
+      })
     : [];
 
   // Función simplificada para el manejo del cambio de página
@@ -280,117 +385,170 @@ export default function PropertyPage() {
               {/* Lista de propiedades en grid */}
               {filteredProperties && filteredProperties.length > 0 ? (
                 <div className="grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6 mt-6">
-                  {getCurrentProperties().map((item, index) => {
-                    // Adaptación para productos de WooCommerce
-                    // Para las imágenes 
-                    const imageUrl = item.images && item.images.length > 0
-                      ? getProxiedImageUrl(item.images[0].src)
-                      : "/fondoamarillo.jpg";
+                  {getCurrentProperties().map((property, index) => {
+                    // Determinar si es una propiedad de WordPress o de MongoDB
+                    const isWordPressProperty = property.id && !property._id;
+                    const isMongoDBProperty = property._id;
                     
-                    // Para el título
-                    const title = item.name || "Propiedad";
-                    
-                    // Para la ubicación
-                    const location = item.short_description 
-                      ? item.short_description.replace(/<\/?[^>]+(>|$)/g, "").substring(0, 30) + "..." 
-                      : "Madrid, España";
-                    
-                    // Mejora en la extracción de datos de habitaciones y baños
+                    // Extraer los datos según el tipo de propiedad
+                    const id = isWordPressProperty ? property.id : property._id;
+                    let title = "";
+
+                    if (isWordPressProperty) {
+                      title = property.name || "Propiedad sin título";
+                    } else if (isMongoDBProperty) {
+                      // Para propiedades de MongoDB, usar title o typeProperty
+                      title = property.title || property.typeProperty || "Propiedad sin título";
+                      
+                      // Si solo tenemos el tipo de propiedad, agregar la ubicación para hacerlo más descriptivo
+                      if (!property.title && property.typeProperty && property.address) {
+                        title = `${property.typeProperty} en ${property.address}`;
+                      }
+                    }
+
+                    const description = isWordPressProperty 
+                      ? property.description 
+                      : (property.description || "Sin descripción disponible");
+
+                    // Extraer la ubicación
+                    let location = "Ubicación no disponible";
+                    if (isWordPressProperty) {
+                      // Para propiedades de WordPress
+                      if (property.meta_data) {
+                        // Buscar en meta_data primero
+                        const addressMeta = property.meta_data.find(meta => 
+                          meta.key === "address" || meta.key === "Ubicación" || meta.key === "ubicacion"
+                        );
+                        if (addressMeta && addressMeta.value) {
+                          location = typeof addressMeta.value === 'object' 
+                            ? addressMeta.value.address || addressMeta.value.name || "Ubicación no disponible"
+                            : addressMeta.value;
+                        }
+                      }
+                      
+                      // Si no se encontró en meta_data, usar short_description
+                      if (location === "Ubicación no disponible" && property.short_description) {
+                        location = property.short_description;
+                      }
+                      
+                      // Extraer del nombre si contiene una dirección
+                      if (location === "Ubicación no disponible" && property.name && 
+                          (property.name.includes("Calle") || property.name.includes("Avenida") || 
+                           property.name.includes("Plaza"))) {
+                        location = property.name;
+                      }
+                    } else if (isMongoDBProperty) {
+                      // Para propiedades de MongoDB
+                      location = property.address || "Ubicación no disponible";
+                    }
+
+                    // Extraer el precio y formatear sin decimales
+                    let price = "Consultar";
+                    if (isWordPressProperty && property.price) {
+                      price = property.price;
+                    } else if (isMongoDBProperty && property.price) {
+                      // Para propiedades de MongoDB, verificar si el precio necesita ajuste
+                      price = property.price;
+                      
+                      // Si el precio es un número pequeño (menos de 1000), podría ser que falten los miles
+                      if (!isNaN(parseFloat(price)) && parseFloat(price) < 1000) {
+                        // Multiplicar por 1000 para convertir a miles
+                        price = parseFloat(price) * 1000;
+                      }
+                    }
+
+                    // Convertir el precio a número si es posible
+                    if (typeof price === 'string') {
+                      // Eliminar símbolos de moneda y separadores
+                      const cleanPrice = price.replace(/[^\d.,]/g, '').replace(',', '.');
+                      if (!isNaN(parseFloat(cleanPrice))) {
+                        price = parseFloat(cleanPrice);
+                      }
+                    }
+
+                    // Extraer información de habitaciones y baños
                     let bedrooms = "Consultar";
                     let bathrooms = "Consultar";
                     
-                    // Intentar obtener de los atributos (primera opción)
-                    if (item.attributes && Array.isArray(item.attributes)) {
-                      // Buscar por nombre exacto
-                      const bedroomsAttr = item.attributes.find(attr => 
-                        attr.name === "Habitaciones" || 
-                        attr.name.toLowerCase() === "habitaciones" ||
-                        attr.name === "Dormitorios" ||
-                        attr.name.toLowerCase() === "dormitorios"
-                      );
-                      
-                      const bathroomsAttr = item.attributes.find(attr => 
-                        attr.name === "Baños" || 
-                        attr.name.toLowerCase() === "baños" ||
-                        attr.name === "Banos" ||
-                        attr.name.toLowerCase() === "banos"
-                      );
-                      
-                      if (bedroomsAttr && bedroomsAttr.options && bedroomsAttr.options.length > 0) {
-                        bedrooms = bedroomsAttr.options[0];
+                    if (isWordPressProperty) {
+                      // Para propiedades de WordPress
+                      if (property.meta_data) {
+                        // Buscar habitaciones en meta_data
+                        const bedroomsMeta = property.meta_data.find(meta => 
+                          meta.key === "bedrooms" || meta.key === "habitaciones"
+                        );
+                        if (bedroomsMeta && bedroomsMeta.value) {
+                          bedrooms = bedroomsMeta.value;
+                        }
+                        
+                        // Buscar baños en meta_data
+                        const bathroomsMeta = property.meta_data.find(meta => 
+                          meta.key === "baños" || meta.key === "bathrooms" || meta.key === "banos"
+                        );
+                        if (bathroomsMeta && bathroomsMeta.value && bathroomsMeta.value !== "-1") {
+                          bathrooms = bathroomsMeta.value;
+                        }
                       }
                       
-                      if (bathroomsAttr && bathroomsAttr.options && bathroomsAttr.options.length > 0) {
-                        bathrooms = bathroomsAttr.options[0];
-                      }
-                    }
-                    
-                    // Intentar obtener de metadatos si los atributos no funcionaron
-                    if (bedrooms === "Consultar" && item.meta_data) {
-                      const bedroomsMeta = item.meta_data.find(meta => 
-                        meta.key === "_bedrooms" || 
-                        meta.key === "bedrooms" || 
-                        meta.key.includes("habitacion") || 
-                        meta.key.includes("dormitor")
-                      );
-                      
-                      if (bedroomsMeta && bedroomsMeta.value) {
-                        bedrooms = bedroomsMeta.value;
-                      }
-                    }
-                    
-                    if (bathrooms === "Consultar" && item.meta_data) {
-                      const bathroomsMeta = item.meta_data.find(meta => 
-                        meta.key === "_bathrooms" || 
-                        meta.key === "bathrooms" || 
-                        meta.key.includes("bano") || 
-                        meta.key.includes("baño")
-                      );
-                      
-                      if (bathroomsMeta && bathroomsMeta.value) {
-                        bathrooms = bathroomsMeta.value;
-                      }
-                    }
-                    
-                    // Si todavía no tenemos los datos, intentar extraerlos de la descripción o título
-                    if (bedrooms === "Consultar" && item.description) {
-                      const bedroomsMatch = item.description.match(/(\d+)\s*habitacion(es)?/i) || 
-                                           item.description.match(/(\d+)\s*dormitorio(s)?/i);
+                      // Buscar en la descripción si no se encontró en meta_data
+                      if (bedrooms === "Consultar" && property.description) {
+                        const bedroomsMatch = property.description.match(/(\d+)\s*habitaciones/i);
                       if (bedroomsMatch) {
                         bedrooms = bedroomsMatch[1];
                       }
                     }
                     
-                    if (bathrooms === "Consultar" && item.description) {
-                      const bathroomsMatch = item.description.match(/(\d+)\s*baño(s)?/i) || 
-                                            item.description.match(/(\d+)\s*bano(s)?/i);
+                      if (bathrooms === "Consultar" && property.description) {
+                        const bathroomsMatch = property.description.match(/(\d+)\s*baños/i);
                       if (bathroomsMatch) {
                         bathrooms = bathroomsMatch[1];
+                        }
+                      }
+                    } else if (isMongoDBProperty) {
+                      // Para propiedades de MongoDB
+                      bedrooms = property.bedrooms || property.rooms || "Consultar";
+                      bathrooms = property.bathrooms || property.wc || "Consultar";
+                    }
+                    
+                    // Determinar la URL de la imagen
+                    let imageUrl = "/fondoamarillo.jpg"; // Imagen por defecto
+                    if (isWordPressProperty) {
+                      // Para propiedades de WordPress
+                      if (property.images && property.images.length > 0) {
+                        imageUrl = property.images[0].src;
+                        console.log(`Imagen de WordPress: ${imageUrl}`);
+                      }
+                    } else if (isMongoDBProperty) {
+                      // Para propiedades de MongoDB
+                      if (property.images && property.images.length > 0) {
+                        // Verificar la estructura de las imágenes
+                        if (typeof property.images[0] === 'string') {
+                          imageUrl = property.images[0];
+                        } else if (property.images[0].src) {
+                          imageUrl = property.images[0].src;
+                        } else if (property.images[0].url) {
+                          imageUrl = property.images[0].url;
+                        }
+                        console.log(`Imagen de MongoDB: ${imageUrl}`);
                       }
                     }
                     
-                    // Último recurso - si el título contiene la información
-                    if (bedrooms === "Consultar" && title) {
-                      const titleBedroomsMatch = title.match(/(\d+)\s*hab/i) || title.match(/(\d+)\s*dorm/i);
-                      if (titleBedroomsMatch) {
-                        bedrooms = titleBedroomsMatch[1];
-                      }
-                    }
+                    console.log(`Propiedad ${index} detalles:`, { 
+                      id, 
+                      title, 
+                      location,
+                      price: typeof price === 'number' 
+                        ? new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(price)
+                        : price,
+                      bedrooms,
+                      bathrooms,
+                      source: isWordPressProperty ? 'WordPress' : 'MongoDB'
+                    });
                     
-                    if (bathrooms === "Consultar" && title) {
-                      const titleBathroomsMatch = title.match(/(\d+)\s*baño/i) || title.match(/(\d+)\s*bano/i);
-                      if (titleBathroomsMatch) {
-                        bathrooms = titleBathroomsMatch[1];
-                      }
-                    }
-                    
-                    const price = item.price 
-                      ? `${parseInt(item.price).toLocaleString('es-ES')}€` 
-                      : "Consultar";
-
+                    // Renderizar la propiedad
                     return (
                       <motion.div
-                        key={item.id}
+                        key={id || index}
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ delay: Math.min(index * 0.05, 0.3) }}
@@ -398,93 +556,92 @@ export default function PropertyPage() {
                         className="bg-white/5 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden hover:scale-[1.03]"
                       >
                         <Link
-                          href={`/property/${item.id}`}
+                          href={`/property/${id}`}
                           className="group block rounded-xl dark:text-white dark:hover:text-black bg-white dark:bg-slate-900 shadow hover:bg-gold dark:hover:shadow-xl dark:shadow-gray-700 dark:hover:shadow-gray-700 overflow-hidden ease-in-out duration-500"
                         >
                           <div className="relative">
                             <div className="relative w-full aspect-video">
-                              {imageUrl.startsWith('http') ? (
-                                // Para imágenes externas, usar un elemento img regular
-                                <img 
+                              <PropertyImage 
                                   src={imageUrl}
                                   alt={title}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                // Para imágenes locales, usar Next Image
-                                <Image
-                                  src={imageUrl}
-                                  width={0}
-                                  height={0}
-                                  sizes="100vw"
-                                  style={{ width: "100%", height: "auto" }}
-                                  alt={title}
-                                />
-                              )}
+                                className="w-full h-full"
+                              />
                             </div>
 
                             <div className="absolute top-4 end-4">
-                              <Link
-                                href="#"
+                              <button
                                 onClick={(e) => {
                                   e.preventDefault();
+                                  e.stopPropagation();
                                   // Aquí la lógica para "like" si lo deseas
                                 }}
                                 className="btn btn-icon bg-white dark:bg-slate-900 shadow dark:shadow-gray-700 rounded-full text-slate-100 dark:text-slate-700 focus:text-red-600 dark:focus:text-red-600 hover:text-red-600 dark:hover:text-red-600"
                               >
                                 <i className="mdi mdi-heart text-[20px]"></i>
-                              </Link>
+                              </button>
                             </div>
                           </div>
 
                           <div className="p-6">
                             <div className="pb-6">
+                              {/* Mostrar la dirección como título principal */}
                               <h3 className="text-lg hover:text-amarillo font-medium ease-in-out duration-500">
-                                {title}
+                                {getCorrectLocation(property)}
                               </h3>
+                              {/* Mostrar el título original como subtítulo si es diferente de la dirección */}
+                              {title !== getCorrectLocation(property) && (
+                                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                  {title}
+                                </p>
+                              )}
                             </div>
 
-                            <ul className="py-6 border-y border-slate-100 dark:border-gray-800 flex items-center list-none">
-                              <li className="flex items-center me-4">
+                            <ul className="py-6 border-y border-slate-100 dark:border-gray-800 flex flex-wrap items-center list-none">
+                              {/* Superficie en lugar de tipo de propiedad */}
+                              <li className="flex items-center me-4 mb-2">
                                 <i className="mdi mdi-arrow-expand-all text-2xl me-2 text-amarillo"></i>
-                                <span>{location}</span>
+                                <span>
+                                  <span className="block text-xs text-gray-500 dark:text-gray-400">Superficie</span>
+                                  {property.area || property.superficie || 
+                                   (property.meta_data?.find(m => m.key === 'area' || m.key === 'superficie' || m.key === 'living_area')?.value) || 
+                                   "Consultar"} 
+                                  {property.area || property.superficie || property.meta_data?.find(m => m.key === 'area' || m.key === 'superficie' || m.key === 'living_area')?.value ? "m²" : ""}
+                                </span>
                               </li>
-                              <li className="flex items-center me-4">
+                              {/* Habitaciones */}
+                              <li className="flex items-center me-4 mb-2">
                                 <i className="mdi mdi-bed text-2xl me-2 text-amarillo"></i>
-                                <span>{bedrooms} habitaciones</span>
+                                <span>
+                                  <span className="block text-xs text-gray-500 dark:text-gray-400">Habitaciones</span>
+                                  {bedrooms} {bedrooms !== "Consultar" ? "" : ""}
+                                </span>
                               </li>
-                              <li className="flex items-center">
+                              {/* Baños */}
+                              <li className="flex items-center me-4 mb-2">
                                 <i className="mdi mdi-shower text-2xl me-2 text-amarillo"></i>
-                                <span>{bathrooms} baños</span>
+                                <span>
+                                  <span className="block text-xs text-gray-500 dark:text-gray-400">Baños</span>
+                                  {bathrooms} {bathrooms !== "Consultar" ? "" : ""}
+                                </span>
                               </li>
                             </ul>
 
                             <ul className="pt-6 flex justify-between items-center list-none">
                               <li>
-                                <span>Price</span>
-                                <p className="text-lg font-medium">{price}</p>
-                              </li>
-
-                              <li>
-                                <span>Rating</span>
-                                <ul className="text-lg font-medium list-none">
-                                  <li className="inline">
-                                    <i className="mdi mdi-star"></i>
-                                  </li>
-                                  <li className="inline">
-                                    <i className="mdi mdi-star"></i>
-                                  </li>
-                                  <li className="inline">
-                                    <i className="mdi mdi-star"></i>
-                                  </li>
-                                  <li className="inline">
-                                    <i className="mdi mdi-star"></i>
-                                  </li>
-                                  <li className="inline">
-                                    <i className="mdi mdi-star"></i>
-                                  </li>
-                                  <li className="inline">5.0(30)</li>
-                                </ul>
+                                <span>Precio</span>
+                                <p className="text-lg font-medium">
+                                  {typeof price === 'number' 
+                                    ? new Intl.NumberFormat('es-ES', { 
+                                        style: 'currency', 
+                                        currency: 'EUR',
+                                        minimumFractionDigits: 0,
+                                        maximumFractionDigits: 0 
+                                      }).format(price)
+                                    : price === 0 || !price 
+                                      ? "Consultar" 
+                                      : typeof price === 'string' ? price : "Consultar"
+                                  }
+                                </p>
                               </li>
                             </ul>
                           </div>
