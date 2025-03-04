@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { addDays, setHours, setMinutes } from "date-fns";
 import es from "date-fns/locale/es";
 import { toast } from "react-hot-toast";
-import { sendPropertyEmail } from "@/pages/api";
+import { sendPropertyEmail, getPropertyById } from "@/pages/api";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://goza-madrid.onrender.com';
 
@@ -28,52 +28,260 @@ export default function DefaultPropertyContent({ property }) {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-
-  // Adaptación para manejar los datos de WordPress
   const [propertyImages, setPropertyImages] = useState([]);
+  const [propertyData, setPropertyData] = useState(property);
+  const [loading, setLoading] = useState(false);
+  const [cleanedContent, setCleanedContent] = useState("");
 
-  // Extracción y procesamiento de datos de la propiedad de WordPress
+  // Determinar si es una propiedad de WordPress o de MongoDB
+  const isWordPressProperty = propertyData?.id && !propertyData?._id;
+  const isMongoDBProperty = propertyData?._id;
+
+  // Efecto para cargar los datos completos de la propiedad
   useEffect(() => {
+    const fetchPropertyData = async () => {
     if (!property) return;
+      
+      try {
+        setLoading(true);
+        // Obtener el ID de la propiedad
+        const propertyId = property._id || property.id;
+        
+        if (!propertyId) {
+          console.error("No se pudo determinar el ID de la propiedad");
+          setLoading(false);
+          return;
+        }
+        
+        console.log(`Obteniendo datos completos para propiedad ${propertyId}`);
+        
+        // Obtener los datos completos de la propiedad
+        const fullPropertyData = await getPropertyById(propertyId);
+        
+        if (fullPropertyData) {
+          console.log("Datos completos de la propiedad obtenidos:", fullPropertyData);
+          setPropertyData(fullPropertyData);
+        } else {
+          console.error("No se pudieron obtener los datos completos de la propiedad");
+        }
+      } catch (error) {
+        console.error("Error al obtener datos de la propiedad:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
     
-    setPropertyImages([]);
-    setCurrent(0);
+    fetchPropertyData();
+  }, [property?._id, property?.id]);
+
+  // Función para limpiar el contenido de WordPress
+  useEffect(() => {
+    if (!propertyData) return;
+    
+    const cleanWordPressContent = (content) => {
+      if (!content) return "";
+      
+      let cleanContent = content;
+      
+      // Eliminar shortcodes de WPBakery
+      cleanContent = cleanContent.replace(/\[\/?vc_[^\]]*\]/g, "");
+      cleanContent = cleanContent.replace(/\[\/?(fusion|vc)_[^\]]*\]/g, "");
+      
+      // Eliminar cualquier shortcode entre corchetes [] que pueda quedar
+      cleanContent = cleanContent.replace(/\[[^\]]*\]/g, "");
+      
+      // Eliminar los botones "Mostrar más/Mostrar menos" que aparecen como texto
+      cleanContent = cleanContent.replace(/Mostrar más|Mostrar menos/gi, "");
+      cleanContent = cleanContent.replace(/Mostrar másMostrar menos/gi, "");
+      
+      // Eliminar también los botones con elementos HTML
+      cleanContent = cleanContent.replace(/<button[^>]*>(Mostrar más|Mostrar menos)<\/button>/gi, "");
+      cleanContent = cleanContent.replace(/<a[^>]*class="[^"]*mostrarmas[^"]*"[^>]*>.*?<\/a>/gi, "");
+      cleanContent = cleanContent.replace(/<a[^>]*class="[^"]*mostrarmenos[^"]*"[^>]*>.*?<\/a>/gi, "");
+      
+      // Eliminar toda la sección de Ubicación completa (desde el h2 hasta el siguiente h2 o hasta el final)
+      cleanContent = cleanContent.replace(/<h2[^>]*>Ubicación<\/h2>[\s\S]*?(?=<h2|$)/gi, "");
+      
+      // Eliminar específicamente la sección que usa el nombre en español
+      cleanContent = cleanContent.replace(/<h2[^>]*>\s*Ubicación\s*<\/h2>[\s\S]*?(?=<h2|<div class="elementor|$)/gi, "");
+      
+      // Eliminar iframes de Google Maps más específicamente
+      cleanContent = cleanContent.replace(/<iframe[^>]*google\.com\/maps[^>]*>[\s\S]*?<\/iframe>/gi, "");
+      
+      // Eliminar divs con clase "ubicacion"
+      cleanContent = cleanContent.replace(/<div[^>]*class="[^"]*ubicacion[^"]*"[^>]*>[\s\S]*?<\/div>/gi, "");
+      
+      // Eliminar secciones completas que contengan mapas o ubicación
+      cleanContent = cleanContent.replace(/<section[^>]*class="[^"]*mapa[^"]*"[^>]*>[\s\S]*?<\/section>/gi, "");
+      
+      // Limpiar divs vacíos y espacios en blanco excesivos
+      cleanContent = cleanContent.replace(/<div[^>]*>\s*<\/div>/g, "");
+      cleanContent = cleanContent.replace(/\s{2,}/g, " ");
+      
+      return cleanContent;
+    };
+    
+    // Procesar el contenido según el tipo de propiedad
+    let processedContent = "";
+    
+    if (isWordPressProperty) {
+      processedContent = cleanWordPressContent(propertyData.description || propertyData.content?.rendered || "");
+    } else if (isMongoDBProperty) {
+      // Para MongoDB no necesitamos limpiar tanto, pero podemos aplicar algunas mejoras básicas
+      processedContent = propertyData.description || "";
+    }
+    
+    // Actualizar el estado con el contenido procesado
+    setCleanedContent(processedContent);
+  }, [propertyData, isWordPressProperty, isMongoDBProperty]);
+
+  // Extraer y procesar datos de la propiedad
+  let title, content, excerpt, price, bedrooms, bathrooms, area, location, propertyType, images;
+
+  if (isWordPressProperty) {
+    // Para propiedades de WordPress
+    title = propertyData.name || "Propiedad sin título";
+    content = propertyData.description || propertyData.content?.rendered || "";
+    excerpt = propertyData.short_description || "Ubicación no disponible";
+    price = propertyData.price || "Consultar precio";
+    bedrooms = "Consultar";
+    bathrooms = "Consultar";
+    area = "Consultar";
+    location = propertyData.address || "Madrid, España";
+    propertyType = "Propiedad";
+
+    // Extraer habitaciones y baños de los metadatos o atributos
+    if (propertyData.meta_data) {
+      const bedroomsMeta = propertyData.meta_data.find(meta => 
+        meta.key === "bedrooms" || meta.key === "habitaciones"
+      );
+      if (bedroomsMeta && bedroomsMeta.value) {
+        bedrooms = bedroomsMeta.value;
+      }
+      
+      const bathroomsMeta = propertyData.meta_data.find(meta => 
+        meta.key === "baños" || meta.key === "bathrooms" || meta.key === "banos"
+      );
+      if (bathroomsMeta && bathroomsMeta.value && bathroomsMeta.value !== "-1") {
+        bathrooms = bathroomsMeta.value;
+      }
+      
+      const areaMeta = propertyData.meta_data.find(meta => 
+        meta.key === "area" || meta.key === "superficie" || meta.key === "m2"
+      );
+      if (areaMeta && areaMeta.value) {
+        area = areaMeta.value;
+      }
+    }
+  } else if (isMongoDBProperty) {
+    // Para propiedades de MongoDB
+    title = propertyData.title || propertyData.typeProperty || "Propiedad sin título";
+    content = propertyData.description || "";
+    excerpt = propertyData.address || "Ubicación no disponible";
+    
+    // Procesar el precio
+    price = propertyData.price || "Consultar precio";
+    if (price && !isNaN(parseFloat(price)) && parseFloat(price) < 1000) {
+      // Si el precio es un número pequeño (menos de 1000), multiplicar por 1000
+      price = parseFloat(price) * 1000;
+    }
+    
+    // Formatear el precio
+    if (typeof price === 'number' || !isNaN(parseFloat(price))) {
+      price = new Intl.NumberFormat('es-ES', { 
+        style: 'currency', 
+        currency: 'EUR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0 
+      }).format(parseFloat(price));
+    }
+    
+    // Extraer otros datos
+    bedrooms = propertyData.bedrooms || propertyData.rooms || "Consultar";
+    bathrooms = propertyData.bathrooms || propertyData.wc || "Consultar";
+    area = propertyData.area || propertyData.m2 || "Consultar";
+    location = propertyData.address || "Madrid, España";
+    propertyType = propertyData.typeProperty || "Propiedad";
+  } else {
+    // Valores por defecto si no se puede determinar el tipo
+    title = propertyData.title || propertyData.name || "Propiedad sin título";
+    content = propertyData.description || propertyData.content?.rendered || "";
+    excerpt = propertyData.address || propertyData.short_description || "Ubicación no disponible";
+    price = propertyData.price || "Consultar precio";
+    bedrooms = propertyData.bedrooms || "Consultar";
+    bathrooms = propertyData.bathrooms || "Consultar";
+    area = propertyData.area || "Consultar";
+    location = propertyData.address || "Madrid, España";
+    propertyType = propertyData.typeProperty || "Propiedad";
+  }
+
+  // Procesar imágenes
+  useEffect(() => {
+    if (!propertyData) return;
+    
+    console.log("Procesando imágenes para la propiedad:", propertyData.title || propertyData.name);
     
     let images = [];
     
-    if (property.images && Array.isArray(property.images) && property.images.length > 0) {
-      console.log("Procesando imágenes de la API:", property.images.length);
+    if (isWordPressProperty && propertyData.images && Array.isArray(propertyData.images) && propertyData.images.length > 0) {
+      console.log("Procesando imágenes de WordPress:", propertyData.images.length);
       
       // Prevenir doble proxying
-      images = property.images.map(img => {
-        let imageSrc = img.src;
+      images = propertyData.images.map(img => {
+        // Determinar si la imagen ya está siendo procesada por el proxy
+        const isAlreadyProxied = img.src && img.src.includes('/api/image-proxy');
         
-        // IMPORTANTE: Verificar que no estamos haciendo proxy de un proxy
-        // Solo aplicar proxy a URLs directas de realestategozamadrid.com
-        if (imageSrc && 
-            imageSrc.includes('realestategozamadrid.com') && 
-            !imageSrc.includes('/api/image-proxy')) {
-          imageSrc = `/api/image-proxy?url=${encodeURIComponent(imageSrc)}`;
+        // Si ya está proxificada, usar la URL tal cual
+        const imageSrc = isAlreadyProxied 
+          ? img.src 
+          : `/api/image-proxy?url=${encodeURIComponent(img.src)}`;
+        
+        return {
+          src: imageSrc,
+          alt: img.name || title || "Imagen de propiedad",
+          originalSrc: img.src,
+          isProxied: imageSrc !== img.src // Marcar si ya está proxificada
+        };
+      });
+    } else if (isMongoDBProperty && propertyData.images && Array.isArray(propertyData.images)) {
+      console.log("Procesando imágenes de MongoDB:", propertyData.images.length);
+      
+      // Manejar diferentes formatos de imágenes en MongoDB
+      images = propertyData.images.map(img => {
+        let imageSrc, imgAlt;
+        
+        if (typeof img === 'string') {
+          imageSrc = img;
+          imgAlt = title || "Imagen de propiedad";
+        } else if (img.src) {
+          imageSrc = img.src;
+          imgAlt = img.alt || title || "Imagen de propiedad";
+        } else if (img.url) {
+          imageSrc = img.url;
+          imgAlt = img.alt || title || "Imagen de propiedad";
+        } else {
+          imageSrc = "/fondoamarillo.jpg";
+          imgAlt = "Imagen no disponible";
         }
         
         return {
           src: imageSrc,
-          alt: img.name || property.title || "Imagen de propiedad",
-          originalSrc: img.src,
-          isProxied: imageSrc !== img.src // Marcar si ya está proxificada
+          alt: imgAlt,
+          originalSrc: imageSrc,
+          isProxied: false
         };
       });
     } else {
       images = [{ 
         src: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format", 
-        alt: "Imagen no disponible para " + (property.title || "esta propiedad"),
+        alt: "Imagen no disponible para " + (title || "esta propiedad"),
         isProxied: false
       }];
     }
     
     console.log(`Total de imágenes a mostrar: ${images.length}`);
     setPropertyImages(images);
-  }, [property?.id]);
+  }, [propertyData?.id, propertyData?._id, isWordPressProperty, isMongoDBProperty, title]);
 
   useEffect(() => {
     if (propertyImages.length > 0) {
@@ -119,23 +327,13 @@ export default function DefaultPropertyContent({ property }) {
     }
   }, [propertyImages, current]);
 
-  if (!property) {
+  if (!propertyData) {
     return (
       <div className="container mx-auto py-8 text-center">
         <p className="text-lg text-white/80">No se encontró información de la propiedad</p>
       </div>
     );
   }
-
-  const title = property.title || property.name || "Propiedad sin título";
-  const content = property.description || property.content?.rendered || "";
-  const excerpt = property.address || "Ubicación no disponible";
-  const price = property.price || "Consultar precio";
-  const bedrooms = property.bedrooms || "2";
-  const bathrooms = property.bathrooms || "1";
-  const area = property.area || "80";
-  const location = property.address || "Madrid, España";
-  const propertyType = property.typeProperty || "Propiedad";
 
   const filterAvailableDates = (date) => {
     const today = new Date();
@@ -158,13 +356,13 @@ export default function DefaultPropertyContent({ property }) {
     
     // Enviar datos en segundo plano
     try {
-      if (!property || !property.id || !selectedDate || !selectedTime) {
+      if (!propertyData || !propertyData.id || !selectedDate || !selectedTime) {
         console.error("Datos incompletos");
         return;
       }
 
       const formData = {
-        property: property.id,
+        property: propertyData.id,
         propertyAddress: location,
         date: selectedDate.toISOString().split('T')[0],
         time: selectedTime.toISOString(),
@@ -229,7 +427,7 @@ export default function DefaultPropertyContent({ property }) {
         timestamp: new Date().toISOString()
       });
       localStorage.setItem('pendingRequests', JSON.stringify(pendingRequests));
-      console.log("�� Solicitud guardada localmente para reintento posterior");
+      console.log("Solicitud guardada localmente para reintento posterior");
     } catch (e) {
       console.error("❌ Error al guardar solicitud localmente:", e);
     }
@@ -241,7 +439,7 @@ export default function DefaultPropertyContent({ property }) {
     
     // Guardar datos para el envío antes de limpiar el formulario
     const offerData = {
-      property: property.id,
+      property: propertyData.id,
       propertyAddress: location,
       email,
       name, 
@@ -343,6 +541,15 @@ export default function DefaultPropertyContent({ property }) {
     return ranges;
   };
 
+  // Mostrar un indicador de carga mientras se obtienen los datos
+  if (loading) {
+    return (
+      <div className="container mx-auto py-12 flex justify-center items-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-amber-400"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <AnimatedOnScroll>
@@ -420,14 +627,14 @@ export default function DefaultPropertyContent({ property }) {
 
           {/* Información principal */}
           <div className="mt-8 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-xl shadow-lg p-6">
-            <div className="bg-black/50 backdrop-blur-sm rounded-xl p-4 md:p-6 mt-4">
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 mt-4">
               {/* Título de la propiedad con responsive */}
               <h1 className="text-3xl font-bold mb-2 text-black dark:text-white">{title}</h1>
               
               {/* Ubicación con responsive */}
               <div className="flex items-center gap-2 text-amber-400 mb-3">
                 <FaMapMarkerAlt className="text-sm sm:text-base" />
-                <p className="text-lg text-gray-700 dark:text-white mb-4">{location}</p>
+                <p className="text-lg text-gray-700 dark:text-white">{location}</p>
               </div>
               
               {/* Detalles de la propiedad con responsive */}
@@ -463,30 +670,33 @@ export default function DefaultPropertyContent({ property }) {
               </div>
               
               {/* Precio con responsive */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 mt-4">
                 <FaEuroSign className="text-amber-400 text-lg sm:text-xl" />
                 <p className="text-sm sm:text-base md:text-lg font-semibold text-black dark:text-white">{price}</p>
               </div>
             </div>
 
             {/* Descripción con responsive */}
-            <div 
-              className="prose prose-lg max-w-none 
-                text-black dark:text-white 
-                dark:prose-headings:text-white 
-                dark:prose-h1:text-white dark:prose-h2:!text-white dark:prose-h3:text-white
-                dark:prose-p:text-white 
-                dark:prose-li:text-white 
-                dark:prose-strong:!text-white
-                dark:prose-a:text-amarillo
-                dark:prose-code:text-white
-                dark:prose-figcaption:text-white
-                dark:prose-blockquote:text-white" 
-              dangerouslySetInnerHTML={{ __html: content }} 
-            />
+            <div className="mt-6">
+              <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Descripción</h2>
+              <div 
+                className="prose prose-lg max-w-none 
+                  text-black dark:text-white 
+                  dark:prose-headings:text-white 
+                  dark:prose-h1:text-white dark:prose-h2:!text-white dark:prose-h3:text-white
+                  dark:prose-p:text-white 
+                  dark:prose-li:text-white 
+                  dark:prose-strong:!text-white
+                  dark:prose-a:text-amarillo
+                  dark:prose-code:text-white
+                  dark:prose-figcaption:text-white
+                  dark:prose-blockquote:text-white" 
+                dangerouslySetInnerHTML={{ __html: cleanedContent }} 
+              />
+            </div>
 
             {/* Botones de acción con responsive */}
-            <div className="flex flex-col sm:flex-row justify-center gap-3 md:gap-4 mb-6 md:mb-8">
+            <div className="flex flex-col sm:flex-row justify-center gap-3 md:gap-4 mb-6 md:mb-8 mt-8">
               <button
                 onClick={() => setShowCalendar(true)}
                 className="group relative inline-flex items-center gap-1 sm:gap-2 overflow-hidden rounded-full bg-white/20 dark:bg-white/20 px-4 sm:px-6 md:px-8 py-2 sm:py-3 transition-all duration-300 hover:bg-white/30 dark:hover:bg-white/30 backdrop-blur-sm"
@@ -753,3 +963,4 @@ export default function DefaultPropertyContent({ property }) {
     </div>
   );
 }
+

@@ -149,150 +149,126 @@ export const getBlogById = async (id) => {
 };
 
 export async function getPropertyPosts() {
-  const response = await fetch(`${API_URL}/property`);
-
-  if (!response.ok) {
-    const errorData = await response.json()
-    throw new Error(errorData.message || 'Error al obtener los property posts')
-  }
-
-  return response.json()
-}
-export async function getPropertyById(id) {
+  let wpData = [];
+  let localData = [];
+  
+  // Intentar obtener propiedades de WordPress
   try {
-    console.log(`Intentando obtener la propiedad #${id}`);
+    console.log("Intentando obtener todas las propiedades desde WordPress...");
     
-    // Evitar solicitudes duplicadas con una bandera
-    let isFetching = false;
+    // Primero, obtener la primera página para saber cuántas páginas hay en total
+    const firstPageResponse = await fetch(
+      `https://realestategozamadrid.com/wp-json/wc/v3/products?consumer_key=ck_3efe242c61866209c650716bed69999cbf00a09c&consumer_secret=cs_d9a74b0a40175d14515e4f7663c126b82b09aa2d&per_page=100`
+    );
     
-    // Intentar obtener de WooCommerce si es un ID numérico
-    const isWooCommerceId = !isNaN(parseInt(id)) && String(parseInt(id)) === id;
-    
-    if (isWooCommerceId && !isFetching) {
-      try {
-        isFetching = true; // Evita múltiples solicitudes
-        
-        // Agregar timeout para evitar bloqueos
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 segundos
-        
-        const response = await fetch(
-          `https://realestategozamadrid.com/wp-json/wc/v3/products/${id}?consumer_key=ck_3efe242c61866209c650716bed69999cbf00a09c&consumer_secret=cs_d9a74b0a40175d14515e4f7663c126b82b09aa2d`,
-          { signal: controller.signal }
-        );
-        
-        clearTimeout(timeoutId);
-        isFetching = false;
-        
-        if (!response.ok) {
-          throw new Error(`Error al obtener propiedad: ${response.status}`);
-        }
-        
-        const wcData = await response.json();
-        console.log("--- DATOS DE WOOCOMMERCE ---");
-        console.log("Images en respuesta original:", wcData.images);
-        if (wcData.images && wcData.images.length > 0) {
-          console.log("Primera imagen estructura:", wcData.images[0]);
-          console.log("URL de primera imagen:", wcData.images[0].src);
-        }
-        
-        // Limpiar la descripción de elementos no deseados
-        let cleanDescription = wcData.description || "";
-        
-        // Eliminar shortcodes de Visual Composer/WPBakery
-        cleanDescription = cleanDescription.replace(/\[\/?vc_[^\]]*\]/g, "");
-        cleanDescription = cleanDescription.replace(/\[\/?(fusion|vc)_[^\]]*\]/g, "");
-        
-        // Eliminar cualquier shortcode entre corchetes [] que pueda quedar
-        cleanDescription = cleanDescription.replace(/\[[^\]]*\]/g, "");
-        
-        // Eliminar los botones "Mostrar más/Mostrar menos" que aparecen como texto
-        cleanDescription = cleanDescription.replace(/Mostrar más|Mostrar menos/gi, "");
-        cleanDescription = cleanDescription.replace(/Mostrar másMostrar menos/gi, "");
-        
-        // Eliminar también los botones con elementos HTML
-        cleanDescription = cleanDescription.replace(/<button[^>]*>(Mostrar más|Mostrar menos)<\/button>/gi, "");
-        cleanDescription = cleanDescription.replace(/<a[^>]*class="[^"]*mostrarmas[^"]*"[^>]*>.*?<\/a>/gi, "");
-        cleanDescription = cleanDescription.replace(/<a[^>]*class="[^"]*mostrarmenos[^"]*"[^>]*>.*?<\/a>/gi, "");
-        
-        // Eliminar toda la sección de Ubicación completa (desde el h2 hasta el siguiente h2 o hasta el final)
-        cleanDescription = cleanDescription.replace(/<h2[^>]*>Ubicación<\/h2>[\s\S]*?(?=<h2|$)/gi, "");
-        
-        // Eliminar específicamente la sección que usa el nombre en español
-        cleanDescription = cleanDescription.replace(/<h2[^>]*>\s*Ubicación\s*<\/h2>[\s\S]*?(?=<h2|<div class="elementor|$)/gi, "");
-        
-        // Eliminar iframes de Google Maps más específicamente
-        cleanDescription = cleanDescription.replace(/<iframe[^>]*google\.com\/maps[^>]*>[\s\S]*?<\/iframe>/gi, "");
-        
-        // Eliminar divs con clase "ubicacion"
-        cleanDescription = cleanDescription.replace(/<div[^>]*class="[^"]*ubicacion[^"]*"[^>]*>[\s\S]*?<\/div>/gi, "");
-        
-        // Eliminar secciones completas que contengan mapas o ubicación
-        cleanDescription = cleanDescription.replace(/<section[^>]*class="[^"]*mapa[^"]*"[^>]*>[\s\S]*?<\/section>/gi, "");
-        
-        // Limpiar divs vacíos y espacios en blanco excesivos
-        cleanDescription = cleanDescription.replace(/<div[^>]*>\s*<\/div>/g, "");
-        cleanDescription = cleanDescription.replace(/\s{2,}/g, " ");
-        
-        // Procesar datos para la aplicación
-        const property = {
-          id: wcData.id,
-          title: wcData.name,
-          description: cleanDescription, // Usamos la descripción limpia
-          address: wcData.short_description?.replace(/<\/?[^>]+(>|$)/g, "") || "Madrid, España",
-          price: wcData.price ? `${parseInt(wcData.price).toLocaleString()}€` : "Consultar precio",
-          images: wcData.images || [],
-          bedrooms: "2",
-          bathrooms: "1",
-          area: "80",
-          typeProperty: wcData.categories?.[0]?.name || "Propiedad",
-          _originalData: wcData
-        };
-        
-        // Convertir la URL original en una URL de proxy
-        const proxiedImages = property.images.map(img => {
-          const proxiedSrc = `/api/image-proxy?url=${encodeURIComponent(img.src)}`;
-          
-          return {
-            src: proxiedSrc,
-            alt: img.name || property.title || "Imagen de propiedad",
-            originalSrc: img.src
-          };
-        });
-        
-        return {
-          ...property,
-          images: proxiedImages
-        };
-      } catch (error) {
-        console.error("Error en solicitud a WooCommerce:", error.message);
-        isFetching = false;
-      }
+    if (!firstPageResponse.ok) {
+      throw new Error(`Error al obtener propiedades: ${firstPageResponse.status}`);
     }
     
-    // Respuesta por defecto si falla todo
-    return {
-      id: id || "error",
-      title: "Error de carga",
-      description: "No se pudo cargar la información de esta propiedad.",
-      address: "Madrid, España",
-      price: "Consultar precio",
-      images: [{ src: "/fondoamarillo.jpg", alt: "Imagen no disponible" }],
-      bedrooms: "2",
-      bathrooms: "1",
-      area: "80",
-      typeProperty: "Propiedad",
-      error: true
-    };
+    // Obtener el número total de páginas
+    const totalPages = parseInt(firstPageResponse.headers.get('X-WP-TotalPages') || '1');
+    console.log(`Total de páginas en WordPress: ${totalPages}`);
+    
+    // Obtener los datos de la primera página
+    const firstPageData = await firstPageResponse.json();
+    wpData = [...firstPageData];
+    
+    // Si hay más de una página, obtener el resto
+    if (totalPages > 1) {
+      // Crear un array de promesas para obtener todas las páginas restantes
+      const pagePromises = [];
+      
+      for (let page = 2; page <= totalPages; page++) {
+        pagePromises.push(
+          fetch(`https://realestategozamadrid.com/wp-json/wc/v3/products?consumer_key=ck_3efe242c61866209c650716bed69999cbf00a09c&consumer_secret=cs_d9a74b0a40175d14515e4f7663c126b82b09aa2d&per_page=100&page=${page}`)
+            .then(response => {
+              if (!response.ok) {
+                throw new Error(`Error al obtener página ${page}: ${response.status}`);
+              }
+              return response.json();
+            })
+        );
+      }
+      
+      // Esperar a que todas las promesas se resuelvan
+      const pagesData = await Promise.all(pagePromises);
+      
+      // Combinar todos los datos
+      pagesData.forEach(pageData => {
+        wpData = [...wpData, ...pageData];
+      });
+    }
+    
+    console.log(`Total de propiedades obtenidas de WordPress: ${wpData.length}`);
   } catch (error) {
-    console.error("Error general:", error);
-    return {
-      id: "error",
-      title: "Error de sistema",
-      description: "Error interno del servidor",
-      images: [{ src: "/fondoamarillo.jpg", alt: "Error" }],
-      error: true
-    };
+    console.error("Error al obtener propiedades de WordPress:", error);
+  }
+  
+  // Intentar obtener propiedades de la API local
+  try {
+    console.log("Intentando obtener propiedades desde API local...");
+    console.log("URL de la API local:", `${API_URL}/property`);
+    
+    const localResponse = await fetch(`${API_URL}/property`);
+    
+    if (localResponse.ok) {
+      const contentType = localResponse.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        localData = await localResponse.json();
+        console.log(`Propiedades obtenidas de API local: ${localData.length}`);
+      } else {
+        console.error("La respuesta no es JSON válido:", await localResponse.text());
+      }
+    } else {
+      console.error(`Error al obtener propiedades locales: ${localResponse.status}`);
+    }
+  } catch (localError) {
+    console.error("Error al obtener propiedades de API local:", localError);
+  }
+  
+  // Combinar los resultados de ambas fuentes
+  const combinedData = [...wpData, ...localData];
+  console.log(`Total de propiedades combinadas: ${combinedData.length}`);
+  
+  return combinedData;
+}
+
+export async function getPropertyById(id) {
+  try {
+    console.log(`Intentando obtener propiedad con ID: ${id}`);
+    
+    const isMongoId = id && id.length === 24 && /^[0-9a-fA-F]{24}$/.test(id);
+    
+    if (isMongoId) {
+      // Es un ID de MongoDB, obtener de la API local
+      console.log("Obteniendo propiedad de MongoDB");
+      const response = await fetch(`${API_URL}/property/${id}`);
+      
+      if (!response.ok) {
+        throw new Error(`Error al obtener propiedad de MongoDB: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log("Datos de MongoDB:", data);
+      return data;
+    } else {
+      // Es un ID de WordPress, obtener de la API de WordPress
+      console.log("Obteniendo propiedad de WordPress");
+      const response = await fetch(
+        `https://realestategozamadrid.com/wp-json/wc/v3/products/${id}?consumer_key=ck_3efe242c61866209c650716bed69999cbf00a09c&consumer_secret=cs_d9a74b0a40175d14515e4f7663c126b82b09aa2d`
+      );
+      
+      if (!response.ok) {
+        throw new Error(`Error al obtener propiedad de WordPress: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log("Datos de WordPress:", data);
+      return data;
+    }
+  } catch (error) {
+    console.error("Error en getPropertyById:", error);
+    throw error;
   }
 }
 

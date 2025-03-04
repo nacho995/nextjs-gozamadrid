@@ -9,35 +9,33 @@ import { dirname } from 'path';
 import cloudinary from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import multer from 'multer';
-import { notificationRouter } from './routes/notificationRoutes.js';  // Importación nombrada
-
-
+import { notificationRouter } from './routes/notificationRoutes.js';
 
 // Para usar __dirname en ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Importar rutas (convertir a import)
+// Importar rutas
 import propertyNotificationRoutes from './routes/propertyNotificationRoutes.js';
 import prefixRouter from "./routes/routerPrefix.js";
 import blogRouter from "./routes/blogRouter.js";
 import userRouter from "./routes/userContentRouter.js";
-import propertyRouter from "./routes/propertyRouter.js";
+import propertyRoutes from './routes/propertyRoutes.js';
 import propertyOfferRoutes from './routes/propertyOfferRoutes.js';
 
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
-// Configuración CORS más permisiva para diagnóstico
+// Configuración CORS
 app.use(cors({
-    origin: '*',  // Permitir todas las conexiones (SÓLO para diagnóstico)
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
 }));
 
-// Middleware para asegurar que el body se parsea correctamente
+// Middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -68,19 +66,26 @@ const storage = new CloudinaryStorage({
 const upload = multer({ storage: storage });
 
 // Rutas
-app.use("/property-notification", propertyRouter);
 app.use('/api', notificationRouter);
 app.use("/prefix", prefixRouter);
 app.use("/blog", blogRouter);
 app.use("/user", userRouter);
-app.use("/property", propertyRouter);
+app.use('/property', propertyRoutes);
 app.use('/api/property-notification', propertyNotificationRoutes);
 app.use('/api/property-offer', propertyOfferRoutes); 
 
 // Conexión a MongoDB
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log("Connected to BBDD"))
-  .catch(error => console.log("Error trying to connect to BBDD:", error));
+  .then(() => {
+    console.log('Conectado a MongoDB');
+    console.log('URI de conexión:', process.env.MONGODB_URI.replace(/mongodb\+srv:\/\/([^:]+):[^@]+@/, 'mongodb+srv://$1:****@')); // Oculta la contraseña
+    app.listen(PORT, () => {
+      console.log(`Servidor corriendo en puerto ${PORT}`);
+    });
+  })
+  .catch(err => {
+    console.error('Error al conectar a MongoDB:', err);
+  });
 
 // Manejador de errores
 app.use((err, req, res, next) => {
@@ -90,8 +95,3 @@ app.use((err, req, res, next) => {
         message: err.message || 'Error interno del servidor'
     });
 });
-
-// Iniciar servidor
-app.listen(port, () => {
-  console.log(`Server running in http://localhost:${port}`);
-}); 

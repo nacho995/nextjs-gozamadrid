@@ -1,0 +1,118 @@
+import User from '../models/userSchema.js';
+import crypto from 'crypto';
+import { sendEmail } from '../utils/email.js';
+
+// Configuración para entornos (desarrollo/producción)
+const frontendURL = process.env.FRONTEND_URL || 'http://localhost:5174';
+
+export const forgotPassword = async (req, res) => {
+  try {
+    // 1) Obtener usuario basado en el email
+    const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Por favor proporcione un email'
+      });
+    }
+
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'No existe un usuario con ese email'
+      });
+    }
+
+    // 2) Generar token de restablecimiento aleatorio
+    const resetToken = user.createPasswordResetToken();
+    await user.save({ validateBeforeSave: false });
+
+    // 3) Enviar por email
+    const resetURL = `${frontendURL}/reset-password/${resetToken}`;
+    
+    const message = `
+      <p>¿Olvidaste tu contraseña? No te preocupes, puedes establecer una nueva utilizando el siguiente enlace:</p>
+      <p><a href="${resetURL}" style="background-color: #000; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Restablecer Contraseña</a></p>
+      <p>Este enlace es válido por 10 minutos.</p>
+      <p>Si no solicitaste este cambio, por favor ignora este email.</p>
+    `;
+
+    try {
+      await sendEmail({
+        email: user.email,
+        subject: 'Restablecimiento de contraseña (válido por 10 min)',
+        html: message,
+        sendCopyToAdmin: true
+      });
+
+      console.log(`Email de recuperación enviado a: ${user.email}`);
+
+      res.status(200).json({
+        status: 'success',
+        message: 'Token enviado al email'
+      });
+      
+    } catch (err) {
+      console.error('Error al enviar email de recuperación:', err);
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      await user.save({ validateBeforeSave: false });
+
+      return res.status(500).json({
+        status: 'error',
+        message: 'Error al enviar el email. Inténtelo más tarde.'
+      });
+    }
+  } catch (error) {
+    console.error('Error en forgotPassword:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Ocurrió un error al procesar su solicitud'
+    });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    // 1) Obtener usuario basado en el token
+    const hashedToken = crypto
+      .createHash('sha256')
+      .update(req.params.token)
+      .digest('hex');
+
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
+
+    // 2) Si el token no ha expirado, y hay un usuario, establecer la nueva contraseña
+    if (!user) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'El token es inválido o ha expirado'
+      });
+    }
+
+    // 3) Actualizar la contraseña
+    user.password = req.body.password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    // 4) Responder al cliente
+    res.status(200).json({
+      status: 'success',
+      message: 'Contraseña actualizada correctamente'
+    });
+    
+  } catch (error) {
+    console.error('Error en resetPassword:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Ocurrió un error al procesar su solicitud'
+    });
+  }
+}; 

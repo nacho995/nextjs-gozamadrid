@@ -2,22 +2,25 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['realestategozamadrid.com'],
+    domains: [
+      'realestategozamadrid.com',
+      'localhost',
+      'res.cloudinary.com',
+      'images.weserv.nl',
+      'via.placeholder.com'
+    ],
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'realestategozamadrid.com',
-        port: '',
-        pathname: '/wp-content/uploads/**',
+        hostname: '**',
       },
-      // Añadir otros patrones si es necesario
     ],
   },
   async rewrites() {
     return [
       {
         source: '/imageproxy/:path*',
-        destination: 'https://realestategozamadrid.com/:path*',
+        destination: 'https://images.weserv.nl/?url=https://realestategozamadrid.com/:path*',
       },
     ];
   },
