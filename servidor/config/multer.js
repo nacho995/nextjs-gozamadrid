@@ -8,22 +8,24 @@ const __dirname = dirname(__filename);
 
 // Configuración del almacenamiento
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, '../uploads'));
+    destination: function (req, file, cb) {
+        cb(null, path.join(dirname(__dirname), 'uploads'));
     },
-    filename: (req, file, cb) => {
+    filename: function (req, file, cb) {
+        // Generar un nombre único para el archivo
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, uniqueSuffix + '-' + file.originalname);
+        const extension = path.extname(file.originalname);
+        cb(null, file.fieldname + '-' + uniqueSuffix + extension);
     }
 });
 
 // Filtro de archivos
 const fileFilter = (req, file, cb) => {
-    // Acepta solo imágenes
+    // Verificar que sea una imagen
     if (file.mimetype.startsWith('image/')) {
         cb(null, true);
     } else {
-        cb(new Error('No es un archivo de imagen válido'), false);
+        cb(new Error('Solo se permiten archivos de imagen'), false);
     }
 };
 
@@ -32,7 +34,7 @@ const upload = multer({
     storage: storage,
     fileFilter: fileFilter,
     limits: {
-        fileSize: 5 * 1024 * 1024 // 5MB máximo
+        fileSize: 5 * 1024 * 1024 // Límite de 5MB
     }
 });
 

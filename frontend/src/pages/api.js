@@ -98,42 +98,32 @@ export async function deleteBlogPost(id) {
   return response.json();
 }
 
-export const getBlogById = async (id) => {
+export async function getBlogById(id) {
   try {
-    // Verificar que el ID sea válido
-    if (!id) {
-      console.error("ID de blog no proporcionado");
-      return null;
+    const apiUrl = process.env.NEXT_LOCAL_API_URL || 'http://localhost:4000';
+    console.log(`Obteniendo blog con ID ${id} desde ${apiUrl}/blog/${id}`);
+    
+    // Usar fetch directamente sin ninguna transformación
+    const response = await fetch(`${apiUrl}/blog/${id}`);
+    
+    if (!response.ok) {
+      throw new Error(`Error al obtener blog: ${response.status}`);
     }
     
-    // Convertir a string si es necesario
-    const blogId = String(id);
+    // Obtener datos RAW y mostrarlos en consola tal cual vienen
+    const data = await response.json();
+    console.log("Datos crudos recibidos del API:", data);
+    console.log("Campos disponibles:", Object.keys(data));
+    console.log("¿Tiene content?", data.hasOwnProperty('content'));
+    console.log("Tipo de content:", typeof data.content);
     
-    // Obtener todos los blogs primero
-    const allBlogs = await getBlogPosts();
-    
-    if (!Array.isArray(allBlogs)) {
-      console.error("No se pudieron obtener los blogs");
-      return null;
-    }
-    
-    // Buscar el blog por ID o _id (podría ser cualquiera de los dos)
-    const foundBlog = allBlogs.find(blog => 
-      (blog.id && blog.id.toString() === blogId) || 
-      (blog._id && blog._id.toString() === blogId)
-    );
-    
-    if (!foundBlog) {
-      console.log(`No se encontró ningún blog con ID: ${id}`);
-      return null;
-    }
-    
-    return foundBlog;
+    // NO transformar los datos, devolverlos tal cual
+    return data;
   } catch (error) {
-    console.error("Error en getBlogById:", error);
-    return null;
+    console.error("Error obteniendo blog por ID:", error);
+    throw error;
   }
-};
+}
 
 export async function getPropertyPosts() {
   let wpData = [];
@@ -375,6 +365,7 @@ export const sendPropertyEmail = async (data) => {
     };
   }
 };
+
 
 export default async function handler(req, res) {
   const { url } = req.query;

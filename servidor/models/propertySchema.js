@@ -1,10 +1,11 @@
 import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
-const propertySchema = new mongoose.Schema({
+const propertySchema = new Schema({
     title: {
       type: String,
-      required: true
+      required: true,
+      trim: true
     },
     description: {
       type: String,
@@ -12,27 +13,27 @@ const propertySchema = new mongoose.Schema({
     },
     address: {
       type: String,
-      required: true
+      required: false
     },
     price: {
       type: String,
       required: true
     },
     images: [{
-      src: String,
-      alt: String
+      src: { type: String },
+      alt: { type: String }
     }],
     bedrooms: {
       type: String,
-      default: "2"
+      required: true
     },
     bathrooms: {
       type: String,
-      default: "1"
+      required: true
     },
     area: {
       type: String,
-      default: "80"
+      required: true
     },
     typeProperty: {
       type: String,
@@ -40,14 +41,42 @@ const propertySchema = new mongoose.Schema({
     },
     m2: { type: String },
     priceM2: { type: String },
-    rooms: { type: String, required: true },
-    wc: { type: String, required: true },
-    piso: { type: String, required: true },
+    rooms: { 
+      type: String, 
+      required: false
+    },
+    wc: { 
+      type: String, 
+      required: false
+    },
+    piso: { 
+      type: String, 
+      required: false
+    },
     tags: [String],
     template: {
       type: String,
       default: "default",
     },
+    location: {
+      type: String,
+      required: true
+    },
+    propertyType: {
+      type: String,
+      enum: ['Venta', 'Alquiler', 'Alquiler Vacacional'],
+      default: 'Venta'
+    },
+    features: [String],
+    status: {
+      type: String,
+      enum: ['Disponible', 'Vendido', 'Reservado'],
+      default: 'Disponible'
+    },
+    featured: {
+      type: Boolean,
+      default: false
+    }
   }, {
     timestamps: true,
   });

@@ -28,12 +28,21 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// Configuración CORS
+// Configuración CORS más permisiva para desarrollo
 app.use(cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
+  origin: '*',  // En producción, restringe esto a dominios específicos
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
+  credentials: true,
+  optionsSuccessStatus: 200
 }));
+
+// Middleware para depurar solicitudes
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  console.log('Headers:', req.headers);
+  next();
+});
 
 // Middleware
 app.use(express.json({ limit: '10mb' }));
@@ -74,6 +83,21 @@ app.use('/property', propertyRoutes);
 app.use('/api/property-notification', propertyNotificationRoutes);
 app.use('/api/property-offer', propertyOfferRoutes); 
 
+// Añadir esta línea para servir archivos estáticos
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Añadir un middleware para verificar que las solicitudes llegan al servidor
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  console.log('Headers:', JSON.stringify(req.headers));
+  next();
+});
+
+// Añadir una ruta de prueba en la raíz
+app.get('/', (req, res) => {
+  res.status(200).json({ message: 'Servidor funcionando correctamente' });
+});
+
 // Conexión a MongoDB
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
@@ -82,16 +106,27 @@ mongoose.connect(process.env.MONGODB_URI)
     app.listen(PORT, () => {
       console.log(`Servidor corriendo en puerto ${PORT}`);
     });
+
+    // Añadir un log para verificar la conexión a MongoDB
+    mongoose.connection.on('connected', () => {
+      console.log('Conectado a MongoDB');
+    });
+
+    mongoose.connection.on('error', (err) => {
+      console.error('Error de conexión a MongoDB:', err);
+    });
   })
   .catch(err => {
     console.error('Error al conectar a MongoDB:', err);
   });
 
-// Manejador de errores
+// Middleware para logging de errores
 app.use((err, req, res, next) => {
-    console.error('Error en el servidor:', err);
-    res.status(500).json({
-        success: false,
-        message: err.message || 'Error interno del servidor'
-    });
+  console.error('Error en el servidor:', err);
+  console.error('Stack trace:', err.stack);
+  res.status(500).json({
+    success: false,
+    message: err.message || 'Error interno del servidor',
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+  });
 });

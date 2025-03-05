@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FaCalendarAlt, FaUser, FaTags, FaArrowLeft, FaShare, FaFacebook, FaTwitter, FaLinkedin } from "react-icons/fa";
+import { FaCalendarAlt, FaUser, FaTags, FaArrowLeft, FaShare, FaFacebook, FaTwitter, FaLinkedin, FaClock } from "react-icons/fa";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { getBlogPostBySlug } from '@/services/wpApi';
@@ -381,6 +381,14 @@ const BlogContent = ({ slug }) => {
     }
   }, []);
   
+  useEffect(() => {
+    if (blog) {
+      console.log('Datos del blog recibidos:', blog);
+      console.log('Content:', blog.content);
+      console.log('ReadTime:', blog.readTime);
+    }
+  }, [blog]);
+  
   if (loading) {
     return (
       <div className="py-20 flex justify-center items-center">
@@ -412,14 +420,23 @@ const BlogContent = ({ slug }) => {
   
   const {
     title,
-    content,
+    content: rawContent,  // Renombrar para evitar confusiones
     image,
     date,
     author = "Equipo Goza Madrid",
     category = "Inmobiliaria",
     tags = [],
     excerpt,
-  } = blog;
+    readTime: blogReadTime,  // Renombrar para evitar confusiones
+  } = blog || {};
+
+  // Asegurar que content y readTime estén disponibles
+  const content = rawContent || (blog && blog.content) || blog.description || '';
+  const readTime = blogReadTime || (blog && blog.readTime) || '';
+
+  // Añadir log para verificar
+  console.log('Content procesado:', content);
+  console.log('ReadTime procesado:', readTime);
 
   const imageSrc = typeof image === 'string' 
     ? image 
@@ -483,6 +500,12 @@ const BlogContent = ({ slug }) => {
                     <span>{category}</span>
                   </div>
                 )}
+                {readTime && (
+                  <div className="flex items-center">
+                    <FaClock className="mr-2 text-amarillo" />
+                    <span>{readTime} min de lectura</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -513,6 +536,12 @@ const BlogContent = ({ slug }) => {
                 <div className="flex items-center">
                   <FaTags className="mr-2 text-amarillo" />
                   <span>{category}</span>
+                </div>
+              )}
+              {readTime && (
+                <div className="flex items-center">
+                  <FaClock className="mr-2 text-amarillo" />
+                  <span>{readTime} min de lectura</span>
                 </div>
               )}
             </div>
@@ -580,7 +609,9 @@ const BlogContent = ({ slug }) => {
           
           sm:prose-p:text-base sm:prose-h2:text-xl sm:prose-h3:text-lg"
         dangerouslySetInnerHTML={{
-          __html: typeof content === 'object' ? processHTMLContent(content.rendered) : processHTMLContent(content)
+          __html: typeof content === 'object' 
+            ? processHTMLContent(content.rendered) 
+            : processHTMLContent(content || '<p>No hay contenido disponible para este blog.</p>')
         }}
       />
 

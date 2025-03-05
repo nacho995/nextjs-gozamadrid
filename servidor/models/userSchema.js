@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
@@ -20,8 +21,8 @@ const userSchema = new Schema({
     },
     role: {
         type: String,
-        enum: ['user', 'admin'],
-        default: 'user'
+        enum: ['USER', 'ADMIN'],
+        default: 'USER'
     },
     profilePic: {
         src: {
@@ -30,7 +31,7 @@ const userSchema = new Schema({
         },
         alt: {
             type: String,
-            default: null
+            default: 'Foto de perfil'
         }
     },
     createdAt: {
@@ -50,6 +51,11 @@ userSchema.pre('save', function(next) {
     this.updatedAt = new Date();
     next();
 });
+
+// Método para comparar contraseñas
+userSchema.methods.comparePassword = async function(candidatePassword) {
+    return await bcrypt.compare(candidatePassword, this.password);
+};
 
 const User = mongoose.model('User', userSchema);
 

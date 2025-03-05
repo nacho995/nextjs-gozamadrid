@@ -7,7 +7,14 @@ const blogSchema = new mongoose.Schema({
     url: { type: String },
     author: { type: String, required: true },
     category: { type: String, required: true },
-    content: { type: String, required: true },
+    content: { 
+      type: String, 
+      required: function() {
+        // Solo requerir en documentos nuevos
+        return this.isNew;
+      },
+      default: "" 
+    },
     tags: [String],
     image: {
       src: { type: String },
@@ -21,10 +28,7 @@ const blogSchema = new mongoose.Schema({
       iconRight: { type: String },
     },
     // Nuevo campo para definir la plantilla a usar
-    template: {
-      type: String,
-      default: "default",  // Valor predeterminado
-    },
+   
   }, {
     timestamps: true,
   });

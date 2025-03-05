@@ -27,6 +27,14 @@ const nextConfig = {
         source: '/api/property-test',
         destination: '/404',
       },
+      {
+        source: '/blog-api',
+        destination: 'http://localhost:4000/blog',
+      },
+      {
+        source: '/blog-api/:path*',
+        destination: 'http://localhost:4000/blog/:path*',
+      },
     ];
   },
 }
