@@ -28,13 +28,24 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// Configuración CORS más permisiva para desarrollo
+// Definir los orígenes permitidos
+const allowedOrigins = ['https://goza-madrid-qbw9.onrender.com/', 'https://blogsypropiedades.onrender.com', 'http://localhost:4000'];
+
+// Modificar la configuración CORS con verificación de origen
 app.use(cors({
-  origin: '*',  // En producción, restringe esto a dominios específicos
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
+  // Mantener las opciones existentes
   credentials: true,
-  optionsSuccessStatus: 200
+  origin: function(origin, callback) {
+    // Permitir solicitudes sin origin (como postman) o si está en la lista de dominios permitidos
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      return callback(null, true);
+    }
+    console.log('Origen bloqueado por CORS:', origin);
+    callback(new Error('Origen no permitido por política CORS'));
+  },
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  optionsSuccessStatus: 204,
+  preflightContinue: false
 }));
 
 // Middleware para depurar solicitudes
