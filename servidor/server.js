@@ -29,7 +29,7 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 // Definir los orígenes permitidos
-const allowedOrigins = ['https://goza-madrid-qbw9.onrender.com/', 'https://blogsypropiedades.onrender.com', 'http://localhost:4000'];
+const allowedOrigins = ['https://goza-madrid-qbw9.onrender.com', 'https://blogsypropiedades.onrender.com', 'http://localhost:4000'];
 
 // Modificar la configuración CORS con verificación de origen
 app.use(cors({
@@ -114,8 +114,10 @@ mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
     console.log('Conectado a MongoDB');
     console.log('URI de conexión:', process.env.MONGODB_URI.replace(/mongodb\+srv:\/\/([^:]+):[^@]+@/, 'mongodb+srv://$1:****@')); // Oculta la contraseña
-    app.listen(PORT, () => {
-      console.log(`Servidor corriendo en puerto ${PORT}`);
+    
+    // Modificar para escuchar en todas las interfaces
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`Servidor corriendo en puerto ${PORT} en todas las interfaces`);
     });
 
     // Añadir un log para verificar la conexión a MongoDB
