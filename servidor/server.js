@@ -29,7 +29,11 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 // Definir los orígenes permitidos
-const allowedOrigins = ['https://goza-madrid-qbw9.onrender.com', 'https://blogsypropiedades.onrender.com', 'http://localhost:4000'];
+const allowedOrigins = ['https://goza-madrid-qbw9.onrender.com', 
+  'https://goza-madrid.onrender.com',
+  'https://blogsypropiedades.onrender.com', 
+  'http://localhost:4000',
+  'http://localhost:5173'];
 
 // Modificar la configuración CORS con verificación de origen
 app.use(cors({
