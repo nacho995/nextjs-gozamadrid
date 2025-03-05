@@ -100,7 +100,7 @@ export async function deleteBlogPost(id) {
 
 export async function getBlogById(id) {
   try {
-    const apiUrl = process.env.NEXT_LOCAL_API_URL || 'http://localhost:4000';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
     console.log(`Obteniendo blog con ID ${id} desde ${apiUrl}/blog/${id}`);
     
     // Usar fetch directamente sin ninguna transformación
