@@ -29,33 +29,39 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 // Definir los orígenes permitidos
-const allowedOrigins = ['https://goza-madrid-qbw9.onrender.com', 
+const allowedOrigins = [
+  'https://goza-madrid-qbw9.onrender.com', 
   'https://goza-madrid.onrender.com',
   'https://blogsypropiedades.onrender.com', 
   'http://localhost:4000',
-  'http://localhost:5173'];
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://realestategozamadrid.com'  // Añadir el dominio de WordPress
+];
 
-// Modificar la configuración CORS con verificación de origen
+// Modificar la configuración CORS para ser más permisiva con recursos estáticos
 app.use(cors({
-  // Mantener las opciones existentes
   credentials: true,
   origin: function(origin, callback) {
-    // Permitir solicitudes sin origin (como postman) o si está en la lista de dominios permitidos
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      return callback(null, true);
+    // Permitir solicitudes sin origin (como recursos estáticos) o si está en la lista
+    if (!origin || allowedOrigins.some(allowed => origin.includes(allowed))) {
+      callback(null, true);
+    } else {
+      console.log('Origen bloqueado por CORS:', origin);
+      callback(null, true); // Temporalmente permitir todos los orígenes para debugging
     }
-    console.log('Origen bloqueado por CORS:', origin);
-    callback(new Error('Origen no permitido por política CORS'));
   },
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   optionsSuccessStatus: 204,
-  preflightContinue: false
+  preflightContinue: false,
+  exposedHeaders: ['Content-Length', 'Content-Type'] // Permitir estos headers
 }));
 
-// Middleware para depurar solicitudes
+// Middleware para depurar solicitudes CORS
 app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url}`);
-  console.log('Headers:', req.headers);
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  console.log('Origin:', req.headers.origin);
+  console.log('Referer:', req.headers.referer);
   next();
 });
 
@@ -98,8 +104,12 @@ app.use('/property', propertyRoutes);
 app.use('/api/property-notification', propertyNotificationRoutes);
 app.use('/api/property-offer', propertyOfferRoutes); 
 
-// Añadir esta línea para servir archivos estáticos
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Configurar headers para recursos estáticos
+app.use('/uploads', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+}, express.static(path.join(__dirname, 'uploads')));
 
 // Añadir un middleware para verificar que las solicitudes llegan al servidor
 app.use((req, res, next) => {
