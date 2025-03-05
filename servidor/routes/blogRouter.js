@@ -25,52 +25,14 @@ const storage = new CloudinaryStorage({
 // Middleware de multer con Cloudinary
 const upload = multer({ storage: storage });
 
-// Rutas para el blog
-blogRouter.get("/", async (req, res) => {
-  try {
-    // Obtener todos los blogs con los campos necesarios
-    const blogs = await Blog.find().select('title description author category readTime button image tags createdAt updatedAt');
-    
-    // Log para verificar que se están obteniendo los blogs
-    console.log(`Se encontraron ${blogs.length} blogs en MongoDB`);
-    
-    // Devolver los blogs
-    res.status(200).json(blogs);
-  } catch (error) {
-    console.error('Error al obtener blogs:', error);
-    res.status(500).json({ message: 'Error al obtener blogs', error: error.message });
-  }
-});
-blogRouter.get("/:id", async (req, res) => {
-  try {
-    // Obtener el blog completo sin filtrar campos
-    const blog = await Blog.findById(req.params.id);
-    
-    if (!blog) {
-      return res.status(404).json({ message: 'Blog no encontrado' });
-    }
-    
-    // Log para verificar que los campos están presentes
-    console.log('Blog encontrado:', {
-      id: blog._id,
-      title: blog.title,
-      hasContent: !!blog.content,
-      contentLength: blog.content ? blog.content.length : 0,
-      readTime: blog.readTime
-    });
-    
-    // Devolver el blog completo
-    res.status(200).json(blog);
-  } catch (error) {
-    console.error('Error al obtener blog:', error);
-    res.status(500).json({ message: 'Error al obtener blog', error: error.message });
-  }
-});
+// Rutas CRUD básicas
+blogRouter.get("/", blogController.getData);
+blogRouter.get("/:id", blogController.getDataById);
 blogRouter.post("/", blogController.addData);
 blogRouter.delete("/:id", blogController.deleteData);
 blogRouter.patch("/:id", blogController.updateData);
 
-// Rutas para subir imágenes
+// Rutas para imágenes
 blogRouter.post("/upload", upload.single('file'), async (req, res) => {
   try {
     if (!req.file) {
@@ -108,6 +70,14 @@ blogRouter.delete("/delete-image", async (req, res) => {
       error: error.message 
     });
   }
+});
+
+// Ruta para actualización específica de contenido
+blogRouter.patch("/update-content/:id", blogController.updateBlogContent);
+
+// Ruta de prueba simple
+blogRouter.get("/test", (req, res) => {
+  res.status(200).json({ message: "API de blogs funcionando correctamente" });
 });
 
 // Añadir esta ruta temporal para actualizar todos los blogs sin content
@@ -170,49 +140,6 @@ blogRouter.get("/debug", async (req, res) => {
     console.error('Error en endpoint de depuración:', error);
     res.status(500).json({ message: 'Error en endpoint de depuración', error: error.message });
   }
-});
-
-// Añadir una ruta para actualizar un blog específico
-blogRouter.patch("/update-content/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { content, readTime } = req.body;
-    
-    // Construir el objeto de actualización
-    const updateData = {};
-    if (content) updateData.content = content;
-    if (readTime) updateData.readTime = readTime;
-    
-    // Actualizar el blog
-    const updatedBlog = await Blog.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true }
-    );
-    
-    if (!updatedBlog) {
-      return res.status(404).json({ message: 'Blog no encontrado' });
-    }
-    
-    // Log para verificar la actualización
-    console.log('Blog actualizado:', {
-      id: updatedBlog._id,
-      title: updatedBlog.title,
-      hasContent: !!updatedBlog.content,
-      contentLength: updatedBlog.content ? updatedBlog.content.length : 0,
-      readTime: updatedBlog.readTime
-    });
-    
-    res.status(200).json(updatedBlog);
-  } catch (error) {
-    console.error('Error al actualizar blog:', error);
-    res.status(500).json({ message: 'Error al actualizar blog', error: error.message });
-  }
-});
-
-// Añadir un endpoint de prueba simple
-blogRouter.get("/test", (req, res) => {
-  res.status(200).json({ message: "API de blogs funcionando correctamente" });
 });
 
 export default blogRouter;
