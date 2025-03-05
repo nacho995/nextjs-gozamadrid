@@ -2,6 +2,7 @@ import Blog from '../models/blogSchema.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import mongoose from 'mongoose';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -24,7 +25,32 @@ const blogController = {
     getDataById: async (req, res) => {
         try {
             const { id } = req.params;
-            const foundBlog = await Blog.findById(id);
+            console.log("Buscando blog por ID:", id);
+            
+            // Validar que el ID tenga formato válido de MongoDB
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                console.log("ID inválido:", id);
+                return res.status(400).json({ message: "ID de blog inválido" });
+            }
+            
+            // Buscar el blog incluyendo explícitamente todos los campos
+            const foundBlog = await Blog.findById(id).lean();
+            
+            if (!foundBlog) {
+                console.log("Blog no encontrado con ID:", id);
+                return res.status(404).json({ message: "Blog no encontrado" });
+            }
+            
+            // Verificación del contenido del documento
+            console.log("===== DOCUMENTO DE MONGODB =====");
+            console.log('ID:', id);
+            console.log('Campos en documento:', Object.keys(foundBlog));
+            console.log('Content existe:', 'content' in foundBlog);
+            console.log('Content value:', foundBlog.content);
+            console.log('Content type:', typeof foundBlog.content);
+            console.log('===============================');
+            
+            // Enviar el documento como JSON
             res.json(foundBlog);
         } catch (err) {
             console.log("Error fetching blog by ID:", err);
@@ -77,6 +103,33 @@ const blogController = {
         } catch (err) {
             console.log("Error uploading image:", err);
             res.status(500).json({ message: "No se pudo subir la imagen" });
+        }
+    },
+
+    // Añadir una función para actualizar el blog existente
+    updateBlogContent: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { content } = req.body;
+            
+            if (!content) {
+                return res.status(400).json({ message: 'El contenido es obligatorio' });
+            }
+            
+            const updatedBlog = await Blog.findByIdAndUpdate(
+                id,
+                { content },
+                { new: true }
+            );
+            
+            if (!updatedBlog) {
+                return res.status(404).json({ message: 'Blog no encontrado' });
+            }
+            
+            res.status(200).json(updatedBlog);
+        } catch (error) {
+            console.error('Error al actualizar el contenido del blog:', error);
+            res.status(500).json({ message: 'Error al actualizar el blog', error: error.message });
         }
     }
 };

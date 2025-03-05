@@ -11,9 +11,13 @@ import Error from 'next/error';
 const DEFAULT_IMAGE = '/img/default-image.jpg';
 
 // Importa las diferentes plantillas
-import EstiloABlogContent from '@/components/blog/ABlogContent';
+
 import DefaultBlogContent from '@/components/blog/blogcontent';
 
+// Importar el nuevo componente
+
+// Volver a importar el componente MongoDBBlogContent
+// import MongoDBBlogContent from '@/components/blog/MongoDBBlogContent';
 
 const BlogDetail = ({ initialBlog, id, isWordPress }) => {
   const router = useRouter();
@@ -22,25 +26,28 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
   const processDataBeforeRender = (data) => {
     if (!data) return null;
     
+    // Mostrar datos antes de procesar
+    console.log("ANTES DE PROCESAR:", {
+      hasContent: !!data.content,
+      contentType: typeof data.content,
+      contentSample: data.content ? data.content.substring(0, 50) : null
+    });
+    
     // Copia superficial para no modificar la fuente original
     const processed = {...data};
     
-    // Procesar campos que podrían ser objetos
-    if (processed.title && typeof processed.title === 'object') {
-      processed.title = processed.title.rendered || JSON.stringify(processed.title);
+    // Asegurarse de mantener content intacto
+    if (processed.content === undefined) {
+      console.log("ALERTA: content es undefined, creando contenido basado en description");
+      processed.content = `<p>${processed.description || ""}</p><p><em>Contenido en desarrollo.</em></p>`;
     }
     
-    if (processed.content && typeof processed.content === 'object') {
-      processed.content = processed.content.rendered || JSON.stringify(processed.content);
-    }
-    
-    if (processed.excerpt && typeof processed.excerpt === 'object') {
-      processed.excerpt = processed.excerpt.rendered || JSON.stringify(processed.excerpt);
-    }
-    
-    // Asegurarse de que otros campos críticos sean cadenas
-    processed.date = typeof processed.date === 'object' ? JSON.stringify(processed.date) : processed.date;
-    processed.author = typeof processed.author === 'object' ? JSON.stringify(processed.author) : processed.author;
+    // Mostrar datos después de procesar
+    console.log("DESPUÉS DE PROCESAR:", {
+      hasContent: !!processed.content,
+      contentType: typeof processed.content,
+      contentSample: processed.content ? processed.content.substring(0, 50) : null
+    });
     
     return processed;
   };
@@ -54,17 +61,129 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
   // Si no tenemos blog inicial, intentamos cargarlo en el cliente
   useEffect(() => {
     const fetchBlogData = async () => {
+      if (!id) return;
       if (blog) return; // Si ya tenemos datos, no hacemos nada
       
-      setLoading(true);
       try {
-        // Determinar si es un blog de WordPress o local
-        let isWP = id.startsWith('wp-') || id.startsWith('wp/') || isNaN(id);
-        let blogData;
+        setLoading(true);
         
-        console.log("Intentando cargar blog con ID:", id, "Tipo:", isWP ? "WordPress" : "Local");
+        // Determinar si es un ID de MongoDB (como en property/[id].js)
+        const isMongoId = id && id.length === 24 && /^[0-9a-fA-F]{24}$/.test(id);
         
-        if (isWP) {
+        console.log("Tipo de ID detectado:", isMongoId ? "MongoDB" : "WordPress/Otro");
+        
+        if (isMongoId) {
+          // MongoDB - obtener directamente el blog por ID
+          console.log("Obteniendo blog de MongoDB con ID:", id);
+          
+          // Usar la URL completa para asegurarnos de que es correcta
+          const apiUrl = process.env.NEXT_LOCAL_API_URL || 'http://localhost:4000';
+          console.log('URL completa:', `${apiUrl}/blog/${id}`);
+          
+          const response = await fetch(`${apiUrl}/blog/${id}`);
+          
+          if (!response.ok) {
+            throw new Error(`Error al obtener blog: ${response.status}`);
+          }
+          
+          // Muestra los datos exactos recibidos sin procesar
+          const rawData = await response.json();
+          console.log("Datos RAW recibidos de MongoDB:", rawData);
+          
+          // Aplicar el estilo de revista moderna solo a blogs de MongoDB
+          if (!rawData.content || rawData.content === 'undefined' || rawData.content.trim() === '') {
+            console.log("APLICANDO DISEÑO DE REVISTA: Creando contenido estilizado");
+            
+            // Usar la fecha formateada si está disponible
+            const formattedDate = rawData.createdAt ? new Date(rawData.createdAt).toLocaleDateString('es-ES', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            }) : 'Fecha no disponible';
+            
+            // Crear un HTML completo con nuestras clases personalizadas
+            rawData.content = `
+              <article class="magazine-layout">
+                <div class="magazine-header">
+                  <div class="magazine-category">${rawData.category || "General"}</div>
+                  <div class="magazine-readtime">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    ${rawData.readTime || "5 minutos de lectura"}
+                  </div>
+                </div>
+                
+                <div class="magazine-intro">
+                  <p class="magazine-intro-text">${rawData.description || ""}</p>
+                </div>
+                
+                <div class="magazine-grid">
+                  <div class="magazine-main">
+                    <h2 class="magazine-section-title">Aspectos Destacados</h2>
+                    <div>
+                      <p class="mb-5">Madrid es una ciudad llena de historia, cultura y gastronomía. En Goza Madrid queremos ayudarte a descubrir los mejores lugares y experiencias que ofrece la capital española.</p>
+                      
+                      <div class="magazine-highlight">
+                        <h3>¿Sabías que?</h3>
+                        <p>Madrid es una de las capitales europeas con más zonas verdes, con parques emblemáticos como El Retiro o Casa de Campo.</p>
+                      </div>
+                      
+                      <p>Este artículo está en desarrollo y pronto encontrarás mucho más contenido relacionado con ${rawData.title || "este tema"}.</p>
+                    </div>
+                  </div>
+                  
+                  <div class="magazine-sidebar">
+                    <div class="magazine-sidebar-block">
+                      <h3 class="block-title">Información Útil</h3>
+                      <div class="mb-3">
+                        <span class="font-semibold">Autor:</span>
+                        <span>${rawData.author || "Equipo Goza Madrid"}</span>
+                      </div>
+                      <div class="mb-3">
+                        <span class="font-semibold">Categoría:</span>
+                        <span>${rawData.category || "General"}</span>
+                      </div>
+                      <div class="mb-3">
+                        <span class="font-semibold">Publicado:</span>
+                        <span>${formattedDate}</span>
+                      </div>
+                    </div>
+                    
+                    <div class="magazine-quote">
+                      <blockquote>"Madrid es una ciudad que nunca duerme, llena de posibilidades para todos los gustos"</blockquote>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="magazine-banner">
+                  <p>Este artículo está en constante actualización. Visítanos pronto para descubrir nuevo contenido.</p>
+                  <a href="/blog" class="magazine-banner-link">Explorar más artículos</a>
+                </div>
+                
+                <div class="magazine-topics">
+                  <h3>Temas relacionados</h3>
+                  <div>
+                    <span class="magazine-topic">Madrid</span>
+                    <span class="magazine-topic">Turismo</span>
+                    <span class="magazine-topic">Cultura</span>
+                    <span class="magazine-topic">Ocio</span>
+                  </div>
+                </div>
+              </article>
+            `;
+          } else if (rawData.content && typeof rawData.content === 'string') {
+            const existingContent = rawData.content;
+            
+            // Asegurarnos de que el contenido esté dentro de un div con ID único
+            rawData.content = `<div id="mongodb-blog-${id}" class="mongodb-blog-content">${existingContent}</div>`;
+          }
+          
+          // No aplicar ninguna transformación, usar los datos tal como vienen
+          setSource('local');
+          setBlog(rawData);
+        } else {
+          // WordPress u otro - mantén tu lógica actual para WordPress
           // Extraer el slug real
           let slug = id;
           if (id.startsWith('wp-')) slug = id.substring(3);
@@ -77,57 +196,22 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
           if (wpPost) {
             console.log("Blog de WordPress obtenido correctamente");
             // Transformar a formato común - asegurémonos de que esto funciona correctamente
-            blogData = transformWordPressPost(wpPost, slug);
+            const blogData = transformWordPressPost(wpPost, slug);
             setSource('wordpress');
           } else {
             console.error("No se encontró el blog en WordPress");
           }
-        } else {
-          // Es un ID numérico, obtener del API local
-          console.log("Obteniendo blog local con ID:", id);
-          blogData = await getBlogById(id);
-          
-          // Asegémonos de que los datos locales también se manejen correctamente
-          if (blogData.title && typeof blogData.title === 'object') {
-            blogData.title = JSON.stringify(blogData.title);
-          }
-          if (blogData.content && typeof blogData.content === 'object') {
-            blogData.content = JSON.stringify(blogData.content);
-          }
         }
-        
-        if (blogData) {
-          // Procesar todos los campos para asegurar que son seguros para renderizar
-          Object.keys(blogData).forEach(key => {
-            if (typeof blogData[key] === 'object' && blogData[key] !== null) {
-              if (key === 'content' || key === 'excerpt' || key === 'title') {
-                if (blogData[key].rendered) {
-                  blogData[key] = blogData[key].rendered;
-                } else {
-                  blogData[key] = JSON.stringify(blogData[key]);
-                }
-              }
-            }
-          });
-          
-          console.log("Blog procesado correctamente:", 
-            typeof blogData.title === 'string' ? blogData.title : 'Título procesado');
-          setBlog(blogData);
-        } else {
-          throw new Error('No se encontró el blog solicitado');
-        }
-      } catch (error) {
-        console.error("Error cargando blog:", error);
-        setError(error.message || 'Error desconocido');
+      } catch (err) {
+        console.error("Error cargando blog:", err);
+        setError(err.message);
       } finally {
         setLoading(false);
       }
     };
     
-    if (!blog && id) {
-      fetchBlogData();
-    }
-  }, [blog, id, isWordPress]);
+    fetchBlogData();
+  }, [id, blog]);
 
   // Función para transformar datos de WordPress al formato común
   const processContent = (content) => {
@@ -174,9 +258,6 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
     );
   }
 
-  // Determinar qué componente usar para mostrar el contenido
-  const BlogContentComponent = blog.template === 'A' ? EstiloABlogContent : DefaultBlogContent;
-  
   // Procesar el contenido si es de WordPress
   if (source === 'wordpress' && blog.content) {
     blog.content = processContent(blog.content);
@@ -195,6 +276,96 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
     }
     return String(value);
   };
+
+  // Si es un blog de MongoDB, asegurarse de que todos los campos estén presentes
+  if (!isWordPress && blog) {
+    console.log('Datos de MongoDB antes de pasar al componente:', blog);
+    
+    // Asegurarse de que readTime esté presente
+    if (!blog.readTime) {
+      console.log('ReadTime no está presente en los datos');
+    }
+    
+    // Asegurarse de que content esté presente
+    if (!blog.content) {
+      console.log('Content no está presente en los datos');
+    }
+  }
+
+  // Añadir este useEffect para inyectar los estilos CSS
+  useEffect(() => {
+    // Solo si es un blog de MongoDB
+    if (source === 'local' && blog) {
+      const styleElement = document.createElement('style');
+      styleElement.textContent = `
+        /* Estilos para el contenido del blog de MongoDB */
+        .mongodb-blog-content {
+          font-family: 'Georgia', serif;
+          font-size: 1.125rem;
+          line-height: 1.8;
+          color: #333;
+        }
+        
+        .mongodb-blog-content p {
+          margin-bottom: 1.75rem !important;
+          line-height: 1.8 !important;
+          font-size: 1.1rem !important;
+        }
+        
+        .mongodb-blog-content h2 {
+          font-family: 'Helvetica', 'Arial', sans-serif;
+          font-size: 1.8rem !important;
+          font-weight: 700 !important;
+          color: #111827 !important;
+          margin-top: 2.5rem !important;
+          margin-bottom: 1.25rem !important;
+          padding-bottom: 0.5rem;
+          border-bottom: 2px solid #F3F4F6;
+        }
+        
+        .mongodb-blog-content h3 {
+          font-family: 'Helvetica', 'Arial', sans-serif;
+          font-size: 1.5rem !important;
+          font-weight: 600 !important;
+          color: #1F2937 !important;
+          margin-top: 2rem !important;
+          margin-bottom: 1rem !important;
+        }
+        
+        .mongodb-blog-content ul, .mongodb-blog-content ol {
+          margin-bottom: 1.5rem;
+          margin-left: 1.5rem;
+        }
+        
+        .mongodb-blog-content li {
+          margin-bottom: 0.5rem;
+        }
+        
+        .mongodb-blog-content a {
+          color: #2563EB;
+          text-decoration: underline;
+        }
+        
+        .mongodb-blog-content a:hover {
+          color: #1D4ED8;
+        }
+        
+        .mongodb-blog-content blockquote {
+          border-left: 4px solid #FCD34D;
+          padding-left: 1rem;
+          font-style: italic;
+          margin: 1.5rem 0;
+          color: #4B5563;
+        }
+      `;
+      document.head.appendChild(styleElement);
+      
+      return () => document.head.removeChild(styleElement);
+    }
+  }, [source, blog]);
+
+  // Usar siempre el componente disponible
+  const BlogContentComponent = DefaultBlogContent;
 
   return (
     <>
@@ -220,13 +391,7 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
                   : 'Artículo del blog de Goza Madrid'} 
               />
             </Head>
-            <BlogContentComponent 
-              slug={blog.slug} 
-              key={blog.slug}
-            />
-            <script dangerouslySetInnerHTML={{
-              __html: `console.log("Renderizando BlogContent con slug: ${blog.slug}");`
-            }} />
+            <BlogContentComponent slug={blog.slug} key={blog.slug} />
           </>
         ) : (
           <>
@@ -239,22 +404,37 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
                   : 'Artículo del blog de Goza Madrid'} 
               />
             </Head>
-            {/* Contenido normal para blogs no WordPress */}
-            <div className="pt-20 pb-12 bg-gray-50">
+            
+            {/* Renderizado directo del contenido del blog de MongoDB */}
+            <div className="pt-20 pb-12 bg-white">
               <article className="container mx-auto p-4 max-w-4xl">
                 <header className="mb-8">
                   <h1 className="text-3xl font-bold mb-4">
-                    {safeRenderValue(blog.title)}
+                    {blog.title || 'Sin título'}
                   </h1>
-                  <div className="flex items-center text-gray-600 mb-6">
-                    <time dateTime={typeof blog.date === 'object' ? JSON.stringify(blog.date) : blog.date}>
-                      {safeRenderValue(blog.date)}
-                    </time>
+                  <div className="flex flex-wrap items-center text-gray-600 mb-6 gap-2">
+                    {blog.date && (
+                      <time className="bg-gray-100 px-2 py-1 rounded text-sm">
+                        {blog.date}
+                      </time>
+                    )}
                     {blog.author && (
-                      <>
-                        <span className="mx-2">•</span>
-                        <span>{safeRenderValue(blog.author)}</span>
-                      </>
+                      <span className="bg-gray-100 px-2 py-1 rounded text-sm">
+                        Autor: {blog.author}
+                      </span>
+                    )}
+                    {blog.readTime && (
+                      <span className="bg-gray-100 px-2 py-1 rounded text-sm flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {blog.readTime}
+                      </span>
+                    )}
+                    {blog.category && (
+                      <span className="bg-amber-100 text-amber-800 px-2 py-1 rounded text-sm">
+                        {blog.category}
+                      </span>
                     )}
                   </div>
                   
@@ -269,14 +449,11 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
                   </div>
                 </header>
                 
-                {/* Contenido del blog */}
-                <div className="prose prose-lg max-w-none">
-                  {typeof blog.content === 'string' ? (
-                    <div dangerouslySetInnerHTML={{ __html: blog.content }} />
-                  ) : (
-                    <p>{safeRenderValue(blog.content)}</p>
-                  )}
-                </div>
+                {/* Contenido del blog con estilos profesionales */}
+                <div 
+                  className="prose prose-lg max-w-none mongodb-blog-content"
+                  dangerouslySetInnerHTML={{ __html: blog.content }}
+                />
               </article>
             </div>
           </>
@@ -372,17 +549,23 @@ const identifyBlogType = (id, source) => {
 // SSR para manejar tanto IDs numéricos como slugs de WordPress
 export async function getServerSideProps(context) {
   const { id } = context.params;
-  const { source } = context.query;
-  
-  console.log("SSR Blog: Recibidos parámetros:", { id, source });
-  
-  const isWordPress = identifyBlogType(id, source);
-  console.log("SSR Blog: Tipo determinado:", isWordPress ? "WordPress" : "Local");
   
   try {
-    let blog = null;
+    // Determinar si es un ID de MongoDB
+    const isMongoId = id && id.length === 24 && /^[0-9a-fA-F]{24}$/.test(id);
     
-    if (isWordPress) {
+    if (isMongoId) {
+      // MongoDB
+      const blog = await getBlogById(id);
+      return { 
+        props: { 
+          initialBlog: blog || null, 
+          id, 
+          isWordPress: false
+        } 
+      };
+    } else {
+      // WordPress
       // Extraer el slug real
       let slug = id;
       if (id.startsWith('wp-')) slug = id.substring(3);
@@ -393,36 +576,33 @@ export async function getServerSideProps(context) {
       const wpPost = await getBlogPostBySlug(slug);
       if (wpPost) {
         // Transformar a formato común
-        blog = transformWordPressPost(wpPost, slug);
-        console.log("SSR: Blog de WordPress encontrado:", wpPost.id);
+        const blogData = transformWordPressPost(wpPost, slug);
+        return { 
+          props: { 
+            initialBlog: blogData, 
+            id, 
+            isWordPress: true
+          } 
+        };
       } else {
         console.log("SSR: No se encontró blog de WordPress con slug:", slug);
-      }
-    } else {
-      // Es un ID local
-      console.log("SSR: Obteniendo blog local con ID:", id);
-      blog = await getBlogById(id);
-      if (blog) {
-        console.log("SSR: Blog local encontrado:", blog._id || blog.id);
-      } else {
-        console.log("SSR: No se encontró blog local con ID:", id);
+        return { 
+          props: { 
+            initialBlog: null, 
+            id, 
+            isWordPress: true, 
+            error: "No se encontró el blog en WordPress"
+          } 
+        };
       }
     }
-    
-    return { 
-      props: { 
-        initialBlog: blog, 
-        id, 
-        isWordPress 
-      } 
-    };
   } catch (error) {
-    console.error("Error fetching blog content:", error);
+    console.error("Error en SSR:", error);
     return { 
       props: { 
         initialBlog: null, 
         id, 
-        isWordPress, 
+        isWordPress: false, 
         error: error.message 
       } 
     };
@@ -430,3 +610,4 @@ export async function getServerSideProps(context) {
 }
 
 export default BlogDetail;
+

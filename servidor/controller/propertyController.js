@@ -6,10 +6,9 @@ const propertyController = {
     getAllProperties: async (req, res) => {
         try {
             const properties = await Property.find();
-            console.log(`Obtenidas ${properties.length} propiedades`);
-            res.json(properties);
+            res.status(200).json(properties);
         } catch (error) {
-            console.error('Error al obtener todas las propiedades:', error);
+            console.error('Error al obtener propiedades:', error);
             res.status(500).json({ message: 'Error al obtener propiedades', error: error.message });
         }
     },
@@ -227,21 +226,156 @@ const propertyController = {
     // Obtener una propiedad por ID
     getPropertyById: async (req, res) => {
         try {
-            const { id } = req.params;
-            console.log(`Buscando propiedad con ID: ${id}`);
-            
-            const property = await Property.findById(id);
-            
+            const property = await Property.findById(req.params.id);
             if (!property) {
-                console.log(`No se encontró propiedad con ID: ${id}`);
-                return res.status(404).json({ message: "Propiedad no encontrada" });
+                return res.status(404).json({ message: 'Propiedad no encontrada' });
+            }
+            res.status(200).json(property);
+        } catch (error) {
+            console.error('Error al obtener propiedad:', error);
+            res.status(500).json({ message: 'Error al obtener propiedad', error: error.message });
+        }
+    },
+
+    // Crear una nueva propiedad
+    createProperty: async (req, res) => {
+        try {
+            console.log('Datos recibidos para crear propiedad:', req.body);
+            console.log('Archivos recibidos:', req.files);
+            
+            // Crear un objeto con los campos necesarios
+            const propertyData = {
+                title: req.body.title,
+                description: req.body.description,
+                price: req.body.price,
+                location: req.body.location,
+                bedrooms: req.body.bedrooms,
+                bathrooms: req.body.bathrooms,
+                area: req.body.area,
+                propertyType: req.body.propertyType,
+                features: req.body.features || [],
+                address: req.body.address || req.body.location,
+                rooms: req.body.bedrooms,
+                wc: req.body.bathrooms,
+                piso: req.body.piso || '1',
+                m2: req.body.area,
+                priceM2: req.body.priceM2 || ''
+            };
+            
+            // Procesar imágenes si se han subido
+            if (req.files && req.files.length > 0) {
+                propertyData.images = req.files.map(file => {
+                    // Crear URL para la imagen
+                    const serverUrl = process.env.API_BASE_URL || `http://${req.get('host')}`;
+                    const imageUrl = `${serverUrl}/uploads/${file.filename}`;
+                    
+                    return {
+                        src: imageUrl,
+                        alt: req.body.title || 'Imagen de propiedad'
+                    };
+                });
+                
+                console.log('Imágenes procesadas:', propertyData.images);
             }
             
-            console.log(`Propiedad encontrada: ${property.title}`);
-            res.json(property);
+            // Si se enviaron URLs de imágenes en el cuerpo (para imágenes externas)
+            if (req.body.imageUrls && Array.isArray(req.body.imageUrls)) {
+                const existingImages = propertyData.images || [];
+                const externalImages = req.body.imageUrls.map((url, index) => ({
+                    src: url,
+                    alt: (req.body.imageAlts && req.body.imageAlts[index]) || 'Imagen de propiedad'
+                }));
+                
+                propertyData.images = [...existingImages, ...externalImages];
+            }
+            
+            console.log('Datos procesados para crear propiedad:', propertyData);
+            
+            const newProperty = new Property(propertyData);
+            const savedProperty = await newProperty.save();
+            
+            res.status(201).json(savedProperty);
         } catch (error) {
-            console.error("Error al obtener propiedad por ID:", error);
-            res.status(500).json({ message: "Error al obtener la propiedad", error: error.message });
+            console.error('Error al crear propiedad:', error);
+            res.status(500).json({ message: 'Error al crear propiedad', error: error.message });
+        }
+    },
+
+    // Actualizar una propiedad
+    updateProperty: async (req, res) => {
+        try {
+            console.log('Actualizando propiedad:', req.params.id);
+            console.log('Datos recibidos:', req.body);
+            console.log('Archivos recibidos:', req.files);
+            
+            // Preparar el objeto de actualización
+            const updateData = { ...req.body };
+            
+            // Procesar imágenes si se han subido
+            if (req.files && req.files.length > 0) {
+                // Obtener la propiedad actual para añadir a las imágenes existentes
+                const property = await Property.findById(req.params.id);
+                const existingImages = property.images || [];
+                
+                // Procesar las nuevas imágenes
+                const newImages = req.files.map(file => {
+                    // Crear URL para la imagen
+                    const serverUrl = process.env.API_BASE_URL || `http://${req.get('host')}`;
+                    const imageUrl = `${serverUrl}/uploads/${file.filename}`;
+                    
+                    return {
+                        src: imageUrl,
+                        alt: req.body.title || 'Imagen de propiedad'
+                    };
+                });
+                
+                // Combinar imágenes existentes con nuevas
+                updateData.images = [...existingImages, ...newImages];
+                console.log('Imágenes actualizadas:', updateData.images);
+            }
+            
+            // Si se enviaron URLs de imágenes en el cuerpo (para imágenes externas)
+            if (req.body.imageUrls && Array.isArray(req.body.imageUrls)) {
+                const existingImages = updateData.images || [];
+                const externalImages = req.body.imageUrls.map((url, index) => ({
+                    src: url,
+                    alt: (req.body.imageAlts && req.body.imageAlts[index]) || 'Imagen de propiedad'
+                }));
+                
+                updateData.images = [...existingImages, ...externalImages];
+            }
+            
+            // Actualizar la propiedad
+            const updatedProperty = await Property.findByIdAndUpdate(
+                req.params.id,
+                updateData,
+                { new: true, runValidators: true }
+            );
+            
+            if (!updatedProperty) {
+                return res.status(404).json({ message: 'Propiedad no encontrada' });
+            }
+            
+            res.status(200).json(updatedProperty);
+        } catch (error) {
+            console.error('Error al actualizar propiedad:', error);
+            res.status(500).json({ message: 'Error al actualizar propiedad', error: error.message });
+        }
+    },
+
+    // Eliminar una propiedad
+    deleteProperty: async (req, res) => {
+        try {
+            const deletedProperty = await Property.findByIdAndDelete(req.params.id);
+            
+            if (!deletedProperty) {
+                return res.status(404).json({ message: 'Propiedad no encontrada' });
+            }
+            
+            res.status(200).json({ message: 'Propiedad eliminada correctamente' });
+        } catch (error) {
+            console.error('Error al eliminar propiedad:', error);
+            res.status(500).json({ message: 'Error al eliminar propiedad', error: error.message });
         }
     }
 };

@@ -1,18 +1,17 @@
 import express from 'express';
 import propertyController from '../controller/propertyController.js';
-import Property from '../models/propertySchema.js';
+import { verifyToken, isAdmin } from '../middlewares/auth.js';
+import upload from '../config/multer.js';
 
 const router = express.Router();
 
-// Rutas principales de propiedades
-router.get('/getAllProperties', propertyController.getAllProperties);
-router.get('/:id', propertyController.getDataById);
-router.get('/', propertyController.getData);
-router.post('/', propertyController.addData);
-router.put('/:id', propertyController.updateData);
-router.delete('/:id', propertyController.deleteData);
-
-// Ruta específica para obtener propiedad por ID
+// Rutas públicas
+router.get('/', propertyController.getAllProperties);
 router.get('/:id', propertyController.getPropertyById);
+
+// Rutas protegidas (requieren autenticación)
+router.post('/', upload.array('images', 10), propertyController.createProperty);
+router.put('/:id', verifyToken, upload.array('images', 10), propertyController.updateProperty);
+router.delete('/:id', verifyToken, isAdmin, propertyController.deleteProperty);
 
 export default router;
