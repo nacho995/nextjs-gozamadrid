@@ -5,8 +5,7 @@ import { FaCalendarAlt, FaUser, FaTags, FaArrowLeft, FaShare, FaFacebook, FaTwit
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { getBlogPostBySlug } from '@/services/wpApi';
-import DirectImage from '../DirectImage';
-import styles from './blogcontent.module.css';
+
 
 // Usar una imagen local en lugar de placeholder.com
 const DEFAULT_IMAGE = '/img/default-image.jpg';
@@ -39,7 +38,6 @@ const processHTMLContent = (content) => {
     /<img[^>]*src\s*=\s*["']?\s*["']?[^>]*>/gi,
     (match) => {
       if (match.includes('src=""') || !match.includes('src=')) {
-        console.log('BlogContent: Eliminando imagen sin src:', match);
         return ''; // Eliminar imagen problemática
       }
       return match; // Mantener imágenes con src
@@ -68,7 +66,6 @@ const processHTMLContent = (content) => {
         absoluteSrc = `${wpDomain}/${src}`;
       }
       
-      console.log(`BlogContent: Convertida imagen relativa '${src}' a absoluta: '${absoluteSrc}'`);
       return `<img${before}src="${absoluteSrc}"${after}>`;
     }
   );
@@ -332,7 +329,6 @@ const BlogContent = ({ slug }) => {
           throw new Error('Slug no proporcionado');
         }
         
-        console.log('BlogContent: Obteniendo blog con slug:', slug);
         setLoading(true);
         
         // Obtener el blog de WordPress usando el slug
@@ -364,7 +360,6 @@ const BlogContent = ({ slug }) => {
         
         setBlog(blogData);
       } catch (err) {
-        console.error('Error obteniendo el blog:', err);
         setError(err.message || 'Error desconocido');
       } finally {
         setLoading(false);
@@ -372,10 +367,8 @@ const BlogContent = ({ slug }) => {
     };
     
     if (slug) {
-      console.log('BlogContent: Slug disponible, iniciando fetch:', slug);
       fetchBlogData();
     } else {
-      console.error('BlogContent: No se proporcionó un slug válido');
       setError('No se proporcionó un identificador para el blog');
     }
   }, [slug]);
@@ -385,7 +378,6 @@ const BlogContent = ({ slug }) => {
     if (typeof window !== 'undefined') {
       // Asegúrate de capturar la URL completa incluyendo protocolo, dominio y ruta
       setBlogUrl(window.location.href);
-      console.log("URL actual compartible:", window.location.href);
     }
   }, []);
   

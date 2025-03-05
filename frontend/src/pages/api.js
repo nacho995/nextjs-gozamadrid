@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_URL = process.env.NEXT_PUBLIC_LOCAL_API_URL || 'http://localhost:4000';
 
 export async function getCountryPrefix() {
   try {
@@ -37,68 +37,58 @@ export async function getCountryPrefix() {
   }
 }
 
-// Función auxiliar para proporcionar prefijos de país por defecto
-function getDefaultCountryPrefixes() {
-  return [
-    { code: "ES", name: "España", prefix: "+34" },
-    { code: "US", name: "Estados Unidos", prefix: "+1" },
-    { code: "UK", name: "Reino Unido", prefix: "+44" },
-    { code: "MX", name: "México", prefix: "+52" },
-    { code: "AR", name: "Argentina", prefix: "+54" },
-    { code: "CO", name: "Colombia", prefix: "+57" },
-    { code: "PE", name: "Perú", prefix: "+51" },
-    { code: "CL", name: "Chile", prefix: "+56" },
-    { code: "FR", name: "Francia", prefix: "+33" },
-    { code: "DE", name: "Alemania", prefix: "+49" },
-    { code: "IT", name: "Italia", prefix: "+39" },
-    { code: "PT", name: "Portugal", prefix: "+351" },
-    { code: "BR", name: "Brasil", prefix: "+55" }
-  ];
-}
-
-// src/pages/api/index.js
+// Esta es la forma correcta, un junior podría hacerlo así:
 export async function getBlogPosts() {
+  // Array donde guardaremos todos los blogs
+  let allBlogs = [];
+  
+  // 1. Intentar obtener blogs de WordPress
   try {
-    // Primero intentar con WordPress
-    console.log("Intentando obtener blogs desde WordPress...");
     const wpResponse = await fetch(
       "https://realestategozamadrid.com/wp-json/wp/v2/posts?_embed"
     );
     
     if (wpResponse.ok) {
-      const contentType = wpResponse.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
-        const blogData = await wpResponse.json();
-        console.log("Blogs obtenidos de WordPress:", blogData.length);
-        return blogData;
-      }
+      const wpBlogs = await wpResponse.json();
+      
+      // Añadir los blogs de WordPress al array, con la fuente marcada
+      wpBlogs.forEach(blog => {
+        allBlogs.push({
+          ...blog,
+          source: 'wordpress'  // Marcar el origen
+        });
+      });
     }
-    
-    // Si WordPress falla, intentar con la API local
-    console.log("WordPress falló o sin datos, intentando con API local...");
-    const response = await fetch(`${API_URL}/blog`, {
+  } catch (error) {
+    console.log("Error con WordPress:", error.message);
+  }
+  
+  // 2. Intentar obtener blogs de MongoDB (siempre, no importa si WordPress funcionó)
+  try {
+    const mongoResponse = await fetch(`${API_URL}/blog`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
       }
     });
     
-    if (response.ok) {
-      const localBlogData = await response.json();
-      console.log("Blogs obtenidos de API local:", localBlogData.length);
-      return localBlogData;
+    if (mongoResponse.ok) {
+      const mongoBlogs = await mongoResponse.json();
+      
+      // Añadir los blogs de MongoDB al array, con la fuente marcada
+      mongoBlogs.forEach(blog => {
+        allBlogs.push({
+          ...blog,
+          source: 'mongodb'  // Marcar el origen
+        });
+      });
     }
-    
-    // Si ambas fallan, devolver array vacío
-    return [];
-    
   } catch (error) {
-    console.error("Error al obtener blogs:", error.message);
-    return [];
+    console.log("Error con MongoDB:", error.message);
   }
+  
+  return allBlogs;
 }
-
-
 
 export async function deleteBlogPost(id) {
   const response = await fetch(`${API_URL}/blog/${id}`, {
@@ -109,8 +99,6 @@ export async function deleteBlogPost(id) {
 }
 
 export const getBlogById = async (id) => {
-  console.log("Llamando a getBlogById con ID:", id);
-  
   try {
     // Verificar que el ID sea válido
     if (!id) {
@@ -140,7 +128,6 @@ export const getBlogById = async (id) => {
       return null;
     }
     
-    console.log(`Blog encontrado con ID ${id}:`, foundBlog.title);
     return foundBlog;
   } catch (error) {
     console.error("Error en getBlogById:", error);
@@ -154,8 +141,6 @@ export async function getPropertyPosts() {
   
   // Intentar obtener propiedades de WordPress
   try {
-    console.log("Intentando obtener todas las propiedades desde WordPress...");
-    
     // Primero, obtener la primera página para saber cuántas páginas hay en total
     const firstPageResponse = await fetch(
       `https://realestategozamadrid.com/wp-json/wc/v3/products?consumer_key=ck_3efe242c61866209c650716bed69999cbf00a09c&consumer_secret=cs_d9a74b0a40175d14515e4f7663c126b82b09aa2d&per_page=100`
@@ -167,7 +152,6 @@ export async function getPropertyPosts() {
     
     // Obtener el número total de páginas
     const totalPages = parseInt(firstPageResponse.headers.get('X-WP-TotalPages') || '1');
-    console.log(`Total de páginas en WordPress: ${totalPages}`);
     
     // Obtener los datos de la primera página
     const firstPageData = await firstPageResponse.json();
@@ -199,23 +183,18 @@ export async function getPropertyPosts() {
       });
     }
     
-    console.log(`Total de propiedades obtenidas de WordPress: ${wpData.length}`);
   } catch (error) {
     console.error("Error al obtener propiedades de WordPress:", error);
   }
   
   // Intentar obtener propiedades de la API local
   try {
-    console.log("Intentando obtener propiedades desde API local...");
-    console.log("URL de la API local:", `${API_URL}/property`);
-    
     const localResponse = await fetch(`${API_URL}/property`);
     
     if (localResponse.ok) {
       const contentType = localResponse.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
         localData = await localResponse.json();
-        console.log(`Propiedades obtenidas de API local: ${localData.length}`);
       } else {
         console.error("La respuesta no es JSON válido:", await localResponse.text());
       }
@@ -228,20 +207,18 @@ export async function getPropertyPosts() {
   
   // Combinar los resultados de ambas fuentes
   const combinedData = [...wpData, ...localData];
-  console.log(`Total de propiedades combinadas: ${combinedData.length}`);
   
   return combinedData;
 }
 
 export async function getPropertyById(id) {
   try {
-    console.log(`Intentando obtener propiedad con ID: ${id}`);
+    
     
     const isMongoId = id && id.length === 24 && /^[0-9a-fA-F]{24}$/.test(id);
     
     if (isMongoId) {
       // Es un ID de MongoDB, obtener de la API local
-      console.log("Obteniendo propiedad de MongoDB");
       const response = await fetch(`${API_URL}/property/${id}`);
       
       if (!response.ok) {
@@ -249,11 +226,10 @@ export async function getPropertyById(id) {
       }
       
       const data = await response.json();
-      console.log("Datos de MongoDB:", data);
+      
       return data;
     } else {
       // Es un ID de WordPress, obtener de la API de WordPress
-      console.log("Obteniendo propiedad de WordPress");
       const response = await fetch(
         `https://realestategozamadrid.com/wp-json/wc/v3/products/${id}?consumer_key=ck_3efe242c61866209c650716bed69999cbf00a09c&consumer_secret=cs_d9a74b0a40175d14515e4f7663c126b82b09aa2d`
       );
@@ -263,7 +239,7 @@ export async function getPropertyById(id) {
       }
       
       const data = await response.json();
-      console.log("Datos de WordPress:", data);
+      
       return data;
     }
   } catch (error) {
@@ -275,7 +251,7 @@ export async function getPropertyById(id) {
 // Función para enviar el formulario de contacto
 export const sendEmail = async (data) => {
   try {
-    console.log("Enviando formulario de contacto:", data);
+   
     
     // Reformatear los datos para adaptarse al formato esperado por la API
     const formattedData = {
@@ -301,9 +277,6 @@ export const sendEmail = async (data) => {
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
     const endpoint = `${API_URL}/api/contact`;
     
-    console.log("Datos a enviar al servidor:", formattedData);
-    console.log("Endpoint:", endpoint);
-    
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
@@ -314,7 +287,6 @@ export const sendEmail = async (data) => {
     
     // Capturar la respuesta como texto para debugging
     const responseText = await response.text();
-    console.log("Respuesta del servidor (texto):", responseText);
     
     // Intentar parsear la respuesta como JSON
     let responseData;
