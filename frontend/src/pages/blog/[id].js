@@ -13,7 +13,7 @@ const DEFAULT_IMAGE = '/img/default-image.jpg';
 // Importa las diferentes plantillas
 import EstiloABlogContent from '@/components/blog/ABlogContent';
 import DefaultBlogContent from '@/components/blog/blogcontent';
-import Layout from '@/components/layout';
+
 
 const BlogDetail = ({ initialBlog, id, isWordPress }) => {
   const router = useRouter();
@@ -151,30 +151,26 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
   // Si hay error
   if (error) {
     return (
-      <Layout>
-        <div className="container mx-auto p-8">
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            <p>Error: {error}</p>
-            <button 
-              onClick={() => router.back()} 
-              className="mt-4 bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700"
-            >
-              Volver
-            </button>
-          </div>
+      <div className="container mx-auto p-8">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          <p>Error: {error}</p>
+          <button 
+            onClick={() => router.back()} 
+            className="mt-4 bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700"
+          >
+            Volver
+          </button>
         </div>
-      </Layout>
+      </div>
     );
   }
 
   // Si no hay blog
   if (!blog) {
     return (
-      <Layout>
-        <div className="container mx-auto p-8">
-          <Error statusCode={404} title="Blog no encontrado" />
-        </div>
-      </Layout>
+      <div className="container mx-auto p-8">
+        <Error statusCode={404} title="Blog no encontrado" />
+      </div>
     );
   }
 
@@ -227,14 +223,13 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
             <BlogContentComponent 
               slug={blog.slug} 
               key={blog.slug}
-              isInPageWithLayout={true}
             />
             <script dangerouslySetInnerHTML={{
               __html: `console.log("Renderizando BlogContent con slug: ${blog.slug}");`
             }} />
           </>
         ) : (
-          <Layout>
+          <>
             <Head>
               <title>{blog.title || 'Blog Post'} | Goza Madrid</title>
               <meta 
@@ -284,7 +279,7 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
                 </div>
               </article>
             </div>
-          </Layout>
+          </>
         )}
       </div>
     </>

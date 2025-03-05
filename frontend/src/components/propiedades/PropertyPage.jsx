@@ -224,25 +224,19 @@ export default function PropertyPage() {
       
       // Cargar los datos
         setLoading(true);
-        console.log(`Cargando página ${pageToLoad}...`);
         
         try {
         // Usar getPropertyPosts en lugar del fetch directo
         const data = await getPropertyPosts();
-        console.log(`Propiedades recibidas: ${data.length}`);
         
         // Verificar si hay propiedades de MongoDB
         const mongoDBProperties = data.filter(p => p._id);
-        console.log(`Propiedades de MongoDB: ${mongoDBProperties.length}`);
         if (mongoDBProperties.length > 0) {
-          console.log('Primera propiedad de MongoDB:', mongoDBProperties[0]);
         }
         
         // Verificar si hay propiedades de WordPress
         const wordPressProperties = data.filter(p => p.id && !p._id);
-        console.log(`Propiedades de WordPress: ${wordPressProperties.length}`);
         if (wordPressProperties.length > 0) {
-          console.log('Primera propiedad de WordPress:', wordPressProperties[0].name);
         }
         
         // Reordenar las propiedades para mostrar primero las de MongoDB
@@ -516,7 +510,6 @@ export default function PropertyPage() {
                       // Para propiedades de WordPress
                       if (property.images && property.images.length > 0) {
                         imageUrl = property.images[0].src;
-                        console.log(`Imagen de WordPress: ${imageUrl}`);
                       }
                     } else if (isMongoDBProperty) {
                       // Para propiedades de MongoDB
@@ -529,21 +522,11 @@ export default function PropertyPage() {
                         } else if (property.images[0].url) {
                           imageUrl = property.images[0].url;
                         }
-                        console.log(`Imagen de MongoDB: ${imageUrl}`);
                       }
                     }
                     
-                    console.log(`Propiedad ${index} detalles:`, { 
-                      id, 
-                      title, 
-                      location,
-                      price: typeof price === 'number' 
-                        ? new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(price)
-                        : price,
-                      bedrooms,
-                      bathrooms,
-                      source: isWordPressProperty ? 'WordPress' : 'MongoDB'
-                    });
+                    
+                    
                     
                     // Renderizar la propiedad
                     return (

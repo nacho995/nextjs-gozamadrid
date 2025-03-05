@@ -16,11 +16,16 @@ const nextConfig = {
       },
     ],
   },
+  pageExtensions: ['jsx', 'js'],
   async rewrites() {
     return [
       {
         source: '/imageproxy/:path*',
         destination: 'https://images.weserv.nl/?url=https://realestategozamadrid.com/:path*',
+      },
+      {
+        source: '/api/property-test',
+        destination: '/404',
       },
     ];
   },

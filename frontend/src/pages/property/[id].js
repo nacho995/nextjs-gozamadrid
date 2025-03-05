@@ -17,14 +17,11 @@ export default function PropertyDetail() {
     const fetchProperty = async () => {
       try {
         setLoading(true);
-        console.log(`Obteniendo propiedad con ID: ${id}`);
         
         // Determinar si es un ID de MongoDB (generalmente un string largo hexadecimal)
         const isMongoId = id && id.length === 24 && /^[0-9a-fA-F]{24}$/.test(id);
-        console.log(`¿Es un ID de MongoDB? ${isMongoId}`);
         
         const propertyData = await getPropertyById(id);
-        console.log("Datos de propiedad obtenidos:", propertyData);
         
         if (!propertyData) {
           throw new Error("No se encontró la propiedad");
@@ -32,7 +29,6 @@ export default function PropertyDetail() {
         
         setProperty(propertyData);
       } catch (err) {
-        console.error("Error al obtener la propiedad:", err);
         setError(err.message);
       } finally {
         setLoading(false);

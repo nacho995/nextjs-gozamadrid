@@ -53,13 +53,13 @@ export default function DefaultPropertyContent({ property }) {
           return;
         }
         
-        console.log(`Obteniendo datos completos para propiedad ${propertyId}`);
+       
         
         // Obtener los datos completos de la propiedad
         const fullPropertyData = await getPropertyById(propertyId);
         
         if (fullPropertyData) {
-          console.log("Datos completos de la propiedad obtenidos:", fullPropertyData);
+         
           setPropertyData(fullPropertyData);
         } else {
           console.error("No se pudieron obtener los datos completos de la propiedad");
@@ -219,12 +219,12 @@ export default function DefaultPropertyContent({ property }) {
   useEffect(() => {
     if (!propertyData) return;
     
-    console.log("Procesando imágenes para la propiedad:", propertyData.title || propertyData.name);
+    
     
     let images = [];
     
     if (isWordPressProperty && propertyData.images && Array.isArray(propertyData.images) && propertyData.images.length > 0) {
-      console.log("Procesando imágenes de WordPress:", propertyData.images.length);
+     
       
       // Prevenir doble proxying
       images = propertyData.images.map(img => {
@@ -244,7 +244,7 @@ export default function DefaultPropertyContent({ property }) {
         };
       });
     } else if (isMongoDBProperty && propertyData.images && Array.isArray(propertyData.images)) {
-      console.log("Procesando imágenes de MongoDB:", propertyData.images.length);
+    
       
       // Manejar diferentes formatos de imágenes en MongoDB
       images = propertyData.images.map(img => {
@@ -279,15 +279,10 @@ export default function DefaultPropertyContent({ property }) {
       }];
     }
     
-    console.log(`Total de imágenes a mostrar: ${images.length}`);
+    
     setPropertyImages(images);
   }, [propertyData?.id, propertyData?._id, isWordPressProperty, isMongoDBProperty, title]);
 
-  useEffect(() => {
-    if (propertyImages.length > 0) {
-      console.log(`Preparando ${propertyImages.length} imágenes para mostrar en el carrusel`);
-    }
-  }, [propertyImages]);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -372,7 +367,7 @@ export default function DefaultPropertyContent({ property }) {
         contactPreference: "email" // Añadido para mejorar la comunicación
       };
 
-      console.log("Enviando solicitud de visita en segundo plano:", formData);
+      
 
       // Usar AbortController para limitar el tiempo máximo de espera
       const controller = new AbortController();
@@ -427,7 +422,7 @@ export default function DefaultPropertyContent({ property }) {
         timestamp: new Date().toISOString()
       });
       localStorage.setItem('pendingRequests', JSON.stringify(pendingRequests));
-      console.log("Solicitud guardada localmente para reintento posterior");
+      
     } catch (e) {
       console.error("❌ Error al guardar solicitud localmente:", e);
     }
@@ -454,8 +449,7 @@ export default function DefaultPropertyContent({ property }) {
     setName("");
     setPhone("");
     
-    // Registrar la oferta en consola
-    console.log("Enviando oferta:", offerData);
+   
     
     // Enviar la oferta usando la ruta de notificación existente
     try {
@@ -471,8 +465,7 @@ export default function DefaultPropertyContent({ property }) {
       .then(response => {
         if (!response.ok) {
           return response.text().then(text => {
-            console.log("Respuesta del servidor:", text);
-            console.log("Oferta enviada localmente, pero hubo un error en el servidor");
+           
           });
         }
         return response.json();
@@ -495,7 +488,7 @@ export default function DefaultPropertyContent({ property }) {
     }
     
     const originalSrc = e.target.getAttribute('data-original-src') || e.target.src;
-    console.log("Error al cargar imagen:", e.target.src);
+    
     e.target.setAttribute('data-error-handled', 'true');
     
     // Comprobar si la imagen ya está siendo procesada por el proxy
@@ -503,14 +496,14 @@ export default function DefaultPropertyContent({ property }) {
     
     // Si ya estamos usando el proxy y sigue fallando, ir directamente al respaldo
     if (isAlreadyProxied) {
-      console.log("La imagen ya estaba en proxy y falló, usando respaldo final");
+     
       e.target.src = "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=400&auto=format";
       return;
     }
     
     // Si es del dominio problemático y no estamos usando el proxy, usar el proxy
     if (originalSrc.includes('realestategozamadrid.com') && !isAlreadyProxied) {
-      console.log("Usando proxy para imagen de realestategozamadrid.com");
+      
       e.target.src = `/api/image-proxy?url=${encodeURIComponent(originalSrc)}`;
     } else {
       // Si no podemos usar el proxy o ya falló con él, usar respaldo final

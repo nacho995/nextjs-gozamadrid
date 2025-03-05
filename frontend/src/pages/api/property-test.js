@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { API_URL } from '@/pages/api';
+
 
 export default function PropertyTest() {
   const [loading, setLoading] = useState(true);
