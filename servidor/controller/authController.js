@@ -115,4 +115,29 @@ export const resetPassword = async (req, res) => {
       message: 'Ocurrió un error al procesar su solicitud'
     });
   }
+};
+
+export const login = async (req, res) => {
+  try {
+    // ... lógica de autenticación existente
+    
+    // Al devolver el usuario, incluir la imagen de perfil
+    const userResponse = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      // ... otros campos
+      profileImage: user.profileImage?.url || null,
+      // ... otros datos
+    };
+    
+    res.status(200).json({
+      success: true,
+      message: 'Login exitoso',
+      user: userResponse,
+      token // si usas JWT
+    });
+  } catch (error) {
+    // ... manejo de errores
+  }
 }; 
