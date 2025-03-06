@@ -3,36 +3,38 @@ import User from '../models/userSchema.js';
 
 export const verifyToken = (req, res, next) => {
     try {
-        // Imprimir todos los encabezados para depuración
-        console.log('Headers recibidos:', req.headers);
-        
-        // Obtener el token del encabezado de autorización
+        // Obtener el token del header Authorization
         const authHeader = req.headers.authorization;
-        console.log('Authorization header:', authHeader);
         
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({ message: 'No token provided or invalid format' });
+        if (!authHeader) {
+            console.log("No hay header Authorization");
+            return res.status(401).json({ message: "No autorizado, token no proporcionado" });
         }
         
+        // El formato debería ser: "Bearer <token>"
         const token = authHeader.split(' ')[1];
-        console.log('Token extraído:', token);
-        
         if (!token) {
-            return res.status(401).json({ message: 'No token provided' });
+            console.log("Formato de token incorrecto");
+            return res.status(401).json({ message: "Formato de token incorrecto" });
         }
         
-        // Verificar el token
+        // Verificar que el token sea válido
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        console.log('Token decodificado:', decoded);
         
-        // Asignar el ID del usuario y el token decodificado a la solicitud
-        req.userId = decoded.id;
-        req.decodedToken = decoded;
+        // Añadir los datos del usuario decodificados a la request
+        req.user = decoded;
+        req.userId = decoded.id; // Para compatibilidad
+        
+        console.log("Token verificado correctamente para usuario:", decoded.id);
         
         next();
     } catch (error) {
-        console.error('Error en verifyToken:', error);
-        return res.status(401).json({ message: 'Invalid token', error: error.message });
+        console.error("Error al verificar token:", error.message);
+        // Respondemos con 401 para todos los errores de autenticación
+        res.status(401).json({ 
+            message: "Token inválido o expirado",
+            error: error.message 
+        });
     }
 };
 

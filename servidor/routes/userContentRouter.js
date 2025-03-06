@@ -131,4 +131,23 @@ userRouter.delete('/profile-image/:userId', async (req, res) => {
   }
 });
 
+// Añadir esta ruta para diagnóstico (quítala en producción)
+userRouter.get("/check-profile-image", verifyToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('name email profilePic profileImage');
+        
+        res.json({
+            user: {
+                name: user.name,
+                email: user.email,
+                profilePic: user.profilePic,
+                profileImage: user.profileImage
+            },
+            tokenInfo: req.user
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 export default userRouter;
