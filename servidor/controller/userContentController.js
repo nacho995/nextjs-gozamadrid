@@ -53,16 +53,20 @@ const userController = {
                 { expiresIn: '1h' }
             );
             
-            // Devolver token y datos básicos del usuario
+            // Devolver token y datos de usuario, incluyendo AMBOS tipos de imágenes de perfil
             res.json({ 
                 token,
                 user: {
+                    _id: user._id,
                     name: user.name,
+                    email: user.email,
                     profilePic: user.profilePic ? user.profilePic.src : null,
+                    profileImage: user.profileImage ? user.profileImage.url : null,
                     role: user.role
                 }
             });
         } catch (error) {
+            console.error("Error en login:", error);
             res.status(500).json({ message: error.message });
         }
     },
