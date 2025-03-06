@@ -5,7 +5,7 @@ import { verifyToken, isAdmin } from '../middlewares/auth.js';
 import cloudinary from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import multer from 'multer';
-import User from '../models/user.js';
+import User from '../models/userSchema.js';
 
 const userRouter = express.Router();
 
