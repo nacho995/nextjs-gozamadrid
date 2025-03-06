@@ -10,8 +10,8 @@ router.get('/', propertyController.getAllProperties);
 router.get('/:id', propertyController.getPropertyById);
 
 // Rutas protegidas (requieren autenticación)
-router.post('/', upload.array('images', 10), propertyController.createProperty);
-router.put('/:id', verifyToken, upload.array('images', 10), propertyController.updateProperty);
+router.post('/', verifyToken, isAdmin, upload.array('images', 10), propertyController.createProperty);
+router.put('/:id', verifyToken, isAdmin, upload.array('images', 10), propertyController.updateProperty);
 router.delete('/:id', verifyToken, isAdmin, propertyController.deleteProperty);
 
 export default router;

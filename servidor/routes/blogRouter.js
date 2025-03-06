@@ -6,7 +6,7 @@ import multer from 'multer';
 import blogController from '../controller/blogController.js';
 import Blog from '../models/blogSchema.js';
 import mongoose from 'mongoose';
-
+import { verifyToken, isAdmin } from '../middlewares/auth.js';
 const blogRouter = express.Router();
 
 // Configurar el storage para Cloudinary
@@ -28,9 +28,9 @@ const upload = multer({ storage: storage });
 // Rutas CRUD básicas
 blogRouter.get("/", blogController.getData);
 blogRouter.get("/:id", blogController.getDataById);
-blogRouter.post("/", blogController.addData);
-blogRouter.delete("/:id", isAdmin, blogController.deleteData);
-blogRouter.patch("/:id", blogController.updateData);
+blogRouter.post("/", verifyToken, isAdmin, blogController.addData);
+blogRouter.delete("/:id", verifyToken, isAdmin, blogController.deleteData);
+blogRouter.patch("/:id", verifyToken, isAdmin, blogController.updateData);
 
 // Rutas para imágenes
 blogRouter.post("/upload", upload.single('file'), async (req, res) => {
