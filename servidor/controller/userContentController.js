@@ -75,12 +75,45 @@ const userController = {
                 return res.status(400).json({ message: "Contraseña incorrecta" });
             }
             
+            // Sincronizar imágenes de perfil (si una existe y la otra no)
+            const updates = {};
+            
+            // Si tiene profileImage pero no profilePic
+            if (user.profileImage && user.profileImage.url && (!user.profilePic || !user.profilePic.src)) {
+                updates.profilePic = {
+                    src: user.profileImage.url,
+                    alt: user.name || 'Foto de perfil'
+                };
+            }
+            
+            // Si tiene profilePic pero no profileImage
+            if (user.profilePic && user.profilePic.src && (!user.profileImage || !user.profileImage.url)) {
+                updates.profileImage = {
+                    url: user.profilePic.src,
+                    publicId: user.profilePic.src.split('/').pop() || ''
+                };
+            }
+            
+            // Actualizar usuario si hay cambios
+            if (Object.keys(updates).length > 0) {
+                await User.findByIdAndUpdate(user._id, updates);
+                // Actualizar objeto user para la respuesta
+                Object.assign(user, updates);
+            }
+            
             // Crear token con expiración de 1 hora (3600 segundos)
             const token = jwt.sign(
                 { id: user._id, role: user.role }, 
                 process.env.JWT_SECRET,
                 { expiresIn: '1h' }
             );
+            
+            // Obtener URLs finales para la respuesta
+            const profilePicUrl = user.profilePic && user.profilePic.src ? user.profilePic.src : null;
+            const profileImageUrl = user.profileImage && user.profileImage.url ? user.profileImage.url : null;
+            
+            // Usar la primera imagen disponible si la otra no existe
+            const finalProfileUrl = profileImageUrl || profilePicUrl;
             
             // Devolver token y datos de usuario, incluyendo AMBOS tipos de imágenes de perfil
             res.json({ 
@@ -89,8 +122,8 @@ const userController = {
                     _id: user._id,
                     name: user.name,
                     email: user.email,
-                    profilePic: user.profilePic ? user.profilePic.src : null,
-                    profileImage: user.profileImage ? user.profileImage.url : null,
+                    profilePic: finalProfileUrl,
+                    profileImage: finalProfileUrl,
                     role: user.role
                 }
             });
@@ -147,6 +180,91 @@ const userController = {
         }
     },
 
+    // Nueva función para sincronizar imágenes de perfil
+    syncProfileImage: async (req, res) => {
+        try {
+            // Obtener ID del usuario del token
+            const userId = req.userId || (req.user && req.user.id);
+            
+            if (!userId) {
+                return res.status(401).json({ 
+                    success: false,
+                    message: 'No se proporcionó ID de usuario o token inválido'
+                });
+            }
+            
+            // Obtener los datos actuales del usuario
+            const user = await User.findById(userId);
+            
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Usuario no encontrado'
+                });
+            }
+            
+            // Inicializar objeto de actualizaciones
+            const updates = {};
+            
+            // Sincronizar profilePic con profileImage si existe profileImage pero no profilePic
+            if (user.profileImage && user.profileImage.url && (!user.profilePic || !user.profilePic.src)) {
+                updates.profilePic = {
+                    src: user.profileImage.url,
+                    alt: user.name || 'Foto de perfil'
+                };
+            }
+            
+            // Sincronizar profileImage con profilePic si existe profilePic pero no profileImage
+            if (user.profilePic && user.profilePic.src && (!user.profileImage || !user.profileImage.url)) {
+                updates.profileImage = {
+                    url: user.profilePic.src,
+                    publicId: user.profilePic.src.split('/').pop() || ''
+                };
+            }
+            
+            // Si no hay nada que actualizar, devolver éxito
+            if (Object.keys(updates).length === 0) {
+                return res.status(200).json({
+                    success: true,
+                    message: 'No se requieren actualizaciones en el perfil',
+                    user: {
+                        _id: user._id,
+                        name: user.name,
+                        profilePic: user.profilePic && user.profilePic.src,
+                        profileImage: user.profileImage && user.profileImage.url
+                    }
+                });
+            }
+            
+            // Actualizar usuario
+            const updatedUser = await User.findByIdAndUpdate(
+                userId,
+                updates,
+                { new: true }
+            );
+            
+            res.status(200).json({
+                success: true,
+                message: 'Perfil sincronizado correctamente',
+                user: {
+                    _id: updatedUser._id,
+                    name: updatedUser.name,
+                    profilePic: updatedUser.profilePic && updatedUser.profilePic.src,
+                    profileImage: updatedUser.profileImage && updatedUser.profileImage.url
+                }
+            });
+            
+        } catch (error) {
+            console.error('Error al sincronizar imágenes de perfil:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error al sincronizar imágenes de perfil',
+                error: error.message
+            });
+        }
+    },
+
+    // Modificar changeUserPerfil para que actualice ambos campos
     changeUserPerfil: async (req, res) => {
         try {
             console.log("Recibida solicitud para actualizar perfil");
@@ -175,9 +293,16 @@ const userController = {
                 const filename = req.file.filename.replace(/\s+/g, '-');
                 const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${filename}`;
                 
+                // Actualizar ambos campos de imagen
                 updates.profilePic = {
                     src: fileUrl,
                     alt: req.body.name || 'Foto de perfil',
+                };
+                
+                // También actualizar el campo profileImage para compatibilidad
+                updates.profileImage = {
+                    url: fileUrl,
+                    publicId: filename
                 };
             }
             
@@ -195,6 +320,7 @@ const userController = {
             res.json({
                 message: 'Perfil actualizado correctamente',
                 profilePic: updatedUser.profilePic && updatedUser.profilePic.src ? updatedUser.profilePic.src : null,
+                profileImage: updatedUser.profileImage && updatedUser.profileImage.url ? updatedUser.profileImage.url : null,
                 name: updatedUser.name,
             });
         } catch (err) {
