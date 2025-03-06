@@ -15,10 +15,39 @@ const userController = {
 
     getMe: async (req, res) => {
         try {
+            // Verificar que req.user existe y tiene id
+            if (!req.user || !req.user.id) {
+                console.error("req.user no está disponible o no tiene id:", req.user);
+                return res.status(401).json({ 
+                    message: "No autenticado correctamente",
+                    debug: { headers: req.headers }
+                });
+            }
+
+            // Buscar el usuario con todos los campos necesarios
             const user = await User.findById(req.user.id).select('-password');
+            
+            if (!user) {
+                console.error("Usuario no encontrado con ID:", req.user.id);
+                return res.status(404).json({ message: "Usuario no encontrado" });
+            }
+
+            // Log de diagnóstico
+            console.log("Usuario recuperado correctamente:", {
+                id: user._id,
+                name: user.name,
+                hasProfilePic: !!user.profilePic,
+                hasProfileImage: !!user.profileImage
+            });
+
+            // Responder con el usuario completo
             res.json(user);
         } catch (error) {
-            res.status(500).json({ message: error.message });
+            console.error("Error en getMe:", error);
+            res.status(500).json({ 
+                message: error.message,
+                stack: process.env.NODE_ENV === 'development' ? error.stack : undefined 
+            });
         }
     },
 
