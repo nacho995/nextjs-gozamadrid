@@ -29,7 +29,7 @@ const upload = multer({ storage: storage });
 blogRouter.get("/", blogController.getData);
 blogRouter.get("/:id", blogController.getDataById);
 blogRouter.post("/", blogController.addData);
-blogRouter.delete("/:id", blogController.deleteData);
+blogRouter.delete("/:id", isAdmin, blogController.deleteData);
 blogRouter.patch("/:id", blogController.updateData);
 
 // Rutas para imágenes
