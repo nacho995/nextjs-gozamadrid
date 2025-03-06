@@ -43,8 +43,18 @@ const userSchema = new Schema({
         default: Date.now
     },
     resetPasswordToken: String,
-    resetPasswordExpires: Date
-});
+    resetPasswordExpires: Date,
+    profileImage: {
+        url: {
+            type: String,
+            default: ''
+        },
+        publicId: {
+            type: String,
+            default: ''
+        }
+    }
+}, { timestamps: true });
 
 // Middleware para actualizar updatedAt antes de cada actualización
 userSchema.pre('save', function(next) {
