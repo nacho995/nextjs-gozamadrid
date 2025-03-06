@@ -14,6 +14,8 @@ const userRouter = express.Router();
 userRouter.get("/profile", verifyToken, userController.getUserProfile);
 userRouter.get("/me", verifyToken, userController.getMe);
 userRouter.post("/update-profile", verifyToken, upload.single("profilePic"), userController.changeUserPerfil);
+// Nueva ruta para sincronizar imágenes de perfil
+userRouter.get("/sync-profile-image", verifyToken, userController.syncProfileImage);
 userRouter.post("/register", userController.addUser);
 userRouter.post("/login", userController.loginUser);
 userRouter.post("/request-reset", userController.requestPasswordReset);
