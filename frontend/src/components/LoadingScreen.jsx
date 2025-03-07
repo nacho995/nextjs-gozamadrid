@@ -1,7 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const LoadingScreen = ({ fullScreen = true, message = "Cargando...", ariaLabel = "Pantalla de carga" }) => {
+const LoadingScreen = ({ 
+  fullScreen = true, 
+  message = "Cargando...", 
+  ariaLabel = "Pantalla de carga" 
+}) => {
   return (
     <div 
       className="fixed inset-0 flex justify-center items-center bg-gradient-to-br from-black to-gray-900 z-[9999]"
@@ -41,13 +45,6 @@ LoadingScreen.propTypes = {
   fullScreen: PropTypes.bool,
   message: PropTypes.string,
   ariaLabel: PropTypes.string
-};
-
-// Valores por defecto para las props
-LoadingScreen.defaultProps = {
-  fullScreen: true,
-  message: "Cargando...",
-  ariaLabel: "Pantalla de carga"
 };
 
 export default LoadingScreen; 

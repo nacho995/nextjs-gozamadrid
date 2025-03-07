@@ -101,17 +101,6 @@ ScaleInView.propTypes = {
     ariaLabel: PropTypes.string
 };
 
-// Valores por defecto
-ScaleInView.defaultProps = {
-    className: "",
-    delay: 0,
-    duration: 0.6,
-    margin: "-100px",
-    scale: 0.9,
-    reducedMotion: false,
-    ariaLabel: "Contenido con animación de escala"
-};
-
 // Documentación del componente para mejor desarrollo
 /**
  * Componente ScaleInView - Añade animaciones de escala a los elementos cuando entran en el viewport
