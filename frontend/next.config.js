@@ -1,30 +1,44 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  // Configuración básica
+  reactStrictMode: false,
   output: 'standalone',
   poweredByHeader: false,
   compress: true,
-  optimizeFonts: true,
-  swcMinify: true,
   generateEtags: true,
+  
+  // Configuración de imágenes
   images: {
-    domains: [
-      'realestategozamadrid.com',
-      'localhost',
-      'res.cloudinary.com',
-      'images.weserv.nl',
-      'via.placeholder.com'
-    ],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**',
+        hostname: 'realestategozamadrid.com',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.weserv.nl',
+      },
+      {
+        protocol: 'https',
+        hostname: 'via.placeholder.com',
       },
     ],
+    formats: ['image/avif', 'image/webp'],
   },
+  
   pageExtensions: ['jsx', 'js'],
+  
+  // Headers para mejorar el rendimiento
   async headers() {
     return [
       {
@@ -38,6 +52,8 @@ const nextConfig = {
       },
     ];
   },
+  
+  // Rewrites para proxies y redirecciones
   async rewrites() {
     return [
       {
@@ -51,28 +67,20 @@ const nextConfig = {
       {
         source: '/blog-api',
         destination: process.env.NODE_ENV === 'production' 
-          ? 'https://tu-backend-url.onrender.com/blog'  // Ajusta esta URL
+          ? 'https://goza-madrid.onrender.com/blog'
           : 'http://localhost:4000/blog',
       },
       {
         source: '/blog-api/:path*',
         destination: process.env.NODE_ENV === 'production'
-          ? 'https://tu-backend-url.onrender.com/blog/:path*'  // Ajusta esta URL
+          ? 'https://goza-madrid.onrender.com/blog/:path*'
           : 'http://localhost:4000/blog/:path*',
       },
+      {
+        source: '/api/:path*',
+        destination: 'http://localhost:4000/:path*',
+      },
     ];
-  },
-  webpack: (config, { dev, isServer }) => {
-    // Optimizaciones para producción
-    if (!dev && !isServer) {
-      Object.assign(config.resolve.alias, {
-        'react/jsx-runtime.js': 'preact/compat/jsx-runtime',
-        react: 'preact/compat',
-        'react-dom/test-utils': 'preact/test-utils',
-        'react-dom': 'preact/compat',
-      });
-    }
-    return config;
   },
 }
 

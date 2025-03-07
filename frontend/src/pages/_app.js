@@ -100,9 +100,9 @@ function MyApp({ Component, pageProps }) {
 
         {/* Metadatos de idioma y región */}
         <meta property="og:locale" content="es_ES" />
-        <link rel="alternate" href="https://gozamadrid.com" hreflang="es-ES" />
-        <link rel="alternate" href="https://gozamadrid.com/en" hreflang="en" />
-        <link rel="alternate" href="https://gozamadrid.com" hreflang="x-default" />
+        <link rel="alternate" href="https://gozamadrid.com" hrefLang="es-ES" />
+        <link rel="alternate" href="https://gozamadrid.com/en" hrefLang="en" />
+        <link rel="alternate" href="https://gozamadrid.com" hrefLang="x-default" />
 
         {/* Estilos globales */}
         <style jsx global>{`
