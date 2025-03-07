@@ -1,8 +1,88 @@
+import Head from "next/head";
 import AnimatedOnScroll from "@/components/AnimatedScroll";
 
 export default function AvisoLegal() {
+    const pageTitle = "Aviso Legal | Goza Madrid Inmobiliaria";
+    const pageDescription = "Información legal, términos y condiciones de uso, política de privacidad y datos de contacto de Goza Madrid Inmobiliaria. Consulta nuestras acreditaciones profesionales y normativa aplicable.";
+
     return (
         <>
+            <Head>
+                <title>{pageTitle}</title>
+                <meta name="description" content={pageDescription} />
+                <meta name="robots" content="index, follow" />
+                <link rel="canonical" href="https://gozamadrid.com/aviso-legal" />
+
+                {/* Open Graph */}
+                <meta property="og:type" content="website" />
+                <meta property="og:title" content={pageTitle} />
+                <meta property="og:description" content={pageDescription} />
+                <meta property="og:url" content="https://gozamadrid.com/aviso-legal" />
+                <meta property="og:site_name" content="Goza Madrid Inmobiliaria" />
+
+                {/* Twitter Card */}
+                <meta name="twitter:card" content="summary" />
+                <meta name="twitter:title" content={pageTitle} />
+                <meta name="twitter:description" content={pageDescription} />
+
+                {/* Schema.org Organization y Legal */}
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "LegalService",
+                        "name": "Aviso Legal - Goza Madrid Inmobiliaria",
+                        "description": pageDescription,
+                        "provider": {
+                            "@type": "RealEstateAgent",
+                            "name": "Goza Madrid Inmobiliaria",
+                            "legalName": "Goza Madrid",
+                            "vatID": "05430931X",
+                            "address": {
+                                "@type": "PostalAddress",
+                                "streetAddress": "Calle de Alcalá, 96",
+                                "addressLocality": "Madrid",
+                                "postalCode": "28009",
+                                "addressCountry": "ES"
+                            },
+                            "telephone": "+34 919 012 103",
+                            "email": "marta@gozamadrid.com",
+                            "url": "https://gozamadrid.com"
+                        },
+                        "knowsAbout": [
+                            "Términos y condiciones",
+                            "Política de privacidad",
+                            "Normativa inmobiliaria",
+                            "Derechos de propiedad intelectual"
+                        ]
+                    })}
+                </script>
+
+                {/* Schema.org BreadcrumbList */}
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "BreadcrumbList",
+                        "itemListElement": [
+                            {
+                                "@type": "ListItem",
+                                "position": 1,
+                                "name": "Inicio",
+                                "item": "https://gozamadrid.com"
+                            },
+                            {
+                                "@type": "ListItem",
+                                "position": 2,
+                                "name": "Aviso Legal",
+                                "item": "https://gozamadrid.com/aviso-legal"
+                            }
+                        ]
+                    })}
+                </script>
+
+                {/* Metadatos adicionales */}
+                <meta name="keywords" content="aviso legal goza madrid, términos y condiciones inmobiliaria, política privacidad madrid, normativa inmobiliaria" />
+            </Head>
+
             <div
                 className="fixed inset-0 z-0 opacity-100 bg-cover bg-center"
                 style={{

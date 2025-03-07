@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import Head from "next/head";
 import { FaXTwitter } from "react-icons/fa6";
 import {
   BiLogoFacebookCircle,
@@ -9,145 +10,270 @@ import {
   BiLogoYoutube,
 } from "react-icons/bi";
 
-export default function Footer3(props) {
+// Configuración y datos estructurados
+const SCHEMA_DATA = {
+  "@context": "https://schema.org",
+  "@type": "RealEstateAgency",
+  "name": "Goza Madrid",
+  "image": "/logo.png",
+  "description": "Agencia inmobiliaria especializada en Madrid, ofreciendo servicios de compra, venta y alquiler de propiedades",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Calle de Alcalá, 96",
+    "addressLocality": "Madrid",
+    "postalCode": "28009",
+    "addressCountry": "ES"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": "40.423399",
+    "longitude": "-3.676840"
+  },
+  "telephone": "+34 919 012 103",
+  "email": "marta@gozamadrid.com",
+  "sameAs": [
+    "https://www.facebook.com/GozaMadridAI",
+    "https://instagram.com/Gozamadrid54",
+    "https://x.com/Marta12857571",
+    "https://www.linkedin.com/in/marta-lópez-55516099/",
+    "https://www.youtube.com/@gozamadrid2410"
+  ]
+};
+
+const Footer = () => {
+  // Datos del footer organizados para mejor mantenimiento
   const footerData = {
     logo: {
       url: "/",
       src: "/logo.png",
-      alt: "Goza Madrid Logo",
-    },
-    address: {
-      label: "Dirección:",
-      value: "Calle de Alcalá, 96, 28009 Madrid",
+      alt: "Goza Madrid - Agencia Inmobiliaria en Madrid",
+      width: 100,
+      height: 40
     },
     contact: {
-      label: "Contacto:",
-      phone: "+34 919 012 103",
-      email: "marta@gozamadrid.com",
+      address: {
+        label: "Dirección",
+        street: "Calle de Alcalá, 96",
+        city: "28009 Madrid",
+        mapUrl: "https://goo.gl/maps/tuDirección"
+      },
+      info: {
+        label: "Contacto",
+        phone: {
+          display: "+34 919 012 103",
+          link: "+34919012103"
+        },
+        email: "marta@gozamadrid.com"
+      }
     },
-    columnLinks: [
+    navigation: [
       {
+        title: "Servicios Principales",
         links: [
-          { title: "Inicio", url: "/" },
-          { title: "Propiedades", url: "/vender/comprar" },
-          { title: "Servicios", url: "/servicios" },
-          { title: "Reformas", url: "/reformas" },
-          { title: "Blog", url: "/blog" },
-        ],
+          { title: "Inicio", url: "/", ariaLabel: "Ir a la página principal" },
+          { title: "Propiedades", url: "/vender/comprar", ariaLabel: "Ver listado de propiedades" },
+          { title: "Servicios", url: "/servicios", ariaLabel: "Conocer nuestros servicios" },
+          { title: "Reformas", url: "/reformas", ariaLabel: "Servicios de reformas" },
+          { title: "Blog", url: "/blog", ariaLabel: "Visitar nuestro blog" },
+        ]
       },
       {
+        title: "Servicios Especializados",
         links: [
-          { title: "eXp Realty", url: "/exp-realty" },
-          { title: "Vender", url: "/vender" },
-          { title: "Contacto", url: "/contacto" },
-          { title: "Guía de Compra", url: "/servicios/residentes-espana/guia-compra" },
-          { title: "Alquiler Turístico", url: "/servicios/residentes-espana/alquiler" },
-        ],
+          { title: "eXp Realty", url: "/exp-realty", ariaLabel: "Información sobre eXp Realty" },
+          { title: "Vender", url: "/vender", ariaLabel: "Servicios de venta" },
+          { title: "Contacto", url: "/contacto", ariaLabel: "Contactar con nosotros" },
+          { title: "Guía de Compra", url: "/servicios/residentes-espana/guia-compra", ariaLabel: "Ver guía de compra" },
+          { title: "Alquiler Turístico", url: "/servicios/residentes-espana/alquiler", ariaLabel: "Información sobre alquiler turístico" },
+        ]
+      }
+    ],
+    social: [
+      { 
+        name: "Facebook",
+        url: "https://www.facebook.com/GozaMadridAI?locale=es_ES", 
+        icon: <BiLogoFacebookCircle className="size-6" />,
+        ariaLabel: "Visitar nuestro Facebook"
       },
+      { 
+        name: "Instagram",
+        url: "https://instagram.com/Gozamadrid54", 
+        icon: <BiLogoInstagram className="size-6" />,
+        ariaLabel: "Seguirnos en Instagram"
+      },
+      { 
+        name: "Twitter",
+        url: "https://x.com/Marta12857571", 
+        icon: <FaXTwitter className="size-6 p-0.5" />,
+        ariaLabel: "Seguirnos en X/Twitter"
+      },
+      { 
+        name: "LinkedIn",
+        url: "https://www.linkedin.com/in/marta-lópez-55516099/", 
+        icon: <BiLogoLinkedinSquare className="size-6" />,
+        ariaLabel: "Conectar en LinkedIn"
+      },
+      { 
+        name: "YouTube",
+        url: "https://www.youtube.com/@gozamadrid2410", 
+        icon: <BiLogoYoutube className="size-6" />,
+        ariaLabel: "Ver nuestro canal de YouTube"
+      }
     ],
-    socialMediaLinks: [
-      { url: "https://www.facebook.com/GozaMadridAI?locale=es_ES", icon: <BiLogoFacebookCircle className="size-6" /> },
-      { url: "https://instagram.com/Gozamadrid54", icon: <BiLogoInstagram className="size-6" /> },
-      { url: "https://x.com/Marta12857571", icon: <FaXTwitter className="size-6 p-0.5" /> },
-      { url: "https://www.linkedin.com/in/marta-l%C3%B3pez-55516099/", icon: <BiLogoLinkedinSquare className="size-6" /> },
-      { url: "https://www.youtube.com/@gozamadrid2410", icon: <BiLogoYoutube className="size-6" /> },
-    ],
-    footerText: "© 2024 Goza Madrid. Todos los derechos reservados.",
-    footerLinks: [
-      { title: "Política de Privacidad", url: "/privacidad" },
-      { title: "Términos y Condiciones", url: "/terminos" },
-      { title: "Aviso Legal", url: "/aviso-legal" },
-    ],
+    legal: {
+      copyright: "© 2024 Goza Madrid. Todos los derechos reservados.",
+      links: [
+        { title: "Política de Privacidad", url: "/privacidad", ariaLabel: "Ver política de privacidad" },
+        { title: "Términos y Condiciones", url: "/terminos", ariaLabel: "Ver términos y condiciones" },
+        { title: "Aviso Legal", url: "/aviso-legal", ariaLabel: "Ver aviso legal" }
+      ]
+    }
   };
 
   return (
-    <footer id="relume" className="px-[5%] py-12 md:py-18 lg:py-20 
-        bg-gradient-to-r from-amarillo to-black 
-        dark:from-amarillo dark:to-black 
-        text-white dark:text-white z-50 relative"
-    >
-        <div className="container">
-            <div className="grid grid-cols-1 gap-x-[4vw] gap-y-12 pb-12 md:gap-y-16 md:pb-18 lg:grid-cols-[1fr_0.5fr] lg:gap-y-4 lg:pb-20">
-                <div>
-                    <div className="rb-6 mb-6 md:mb-8">
-                        <Link href={footerData.logo.url}>
-                            <Image
-                                src={footerData.logo.src}
-                                alt={footerData.logo.alt}
-                                width={100}
-                                height={40}
-                                className="inline-block"
-                            />
-                        </Link>
-                    </div>
-                    <div className="rb-6 mb-6 md:mb-8">
-                        <div>
-                            <p className="mb-1 text-sm font-semibold text-white dark:text-white">
-                                {footerData.address.label}
-                            </p>
-                            <p className="mb-5 text-sm md:mb-6 text-white dark:text-white">
-                                {footerData.address.value}
-                            </p>
-                        </div>
-                        <div>
-                            <p className="mb-1 text-sm font-semibold text-white dark:text-white">
-                                {footerData.contact.label}
-                            </p>
-                            <p className="flex flex-col text-sm underline decoration-white dark:decoration-white 
-                                underline-offset-1 md:mb-6 text-white dark:text-white"
-                            >
-                                <Link href={`tel:${footerData.contact.phone}`}>{footerData.contact.phone}</Link>
-                                <Link href={`mailto:${footerData.contact.email}`}>{footerData.contact.email}</Link>
-                            </p>
-                        </div>
-                    </div>
-                    <div className="grid grid-flow-col grid-cols-[max-content] items-start justify-start gap-x-3">
-                        {footerData.socialMediaLinks.map((link, index) => (
-                            <Link key={index} href={link.url} target="_blank" rel="noopener noreferrer" 
-                                className="text-white dark:text-white hover:text-amarillo dark:hover:text-amarillo 
-                                    transition-colors duration-300"
-                            >
-                                {link.icon}
-                            </Link>
-                        ))}
-                    </div>
-                </div>
-                <div className="grid grid-cols-1 items-start gap-x-6 gap-y-10 md:grid-cols-2 md:gap-x-8 md:gap-y-4">
-                    {footerData.columnLinks.map((column, index) => (
-                        <ul key={index}>
-                            {column.links.map((link, linkIndex) => (
-                                <li key={linkIndex} className="py-2 text-sm font-semibold">
-                                    <Link href={link.url} className="text-white dark:text-white 
-                                        hover:text-amarillo dark:hover:text-amarillo transition-colors duration-300"
-                                    >
-                                        {link.title}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    ))}
-                </div>
-            </div>
-            <div className="h-px w-full bg-white dark:bg-white" />
-            <div className="flex flex-col-reverse items-start justify-between pb-4 pt-6 text-sm 
-                md:flex-row md:items-center md:pb-0 md:pt-8"
-            >
-                <p className="mt-8 md:mt-0 text-white dark:text-white">{footerData.footerText}</p>
-                <ul className="grid grid-flow-row grid-cols-[max-content] justify-center gap-y-4 text-sm 
-                    md:grid-flow-col md:gap-x-6 md:gap-y-0"
+    <>
+      <Head>
+        <script type="application/ld+json">
+          {JSON.stringify(SCHEMA_DATA)}
+        </script>
+      </Head>
+
+      <footer 
+        className="relative z-50 bg-gradient-to-r from-amarillo to-black dark:from-amarillo dark:to-black"
+        aria-label="Pie de página"
+      >
+        <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12">
+            {/* Columna de información principal */}
+            <div className="lg:col-span-5">
+              <div className="space-y-8">
+                {/* Logo */}
+                <Link 
+                  href={footerData.logo.url}
+                  className="inline-block transition-transform hover:scale-105"
+                  aria-label="Ir a la página principal"
                 >
-                    {footerData.footerLinks.map((link, index) => (
-                        <li key={index} className="underline">
-                            <Link href={link.url} className="text-white dark:text-white 
-                                hover:text-amarillo dark:hover:text-amarillo transition-colors duration-300"
-                            >
-                                {link.title}
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
+                  <Image
+                    src={footerData.logo.src}
+                    alt={footerData.logo.alt}
+                    width={footerData.logo.width}
+                    height={footerData.logo.height}
+                    className="h-auto w-auto"
+                    priority
+                  />
+                </Link>
+
+                {/* Información de contacto */}
+                <div className="space-y-6 text-white">
+                  <div>
+                    <h2 className="text-sm font-semibold uppercase tracking-wider">
+                      {footerData.contact.address.label}
+                    </h2>
+                    <Link
+                      href={footerData.contact.address.mapUrl}
+                      className="mt-2 block hover:text-amarillo transition-colors duration-300"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Ver ubicación en el mapa"
+                    >
+                      <p>{footerData.contact.address.street}</p>
+                      <p>{footerData.contact.address.city}</p>
+                    </Link>
+                  </div>
+
+                  <div>
+                    <h2 className="text-sm font-semibold uppercase tracking-wider">
+                      {footerData.contact.info.label}
+                    </h2>
+                    <div className="mt-2 space-y-2">
+                      <Link
+                        href={`tel:${footerData.contact.info.phone.link}`}
+                        className="block hover:text-amarillo transition-colors duration-300"
+                        aria-label="Llamar por teléfono"
+                      >
+                        {footerData.contact.info.phone.display}
+                      </Link>
+                      <Link
+                        href={`mailto:${footerData.contact.info.email}`}
+                        className="block hover:text-amarillo transition-colors duration-300"
+                        aria-label="Enviar email"
+                      >
+                        {footerData.contact.info.email}
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Redes sociales */}
+                <div className="flex space-x-4">
+                  {footerData.social.map((social, index) => (
+                    <Link
+                      key={index}
+                      href={social.url}
+                      className="text-white hover:text-amarillo transition-colors duration-300"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={social.ariaLabel}
+                    >
+                      {social.icon}
+                    </Link>
+                  ))}
+                </div>
+              </div>
             </div>
+
+            {/* Columnas de navegación */}
+            <nav className="lg:col-span-7 grid grid-cols-1 gap-8 sm:grid-cols-2" aria-label="Navegación del pie de página">
+              {footerData.navigation.map((column, index) => (
+                <div key={index} className="space-y-4">
+                  <h2 className="text-sm font-semibold uppercase tracking-wider text-white">
+                    {column.title}
+                  </h2>
+                  <ul className="space-y-3">
+                    {column.links.map((link, linkIndex) => (
+                      <li key={linkIndex}>
+                        <Link
+                          href={link.url}
+                          className="text-white hover:text-amarillo transition-colors duration-300"
+                          aria-label={link.ariaLabel}
+                        >
+                          {link.title}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </nav>
+          </div>
+
+          {/* Separador */}
+          <div className="mt-12 border-t border-white/20 pt-8">
+            <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
+              {/* Copyright */}
+              <p className="text-sm text-white">
+                {footerData.legal.copyright}
+              </p>
+
+              {/* Enlaces legales */}
+              <nav className="flex gap-6" aria-label="Enlaces legales">
+                {footerData.legal.links.map((link, index) => (
+                  <Link
+                    key={index}
+                    href={link.url}
+                    className="text-sm text-white hover:text-amarillo transition-colors duration-300"
+                    aria-label={link.ariaLabel}
+                  >
+                    {link.title}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+          </div>
         </div>
-    </footer>
+      </footer>
+    </>
   );
-}
+};
+
+export default Footer;

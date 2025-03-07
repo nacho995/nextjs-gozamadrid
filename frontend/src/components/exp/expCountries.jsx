@@ -4,32 +4,89 @@ import React from "react";
 import AnimatedOnScroll from "../AnimatedScroll";
 import Image from "next/image";
 import Link from "next/link";
+import Head from "next/head";
 
 export default function ExpCountries() {
+    // Schema.org structured data for international real estate presence
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "RealEstateAgency",
+        "name": "eXp Realty Internacional",
+        "description": "eXp Realty con presencia en España (Madrid, Andalucía, Cataluña, Valencia) y otros mercados internacionales como México, Portugal, Miami y Dubai.",
+        "url": "https://www.gozamadrid.com/exp-international",
+        "areaServed": [
+            { "@type": "Country", "name": "España" },
+            { "@type": "Place", "name": "Madrid, España" },
+            { "@type": "Place", "name": "Andalucía, España" },
+            { "@type": "Place", "name": "Cataluña, España" },
+            { "@type": "Place", "name": "Valencia, España" },
+            { "@type": "Country", "name": "México" },
+            { "@type": "Country", "name": "Portugal" },
+            { "@type": "Place", "name": "Miami, Estados Unidos" },
+            { "@type": "Place", "name": "Dubai, Emiratos Árabes Unidos" }
+        ],
+        "makesOffer": {
+            "@type": "Offer",
+            "itemOffered": {
+                "@type": "Service",
+                "name": "Servicios inmobiliarios internacionales",
+                "description": "Compra, venta y alquiler de propiedades en mercados internacionales"
+            }
+        }
+    };
+
     const countries = [
         {
             name: "México",
             image: "/mexico.jpg",
-            link: "https://gozamerida.com/", // URL para México
-            description: "Descubre las oportunidades..."
+            link: "https://gozamerida.com/",
+            description: "Descubre las oportunidades inmobiliarias en el mercado mexicano con nuestros agentes especializados.",
+            alt: "Propiedades en México gestionadas por eXp Realty - Riviera Maya y Mérida"
         },
         {
             name: "Portugal",
             image: "/portugal.jpg",
-            link: "https://search.app/m1UY4QxWgqK1grma6", // URL para Portugal
-            description: "Explora el encanto..."
+            link: "https://search.app/m1UY4QxWgqK1grma6",
+            description: "Explora el encanto del mercado inmobiliario portugués con las mejores opciones de inversión.",
+            alt: "Inmuebles en Portugal - Lisboa, Porto y Algarve con eXp Realty"
         },
         {
             name: "Miami",
             image: "/miami.jpg",
-            link: "https://search.app/w2k6WEabMDTpiNdM9", // URL para Miami
-            description: "Vive el sueño..."
+            link: "https://search.app/w2k6WEabMDTpiNdM9",
+            description: "Vive el sueño americano con propiedades exclusivas en Miami y sus alrededores.",
+            alt: "Propiedades de lujo en Miami, Florida - Condominios y casas con eXp Realty"
         },
         {
             name: "Dubai",
             image: "/dubai.jpg",
-            link: "https://www.propertyfinder.ae/en/broker/exp-real-estate-br-of-exp-international-holdings-inc-dubai-branch-6166", // URL para Dubai
-            description: "Experimenta el lujo..."
+            link: "https://www.propertyfinder.ae/en/broker/exp-real-estate-br-of-exp-international-holdings-inc-dubai-branch-6166",
+            description: "Experimenta el lujo inmobiliario en Dubai con oportunidades únicas de inversión global.",
+            alt: "Inversiones inmobiliarias en Dubai - Propiedades de lujo con eXp Realty"
+        }
+    ];
+
+    // Spanish regions data with improved descriptions
+    const spanishRegions = [
+        {
+            name: "Andalucía",
+            image: "/spain.jpg",
+            alt: "Propiedades en Andalucía - Costa del Sol, Málaga y Sevilla con eXp Realty"
+        },
+        {
+            name: "Madrid",
+            image: "/madrid.jpg",
+            alt: "Inmuebles en Madrid capital y alrededores - Mercado inmobiliario exclusivo con eXp Realty"
+        },
+        {
+            name: "Cataluña",
+            image: "/cataluña.jpg",
+            alt: "Propiedades en Barcelona y resto de Cataluña gestionadas por eXp Realty"
+        },
+        {
+            name: "Valencia",
+            image: "/valencia.jpg",
+            alt: "Oportunidades inmobiliarias en Valencia y Costa Blanca con eXp Realty"
         }
     ];
 
@@ -51,7 +108,6 @@ export default function ExpCountries() {
         [text-shadow:2px_2px_3px_rgba(65,105,225,0.7)]
     `;
 
-    // Nuevo estilo específico para los títulos de España
     const spainTitleStyles = `
         absolute inset-0 flex items-center justify-center 
         text-2xl font-bold text-white italic
@@ -67,93 +123,106 @@ export default function ExpCountries() {
     `;
 
     return (
-        <AnimatedOnScroll>
-            <div className="grid grid-cols-2 md:grid-cols-4 w-full overflow-hidden">
-                {/* España */}
-                <div className={commonCardStyles}>
-                    <img
-                        src="/spain.jpg"
-                        alt="Andalucía"
-                        className={commonImageStyles}
-                    />
-                    <div className={commonOverlayStyles}></div>
-                    <h3 className={spainTitleStyles}>
-                        Andalucía
-                    </h3>
-                </div>
-
-                <div className={commonCardStyles}>
-                    <img
-                        src="/madrid.jpg"
-                        alt="Madrid"
-                        className={commonImageStyles}
-                    />
-                    <div className={commonOverlayStyles}></div>
-                    <h3 className={spainTitleStyles}>
-                        Madrid
-                    </h3>
-                </div>
-
-                <div className={commonCardStyles}>
-                    <img
-                        src="/cataluña.jpg"
-                        alt="Cataluña"
-                        className={commonImageStyles}
-                    />
-                    <div className={commonOverlayStyles}></div>
-                    <h3 className={spainTitleStyles}>
-                        Cataluña
-                    </h3>
-                </div>
-
-                <div className={commonCardStyles}>
-                    <img
-                        src="/valencia.jpg"
-                        alt="Valencia"
-                        className={commonImageStyles}
-                    />
-                    <div className={commonOverlayStyles}></div>
-                    <h3 className={spainTitleStyles}>
-                        Valencia
-                    </h3>
-                </div>
-
-                {/* Países internacionales */}
-                {countries.map((country, index) => (
-                    <div key={index} className={commonCardStyles}>
-                        <img
-                            src={country.image}
-                            alt={country.name}
-                            className={commonImageStyles}
-                        />
-                        <div className={commonOverlayStyles}>
-                            <div className="absolute inset-0 flex flex-col items-center justify-center p-4 space-y-4">
-                                <h3 className={commonTitleStyles}>
-                                    {country.name}
+        <>
+            <Head>
+                <title>Propiedades Internacionales eXp Realty | España, México, Portugal, Miami, Dubai</title>
+                <meta name="description" content="Descubre nuestras propiedades inmobiliarias internacionales en España (Madrid, Andalucía, Cataluña, Valencia), México, Portugal, Miami y Dubai. Inversión global con eXp Realty." />
+                <meta name="keywords" content="propiedades internacionales, eXp Realty global, inmobiliaria españa internacional, propiedades méxico, propiedades portugal, propiedades miami, propiedades dubai" />
+                <link rel="canonical" href="https://www.gozamadrid.com/exp-international" />
+                <meta property="og:title" content="Propiedades Internacionales eXp Realty | Inversión Global" />
+                <meta property="og:description" content="Explore nuestro portafolio internacional de propiedades en España, México, Portugal, Miami y Dubai. Servicios inmobiliarios globales con eXp Realty." />
+                <meta property="og:url" content="https://www.gozamadrid.com/exp-international" />
+                <meta property="og:type" content="website" />
+                <meta property="og:image" content="https://www.gozamadrid.com/exp-global.jpg" />
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+                />
+            </Head>
+            
+            <AnimatedOnScroll>
+                <section aria-label="Presencia inmobiliaria internacional de eXp Realty">
+                    <div className="grid grid-cols-2 md:grid-cols-4 w-full overflow-hidden">
+                        {/* Regiones de España */}
+                        {spanishRegions.map((region, index) => (
+                            <article 
+                                key={`region-${index}`} 
+                                className={commonCardStyles}
+                                itemScope 
+                                itemType="https://schema.org/Place"
+                            >
+                                {/* Hidden metadata for SEO */}
+                                <meta itemProp="name" content={`${region.name}, España`} />
+                                <meta itemProp="description" content={`Propiedades inmobiliarias en ${region.name}, España gestionadas por eXp Realty`} />
+                                
+                                <Image
+                                    src={region.image}
+                                    alt={region.alt}
+                                    className={commonImageStyles}
+                                    fill
+                                    sizes="(max-width: 768px) 50vw, 25vw"
+                                    itemProp="image"
+                                    priority={index < 2} // Prioritize loading for first two images
+                                />
+                                <div className={commonOverlayStyles}></div>
+                                <h3 className={spainTitleStyles} itemProp="name">
+                                    {region.name}
                                 </h3>
-                                <p className="text-white text-sm font-bold text-center">
-                                    {country.description}
-                                </p>
-                                <a 
-                                    href={country.link}
-                                    className={commonButtonStyles}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    <span className="relative text-lg font-semibold text-white">
-                                        Pincha aquí
-                                    </span>
-                                    <span className="absolute bottom-0 left-0 h-1 w-full transform 
-                                        bg-gradient-to-r from-blue-400 via-white to-blue-400 
-                                        transition-transform duration-300 
-                                        group-hover/link:translate-x-full">
-                                    </span>
-                                </a>
-                            </div>
-                        </div>
+                            </article>
+                        ))}
+
+                        {/* Países internacionales */}
+                        {countries.map((country, index) => (
+                            <article 
+                                key={`country-${index}`} 
+                                className={commonCardStyles}
+                                itemScope
+                                itemType="https://schema.org/Place"
+                            >
+                                {/* Hidden metadata for SEO */}
+                                <meta itemProp="name" content={country.name} />
+                                <meta itemProp="description" content={country.description} />
+                                
+                                <Image
+                                    src={country.image}
+                                    alt={country.alt}
+                                    className={commonImageStyles}
+                                    fill
+                                    sizes="(max-width: 768px) 50vw, 25vw"
+                                    itemProp="image"
+                                />
+                                <div className={commonOverlayStyles}>
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center p-4 space-y-4">
+                                        <h3 className={commonTitleStyles} itemProp="name">
+                                            {country.name}
+                                        </h3>
+                                        <p className="text-white text-sm font-bold text-center" itemProp="description">
+                                            {country.description}
+                                        </p>
+                                        <a 
+                                            href={country.link}
+                                            className={commonButtonStyles}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            aria-label={`Ver propiedades en ${country.name}`}
+                                            itemProp="url"
+                                        >
+                                            <span className="relative text-lg font-semibold text-white">
+                                                Ver propiedades
+                                            </span>
+                                            <span className="absolute bottom-0 left-0 h-1 w-full transform 
+                                                bg-gradient-to-r from-blue-400 via-white to-blue-400 
+                                                transition-transform duration-300 
+                                                group-hover/link:translate-x-full">
+                                            </span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </article>
+                        ))}
                     </div>
-                ))}
-            </div>
-        </AnimatedOnScroll>
+                </section>
+            </AnimatedOnScroll>
+        </>
     );
 }

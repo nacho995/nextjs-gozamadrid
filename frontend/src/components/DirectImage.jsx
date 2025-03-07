@@ -1,88 +1,195 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import Head from 'next/head';
 
 // Usar una imagen que realmente exista en el sistema
 const DEFAULT_IMAGE = '/img/default-image.jpg'; // Volver a la imagen original
 
-const DirectImage = ({ src, alt, className, fallbackSrc, ...rest }) => {
+const DirectImage = ({ 
+  src, 
+  alt, 
+  className, 
+  fallbackSrc, 
+  width,
+  height,
+  priority = false,
+  loading = "lazy",
+  sizes,
+  quality = 75,
+  ...rest 
+}) => {
   const [error, setError] = useState(false);
   const [useDirect, setUseDirect] = useState(false); // Nueva bandera para usar URL directa
-  const [retryCount, setRetryCount] = useState(0);
-  const maxRetries = 1;
-  
+  const [isLoaded, setIsLoaded] = useState(false);
+  const imageRef = useRef(null);
+  const [imageUrl, setImageUrl] = useState('');
+
   // Base64 imagen de respaldo en línea (SVG de placeholder)
   const fallbackSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200' viewBox='0 0 300 200'%3E%3Crect width='300' height='200' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' font-size='24' text-anchor='middle' alignment-baseline='middle' font-family='Arial' fill='%23999999'%3EImagen no disponible%3C/text%3E%3C/svg%3E";
   
-  // Función para procesar URL de imagen
+  // Función mejorada para procesar URL de imagen
   const processImageUrl = (url) => {
-    if (!url) return fallbackSvg;
+    if (!url) return fallbackSrc || fallbackSvg;
     
-    // Si ya estamos en modo directo o tenemos error, no usar proxy
-    if (useDirect || error) {
-      // Si es una URL externa, usarla directamente
-      if (url.startsWith('http')) {
-        return url;
-      }
-      // Si es local o tenemos error, usar fallback o imagen en línea
-      return fallbackSrc || fallbackSvg;
-    }
-    
-    // Procesamiento normal (usando proxy)
     try {
-      // URLs locales se usan directamente
+      // URLs locales
       if (url.startsWith('/') && !url.startsWith('//')) {
         return url;
       }
       
-      // Si ya es un proxy de image-proxy, devolverlo tal cual
+      // URLs de proxy existentes
       if (url.startsWith('/api/image-proxy?url=')) {
         return url;
       }
       
-      // Usar exclusivamente image-proxy para todas las solicitudes
+      // URLs externas
+      if (useDirect || error) {
+        return url.startsWith('http') ? url : (fallbackSrc || fallbackSvg);
+      }
+      
+      // Usar proxy para URLs externas
       return `/api/image-proxy?url=${encodeURIComponent(url)}`;
     } catch (e) {
-      console.error("Error procesando URL:", e);
+      console.error("Error procesando URL de imagen:", e);
       return fallbackSrc || fallbackSvg;
     }
   };
   
-  // URL de imagen procesada
-  const imageUrl = processImageUrl(src);
+  useEffect(() => {
+    setImageUrl(processImageUrl(src));
+  }, [src, useDirect, error]);
   
-  // Usar image.onload para verificar que la imagen carga correctamente
   useEffect(() => {
     if (!src) return;
-    
+
     const img = new Image();
-    img.onload = () => setError(false);
-    img.onerror = () => setError(true);
-    img.src = imageUrl; // Usar imageUrl procesada en lugar de src directamente
-    
+    let isMounted = true;
+
+    img.onload = () => {
+      if (isMounted) {
+        setError(false);
+        setIsLoaded(true);
+      }
+    };
+
+    img.onerror = () => {
+      if (isMounted) {
+        if (!useDirect) {
+          setUseDirect(true); // Intentar carga directa si falla el proxy
+        } else {
+          setError(true);
+        }
+      }
+    };
+
+    img.src = imageUrl;
+
     return () => {
+      isMounted = false;
       img.onload = null;
       img.onerror = null;
     };
-  }, [src, imageUrl]);
-  
-  if (error || !src) {
-    return (
-      <img
-        src={fallbackSvg}
-        alt={alt || "Imagen no disponible"}
-        className={className}
-        {...rest}
-      />
+  }, [src, imageUrl, useDirect]);
+
+  // Observador de intersección para carga lazy
+  useEffect(() => {
+    if (!imageRef.current || loading !== 'lazy' || isLoaded) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setImageUrl(processImageUrl(src));
+          observer.unobserve(entry.target);
+        }
+      },
+      {
+        rootMargin: '50px',
+      }
     );
-  }
-  
+
+    observer.observe(imageRef.current);
+
+    return () => {
+      if (imageRef.current) {
+        observer.unobserve(imageRef.current);
+      }
+    };
+  }, [src, loading, isLoaded]);
+
+  const imageProps = {
+    ref: imageRef,
+    src: error ? (fallbackSrc || fallbackSvg) : imageUrl,
+    alt: alt || "Imagen",
+    className: `${className || ''} ${!isLoaded ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`,
+    loading: priority ? 'eager' : loading,
+    onError: () => {
+      if (!useDirect) {
+        setUseDirect(true);
+      } else {
+        setError(true);
+      }
+    },
+    onLoad: () => setIsLoaded(true),
+    width: width,
+    height: height,
+    ...rest
+  };
+
   return (
-    <img
-      src={imageUrl} // Usar imageUrl procesada en lugar de src directamente
-      alt={alt || "Imagen"}
-      className={className}
-      onError={() => setError(true)}
-      {...rest}
-    />
+    <>
+      <Head>
+        {priority && imageUrl && (
+          <>
+            <link
+              rel="preload"
+              as="image"
+              href={imageUrl}
+              imageSrcSet={sizes}
+              imageSizes={sizes}
+            />
+            <script type="application/ld+json">
+              {JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "ImageObject",
+                "contentUrl": imageUrl,
+                "description": alt,
+                "width": width,
+                "height": height,
+                "encodingFormat": imageUrl.endsWith('.jpg') ? "image/jpeg" : 
+                                imageUrl.endsWith('.png') ? "image/png" : 
+                                "image/webp"
+              })}
+            </script>
+          </>
+        )}
+      </Head>
+
+      <div 
+        className="relative inline-block"
+        role="img"
+        aria-label={alt}
+      >
+        {!isLoaded && !error && (
+          <div 
+            className="absolute inset-0 bg-gray-200 animate-pulse"
+            aria-hidden="true"
+          />
+        )}
+        
+        <img {...imageProps} />
+        
+        {error && (
+          <div 
+            className="absolute inset-0 flex items-center justify-center bg-gray-100"
+            role="alert"
+            aria-label="Error al cargar la imagen"
+          >
+            <span className="text-sm text-gray-500">
+              Imagen no disponible
+            </span>
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 
