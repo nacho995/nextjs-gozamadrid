@@ -130,8 +130,4 @@ YoutubeVideo.propTypes = {
   title: PropTypes.string
 };
 
-YoutubeVideo.defaultProps = {
-  title: "¿Por qué unirte a eXp España?"
-};
-
 export default YoutubeVideo;

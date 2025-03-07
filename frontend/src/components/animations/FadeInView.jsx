@@ -110,17 +110,6 @@ FadeInView.propTypes = {
     ariaLabel: PropTypes.string
 };
 
-// Valores por defecto
-FadeInView.defaultProps = {
-    className: "",
-    delay: 0,
-    direction: "up",
-    duration: 0.8,
-    margin: "-100px",
-    reducedMotion: false,
-    ariaLabel: "Contenido con animación al scroll"
-};
-
 // Documentación del componente para mejor desarrollo
 /**
  * Componente FadeInView - Añade animaciones de aparición con fade a los elementos cuando entran en el viewport
