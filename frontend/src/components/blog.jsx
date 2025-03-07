@@ -3,23 +3,21 @@ import { useState, useEffect } from "react";
 import { Button } from "@relume_io/relume-ui";
 import { RxChevronRight } from "react-icons/rx";
 import Image from 'next/image';
-
 import Link from "next/link";
+import Head from 'next/head';
 import AnimatedOnScroll from "./AnimatedScroll";
 import { getBlogPostsFromServer } from "@/services/wpApi";
 import { getBlogPosts } from "@/pages/api";
 import DirectImage from './DirectImage';
 import LoadingScreen from './LoadingScreen';
 
-// Añadir la función safeRenderValue
+// Utilidades de renderizado seguro
 const safeRenderValue = (value) => {
   if (value === null || value === undefined) return '';
   if (typeof value === 'string') return value;
   if (typeof value === 'number' || typeof value === 'boolean') return String(value);
   if (typeof value === 'object') {
-    // Caso especial para objetos de WordPress
     if (value.rendered) return value.rendered;
-    // Para otros objetos, convertirlos a JSON
     return JSON.stringify(value);
   }
   return String(value);
@@ -32,9 +30,10 @@ const DEFAULT_IMAGE = '/img/default-image.jpg';
 const stripHtml = (htmlString) => {
   if (!htmlString) return '';
   try {
-    return htmlString.replace(/<[^>]*>?/gm, '');
+    const doc = new DOMParser().parseFromString(htmlString, 'text/html');
+    return doc.body.textContent || '';
   } catch (error) {
-    console.error('Error al eliminar HTML:', error);
+    console.error('Error al procesar HTML:', error);
     return String(htmlString);
   }
 };
@@ -71,11 +70,142 @@ const getImageUrl = (post) => {
   return DEFAULT_IMAGE;
 };
 
+const BlogCard = ({ blog, index }) => {
+  const blogUrl = blog.source === 'wordpress' 
+    ? `/blog/${blog.slug}?source=wordpress` 
+    : `/blog/${blog._id || blog.id}`;
+  
+  const imageUrl = typeof blog.image === 'string' ? blog.image : (blog.image?.src || DEFAULT_IMAGE);
+  const title = typeof blog.title === 'object' ? blog.title.rendered : blog.title;
+  
+  // Función mejorada para obtener la descripción
+  const getDescription = (blog) => {
+    if (blog.description) {
+      return stripHtml(blog.description);
+    }
+    if (blog.excerpt?.rendered) {
+      return stripHtml(blog.excerpt.rendered);
+    }
+    if (blog.content?.rendered) {
+      return stripHtml(blog.content.rendered);
+    }
+    if (typeof blog.excerpt === 'string' && blog.excerpt) {
+      return stripHtml(blog.excerpt);
+    }
+    if (typeof blog.content === 'string' && blog.content) {
+      return stripHtml(blog.content);
+    }
+    return blog.description || 'Sin descripción disponible';
+  };
+
+  const description = truncateText(getDescription(blog), 150);
+  
+  // Añadir log para depuración
+  console.log('Blog processing:', {
+    id: blog._id || blog.id,
+    title,
+    hasDescription: !!blog.description,
+    hasExcerpt: !!blog.excerpt,
+    hasContent: !!blog.content,
+    finalDescription: description
+  });
+
+  // Función auxiliar para formatear la fecha de manera segura
+  const formatDate = (dateString) => {
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return null;
+      }
+      return date.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      console.error('Error al formatear fecha:', error);
+      return null;
+    }
+  };
+
+  const formattedDate = formatDate(blog.date);
+
+  return (
+    <article 
+      className="group h-full"
+      itemScope 
+      itemType="https://schema.org/BlogPosting"
+    >
+      <Link
+        href={blogUrl}
+        className="flex flex-col h-full bg-white rounded-xl overflow-hidden transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl shadow-md border border-gray-100"
+        title={`Leer más sobre: ${title}`}
+      >
+        <div className="relative w-full overflow-hidden aspect-[16/9]">
+          <Image 
+            src={imageUrl}
+            alt={title}
+            fill
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
+            unoptimized={!imageUrl.includes('realestategozamadrid.com')}
+            priority={index < 2}
+            itemProp="image"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+          {formattedDate && (
+            <time 
+              className="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full"
+              itemProp="datePublished"
+              dateTime={new Date(blog.date).toISOString()}
+            >
+              {formattedDate}
+            </time>
+          )}
+        </div>
+        
+        <div className="flex flex-1 flex-col p-5 md:p-6">
+          {blog.category && (
+            <span 
+              className="inline-block bg-amarillo/20 text-amarillo px-2.5 py-0.5 rounded-full text-xs font-medium mb-3"
+              itemProp="articleSection"
+            >
+              {blog.category}
+            </span>
+          )}
+          
+          <h2 
+            className="text-xl font-bold text-gray-900 mb-3 group-hover:text-amarillo transition-colors line-clamp-2"
+            itemProp="headline"
+          >
+            {title}
+          </h2>
+          
+          <p 
+            className="text-gray-600 text-sm mb-4 line-clamp-3"
+            itemProp="description"
+          >
+            {description}
+          </p>
+          
+          <div className="mt-auto pt-4 flex items-center border-t border-gray-100">
+            <span className="flex items-center text-amarillo font-medium group-hover:text-amarillo transition-colors">
+              Leer más
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </span>
+          </div>
+        </div>
+      </Link>
+    </article>
+  );
+};
+
 // Componente BlogHome
 const BlogHome = (props) => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { tagline, heading, description, button } = {
+  const { tagline, heading, description } = {
     ...Blog44Defaults,
     ...props,
   };
@@ -83,19 +213,14 @@ const BlogHome = (props) => {
   useEffect(() => {
     const fetchBlogs = async () => {
       setLoading(true);
-      
       try {
-        // Crear un mapa para rastrear blogs únicos por ID/slug
         const uniqueBlogs = new Map();
         
-        // Primero, obtener blogs de WordPress (prioridad alta)
         try {
-          // Nótese que getBlogPostsFromServer devuelve { posts, totalPages }
           const { posts } = await getBlogPostsFromServer(1, 3);
           
           if (posts && posts.length > 0) {
-            // Transformar formato WordPress al formato que espera tu componente
-            const wpBlogs = posts.map(post => {
+            posts.forEach(post => {
               // Obtener contenido para la descripción (probar varias fuentes)
               let description = '';
               
@@ -118,39 +243,28 @@ const BlogHome = (props) => {
               // Truncar la descripción
               const truncatedDescription = truncateText(description, 150);
               
-              // Obtener URL de imagen segura
-              const imageUrl = post.image?.src || getImageUrl(post);
-              
-              // Crear objeto de blog formateado
               const blog = {
                 _id: `wp-${post.id}`,
                 id: post.id,
                 title: safeRenderValue(post.title),
                 description: truncatedDescription,
-                content: truncatedDescription,
+                content: post.content?.rendered || post.content || '',
+                excerpt: post.excerpt?.rendered || post.excerpt || '',
                 date: new Date(post.date).toLocaleDateString('es-ES', {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric'
                 }),
                 image: {
-                  src: imageUrl,
+                  src: getImageUrl(post),
                   alt: safeRenderValue(post.title)
                 },
                 slug: post.slug,
-                source: 'wordpress'
+                source: 'wordpress',
+                category: post.categories?.[0]?.name || 'Blog'
               };
               
-              console.log('Blog WordPress procesado:', {
-                id: blog.id,
-                title: blog.title,
-                description: blog.description,
-                imageUrl: blog.image.src
-              });
-              
-              // Guardar en el mapa usando slug como clave única
               uniqueBlogs.set(post.slug, blog);
-              return blog;
             });
           }
         } catch (wpError) {
@@ -162,22 +276,21 @@ const BlogHome = (props) => {
           try {
             const localBlogs = await getBlogPosts();
             if (Array.isArray(localBlogs) && localBlogs.length > 0) {
-              // Solo agregar blogs locales hasta completar 3 en total
               const remainingSlots = 3 - uniqueBlogs.size;
               
               for (let i = 0; i < Math.min(remainingSlots, localBlogs.length); i++) {
                 const blog = localBlogs[i];
-                // Usar _id como clave única para blogs locales
                 const key = blog._id || blog.id;
                 if (key && !uniqueBlogs.has(key)) {
-                  // Asegurarnos de que la descripción también esté truncada
-                  const truncatedDescription = truncateText(blog.description || blog.content, 150);
+                  const description = blog.description || blog.content || blog.excerpt || '';
+                  const truncatedDescription = truncateText(description, 150);
                   
                   uniqueBlogs.set(key, {
                     ...blog,
-                    content: truncatedDescription,
                     description: truncatedDescription,
-                    source: 'local' // Marcar como blog local
+                    content: blog.content || description,
+                    excerpt: blog.excerpt || description,
+                    source: 'local'
                   });
                 }
               }
@@ -187,19 +300,11 @@ const BlogHome = (props) => {
           }
         }
         
-        // Convertir el mapa de vuelta a un array y limitar a 3 blogs
-        const combinedBlogs = Array.from(uniqueBlogs.values());
+        const combinedBlogs = Array.from(uniqueBlogs.values())
+          .sort((a, b) => new Date(b.date) - new Date(a.date))
+          .slice(0, 3);
         
-        // Ordenar por fecha
-        combinedBlogs.sort((a, b) => {
-          const dateA = a.date ? new Date(a.date) : new Date(0);
-          const dateB = b.date ? new Date(b.date) : new Date(0);
-          return dateB - dateA; // Orden descendente (más reciente primero)
-        });
-        
-        // Establecer al máximo 3 blogs
-        setBlogs(combinedBlogs.slice(0, 3));
-        
+        setBlogs(combinedBlogs);
       } catch (error) {
         console.error("Error al cargar blogs:", error);
         setBlogs([]);
@@ -211,113 +316,72 @@ const BlogHome = (props) => {
     fetchBlogs();
   }, []);
 
-  useEffect(() => {
-    // Precargamos las imágenes para mejorar la experiencia
-    const preloadImages = () => {
-      if (!blogs || blogs.length === 0) return;
-      
-      blogs.forEach(blog => {
-        const imageUrl = typeof blog.image === 'string' ? blog.image : blog.image?.src;
-        if (imageUrl) {
-          const img = new window.Image();
-          img.src = imageUrl;
-          img.onload = () => {
-            const blogId = blog.id || blog._id;
-            const placeholder = document.querySelector(`.animate-pulse[data-blog-id="${blogId}"]`);
-            if (placeholder) placeholder.classList.add('hidden');
-          };
-        }
-      });
-    };
-    
-    if (blogs.length > 0 && !loading) {
-      preloadImages();
-    }
-  }, [blogs, loading]);
-
-  // Reemplazar la lógica de imagen de fallback con un componente
-  const PlaceholderImage = () => (
-    <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-100">
-      <svg className="w-16 h-16 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-      </svg>
-      <span className="text-gray-500 text-sm">Imagen no disponible</span>
-    </div>
-  );
-
-  const isDebug = typeof window !== 'undefined' && 
-    (window.location.search.includes('debug=true') || 
-     localStorage.getItem('debugImages') === 'true');
-
-  if (isDebug) {
-    return (
-      <div className="p-4 bg-gray-100 min-h-screen">
-        <h1 className="text-2xl font-bold mb-4">Modo Debug: Imágenes de Blog</h1>
-        <button 
-          onClick={() => localStorage.setItem('debugImages', 'false')}
-          className="bg-red-500 text-white px-4 py-2 rounded mb-4"
-        >
-          Salir del modo debug
-        </button>
-        
-        <div className="grid grid-cols-1 gap-4">
-          {blogs.map(blog => {
-            const imageUrl = typeof blog.image === 'string' ? blog.image : (blog.image?.src || null);
-            return (
-              <div key={blog.id || blog._id} className="bg-white p-4 rounded shadow">
-                <h2 className="text-lg font-bold">{typeof blog.title === 'object' ? blog.title.rendered : blog.title}</h2>
-                <p className="text-sm text-gray-500">ID: {blog.id || blog._id}</p>
-                <p className="text-sm text-gray-500">Fuente: {blog.source || 'desconocida'}</p>
-                <p className="text-sm text-gray-500">URL de imagen: {imageUrl || 'No disponible'}</p>
-                
-                {imageUrl && (
-                  <div className="mt-2">
-                    <p className="text-sm font-medium">Test directa:</p>
-                    <img 
-                      src={imageUrl} 
-                      alt="Test directo" 
-                      className="h-20 object-cover mt-1 border" 
-                      onLoad={() => console.log(`Imagen cargada directamente: ${imageUrl}`)}
-                      onError={() => console.error(`Error cargando directamente: ${imageUrl}`)}
-                    />
-                    
-                    {imageUrl.startsWith('/api/') && (
-                      <>
-                        <p className="text-sm font-medium mt-2">Test sin proxy:</p>
-                        <img 
-                          src={decodeURIComponent(imageUrl.split('url=')[1] || '')} 
-                          alt="Test sin proxy" 
-                          className="h-20 object-cover mt-1 border" 
-                          onLoad={() => console.log(`Imagen cargada sin proxy: ${decodeURIComponent(imageUrl.split('url=')[1] || '')}`)}
-                          onError={() => console.error(`Error cargando sin proxy: ${decodeURIComponent(imageUrl.split('url=')[1] || '')}`)}
-                        />
-                      </>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  }
-
-  // Añadir un console.log para depurar las URLs
-  console.log("URLs de imágenes:", blogs.map(blog => ({
-    id: blog.id,
-    url: typeof blog.image === 'string' ? blog.image : blog.image?.src
-  })));
-
   return (
     <>
+      <Head>
+        <title>Blog de Goza Madrid | Noticias y Tendencias Inmobiliarias</title>
+        <meta 
+          name="description" 
+          content="Descubre las últimas noticias y tendencias del mercado inmobiliario en Madrid. Consejos de expertos, análisis del mercado y guías para inversores."
+        />
+        <meta 
+          name="keywords" 
+          content="blog inmobiliario, noticias inmobiliarias madrid, mercado inmobiliario, inversión inmobiliaria, propiedades madrid"
+        />
+        <meta property="og:type" content="blog" />
+        <meta property="og:title" content="Blog Inmobiliario Goza Madrid" />
+        <meta property="og:description" content="Noticias y análisis del mercado inmobiliario en Madrid" />
+        <meta property="og:image" content="/img/blog-banner.jpg" />
+        <link rel="canonical" href="https://gozamadrid.com/blog" />
+        
+        {/* Schema.org markup para la página de blog */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Blog",
+            "name": "Blog de Goza Madrid",
+            "description": "Noticias y tendencias del mercado inmobiliario en Madrid",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Goza Madrid",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://gozamadrid.com/logo.png"
+              }
+            },
+            "blogPost": blogs.map(blog => {
+              const formattedDate = (() => {
+                try {
+                  const date = new Date(blog.date);
+                  return !isNaN(date.getTime()) ? date.toISOString() : null;
+                } catch {
+                  return null;
+                }
+              })();
+
+              return {
+                "@type": "BlogPosting",
+                "headline": typeof blog.title === 'object' ? blog.title.rendered : blog.title,
+                "image": typeof blog.image === 'string' ? blog.image : blog.image?.src,
+                ...(formattedDate && { "datePublished": formattedDate }),
+                "articleBody": truncateText(blog.description || blog.content),
+                "url": `https://gozamadrid.com/blog/${blog.slug || blog._id || blog.id}`
+              };
+            }).filter(post => post.headline) // Solo incluir posts con título válido
+          })}
+        </script>
+      </Head>
+
       {loading && <LoadingScreen />}
       
       <AnimatedOnScroll>
-        <section id="relume" className="px-[5%] py-16 md:py-24 lg:py-28">
+        <section 
+          id="blog-section" 
+          className="px-[5%] py-16 md:py-24 lg:py-28"
+          aria-label="Últimas publicaciones del blog"
+        >
           <div className="container mx-auto">
-            {/* Encabezado */}
-            <div className="rb-12 mb-12 grid grid-cols-1 items-start justify-start gap-y-8 md:mb-18 md:grid-cols-[1fr_max-content] md:items-end md:justify-between md:gap-x-12 md:gap-y-4 lg:mb-20 lg:gap-x-20">
+            <header className="rb-12 mb-12 grid grid-cols-1 items-start justify-start gap-y-8 md:mb-18 md:grid-cols-[1fr_max-content] md:items-end md:justify-between md:gap-x-12 md:gap-y-4 lg:mb-20 lg:gap-x-20">
               <div className="w-full max-w-lg">
                 <p className="mb-3 font-semibold md:mb-4">{tagline}</p>
                 <h1 className="mb-3 text-5xl font-bold md:mb-4 md:text-7xl lg:text-8xl">
@@ -326,116 +390,46 @@ const BlogHome = (props) => {
                 <p className="md:text-md">{description}</p>
               </div>
               <div className="hidden flex-wrap items-center justify-end md:block">
-               <Link
-                href="/blog"
-                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-black/50 
-                    px-4 sm:px-6 lg:px-8 
-                    py-2 sm:py-2.5 lg:py-3 
-                    transition-all duration-300 hover:bg-black/70 backdrop-blur-sm
-                    max-w-[90%] sm:max-w-[80%] lg:max-w-none"
-              >
+                <Link
+                  href="/blog"
+                  className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-black/50 px-4 sm:px-6 lg:px-8 py-2 sm:py-2.5 lg:py-3 transition-all duration-300 hover:bg-black/70 backdrop-blur-sm max-w-[90%] sm:max-w-[80%] lg:max-w-none"
+                  title="Ver todos los artículos del blog"
+                  aria-label="Ver todos los artículos del blog"
+                >
                   <span className="relative text-sm sm:text-base lg:text-lg font-semibold text-white whitespace-normal text-center">
-                      Ver todo
+                    Ver todo
                   </span>
                   <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-amarillo via-black to-amarillo transition-transform duration-300 group-hover:translate-x-full"></span>
-              </Link>
+                </Link>
               </div>
+            </header>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+              {loading ? (
+                <LoadingScreen fullScreen={false} />
+              ) : blogs.length > 0 ? (
+                blogs.map((blog, index) => (
+                  <BlogCard key={blog.id || blog._id} blog={blog} index={index} />
+                ))
+              ) : (
+                <div 
+                  className="col-span-full py-16 text-center"
+                  role="alert"
+                  aria-label="No hay publicaciones disponibles"
+                >
+                  <svg className="w-12 h-12 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                  </svg>
+                  <p className="text-gray-500">No hay publicaciones disponibles.</p>
+                  <button 
+                    className="mt-4 px-4 py-2 bg-amarillo text-white rounded-full hover:bg-amarillo/80 transition-colors"
+                    aria-label="Revisa más tarde para ver nuevas publicaciones"
+                  >
+                    Revisa más tarde
+                  </button>
+                </div>
+              )}
             </div>
-
-            {/* Grilla de blogs */}
-            {loading ? (
-              <LoadingScreen fullScreen={false} />
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                {blogs.length > 0 ? (
-                  blogs.map((blog, index) => {
-                    // Definir la URL correcta para cada tipo de blog
-                    const blogUrl = blog.source === 'wordpress' 
-                      ? `/blog/${blog.slug}?source=wordpress` 
-                      : `/blog/${blog._id || blog.id}`;
-                    
-                    return (
-                      <div key={blog.id || blog._id} className="group h-full">
-                        <Link
-                          href={blogUrl}
-                          className="flex flex-col h-full bg-white rounded-xl overflow-hidden transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl shadow-md border border-gray-100"
-                        >
-                          {/* Contenedor de la imagen con overlay de gradiente */}
-                          <div className="relative w-full overflow-hidden aspect-[16/9]">
-                            <Image 
-                              src={
-                                (typeof blog.image === 'string' && blog.image) ? blog.image : 
-                                (blog.image && blog.image.src) ? blog.image.src : DEFAULT_IMAGE
-                              }
-                              alt={typeof blog.title === 'object' ? blog.title.rendered : blog.title}
-                              fill
-                              className="object-cover transition-transform duration-700 group-hover:scale-105"
-                              unoptimized={!((typeof blog.image === 'string' ? blog.image : blog.image?.src) || '').includes('realestategozamadrid.com')}
-                            />
-                            
-                            {/* Gradiente permanente para mejor legibilidad */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
-                          
-                            
-                            {/* Fecha en overlay */}
-                            {blog.date && (
-                              <div className="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
-                                {blog.date}
-                              </div>
-                            )}
-                          </div>
-                          
-                          {/* Contenido de la tarjeta */}
-                          <div className="flex flex-1 flex-col p-5 md:p-6">
-                            {/* Categoría si existe */}
-                            {blog.category && (
-                              <span className="inline-block bg-amarillo/20 text-amarillo px-2.5 py-0.5 rounded-full text-xs font-medium mb-3">
-                                {blog.category}
-                              </span>
-                            )}
-                            
-                            {/* Título */}
-                            <h2 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-amarillo transition-colors line-clamp-2">
-                              {typeof blog.title === 'object' ? blog.title.rendered : blog.title}
-                            </h2>
-                            
-                            {/* Resumen */}
-                            <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                              {typeof blog.content === 'object' && blog.content.rendered 
-                                ? stripHtml(blog.content.rendered)
-                                : blog.description || blog.content || 'Sin descripción disponible'}
-                            </p>
-                            
-                            {/* Footer con botón de acción */}
-                            <div className="mt-auto pt-4 flex items-center border-t border-gray-100">
-                              <span className="flex items-center text-amarillo font-medium group-hover:text-amarillo transition-colors">
-                                Leer más
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                </svg>
-                              </span>
-                            </div>
-                          </div>
-                        </Link>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <div className="col-span-full py-16 text-center">
-                    <svg className="w-12 h-12 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                    </svg>
-                    <p className="text-gray-500">No hay publicaciones disponibles.</p>
-                    <button className="mt-4 px-4 py-2 bg-amarillo text-white rounded-full hover:bg-amarillo/80 transition-colors">
-                      Revisa más tarde
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Botón para ver todos (visible en móvil) */}
-            
           </div>
         </section>
       </AnimatedOnScroll>

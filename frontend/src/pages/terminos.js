@@ -1,8 +1,118 @@
+import Head from "next/head";
 import AnimatedOnScroll from "@/components/AnimatedScroll";
 
 export default function Terminos() {
+    const pageTitle = "Términos y Condiciones | Goza Madrid Inmobiliaria";
+    const pageDescription = "Términos y condiciones de uso de los servicios inmobiliarios de Goza Madrid. Información sobre honorarios, responsabilidades, y normativa aplicable a nuestros servicios de compraventa y alquiler.";
+    const lastUpdated = "2024-03-01";
+
     return (
         <>
+            <Head>
+                <title>{pageTitle}</title>
+                <meta name="description" content={pageDescription} />
+                <meta name="robots" content="index, follow" />
+                <link rel="canonical" href="https://gozamadrid.com/terminos" />
+
+                {/* Open Graph */}
+                <meta property="og:type" content="website" />
+                <meta property="og:title" content={pageTitle} />
+                <meta property="og:description" content={pageDescription} />
+                <meta property="og:url" content="https://gozamadrid.com/terminos" />
+                <meta property="og:site_name" content="Goza Madrid Inmobiliaria" />
+                <meta property="article:modified_time" content={lastUpdated} />
+
+                {/* Twitter Card */}
+                <meta name="twitter:card" content="summary" />
+                <meta name="twitter:title" content={pageTitle} />
+                <meta name="twitter:description" content={pageDescription} />
+
+                {/* Schema.org TermsAndConditions */}
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "WebPage",
+                        "name": "Términos y Condiciones de Goza Madrid",
+                        "description": pageDescription,
+                        "dateModified": lastUpdated,
+                        "publisher": {
+                            "@type": "Organization",
+                            "name": "Goza Madrid Inmobiliaria",
+                            "url": "https://gozamadrid.com"
+                        },
+                        "mainEntity": {
+                            "@type": "TermsAndConditions",
+                            "name": "Términos y Condiciones de Servicios Inmobiliarios",
+                            "text": "Términos y condiciones completos para los servicios inmobiliarios de Goza Madrid",
+                            "datePublished": "2024-01-01",
+                            "dateModified": lastUpdated,
+                            "publisher": {
+                                "@type": "Organization",
+                                "name": "Goza Madrid Inmobiliaria"
+                            }
+                        }
+                    })}
+                </script>
+
+                {/* Schema.org BreadcrumbList */}
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "BreadcrumbList",
+                        "itemListElement": [
+                            {
+                                "@type": "ListItem",
+                                "position": 1,
+                                "name": "Inicio",
+                                "item": "https://gozamadrid.com"
+                            },
+                            {
+                                "@type": "ListItem",
+                                "position": 2,
+                                "name": "Términos y Condiciones",
+                                "item": "https://gozamadrid.com/terminos"
+                            }
+                        ]
+                    })}
+                </script>
+
+                {/* Schema.org Organization */}
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "Organization",
+                        "name": "Goza Madrid Inmobiliaria",
+                        "url": "https://gozamadrid.com",
+                        "contactPoint": {
+                            "@type": "ContactPoint",
+                            "telephone": "+34 919 012 103",
+                            "email": "marta@gozamadrid.com",
+                            "contactType": "customer service",
+                            "areaServed": "ES",
+                            "availableLanguage": ["Spanish", "English"]
+                        },
+                        "address": {
+                            "@type": "PostalAddress",
+                            "streetAddress": "Calle de Alcalá, 96",
+                            "addressLocality": "Madrid",
+                            "postalCode": "28009",
+                            "addressCountry": "ES"
+                        },
+                        "sameAs": [
+                            "https://www.facebook.com/gozamadrid",
+                            "https://www.instagram.com/gozamadrid",
+                            "https://www.linkedin.com/company/gozamadrid"
+                        ]
+                    })}
+                </script>
+
+                {/* Metadatos adicionales */}
+                <meta name="keywords" content="términos y condiciones goza madrid, condiciones servicio inmobiliario, normativa inmobiliaria madrid, honorarios inmobiliarios, servicios inmobiliarios madrid" />
+                <meta name="author" content="Goza Madrid Inmobiliaria" />
+                <meta property="og:locale" content="es_ES" />
+                <meta name="format-detection" content="telephone=no" />
+            </Head>
+
             <div
                 className="fixed inset-0 z-0 opacity-100 bg-cover bg-center"
                 style={{

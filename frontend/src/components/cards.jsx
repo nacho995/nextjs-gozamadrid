@@ -2,9 +2,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import AnimatedOnScroll from "./AnimatedScroll";
 import Image from "next/image";
+import Head from "next/head";
 
 const cardData = [
     {
+        id: 'venta-agil',
         front: "Ventas ágiles y seguras en un máximo de 70 días",
         back: (
             <ol>
@@ -14,8 +16,11 @@ const cardData = [
                 <li>El precio fuera de mercado aleja a compradores.</li>
             </ol>
         ),
+        alt: "Análisis de ventas inmobiliarias",
+        image: "/analisis.png"
     },
     {
+        id: 'razon-no-venta',
         front: "¿Por qué no se vende tu inmueble?",
         back: (
             <ol>
@@ -25,8 +30,11 @@ const cardData = [
                 <li>Te ayudamos a definir el precio real de tu vivienda para que no pierdas el tiempo.</li>
             </ol>
         ),
+        alt: "Estrategias de venta inmobiliaria",
+        image: "/agenteinmo.png"
     },
     {
+        id: 'valor-mercado',
         front: "Vender tu casa: El valor está en el mercado",
         back: (
             <ol>
@@ -35,8 +43,11 @@ const cardData = [
                 <li>Acepta el cambio y vende con decisión.</li>
             </ol>
         ),
+        alt: "Análisis de mercado inmobiliario",
+        image: "/analisisdemercado.jpeg"
     },
     {
+        id: 'agentes-confianza',
         front: "Agentes Inmobiliarios de Confianza",
         back: (
             <ol>
@@ -46,8 +57,11 @@ const cardData = [
                 <li>Vendemos entendiendo y ayudando.</li>
             </ol>
         ),
+        alt: "Equipo de agentes inmobiliarios",
+        image: "/agentesinmobiliarios.jpeg"
     },
     {
+        id: 'conexion-cliente',
         front: "Conexión genuina con el cliente",
         back: (
             <ol>
@@ -57,6 +71,8 @@ const cardData = [
                 <li>Marta López: Tu vendedora de confianza.</li>
             </ol>
         ),
+        alt: "Atención personalizada al cliente",
+        image: "/formFoto.jpeg"
     },
 ];
 
@@ -97,62 +113,50 @@ function DesktopCards({ card, index }) {
 
     return (
         <AnimatedOnScroll>
-            <div className="relative w-[40vw] h-[50vh] group [perspective:1000px] transform transition duration-300 hover:scale-105">
-                <div className="h-full w-[19vw] transition-all duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+            <div 
+                className="relative w-[40vw] h-[50vh] group [perspective:1000px] transform transition duration-300 hover:scale-105"
+                role="article"
+                aria-label={card.front}
+            >
+                <div 
+                    className="h-full w-[19vw] transition-all duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]"
+                    tabIndex={0}
+                    onKeyPress={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.currentTarget.classList.toggle('rotate-y-180');
+                        }
+                    }}
+                >
                     {/* Cara Frontal */}
-                    <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
+                    <div 
+                        className="absolute inset-0 w-full h-full [backface-visibility:hidden] [-webkit-backface-visibility:hidden]"
+                        role="region"
+                        aria-label="Frente de la tarjeta"
+                    >
                         <div className="absolute inset-0 rounded-2xl shadow-lg overflow-hidden">
-                            {/* Modificación para solucionar el problema en Safari */}
                             <div className="absolute inset-0 bg-white/5 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
                                 <div className="relative w-full h-full">
                                     <Image
                                         src="/fondoamarillo.jpg" 
-                                        alt="Fondo"
+                                        alt="Fondo decorativo"
                                         fill
                                         className="object-cover"
                                         style={{ objectPosition: 'center' }}
+                                        priority={index < 2}
                                     />
                                     <div className="absolute inset-0 bg-black/30 rounded-xl"></div>
                                 </div>
                             </div>
 
                             <div className="relative z-10 flex flex-col justify-center items-center p-6 text-center h-full">
-                                {/* Imagen correspondiente según el índice */}
-                                {index === 0 && (
-                                    <img
-                                        src="/analisis.png"
-                                        alt="Análisis"
-                                        className="mb-4 rounded-full h-[12vh] w-[12vh] object-cover border-2 border-white/20 shadow-xl transform transition-transform duration-300 group-hover:scale-110"
-                                    />
-                                )}
-                                {index === 1 && (
-                                    <img
-                                        src="/agenteinmo.png"
-                                        alt="Agente Inmobiliario"
-                                        className="mb-4 rounded-full h-[12vh] w-[12vh] object-cover border-2 border-white/20 shadow-xl transform transition-transform duration-300 group-hover:scale-110"
-                                    />
-                                )}
-                                {index === 2 && (
-                                    <img
-                                        src="/analisisdemercado.jpeg"
-                                        alt="Análisis de Mercado"
-                                        className="mb-4 rounded-full h-[12vh] w-[12vh] object-cover border-2 border-white/20 shadow-xl transform transition-transform duration-300 group-hover:scale-110"
-                                    />
-                                )}
-                                {index === 3 && (
-                                    <img
-                                        src="/agentesinmobiliarios.jpeg"
-                                        alt="Agentes Inmobiliarios"
-                                        className="mb-4 rounded-full h-[12vh] w-[12vh] object-cover border-2 border-white/20 shadow-xl transform transition-transform duration-300 group-hover:scale-110"
-                                    />
-                                )}
-                                {index === 4 && (
-                                    <img
-                                        src="/formFoto.jpeg"
-                                        alt="Formulario"
-                                        className="mb-4 rounded-full h-[12vh] w-[12vh] object-cover border-2 border-white/20 shadow-xl transform transition-transform duration-300 group-hover:scale-110"
-                                    />
-                                )}
+                                <Image
+                                    src={card.image}
+                                    alt={card.alt}
+                                    width={150}
+                                    height={150}
+                                    className="mb-4 rounded-full h-[12vh] w-[12vh] object-cover border-2 border-white/20 shadow-xl transform transition-transform duration-300 group-hover:scale-110"
+                                    priority={index < 2}
+                                />
 
                                 <h2 
                                     className="text-2xl font-bold text-center z-20 mt-2 text-white"
@@ -165,7 +169,11 @@ function DesktopCards({ card, index }) {
                     </div>
 
                     {/* Cara Trasera */}
-                    <div className="absolute inset-0 w-full h-full [transform:rotateY(180deg)] [backface-visibility:hidden] [-webkit-backface-visibility:hidden] z-10">
+                    <div 
+                        className="absolute inset-0 w-full h-full [transform:rotateY(180deg)] [backface-visibility:hidden] [-webkit-backface-visibility:hidden] z-10"
+                        role="region"
+                        aria-label="Reverso de la tarjeta"
+                    >
                         <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl">
                             <Image
                                 src="/fondonegro.jpg"
@@ -199,6 +207,12 @@ function MobileCard({ card, index }) {
         setIsFlipped(!isFlipped);
     };
     
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            setIsFlipped(!isFlipped);
+        }
+    };
+    
     // Función para determinar qué imagen mostrar según el índice
     const getCardImage = () => {
         switch(index) {
@@ -215,6 +229,10 @@ function MobileCard({ card, index }) {
         <div 
             className="relative w-[90vw] h-[50vh] group [perspective:1000px] transform transition duration-300 hover:scale-105"
             onClick={handleCardClick}
+            onKeyPress={handleKeyPress}
+            role="article"
+            aria-label={card.front}
+            tabIndex={0}
         >
             <div className={`h-full w-full transition-all duration-500 [transform-style:preserve-3d] ${isFlipped ? '[transform:rotateY(180deg)]' : ''}`}>
                 {/* Cara Frontal */}
@@ -394,64 +412,108 @@ function TabletCard({ card, index }) {
 
 export default function Cards() {
     return (
-        <AnimatedOnScroll>
-            {/* Desktop Version (visible en lg: ≥1024px) */}
-            <div
-                className="hidden lg:flex justify-center items-center w-full p-10 mt-[-60vh] h-[100vh]"
-                style={{
-                    background:
-                        "linear-gradient(to top, transparent 0%, gray 50%, transparent 100%)",
-                }}
-            >
+        <section 
+            className="cards-section"
+            aria-label="Servicios inmobiliarios destacados"
+        >
+            <Head>
+                <title>Servicios Inmobiliarios | Goza Madrid</title>
+                <meta 
+                    name="description" 
+                    content="Descubre nuestros servicios inmobiliarios especializados: ventas ágiles, asesoramiento experto y gestión profesional de propiedades en Madrid."
+                />
+                <meta 
+                    name="keywords" 
+                    content="servicios inmobiliarios, venta de propiedades, asesoramiento inmobiliario, agentes inmobiliarios madrid, precio de mercado inmobiliario"
+                />
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "ItemList",
+                        "itemListElement": cardData.map((card, index) => ({
+                            "@type": "ListItem",
+                            "position": index + 1,
+                            "item": {
+                                "@type": "Service",
+                                "name": card.front,
+                                "description": Array.isArray(card.back.props.children) 
+                                    ? card.back.props.children.map(li => li.props.children).join(' ')
+                                    : '',
+                                "provider": {
+                                    "@type": "RealEstateAgent",
+                                    "name": "Goza Madrid",
+                                    "areaServed": {
+                                        "@type": "City",
+                                        "name": "Madrid"
+                                    }
+                                },
+                                "serviceType": "RealEstateService"
+                            }
+                        }))
+                    })}
+                </script>
+            </Head>
+            
+            <AnimatedOnScroll>
+                {/* Desktop Version (visible en lg: ≥1024px) */}
                 <div
-                    className="grid grid-cols-5 grid-rows-5 gap-4 w-full h-[70vh]"
+                    className="hidden lg:flex justify-center items-center w-full p-10 mt-[-60vh] h-[100vh]"
+                    style={{
+                        background:
+                            "linear-gradient(to top, transparent 0%, gray 50%, transparent 100%)",
+                    }}
+                    role="region"
+                    aria-label="Servicios inmobiliarios - Vista escritorio"
                 >
-                    {cardData.map((card, index) => (
-                        <div key={index} style={{
-                            gridColumnStart: (() => {
-                                switch (index) {
-                                    case 0: return 1; // Primera columna
-                                    case 1: return 2; // Segunda columna
-                                    case 2: return 3; // Tercera columna
-                                    case 3: return 4; // Cuarta columna
-                                    case 4: return 5; // Quinta columna
-                                    default: return index + 1;
-                                }
-                            })(),
-                            gridRowStart: (() => {
-                                switch (index) {
-                                    case 0: return 4; // Última fila
-                                    case 1: return 1; // Primera fila
-                                    case 2: return 4; // Última fila
-                                    case 3: return 1; // Primera fila
-                                    case 4: return 3; // Fila del medio
-                                    default: return index + 1;
-                                }
-                            })()
-                        }}>
-                            <DesktopCards key={index} card={card} index={index} />
-                        </div>
-                    ))}
+                    <div
+                        className="grid grid-cols-5 grid-rows-5 gap-4 w-full h-[70vh]"
+                    >
+                        {cardData.map((card, index) => (
+                            <div key={index} style={{
+                                gridColumnStart: (() => {
+                                    switch (index) {
+                                        case 0: return 1; // Primera columna
+                                        case 1: return 2; // Segunda columna
+                                        case 2: return 3; // Tercera columna
+                                        case 3: return 4; // Cuarta columna
+                                        case 4: return 5; // Quinta columna
+                                        default: return index + 1;
+                                    }
+                                })(),
+                                gridRowStart: (() => {
+                                    switch (index) {
+                                        case 0: return 4; // Última fila
+                                        case 1: return 1; // Primera fila
+                                        case 2: return 4; // Última fila
+                                        case 3: return 1; // Primera fila
+                                        case 4: return 3; // Fila del medio
+                                        default: return index + 1;
+                                    }
+                                })()
+                            }}>
+                                <DesktopCards key={index} card={card} index={index} />
+                            </div>
+                        ))}
+                    </div>
                 </div>
-            </div>
-            {/* Tablet Version (visible en md: 768px a lg: 1023px) */}
-            <div className="hidden md:flex lg:hidden justify-center items-center w-full p-5 ">
-                <div className="grid grid-cols-3 gap-4 w-full max-w-3xl">
-                    {cardData.map((card, index) => (
-                        <TabletCard key={index} card={card} index={index} />
-                    ))}
+                {/* Tablet Version (visible en md: 768px a lg: 1023px) */}
+                <div className="hidden md:flex lg:hidden justify-center items-center w-full p-5 ">
+                    <div className="grid grid-cols-3 gap-4 w-full max-w-3xl">
+                        {cardData.map((card, index) => (
+                            <TabletCard key={index} card={card} index={index} />
+                        ))}
+                    </div>
                 </div>
-            </div>
 
-            {/* Mobile Version (visible para pantallas <768px) - Modificada para una columna */}
-            <div className="mt-[50vh] sm:mt-[80vh]  md:hidden flex justify-center items-start w-full p-5">
-                <div className=" grid grid-cols-1 gap-6 w-full max-w-md">
-                    {cardData.map((card, index) => (
-                        <MobileCard key={index} card={card} index={index} />
-                    ))}
+                {/* Mobile Version (visible para pantallas <768px) - Modificada para una columna */}
+                <div className="mt-[50vh] sm:mt-[80vh]  md:hidden flex justify-center items-start w-full p-5">
+                    <div className=" grid grid-cols-1 gap-6 w-full max-w-md">
+                        {cardData.map((card, index) => (
+                            <MobileCard key={index} card={card} index={index} />
+                        ))}
+                    </div>
                 </div>
-            </div>
-
-        </AnimatedOnScroll>
+            </AnimatedOnScroll>
+        </section>
     );
 }

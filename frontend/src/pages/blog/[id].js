@@ -383,26 +383,142 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
         {source === 'wordpress' ? (
           <>
             <Head>
-              <title>{blog.title || 'Blog Post'} | Goza Madrid</title>
+              <title>{`${blog.title || 'Blog Post'} | Goza Madrid - Inmobiliaria en Madrid`}</title>
               <meta 
                 name="description" 
-                content={typeof blog.content === 'string' 
-                  ? blog.content.substring(0, 160).replace(/<[^>]*>?/gm, '')
-                  : 'Artículo del blog de Goza Madrid'} 
+                content={blog.excerpt?.substring(0, 160).replace(/<[^>]*>?/gm, '') || 
+                  blog.content?.substring(0, 160).replace(/<[^>]*>?/gm, '') || 
+                  'Descubre más sobre el mercado inmobiliario en Madrid con los artículos especializados de Goza Madrid.'} 
               />
+              <meta name="author" content={blog.author || 'Goza Madrid'} />
+              <meta name="robots" content="index, follow" />
+              <link rel="canonical" href={`https://gozamadrid.com/blog/${blog.slug || id}`} />
+
+              {/* Open Graph */}
+              <meta property="og:type" content="article" />
+              <meta property="og:title" content={blog.title || 'Blog Post'} />
+              <meta property="og:description" content={blog.excerpt?.substring(0, 160).replace(/<[^>]*>?/gm, '') || 
+                blog.content?.substring(0, 160).replace(/<[^>]*>?/gm, '')} />
+              <meta property="og:image" content={blog.imageUrl || DEFAULT_IMAGE} />
+              <meta property="og:url" content={`https://gozamadrid.com/blog/${blog.slug || id}`} />
+              <meta property="og:site_name" content="Goza Madrid Inmobiliaria" />
+
+              {/* Twitter Card */}
+              <meta name="twitter:card" content="summary_large_image" />
+              <meta name="twitter:title" content={blog.title || 'Blog Post'} />
+              <meta name="twitter:description" content={blog.excerpt?.substring(0, 160).replace(/<[^>]*>?/gm, '') || 
+                blog.content?.substring(0, 160).replace(/<[^>]*>?/gm, '')} />
+              <meta name="twitter:image" content={blog.imageUrl || DEFAULT_IMAGE} />
+
+              {/* Schema.org Article */}
+              <script type="application/ld+json">
+                {JSON.stringify({
+                  "@context": "https://schema.org",
+                  "@type": "BlogPosting",
+                  "mainEntityOfPage": {
+                    "@type": "WebPage",
+                    "@id": `https://gozamadrid.com/blog/${blog.slug || id}`
+                  },
+                  "headline": blog.title,
+                  "image": [blog.imageUrl || DEFAULT_IMAGE],
+                  "datePublished": blog.date,
+                  "dateModified": blog.modified || blog.date,
+                  "author": {
+                    "@type": "Person",
+                    "name": blog.author || "Goza Madrid"
+                  },
+                  "publisher": {
+                    "@type": "Organization",
+                    "name": "Goza Madrid Inmobiliaria",
+                    "logo": {
+                      "@type": "ImageObject",
+                      "url": "https://gozamadrid.com/logo.png"
+                    }
+                  },
+                  "description": blog.excerpt?.substring(0, 160).replace(/<[^>]*>?/gm, '') || 
+                    blog.content?.substring(0, 160).replace(/<[^>]*>?/gm, ''),
+                  "keywords": [...(blog.categories || []), ...(blog.tags || [])].join(", ")
+                })}
+              </script>
+
+              {/* Metadatos adicionales */}
+              <meta name="keywords" content={[...(blog.categories || []), ...(blog.tags || [])].join(", ")} />
+              <meta name="news_keywords" content={[...(blog.categories || []), ...(blog.tags || [])].join(", ")} />
+              <meta name="article:published_time" content={blog.date} />
+              <meta name="article:modified_time" content={blog.modified || blog.date} />
+              <meta name="article:section" content={blog.categories?.[0] || 'Real Estate'} />
+              {blog.tags?.map((tag, index) => (
+                <meta key={index} name="article:tag" content={tag} />
+              ))}
             </Head>
             <BlogContentComponent slug={blog.slug} key={blog.slug} />
           </>
         ) : (
           <>
             <Head>
-              <title>{blog.title || 'Blog Post'} | Goza Madrid</title>
+              <title>{`${blog.title || 'Blog Post'} | Goza Madrid - Inmobiliaria en Madrid`}</title>
               <meta 
                 name="description" 
-                content={typeof blog.content === 'string' 
-                  ? blog.content.substring(0, 160).replace(/<[^>]*>?/gm, '')
-                  : 'Artículo del blog de Goza Madrid'} 
+                content={blog.description?.substring(0, 160) || 
+                  blog.content?.substring(0, 160).replace(/<[^>]*>?/gm, '') || 
+                  'Descubre más sobre el mercado inmobiliario en Madrid con los artículos especializados de Goza Madrid.'} 
               />
+              <meta name="author" content={blog.author || 'Goza Madrid'} />
+              <meta name="robots" content="index, follow" />
+              <link rel="canonical" href={`https://gozamadrid.com/blog/${blog._id}`} />
+
+              {/* Open Graph */}
+              <meta property="og:type" content="article" />
+              <meta property="og:title" content={blog.title || 'Blog Post'} />
+              <meta property="og:description" content={blog.description?.substring(0, 160) || 
+                blog.content?.substring(0, 160).replace(/<[^>]*>?/gm, '')} />
+              <meta property="og:image" content={blog.imageUrl || DEFAULT_IMAGE} />
+              <meta property="og:url" content={`https://gozamadrid.com/blog/${blog._id}`} />
+              <meta property="og:site_name" content="Goza Madrid Inmobiliaria" />
+
+              {/* Twitter Card */}
+              <meta name="twitter:card" content="summary_large_image" />
+              <meta name="twitter:title" content={blog.title || 'Blog Post'} />
+              <meta name="twitter:description" content={blog.description?.substring(0, 160) || 
+                blog.content?.substring(0, 160).replace(/<[^>]*>?/gm, '')} />
+              <meta name="twitter:image" content={blog.imageUrl || DEFAULT_IMAGE} />
+
+              {/* Schema.org Article */}
+              <script type="application/ld+json">
+                {JSON.stringify({
+                  "@context": "https://schema.org",
+                  "@type": "BlogPosting",
+                  "mainEntityOfPage": {
+                    "@type": "WebPage",
+                    "@id": `https://gozamadrid.com/blog/${blog._id}`
+                  },
+                  "headline": blog.title,
+                  "image": [blog.imageUrl || DEFAULT_IMAGE],
+                  "datePublished": blog.createdAt || new Date().toISOString(),
+                  "dateModified": blog.updatedAt || blog.createdAt || new Date().toISOString(),
+                  "author": {
+                    "@type": "Person",
+                    "name": blog.author || "Goza Madrid"
+                  },
+                  "publisher": {
+                    "@type": "Organization",
+                    "name": "Goza Madrid Inmobiliaria",
+                    "logo": {
+                      "@type": "ImageObject",
+                      "url": "https://gozamadrid.com/logo.png"
+                    }
+                  },
+                  "description": blog.description?.substring(0, 160) || 
+                    blog.content?.substring(0, 160).replace(/<[^>]*>?/gm, ''),
+                  "keywords": blog.category || "Real Estate, Madrid, Properties"
+                })}
+              </script>
+
+              {/* Metadatos adicionales */}
+              <meta name="keywords" content={`${blog.category || ''}, inmobiliaria madrid, propiedades madrid, real estate madrid`} />
+              <meta name="article:published_time" content={blog.createdAt || new Date().toISOString()} />
+              <meta name="article:modified_time" content={blog.updatedAt || blog.createdAt || new Date().toISOString()} />
+              <meta name="article:section" content={blog.category || 'Real Estate'} />
             </Head>
             
             {/* Renderizado directo del contenido del blog de MongoDB */}
