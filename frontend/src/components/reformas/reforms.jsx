@@ -184,7 +184,7 @@ export default function Reforms() {
                 />
             </Head>
             
-            <main className="relative z-50">
+            <main className="relative z-0">
                 <section aria-label="Introducción a reformas sin obras" className="hero-section">
                     <FadeIn>
                         <div className="container mx-auto px-4 py-12">
