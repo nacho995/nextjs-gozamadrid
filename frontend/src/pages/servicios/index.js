@@ -111,9 +111,9 @@ export default function ServiciosPage() {
                 <meta name="ICBM" content="40.4168, -3.7038" />
 
                 {/* Metadatos multilenguaje */}
-                <link rel="alternate" hreflang="es" href="https://gozamadrid.com/servicios" />
-                <link rel="alternate" hreflang="en" href="https://gozamadrid.com/en/services" />
-                <link rel="alternate" hreflang="x-default" href="https://gozamadrid.com/servicios" />
+                <link rel="alternate" hrefLang="es" href="https://gozamadrid.com/servicios" />
+                <link rel="alternate" hrefLang="en" href="https://gozamadrid.com/en/services" />
+                <link rel="alternate" hrefLang="x-default" href="https://gozamadrid.com/servicios" />
             </Head>
 
             <div
@@ -125,14 +125,6 @@ export default function ServiciosPage() {
             ></div>
             <AnimatedOnScroll>
                 <div className="min-h-screen relative">
-                    <div className="text-center py-12">
-                        <h1 className="mt-[10vh] text-4xl font-bold mb-4 text-black">
-                            Servicios Inmobiliarios Integrales
-                        </h1>
-                        <p className="text-lg text-gray-600 max-w-2xl mx-auto px-4">
-                            Soluciones inmobiliarias profesionales adaptadas a tus necesidades, tanto para residentes locales como inversores internacionales
-                        </p>
-                    </div>
                     <Services />
                 </div>
             </AnimatedOnScroll>
