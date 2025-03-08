@@ -1,6 +1,6 @@
 import Head from "next/head";
-import AnimatedOnScroll from "@/components/AnimatedScroll";
-import ServiciosExtranjero from "@/components/Servicios/fueraDeEspaña";
+import AnimatedOnScroll from "../../../components/AnimatedScroll";
+import ServiciosExtranjero from "../../../components/Servicios/fueraDeEspaña.jsx";
 
 export default function ResidentesExtranjero() {
     const pageTitle = "Servicios Inmobiliarios para Extranjeros en Madrid | Goza Madrid";
@@ -136,14 +136,7 @@ export default function ResidentesExtranjero() {
             ></div>
             <AnimatedOnScroll>
                 <div className="min-h-screen relative">
-                    <div className="text-center py-12">
-                        <h1 className="mt-[10vh] text-4xl font-bold mb-4 text-black">
-                            Servicios Inmobiliarios para Inversores Extranjeros
-                        </h1>
-                        <p className="text-lg text-gray-600 max-w-2xl mx-auto px-4">
-                            Asesoramiento especializado en inversión inmobiliaria internacional, Golden Visa y gestión integral de propiedades en Madrid
-                        </p>
-                    </div>
+                   
                     <ServiciosExtranjero />
                 </div>
             </AnimatedOnScroll>
