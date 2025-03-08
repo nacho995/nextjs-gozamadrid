@@ -200,7 +200,7 @@ export default function ControlMenu() {
 
         {/* Menú Principal Desktop */}
         <nav 
-          className={`relative z-[9999] flex-col items-center px-24 p-4 w-max mx-auto rounded-full shadow-2xl hidden lg:flex ${
+          className={`mb-10 relative z-[9999] flex-col items-center px-24 p-4 w-max mx-auto rounded-full shadow-2xl hidden lg:flex ${
             isExpRealty ? 'header-gradient-exp' : 'header-gradient-default'
           }`}
           role="navigation"
