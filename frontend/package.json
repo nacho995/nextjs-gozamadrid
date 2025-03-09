@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "export": "next build && next export",
-    "postbuild": "node -e \"try { require('next-sitemap')(); console.log('Sitemap generated successfully'); } catch(e) { console.log('Skipping sitemap generation:', e.message); }\"",
+    "generate-sitemap": "next-sitemap",
     "analyze": "ANALYZE=true next build"
   },
   "dependencies": {
