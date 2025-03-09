@@ -2,8 +2,8 @@
  * Servicio para gestionar las peticiones a la API de WordPress
  */
 
-// URL base de la API de WordPress
-const WP_API_URL = 'https://realestategozamadrid.com/wp-json/wp/v2/posts?_embed';
+// URL base de la API de WordPress (usando nuestro proxy)
+const WP_API_URL = '/api/wordpress/posts';
 
 // Añadir esta función de utilidad en la parte superior del archivo
 const proxyImage = (url) => {
@@ -13,7 +13,7 @@ const proxyImage = (url) => {
   if (url.startsWith('/') && !url.startsWith('//')) return url;
   
   // Asegurarse de que todas las URLs externas pasen por el proxy
-  return `/api?url=${encodeURIComponent(url)}`;
+  return `/api/image-proxy?url=${encodeURIComponent(url)}`;
 };
 
 // Añade esta función de seguridad en la parte superior del archivo
@@ -38,24 +38,42 @@ const safeRenderValue = (value) => {
  */
 export const getBlogPostsFromServer = async (page = 1, perPage = 9) => {
   try {
+    // Determinar si estamos en el servidor o en el cliente
+    const isServer = typeof window === 'undefined';
+    
+    // Construir la URL base según el entorno
+    let baseUrl = '';
+    if (isServer) {
+      // En el servidor, usamos directamente la API de WordPress para evitar problemas con URLs relativas
+      baseUrl = 'https://realestategozamadrid.com/wp-json/wp/v2';
+    } else {
+      // En el cliente, usamos nuestro proxy
+      baseUrl = '/api/wordpress';
+    }
+    
+    // Construir la URL completa
+    const url = `${baseUrl}/posts?page=${page}&per_page=${perPage}${isServer ? '&_embed' : ''}`;
+    
     const response = await fetch(
-      `https://realestategozamadrid.com/wp-json/wp/v2/posts?_embed&page=${page}&per_page=${perPage}`,
+      url,
       {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        cache: 'no-store', // Evitar caché en Next.js
-        next: { revalidate: 60 } // Revalidar cada minuto
+        cache: 'no-store' // Evitar caché en Next.js
       }
     );
     
     if (!response.ok) {
+      console.error(`Error en la respuesta de WordPress: ${response.status} ${response.statusText}`);
       throw new Error('Error al obtener los posts');
     }
     
     const postsData = await response.json();
     const totalPages = parseInt(response.headers.get('X-WP-TotalPages') || '1');
+    
+    console.log(`Obtenidos ${postsData.length} posts de WordPress con éxito`);
     
     // Procesar los posts para garantizar que no hay objetos directos en ningún campo
     const processedPosts = postsData.map(post => {
@@ -93,9 +111,22 @@ export async function getBlogPostBySlug(slug) {
   try {
     console.log(`WP API: Buscando blog con slug "${slug}"`);
     
-    // URL correcta para buscar por slug
-    const url = `https://realestategozamadrid.com/wp-json/wp/v2/posts?slug=${encodeURIComponent(slug)}&_embed`;
-    console.log(`WP API: URL de petición: ${url}`);
+    // Determinar si estamos en el servidor o en el cliente
+    const isServer = typeof window === 'undefined';
+    
+    // Construir la URL base según el entorno
+    let baseUrl = '';
+    if (isServer) {
+      // En el servidor, usamos directamente la API de WordPress para evitar problemas con URLs relativas
+      baseUrl = 'https://realestategozamadrid.com/wp-json/wp/v2';
+    } else {
+      // En el cliente, usamos nuestro proxy
+      baseUrl = '/api/wordpress';
+    }
+    
+    // Construir la URL completa
+    const url = `${baseUrl}/posts?slug=${encodeURIComponent(slug)}${isServer ? '&_embed' : ''}`;
+    console.log(`WP API: URL de petición (${isServer ? 'servidor' : 'cliente'}): ${url}`);
     
     const response = await fetch(url, {
       method: 'GET',
@@ -257,6 +288,12 @@ export function getImageUrl(wpPost) {
               wpPost.uagb_featured_image_src?.full?.[0] || 
               wpPost.image?.src ||
               "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200' viewBox='0 0 300 200'%3E%3Crect width='300' height='200' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' font-size='24' text-anchor='middle' alignment-baseline='middle' font-family='Arial' fill='%23999999'%3EImagen no disponible%3C/text%3E%3C/svg%3E";
+  }
+  
+  // Aplicar el proxy para URLs externas
+  if (imageUrl && typeof imageUrl === 'string' && !imageUrl.startsWith('data:') && !imageUrl.startsWith('/')) {
+    // Usar el proxy para imágenes externas
+    return `/api/image-proxy?url=${encodeURIComponent(imageUrl)}`;
   }
   
   return imageUrl;

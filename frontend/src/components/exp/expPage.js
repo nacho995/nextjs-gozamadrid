@@ -1,6 +1,6 @@
 "use client";
 
-import "tailwindcss/tailwind.css";
+import React from 'react';
 import Head from "next/head";
 import ExpRealty from "./eXpRealty";
 import ExpCountries from "./expCountries";

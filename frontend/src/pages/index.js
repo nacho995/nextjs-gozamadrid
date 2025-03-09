@@ -1,6 +1,7 @@
 // src/pages/index.js
 import Head from 'next/head';
 import Home from '@/components/home';
+import TailwindTest from '@/components/TailwindTest';
 
 function Index() {
   const pageTitle = "Goza Madrid | Inmobiliaria de Lujo en Madrid | Compra, Venta y Alquiler";
@@ -121,6 +122,9 @@ function Index() {
         <meta name="ICBM" content="40.423697, -3.676181" />
       </Head>
 
+      {/* Componente de prueba de Tailwind */}
+      <TailwindTest />
+      
       <Home />
     </>
   );

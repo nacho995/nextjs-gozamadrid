@@ -1,6 +1,6 @@
 "use client";
 
-import "tailwindcss/tailwind.css";
+// Importaciones de componentes
 import Head from 'next/head';
 import Eslogan from "./eslogan";
 import ImageSlider from "./slider";

@@ -42,10 +42,10 @@ export async function getBlogPosts() {
   // Array donde guardaremos todos los blogs
   let allBlogs = [];
   
-  // 1. Intentar obtener blogs de WordPress
+  // 1. Intentar obtener blogs de WordPress usando nuestro proxy
   try {
     const wpResponse = await fetch(
-      "https://realestategozamadrid.com/wp-json/wp/v2/posts?_embed"
+      "/api/wordpress/posts"
     );
     
     if (wpResponse.ok) {
@@ -131,50 +131,61 @@ export async function getPropertyPosts() {
   
   // Intentar obtener propiedades de WordPress
   try {
-    // Primero, obtener la primera página para saber cuántas páginas hay en total
+    // Usar nuestro proxy de WooCommerce en lugar de la conexión directa
     const firstPageResponse = await fetch(
-      `https://realestategozamadrid.com/wp-json/wc/v3/products?consumer_key=ck_3efe242c61866209c650716bed69999cbf00a09c&consumer_secret=cs_d9a74b0a40175d14515e4f7663c126b82b09aa2d&per_page=100`
+      `/api/woocommerce-proxy?path=products&per_page=100`
     );
     
     if (!firstPageResponse.ok) {
+      console.error(`Error al obtener propiedades de WooCommerce: ${firstPageResponse.status} ${firstPageResponse.statusText}`);
       throw new Error(`Error al obtener propiedades: ${firstPageResponse.status}`);
     }
     
     // Obtener el número total de páginas
     const totalPages = parseInt(firstPageResponse.headers.get('X-WP-TotalPages') || '1');
+    console.log(`Total de páginas de propiedades: ${totalPages}`);
     
     // Obtener los datos de la primera página
     const firstPageData = await firstPageResponse.json();
     wpData = [...firstPageData];
+    console.log(`Obtenidas ${wpData.length} propiedades de la primera página`);
     
     // Si hay más de una página, obtener el resto
     if (totalPages > 1) {
-      // Crear un array de promesas para obtener todas las páginas restantes
-      const pagePromises = [];
+      const additionalPagePromises = [];
       
       for (let page = 2; page <= totalPages; page++) {
-        pagePromises.push(
-          fetch(`https://realestategozamadrid.com/wp-json/wc/v3/products?consumer_key=ck_3efe242c61866209c650716bed69999cbf00a09c&consumer_secret=cs_d9a74b0a40175d14515e4f7663c126b82b09aa2d&per_page=100&page=${page}`)
+        additionalPagePromises.push(
+          fetch(`/api/woocommerce-proxy?path=products&per_page=100&page=${page}`)
             .then(response => {
               if (!response.ok) {
-                throw new Error(`Error al obtener página ${page}: ${response.status}`);
+                throw new Error(`Error en página ${page}: ${response.status}`);
               }
               return response.json();
+            })
+            .then(pageData => {
+              console.log(`Obtenidas ${pageData.length} propiedades de la página ${page}`);
+              return pageData;
+            })
+            .catch(error => {
+              console.error(`Error en página ${page}:`, error);
+              return []; // Retornar array vacío si hay error en esta página
             })
         );
       }
       
-      // Esperar a que todas las promesas se resuelvan
-      const pagesData = await Promise.all(pagePromises);
+      // Esperar a que todas las promesas adicionales se resuelvan
+      const additionalPagesData = await Promise.all(additionalPagePromises);
       
-      // Combinar todos los datos
-      pagesData.forEach(pageData => {
+      // Añadir los datos adicionales a wpData
+      additionalPagesData.forEach(pageData => {
         wpData = [...wpData, ...pageData];
       });
     }
     
-  } catch (error) {
-    console.error("Error al obtener propiedades de WordPress:", error);
+    console.log(`Total de propiedades de WooCommerce obtenidas: ${wpData.length}`);
+  } catch (wpError) {
+    console.error("Error al obtener propiedades de WooCommerce:", wpError);
   }
   
   // Intentar obtener propiedades de la API local

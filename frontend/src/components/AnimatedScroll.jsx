@@ -75,13 +75,3 @@ AnimatedOnScroll.propTypes = {
     delay: PropTypes.number,
     reducedMotion: PropTypes.bool
 };
-
-// Valores por defecto documentados
-AnimatedOnScroll.defaultProps = {
-    className: "",
-    duration: 0.5,
-    distance: 20,
-    threshold: 0.1,
-    delay: 0,
-    reducedMotion: false
-};

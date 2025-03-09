@@ -258,24 +258,35 @@ export default function DefaultPropertyContent({ property }) {
         };
       });
     } else if (isMongoDBProperty && propertyData.images && Array.isArray(propertyData.images)) {
-    
+      console.log('PropertyContent: Procesando imágenes de MongoDB:', propertyData.images);
       
-      // Manejar diferentes formatos de imágenes en MongoDB
-      images = propertyData.images.map(img => {
+      // Simplificar el procesamiento de imágenes de MongoDB para volver a la implementación anterior
+      images = propertyData.images.map((img, index) => {
         let imageSrc, imgAlt;
         
+        console.log(`PropertyContent: Procesando imagen ${index}:`, img);
+        
+        // Simplemente extraer la URL sin procesamiento adicional
         if (typeof img === 'string') {
           imageSrc = img;
           imgAlt = title || "Imagen de propiedad";
+          console.log('PropertyContent: Imagen es string:', imageSrc);
         } else if (img.src) {
           imageSrc = img.src;
           imgAlt = img.alt || title || "Imagen de propiedad";
+          console.log('PropertyContent: Imagen tiene propiedad src:', imageSrc);
         } else if (img.url) {
           imageSrc = img.url;
           imgAlt = img.alt || title || "Imagen de propiedad";
+          console.log('PropertyContent: Imagen tiene propiedad url:', imageSrc);
+        } else if (img.secure_url) {
+          imageSrc = img.secure_url;
+          imgAlt = img.alt || title || "Imagen de propiedad";
+          console.log('PropertyContent: Imagen es de Cloudinary:', imageSrc);
         } else {
           imageSrc = "/fondoamarillo.jpg";
           imgAlt = "Imagen no disponible";
+          console.log('PropertyContent: No se pudo determinar URL de imagen, usando fallback');
         }
         
         return {
@@ -285,6 +296,8 @@ export default function DefaultPropertyContent({ property }) {
           isProxied: false
         };
       });
+      
+      console.log('PropertyContent: Total de imágenes procesadas:', images.length);
     } else {
       images = [{ 
         src: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format", 

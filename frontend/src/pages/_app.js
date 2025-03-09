@@ -3,7 +3,7 @@ import Head from 'next/head';
 import Router from 'next/router';
 import { useState, useEffect } from 'react';
 import Layout from '../components/layout';
-import '../styles/globals.css';
+import '../../styles/globals.css';
 import { NavbarProvider } from '../components/context/navBarContext';
 import { Toaster } from 'react-hot-toast';
 import LoadingScreen from '../components/LoadingScreen';
