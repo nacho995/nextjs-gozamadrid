@@ -1,6 +1,20 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Button } from "@relume_io/relume-ui";
+// Importar Button de manera condicional para evitar errores en producción
+let Button;
+try {
+  Button = require("@relume_io/relume-ui").Button;
+} catch (error) {
+  // Componente Button de respaldo si no se puede importar @relume_io/relume-ui
+  Button = ({ children, className, ...props }) => (
+    <button 
+      className={`px-4 py-2 bg-amarillo text-white rounded-lg hover:bg-amarillo/80 transition-colors ${className || ''}`}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+}
 import { RxChevronRight } from "react-icons/rx";
 import Image from 'next/image';
 import Link from "next/link";
