@@ -16,6 +16,13 @@ export default function PropertyImage({
   const imageRef = useRef(null);
   const [imageDimensions, setImageDimensions] = useState({ width: 800, height: 600 });
   
+  // Asegurarse de que src sea una cadena de texto
+  const safeSrc = typeof src === 'string' ? src : 
+                 (src && typeof src === 'object' && src.src) ? src.src :
+                 (src && typeof src === 'object' && src.url) ? src.url :
+                 (src && typeof src === 'object' && src.source_url) ? src.source_url :
+                 '/img/property-placeholder.jpg';
+  
   // Generate a unique ID for structured data references
   const imageId = `property-image-${Math.random().toString(36).substring(2, 9)}`;
   
@@ -24,7 +31,7 @@ export default function PropertyImage({
     "@context": "https://schema.org",
     "@type": "ImageObject",
     "@id": `#${imageId}`,
-    "contentUrl": src || "/img/property-placeholder.jpg",
+    "contentUrl": safeSrc || "/img/property-placeholder.jpg",
     "name": alt || "Imagen de propiedad inmobiliaria",
     "description": alt || "Fotografía de propiedad inmobiliaria",
     "representativeOfPage": priority
@@ -57,13 +64,13 @@ export default function PropertyImage({
             setLoaded(true);
           };
           
-          if (src) {
+          if (safeSrc) {
             // For proxy URLs, we need to handle differently
-            if (src.startsWith('http') && src.includes('realestategozamadrid.com')) {
-              const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(src)}&default=https://via.placeholder.com/800x600?text=Sin+Imagen`;
+            if (typeof safeSrc === 'string' && safeSrc.startsWith('http') && safeSrc.includes('realestategozamadrid.com')) {
+              const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(safeSrc)}&default=https://via.placeholder.com/800x600?text=Sin+Imagen`;
               imgElement.src = proxyUrl;
             } else {
-              imgElement.src = src;
+              imgElement.src = safeSrc;
             }
           }
           
@@ -80,10 +87,10 @@ export default function PropertyImage({
     return () => {
       observer.disconnect();
     };
-  }, [src]);
+  }, [safeSrc]);
   
   // Imagen por defecto si hay error o no hay src
-  if (error || !src) {
+  if (error || !safeSrc) {
     return (
       <>
         {/* Include structured data even for fallback images */}
@@ -114,9 +121,9 @@ export default function PropertyImage({
   }
   
   // Usar un servicio de proxy de imágenes para evitar problemas CORS y HTTP2
-  if (src.startsWith('http') && src.includes('realestategozamadrid.com')) {
+  if (typeof safeSrc === 'string' && safeSrc.startsWith('http') && safeSrc.includes('realestategozamadrid.com')) {
     // Usar images.weserv.nl como proxy de imágenes
-    const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(src)}&default=https://via.placeholder.com/800x600?text=Sin+Imagen`;
+    const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(safeSrc)}&default=https://via.placeholder.com/800x600?text=Sin+Imagen`;
     
     return (
       <>
@@ -145,7 +152,7 @@ export default function PropertyImage({
             loading={priority ? "eager" : "lazy"}
             decoding="async"
             itemProp="contentUrl"
-            data-original-url={src}
+            data-original-url={safeSrc}
             style={{ objectPosition }}
           />
           <meta itemProp="description" content={alt || "Fotografía de propiedad inmobiliaria"} />
@@ -162,7 +169,7 @@ export default function PropertyImage({
   }
   
   // Para otras URLs externas
-  if (src.startsWith('http')) {
+  if (typeof safeSrc === 'string' && safeSrc.startsWith('http')) {
     return (
       <>
         <Head>
@@ -179,7 +186,7 @@ export default function PropertyImage({
           itemID={`#${imageId}`}
         >
           <img 
-            src={src}
+            src={safeSrc}
             alt={alt || "Propiedad inmobiliaria"}
             className={`w-full h-full object-cover ${className}`}
             onError={() => setError(true)}
@@ -210,7 +217,7 @@ export default function PropertyImage({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify({
             ...imageSchema,
-            contentUrl: typeof src === 'string' ? src : '/img/property-placeholder.jpg'
+            contentUrl: typeof safeSrc === 'string' ? safeSrc : '/img/property-placeholder.jpg'
           }) }}
         />
       </Head>
@@ -222,7 +229,7 @@ export default function PropertyImage({
         itemID={`#${imageId}`}
       >
         <Image
-          src={src}
+          src={safeSrc}
           alt={alt || "Propiedad inmobiliaria"}
           width={500}
           height={300}

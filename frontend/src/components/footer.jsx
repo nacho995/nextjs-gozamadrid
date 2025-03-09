@@ -1,14 +1,15 @@
 "use client";
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Head from "next/head";
-import { FaXTwitter } from "react-icons/fa6";
-import {
-  BiLogoFacebookCircle,
-  BiLogoInstagram,
-  BiLogoLinkedinSquare,
-  BiLogoYoutube,
-} from "react-icons/bi";
+import { 
+  FaTwitter,
+  FaFacebookSquare,
+  FaInstagram,
+  FaLinkedin,
+  FaYoutube 
+} from "react-icons/fa";
 
 // Configuración y datos estructurados
 const SCHEMA_DATA = {
@@ -92,31 +93,31 @@ const Footer = () => {
       { 
         name: "Facebook",
         url: "https://www.facebook.com/GozaMadridAI?locale=es_ES", 
-        icon: <BiLogoFacebookCircle className="size-6" />,
+        icon: <FaFacebookSquare className="size-6" />,
         ariaLabel: "Visitar nuestro Facebook"
       },
       { 
         name: "Instagram",
         url: "https://instagram.com/Gozamadrid54", 
-        icon: <BiLogoInstagram className="size-6" />,
+        icon: <FaInstagram className="size-6" />,
         ariaLabel: "Seguirnos en Instagram"
       },
       { 
         name: "Twitter",
         url: "https://x.com/Marta12857571", 
-        icon: <FaXTwitter className="size-6 p-0.5" />,
+        icon: <FaTwitter className="size-6 p-0.5" />,
         ariaLabel: "Seguirnos en X/Twitter"
       },
       { 
         name: "LinkedIn",
         url: "https://www.linkedin.com/in/marta-lópez-55516099/", 
-        icon: <BiLogoLinkedinSquare className="size-6" />,
+        icon: <FaLinkedin className="size-6" />,
         ariaLabel: "Conectar en LinkedIn"
       },
       { 
         name: "YouTube",
         url: "https://www.youtube.com/@gozamadrid2410", 
-        icon: <BiLogoYoutube className="size-6" />,
+        icon: <FaYoutube className="size-6" />,
         ariaLabel: "Ver nuestro canal de YouTube"
       }
     ],

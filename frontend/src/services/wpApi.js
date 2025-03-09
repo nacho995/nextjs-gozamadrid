@@ -3,7 +3,7 @@
  */
 
 // URL base de la API de WordPress (usando nuestro proxy)
-const WP_API_URL = '/api/wordpress/posts';
+const WP_API_URL = '/api/wordpress-proxy?endpoint=wp&path=posts';
 
 // Añadir esta función de utilidad en la parte superior del archivo
 const proxyImage = (url) => {
@@ -48,11 +48,15 @@ export const getBlogPostsFromServer = async (page = 1, perPage = 9) => {
       baseUrl = 'https://realestategozamadrid.com/wp-json/wp/v2';
     } else {
       // En el cliente, usamos nuestro proxy
-      baseUrl = '/api/wordpress';
+      baseUrl = '/api/wordpress-proxy?endpoint=wp&path=';
     }
     
     // Construir la URL completa
-    const url = `${baseUrl}/posts?page=${page}&per_page=${perPage}${isServer ? '&_embed' : ''}`;
+    const url = isServer 
+      ? `${baseUrl}/posts?page=${page}&per_page=${perPage}&_embed` 
+      : `${baseUrl}posts&page=${page}&per_page=${perPage}&_embed=true`;
+    
+    console.log(`WP API: URL de petición (${isServer ? 'servidor' : 'cliente'}): ${url}`);
     
     const response = await fetch(
       url,
@@ -121,11 +125,14 @@ export async function getBlogPostBySlug(slug) {
       baseUrl = 'https://realestategozamadrid.com/wp-json/wp/v2';
     } else {
       // En el cliente, usamos nuestro proxy
-      baseUrl = '/api/wordpress';
+      baseUrl = '/api/wordpress-proxy?endpoint=wp&path=';
     }
     
     // Construir la URL completa
-    const url = `${baseUrl}/posts?slug=${encodeURIComponent(slug)}${isServer ? '&_embed' : ''}`;
+    const url = isServer 
+      ? `${baseUrl}/posts?slug=${encodeURIComponent(slug)}&_embed` 
+      : `${baseUrl}posts&slug=${encodeURIComponent(slug)}&_embed=true`;
+    
     console.log(`WP API: URL de petición (${isServer ? 'servidor' : 'cliente'}): ${url}`);
     
     const response = await fetch(url, {

@@ -123,7 +123,7 @@ const FormContact = () => {
     toast.loading('Enviando mensaje...', { id: 'contactForm' });
     
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
       
       const formattedData = {
         nombre: formData.name,

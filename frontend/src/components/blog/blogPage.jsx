@@ -5,7 +5,7 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import AnimatedOnScroll from "../AnimatedScroll";
 import { getBlogPostsFromServer } from "@/services/wpApi";
-import Image from 'next/image';
+import BlogImage from './BlogImage';
 import LoadingScreen from '../LoadingScreen';
 import Head from 'next/head';
 
@@ -67,10 +67,45 @@ const getDescription = (post) => {
   return description;
 };
 
+// Añadir función para procesar URLs de imágenes
+const processImageUrl = (image) => {
+  if (!image) return null;
+
+  // Si es un string
+  if (typeof image === 'string') {
+    if (image.startsWith('http') || image.startsWith('https')) {
+      return { src: image, alt: 'Imagen del blog' };
+    }
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://goza-madrid.onrender.com';
+    return { 
+      src: `${baseUrl}${image.startsWith('/') ? '' : '/'}${image}`,
+      alt: 'Imagen del blog'
+    };
+  }
+
+  // Si es un objeto con src
+  if (image && image.src) {
+    if (image.src.startsWith('http') || image.src.startsWith('https')) {
+      return image;
+    }
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://goza-madrid.onrender.com';
+    return {
+      ...image,
+      src: `${baseUrl}${image.src.startsWith('/') ? '' : '/'}${image.src}`
+    };
+  }
+
+  return null;
+};
+
+// Modificar la función processSafeBlogList para incluir el procesamiento de imágenes
 const processSafeBlogList = (blogs) => {
   if (!Array.isArray(blogs)) return [];
   
   return blogs.map(blog => {
+    // Procesar la imagen
+    const processedImage = processImageUrl(blog.image);
+
     return {
       ...blog,
       title: safeRenderValue(blog.title),
@@ -80,7 +115,7 @@ const processSafeBlogList = (blogs) => {
       date: blog.date,
       dateFormatted: blog.dateFormatted || blog.date,
       author: safeRenderValue(blog.author),
-      image: blog.image
+      image: processedImage
     };
   });
 };
@@ -91,11 +126,11 @@ const getSafeId = (id) => {
 };
 
 export default function BlogPage() {
-    // State management remains the same
-    const [hasMounted, setHasMounted] = useState(false);
     const [blogs, setBlogs] = useState([]);
     const [selectedBlog, setSelectedBlog] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [isClient, setIsClient] = useState(false);
     
     // Schema.org structured data for the blog listing
     const blogListingSchema = {
@@ -103,13 +138,13 @@ export default function BlogPage() {
       "@type": "Blog",
       "name": "Blog de Goza Madrid",
       "description": "Artículos y noticias sobre el sector inmobiliario, inversión y estilo de vida en Madrid",
-      "url": "https://www.gozamadrid.com/blog",
+      "url": typeof window !== 'undefined' ? window.location.origin + '/blog' : 'https://www.gozamadrid.com/blog',
       "publisher": {
         "@type": "Organization",
         "name": "Goza Madrid",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://www.gozamadrid.com/logo.png"
+          "url": typeof window !== 'undefined' ? window.location.origin + '/logo.png' : 'https://www.gozamadrid.com/logo.png'
         }
       },
       "blogPosts": blogs.map(blog => ({
@@ -122,21 +157,27 @@ export default function BlogPage() {
           "name": blog.author || "Equipo Goza Madrid"
         },
         "image": blog.image?.src || "/img/default-image.jpg",
-        "url": blog.source === 'wordpress' 
-            ? `https://www.gozamadrid.com/blog/${blog.slug}?source=wordpress` 
-            : `https://www.gozamadrid.com/blog/${blog._id}`
+        "url": typeof window !== 'undefined' 
+          ? `${window.location.origin}/blog/${blog.source === 'wordpress' ? blog.slug + '?source=wordpress' : blog._id}`
+          : `https://www.gozamadrid.com/blog/${blog.source === 'wordpress' ? blog.slug + '?source=wordpress' : blog._id}`
       }))
     };
 
     // Component mount effect
     useEffect(() => {
-        setHasMounted(true);
+        setIsClient(true);
     }, []);
 
     // Fetch blogs effect
     useEffect(() => {
+        let isMounted = true;
+        
         const fetchBlogs = async () => {
+            if (!isMounted) return;
+            
             setLoading(true);
+            setError(null);
+            
             const combinedBlogs = [];
             const seenPosts = new Map();
             
@@ -145,7 +186,7 @@ export default function BlogPage() {
                 console.log("Cargando blogs de WordPress...");
                 try {
                     const { posts } = await getBlogPostsFromServer(1, 10);
-                    if (posts && posts.length > 0) {
+                    if (isMounted && posts && posts.length > 0) {
                         console.log(`Obtenidos ${posts.length} blogs de WordPress`);
                         
                         posts.forEach(post => {
@@ -207,60 +248,72 @@ export default function BlogPage() {
                     }
                 } catch (wpError) {
                     console.error("Error cargando blogs de WordPress:", wpError);
+                    if (isMounted) {
+                        setError("Error al cargar blogs de WordPress");
+                    }
                 }
                 
                 // PASO 2: Cargar blogs locales
-                console.log("Cargando blogs de la API local...");
-                try {
-                    const localData = await getBlogPosts();
-                    const localBlogs = Array.isArray(localData) ? localData : [];
-                    
-                    if (localBlogs.length > 0) {
-                        console.log(`Obtenidos ${localBlogs.length} blogs de la API local`);
-                        
-                        localBlogs.forEach(blog => {
-                            const localId = blog._id || blog.id;
-                            const localSlug = blog.slug;
+                if (isMounted) {
+                    console.log("Cargando blogs de la API local...");
+                    try {
+                        const localData = await getBlogPosts();
+                        if (isMounted && localData && localData.length > 0) {
+                            console.log(`Obtenidos ${localData.length} blogs locales`);
                             
-                            if (!seenPosts.has(localId) && !seenPosts.has(localSlug)) {
-                                const processedBlog = {
-                                    ...blog,
-                                    _id: localId,
-                                    title: safeRenderValue(blog.title),
-                                    description: truncateText(getDescription(blog), 150),
-                                    source: 'local',
-                                    author: blog.author || "Equipo Goza Madrid"
-                                };
+                            localData.forEach(blog => {
+                                const localKey = blog.slug || blog._id;
                                 
-                                combinedBlogs.push(processedBlog);
-                                seenPosts.set(localId, processedBlog);
-                                if (localSlug) seenPosts.set(localSlug, processedBlog);
-                            }
-                        });
+                                if (!seenPosts.has(localKey)) {
+                                    const processedBlog = {
+                                        ...blog,
+                                        image: processImageUrl(blog.image),
+                                        source: 'local'
+                                    };
+                                    
+                                    combinedBlogs.push(processedBlog);
+                                    seenPosts.set(localKey, processedBlog);
+                                }
+                            });
+                        }
+                    } catch (localError) {
+                        console.error("Error cargando blogs locales:", localError);
+                        if (isMounted) {
+                            setError((prevError) => 
+                                prevError 
+                                    ? `${prevError}. Error al cargar blogs locales` 
+                                    : "Error al cargar blogs locales"
+                            );
+                        }
                     }
-                } catch (localError) {
-                    console.error("Error cargando blogs locales:", localError);
                 }
                 
-                // PASO 3: Ordenar por fecha
-                combinedBlogs.sort((a, b) => {
-                    const dateA = a.date ? new Date(a.date) : new Date(0);
-                    const dateB = b.date ? new Date(b.date) : new Date(0);
-                    return dateB - dateA;
-                });
-                
-                // PASO 4: Establecer los blogs en el estado
-                setBlogs(processSafeBlogList(combinedBlogs));
-                
+                // PASO 3: Ordenar y actualizar el estado
+                if (isMounted) {
+                    const sortedBlogs = combinedBlogs.sort((a, b) => 
+                        new Date(b.date) - new Date(a.date)
+                    );
+                    
+                    setBlogs(sortedBlogs);
+                    console.log(`Total de blogs cargados: ${sortedBlogs.length}`);
+                }
             } catch (error) {
-                console.error("Error general en fetchBlogs:", error);
-                setBlogs(processSafeBlogList(combinedBlogs));
+                console.error("Error general cargando blogs:", error);
+                if (isMounted) {
+                    setError("Error al cargar los blogs");
+                }
             } finally {
-                setLoading(false);
+                if (isMounted) {
+                    setLoading(false);
+                }
             }
         };
         
         fetchBlogs();
+        
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
     // Fetch selected blog effect
@@ -323,7 +376,7 @@ export default function BlogPage() {
         }
     }, [blogs]);
 
-    if (!hasMounted) {
+    if (!isClient) {
         return <LoadingScreen fullScreen={false} />;
     }
 
@@ -397,16 +450,11 @@ export default function BlogPage() {
                                                     >
                                                         {/* Contenedor de la imagen con overlay de gradiente */}
                                                         <div className="relative w-full overflow-hidden aspect-[16/9]">
-                                                            {blog.image && blog.image.src ? (
-                                                                <Image
+                                                            {blog.image ? (
+                                                                <BlogImage
                                                                     src={blog.image.src}
                                                                     alt={blog.image.alt || `Imagen para el artículo: ${blog.title}` || "Imagen del blog"}
-                                                                    fill
-                                                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                                                    unoptimized={!blog.image.src.includes('realestategozamadrid.com')}
-                                                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                                                    loading="lazy"
-                                                                    itemProp="image"
+                                                                    className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
                                                                 />
                                                             ) : (
                                                                 <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">

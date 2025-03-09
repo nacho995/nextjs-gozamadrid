@@ -11,74 +11,59 @@ export const config = {
 };
 
 /**
- * Manejador de proxy de imágenes
- * 
- * Recupera imágenes de URLs externas y las sirve a través de nuestro dominio
- * con el manejo adecuado de tipos de contenido y cacheo
+ * API Proxy para imágenes
+ * Esta función actúa como un proxy para imágenes externas, evitando problemas de CORS
  */
 export default async function handler(req, res) {
-  // Solo permitir solicitudes GET
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Método no permitido' });
+  // Obtener la URL de la imagen de los parámetros de consulta
+  const { url } = req.query;
+  
+  if (!url) {
+    return res.status(400).json({ error: 'URL no proporcionada' });
   }
-
+  
+  // Validar que la URL sea segura
+  if (!isValidUrl(url)) {
+    return res.status(400).json({ error: 'URL no válida' });
+  }
+  
   try {
-    // Obtener la URL de la imagen desde los parámetros de consulta
-    const { url } = req.query;
-    
-    // Validar que se proporcionó una URL
-    if (!url) {
-      return res.status(400).json({ error: 'Se requiere el parámetro URL' });
-    }
-    
-    // Registrar la URL solicitada para depuración
-    console.log(`[Image Proxy] Procesando URL: ${url}`);
-    
-    // Validación básica de URL para seguridad
-    if (!isValidUrl(url)) {
-      console.error(`[Image Proxy] URL no válida: ${url}`);
-      return res.status(400).json({ error: 'URL no válida' });
-    }
-    
-    // Realizar la solicitud a la URL de la imagen
-    console.log(`[Image Proxy] Recuperando imagen de: ${url}`);
+    // Hacer la solicitud a la URL de la imagen
     const response = await fetch(url, {
+      method: 'GET',
       headers: {
-        // Algunos servicios requieren un user-agent para evitar bloqueos
-        'User-Agent': 'Mozilla/5.0 GozaMadrid Image Proxy'
-      }
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+      },
     });
     
-    // Verificar si la solicitud fue exitosa
+    // Verificar si la respuesta es exitosa
     if (!response.ok) {
-      console.error(`[Image Proxy] Error al obtener imagen: ${response.status} - ${url}`);
+      console.error(`Error al obtener la imagen: ${response.status} ${response.statusText}`);
       return redirectToPlaceholder(res);
     }
     
-    // Obtener el tipo de contenido y los datos
+    // Obtener el tipo de contenido
     const contentType = response.headers.get('content-type');
     
-    // Verificar que es una imagen
-    if (!contentType || !contentType.includes('image')) {
-      console.error(`[Image Proxy] Tipo de contenido no válido: ${contentType} para URL: ${url}`);
+    // Verificar si el tipo de contenido es una imagen
+    if (!contentType || !contentType.startsWith('image/')) {
+      console.error(`Tipo de contenido no válido: ${contentType}`);
       return redirectToPlaceholder(res);
     }
     
-    // Obtener los datos de la imagen
-    const imageBuffer = await response.arrayBuffer();
-    
-    // Configurar las cabeceras para la respuesta
+    // Establecer el tipo de contenido en la respuesta
     res.setHeader('Content-Type', contentType);
-    res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=604800'); // 1 día de caché del navegador, 1 semana en CDN
-    res.setHeader('Accept-Ranges', 'bytes');
     
-    console.log(`[Image Proxy] Imagen servida correctamente: ${url} (${contentType}, ${imageBuffer.byteLength} bytes)`);
+    // Establecer el control de caché para mejorar el rendimiento
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
     
-    // Enviar la imagen
-    return res.status(200).send(Buffer.from(imageBuffer));
+    // Obtener los datos de la imagen
+    const buffer = await response.arrayBuffer();
     
+    // Devolver los datos de la imagen
+    return res.status(200).send(Buffer.from(buffer));
   } catch (error) {
-    console.error('[Image Proxy] Error al procesar imagen:', error);
+    console.error('Error en el proxy de imágenes:', error);
     return redirectToPlaceholder(res);
   }
 }
@@ -100,6 +85,6 @@ function isValidUrl(urlString) {
  */
 function redirectToPlaceholder(res) {
   // Redireccionar a una imagen de marcador de posición
-  res.setHeader('Location', '/placeholder.jpg');
+  res.setHeader('Location', '/img/default-blog-image.jpg');
   return res.status(302).end();
 } 

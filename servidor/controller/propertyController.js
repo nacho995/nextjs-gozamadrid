@@ -212,14 +212,28 @@ const propertyController = {
             if (!req.file) {
                 return res.status(400).json({ message: "No se subió ninguna imagen" });
             }
-            console.log("Archivo recibido:", req.file); // Debug: Verifica los detalles del archivo subido
-      
-            const serverUrl = process.env.API_BASE_URL || "http://localhost:3000";
-            const imageUrl = `${serverUrl}/uploads/${req.file.filename}`;
-            res.json({ imageUrl });
+            console.log("Archivo recibido:", req.file);
+
+            // Obtener la URL de Cloudinary
+            const imageUrl = req.file.path;
+            console.log("URL de la imagen:", imageUrl);
+
+            // Devolver la respuesta con la URL de la imagen
+            res.status(200).json({ 
+                success: true,
+                message: "Imagen subida correctamente",
+                imageUrl: imageUrl,
+                url: imageUrl, // Para compatibilidad
+                secure_url: imageUrl.replace('http://', 'https://'),
+                public_id: req.file.filename
+            });
         } catch (err) {
-            console.log("Error uploading image:", err);
-            res.status(500).json({ message: "No se pudo subir la imagen" });
+            console.error("Error al subir imagen:", err);
+            res.status(500).json({ 
+                success: false,
+                message: "Error al subir la imagen",
+                error: err.message 
+            });
         }
     },
 
@@ -240,7 +254,7 @@ const propertyController = {
     // Crear una nueva propiedad
     createProperty: async (req, res) => {
         try {
-            console.log('Datos recibidos para crear propiedad:', req.body);
+            console.log('Datos recibidos para crear propiedad:', JSON.stringify(req.body, null, 2));
             console.log('Archivos recibidos:', req.files);
             
             // Crear un objeto con los campos necesarios
@@ -259,37 +273,34 @@ const propertyController = {
                 wc: req.body.bathrooms,
                 piso: req.body.piso || '1',
                 m2: req.body.area,
-                priceM2: req.body.priceM2 || ''
+                priceM2: req.body.priceM2 || '',
+                images: [] // Inicializar el array de imágenes
             };
+
+            // Procesar imágenes del cuerpo de la solicitud
+            if (req.body.images && Array.isArray(req.body.images)) {
+                propertyData.images = req.body.images.map(img => ({
+                    src: img.src || img,
+                    alt: img.alt || 'Imagen de propiedad'
+                })).filter(img => img.src);
+            }
             
-            // Procesar imágenes si se han subido
+            // Procesar imágenes subidas como archivos
             if (req.files && req.files.length > 0) {
-                propertyData.images = req.files.map(file => {
-                    return {
-                        src: file.path, // URL de Cloudinary
-                        alt: req.body.title || 'Imagen de propiedad',
-                        public_id: file.filename // ID público de Cloudinary
-                    };
-                });
-                
-                console.log('Imágenes procesadas:', propertyData.images);
-            }
-            
-            // Si se enviaron URLs de imágenes en el cuerpo (para imágenes externas)
-            if (req.body.imageUrls && Array.isArray(req.body.imageUrls)) {
-                const existingImages = propertyData.images || [];
-                const externalImages = req.body.imageUrls.map((url, index) => ({
-                    src: url,
-                    alt: (req.body.imageAlts && req.body.imageAlts[index]) || 'Imagen de propiedad'
+                const fileImages = req.files.map(file => ({
+                    src: file.path,
+                    alt: 'Imagen de propiedad',
+                    public_id: file.filename
                 }));
-                
-                propertyData.images = [...existingImages, ...externalImages];
+                propertyData.images = [...propertyData.images, ...fileImages];
             }
-            
-            console.log('Datos procesados para crear propiedad:', propertyData);
+
+            console.log('Datos finales de la propiedad:', JSON.stringify(propertyData, null, 2));
             
             const newProperty = new Property(propertyData);
             const savedProperty = await newProperty.save();
+            
+            console.log('Propiedad guardada:', JSON.stringify(savedProperty, null, 2));
             
             res.status(201).json(savedProperty);
         } catch (error) {

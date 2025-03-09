@@ -1,26 +1,32 @@
 "use client";
 import { usePathname } from 'next/navigation';
 import Image from "next/image";
-import { Suspense, lazy } from 'react';
-import { FaFacebook, FaInstagram, FaPhone } from "react-icons/fa";
-import { AiOutlineMenuUnfold, AiOutlineMenuFold, AiOutlineDown } from "react-icons/ai";
 import Link from "next/link";
 import Head from 'next/head';
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavbar } from './context/navBarContext';
+import { 
+  FaFacebook, 
+  FaInstagram, 
+  FaPhone, 
+  FaBars, 
+  FaTimes, 
+  FaChevronDown, 
+  FaChevronRight,
+  FaHome,
+  FaBuilding,
+  FaHandshake,
+  FaChartLine,
+  FaEllipsisH,
+  FaAngleDown,
+  FaAngleUp
+} from "react-icons/fa";
 
-// Carga perezosa de los íconos menos críticos
-const FaHome = lazy(() => import('react-icons/fa').then(mod => ({ default: mod.FaHome })));
-const FaHandshake = lazy(() => import('react-icons/fa').then(mod => ({ default: mod.FaHandshake })));
-const FaChartLine = lazy(() => import('react-icons/fa').then(mod => ({ default: mod.FaChartLine })));
-const AiOutlineRight = lazy(() => import('react-icons/ai').then(mod => ({ default: mod.AiOutlineRight })));
-
-// Memoización de componentes de menú para evitar re-renders innecesarios
-const MenuIcon = ({ icon: Icon, ...props }) => (
-  <Suspense fallback={<div className="w-6 h-6" />}>
-    <Icon {...props} />
-  </Suspense>
-);
+// Componente para renderizar iconos con Suspense
+const MenuIcon = ({ icon: Icon, ...props }) => {
+  if (!Icon) return null;
+  return <Icon {...props} />;
+};
 
 // Configuración SEO - Schema.org para la organización
 const ORGANIZATION_SCHEMA = {
@@ -139,11 +145,9 @@ export default function ControlMenu() {
       (entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
-            // Precarga de íconos cuando el menú está visible
-            FaHome.preload();
-            FaHandshake.preload();
-            FaChartLine.preload();
-            AiOutlineRight.preload();
+            // Los iconos de React Icons no tienen método preload()
+            // Simplemente cargamos los componentes cuando son visibles
+            // No es necesario hacer nada especial aquí
           }
         });
       },
@@ -185,15 +189,15 @@ export default function ControlMenu() {
       <header className="relative w-full z-[9999]">
         {/* Botón de menú para móviles */}
         {!menuVisible && (
-          <div className="lg:hidden fixed right-4 top-4 z-[9999] text-white bg-gray-600 p-2 rounded">
+          <div className="lg:hidden fixed right-4 top-4 z-[9999] text-white">
             <button 
               onClick={handleMenuToggle} 
-              className="text-white hover:text-gray-700 flex items-center space-x-2"
+              className="text-white hover:text-amarillo flex items-center justify-center bg-black/40 backdrop-blur-sm p-3 rounded-full shadow-lg hover:shadow-amarillo/30 transition-all duration-300"
               aria-expanded={menuVisible}
               aria-controls="mobile-menu"
               aria-label={menuVisible ? "Cerrar menú" : "Abrir menú"}
             >
-              {menuVisible ? <AiOutlineMenuFold size={30} /> : <AiOutlineMenuUnfold size={30} />}
+              {menuVisible ? <FaTimes size={24} /> : <FaEllipsisH size={24} />}
             </button>
           </div>
         )}
@@ -208,9 +212,20 @@ export default function ControlMenu() {
         >
           {/* Botón Ver más/menos */}
           <div className="absolute left-1/4 top-1/2 flex space-x-4 mt-4 ml-4">
-            <button onClick={handleMenuToggle} className={`${isExpRealty ? 'text-white' : 'text-white'} hover:text-gray-300 flex items-center space-x-2`}>
-              <span className="hidden lg:block">{menuVisible ? "Ver menos" : "Ver más"}</span>
-              {menuVisible ? <AiOutlineMenuFold size={30} /> : <AiOutlineMenuUnfold size={30} />}
+            <button 
+              onClick={handleMenuToggle} 
+              className={`${isExpRealty ? 'text-white' : 'text-white'} hover:text-amarillo transition-all duration-300 flex items-center space-x-2 bg-black/20 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg hover:shadow-amarillo/30 group`}
+              aria-label={menuVisible ? "Ver menos opciones" : "Ver más opciones"}
+            >
+              <span className="hidden lg:block font-medium">{menuVisible ? "Ver menos" : "Ver más"}</span>
+              <div className="relative w-6 h-6 flex items-center justify-center overflow-hidden">
+                <div className={`absolute transition-all duration-500 transform ${menuVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+                  <FaAngleUp size={24} className="text-amarillo group-hover:scale-110 transition-transform duration-300" />
+                </div>
+                <div className={`absolute transition-all duration-500 transform ${menuVisible ? 'translate-y-8 opacity-0' : 'translate-y-0 opacity-100'}`}>
+                  <FaEllipsisH size={24} className="text-amarillo group-hover:scale-110 transition-transform duration-300" />
+                </div>
+              </div>
             </button>
           </div>
 
@@ -259,7 +274,9 @@ export default function ControlMenu() {
             >
               <Link href="/vender" className={`${isExpRealty ? 'text-white' : 'text-white'} hover:text-gray-300 flex items-center gap-2`}>
                 Vende tu propiedad
-                <AiOutlineDown className={`transition-transform duration-300 ${dropdownVisible.vender ? 'rotate-180' : ''}`} />
+                <FaChevronDown
+                  className={`transition-transform duration-300 ${dropdownVisible.vender ? 'rotate-180' : ''}`}
+                />
               </Link>
               {dropdownVisible.vender && (
                 <>
@@ -321,7 +338,7 @@ export default function ControlMenu() {
                 >
                   Servicios
                 </Link>
-                <AiOutlineDown
+                <FaChevronDown
                   className={`transition-transform duration-300 ${dropdownVisible.servicios ? 'rotate-180' : ''}`}
                 />
               </div>
@@ -354,7 +371,7 @@ export default function ControlMenu() {
                           <MenuIcon icon={FaHandshake} className="mr-3 text-amarillo" />
                           Residentes en España
                         </div>
-                        <MenuIcon icon={AiOutlineRight} className="ml-2 group-hover/espana:rotate-90 transition-transform duration-200" />
+                        <MenuIcon icon={FaChevronRight} className="ml-2 group-hover/espana:rotate-90 transition-transform duration-200" />
                       </Link>
 
                       {/* Área invisible para el submenú */}
@@ -393,7 +410,7 @@ export default function ControlMenu() {
                           <MenuIcon icon={FaChartLine} className="mr-3 text-amarillo" />
                           Residentes en el extranjero
                         </div>
-                        <MenuIcon icon={AiOutlineRight} className="ml-2 group-hover/extranjero:rotate-90 transition-transform duration-200" />
+                        <MenuIcon icon={FaChevronRight} className="ml-2 group-hover/extranjero:rotate-90 transition-transform duration-200" />
                       </Link>
 
                       {/* Área invisible para el submenú */}
@@ -457,10 +474,10 @@ export default function ControlMenu() {
               <Image src="/logo.png" alt="Logo de Goza Madrid" width={100} height={20} />
               <button 
                 onClick={handleMenuToggle} 
-                className="text-white hover:text-gray-700"
+                className="text-white hover:text-amarillo bg-black/20 backdrop-blur-sm p-2 rounded-full transition-all duration-300"
                 aria-label="Cerrar menú"
               >
-                <AiOutlineMenuFold size={30} />
+                <FaTimes size={24} />
               </button>
             </div>
 
@@ -477,7 +494,7 @@ export default function ControlMenu() {
                   className="ml-2 text-white hover:text-gray-700"
                   aria-expanded={dropdownVisible.vender}
                 >
-                  <AiOutlineDown
+                  <FaChevronDown
                     className={`transition-transform duration-300 ${dropdownVisible.vender ? 'rotate-180' : ''}`}
                     size={20}
                   />
@@ -511,7 +528,7 @@ export default function ControlMenu() {
                     className="ml-2 text-white hover:text-gray-700"
                     aria-expanded={dropdownVisible.servicios}
                   >
-                    <AiOutlineDown
+                    <FaChevronDown
                       className={`transition-transform duration-300 ${dropdownVisible.servicios ? 'rotate-180' : ''}`}
                       size={20}
                     />

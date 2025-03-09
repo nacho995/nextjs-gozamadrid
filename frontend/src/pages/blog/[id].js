@@ -77,7 +77,7 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
           console.log("Obteniendo blog de MongoDB con ID:", id);
           
           // Usar la URL completa para asegurarnos de que es correcta
-          const apiUrl = process.env.NEXT_LOCAL_API_URL || 'http://localhost:4000';
+          const apiUrl = process.env.NEXT_LOCAL_API_URL || 'http://localhost:3000';
           console.log('URL completa:', `${apiUrl}/blog/${id}`);
           
           const response = await fetch(`${apiUrl}/blog/${id}`);

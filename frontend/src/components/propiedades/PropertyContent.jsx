@@ -238,17 +238,25 @@ export default function DefaultPropertyContent({ property }) {
     let images = [];
     
     if (isWordPressProperty && propertyData.images && Array.isArray(propertyData.images) && propertyData.images.length > 0) {
-     
+      console.log('PropertyContent: Procesando imágenes de WordPress:', propertyData.images.length);
       
       // Prevenir doble proxying
-      images = propertyData.images.map(img => {
+      images = propertyData.images.map((img, index) => {
         // Determinar si la imagen ya está siendo procesada por el proxy
-        const isAlreadyProxied = img.src && img.src.includes('/api/image-proxy');
+        const isAlreadyProxied = img.src && (
+          img.src.includes('/api/image-proxy') || 
+          img.src.includes('/imageproxy/')
+        );
         
         // Si ya está proxificada, usar la URL tal cual
         const imageSrc = isAlreadyProxied 
           ? img.src 
           : `/api/image-proxy?url=${encodeURIComponent(img.src)}`;
+        
+        console.log(`PropertyContent: WordPress imagen ${index}:`, {
+          original: img.src,
+          procesada: imageSrc
+        });
         
         return {
           src: imageSrc,
@@ -258,49 +266,75 @@ export default function DefaultPropertyContent({ property }) {
         };
       });
     } else if (isMongoDBProperty && propertyData.images && Array.isArray(propertyData.images)) {
-      console.log('PropertyContent: Procesando imágenes de MongoDB:', propertyData.images);
+      console.log('PropertyContent: Procesando imágenes de MongoDB:', propertyData.images.length);
       
-      // Simplificar el procesamiento de imágenes de MongoDB para volver a la implementación anterior
+      // Procesar imágenes de MongoDB a través del proxy para evitar problemas de CORS
       images = propertyData.images.map((img, index) => {
         let imageSrc, imgAlt;
         
-        console.log(`PropertyContent: Procesando imagen ${index}:`, img);
-        
-        // Simplemente extraer la URL sin procesamiento adicional
+        // Extraer la URL de la imagen según su formato
         if (typeof img === 'string') {
           imageSrc = img;
           imgAlt = title || "Imagen de propiedad";
-          console.log('PropertyContent: Imagen es string:', imageSrc);
+          console.log(`PropertyContent: MongoDB imagen ${index} es string:`, imageSrc);
         } else if (img.src) {
           imageSrc = img.src;
           imgAlt = img.alt || title || "Imagen de propiedad";
-          console.log('PropertyContent: Imagen tiene propiedad src:', imageSrc);
+          console.log(`PropertyContent: MongoDB imagen ${index} tiene propiedad src:`, imageSrc);
         } else if (img.url) {
           imageSrc = img.url;
           imgAlt = img.alt || title || "Imagen de propiedad";
-          console.log('PropertyContent: Imagen tiene propiedad url:', imageSrc);
+          console.log(`PropertyContent: MongoDB imagen ${index} tiene propiedad url:`, imageSrc);
         } else if (img.secure_url) {
           imageSrc = img.secure_url;
           imgAlt = img.alt || title || "Imagen de propiedad";
-          console.log('PropertyContent: Imagen es de Cloudinary:', imageSrc);
+          console.log(`PropertyContent: MongoDB imagen ${index} es de Cloudinary:`, imageSrc);
         } else {
           imageSrc = "/fondoamarillo.jpg";
           imgAlt = "Imagen no disponible";
-          console.log('PropertyContent: No se pudo determinar URL de imagen, usando fallback');
+          console.log(`PropertyContent: MongoDB imagen ${index} no tiene URL válida`);
         }
         
+        // Si es una URL relativa dentro de la aplicación, no usamos proxy
+        const isLocalUrl = imageSrc && imageSrc.startsWith('/') && !imageSrc.startsWith('//');
+        // Si es una URL externa (HTTP o HTTPS), usamos proxy
+        const isExternalUrl = imageSrc && (imageSrc.startsWith('http://') || imageSrc.startsWith('https://'));
+        // Verificar si ya está proxificada
+        const isAlreadyProxied = imageSrc && (
+          imageSrc.includes('/api/image-proxy') || 
+          imageSrc.includes('/imageproxy/')
+        );
+        
+        let finalSrc = imageSrc;
+        
+        // Solo aplicar proxy si:
+        // 1. Es una URL externa
+        // 2. No es ya una URL de proxy
+        if (isExternalUrl && !isAlreadyProxied) {
+          finalSrc = `/api/image-proxy?url=${encodeURIComponent(imageSrc)}`;
+        }
+        
+        console.log(`PropertyContent: URL final para MongoDB imagen ${index}:`, {
+          original: imageSrc,
+          procesada: finalSrc,
+          tipo: isLocalUrl ? 'local' : (isExternalUrl ? 'externa' : 'indefinida'),
+          usaProxy: finalSrc !== imageSrc
+        });
+        
         return {
-          src: imageSrc,
+          src: finalSrc,
           alt: imgAlt,
           originalSrc: imageSrc,
-          isProxied: false
+          isProxied: finalSrc !== imageSrc
         };
       });
       
       console.log('PropertyContent: Total de imágenes procesadas:', images.length);
     } else {
+      console.log('PropertyContent: No se encontraron imágenes válidas, usando imagen predeterminada');
+      
       images = [{ 
-        src: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format", 
+        src: "https://via.placeholder.com/800x600?text=Sin+Imagen",
         alt: "Imagen no disponible para " + (title || "esta propiedad"),
         isProxied: false
       }];
