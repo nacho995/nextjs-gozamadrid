@@ -10,6 +10,7 @@ import { getBlogPostsFromServer } from "@/services/wpApi";
 import { getBlogPosts } from "@/pages/api";
 import DirectImage from './DirectImage';
 import LoadingScreen from './LoadingScreen';
+import BlogImage from './blog/BlogImage';
 
 // Utilidades de renderizado seguro
 const safeRenderValue = (value) => {
@@ -70,6 +71,41 @@ const getImageUrl = (post) => {
   return DEFAULT_IMAGE;
 };
 
+// Añadir esta función para procesar URLs de imágenes, similar a la de blogPage.jsx
+const processImageUrl = (image) => {
+  if (!image) return { src: DEFAULT_IMAGE, alt: 'Imagen del blog' };
+
+  // Si es un string
+  if (typeof image === 'string') {
+    if (image.startsWith('http') || image.startsWith('https')) {
+      return { src: image, alt: 'Imagen del blog' };
+    }
+    const baseUrl = process.env.NODE_ENV === 'production'
+      ? 'https://goza-madrid.onrender.com'
+      : 'http://localhost:3000';
+    return { 
+      src: `${baseUrl}${image.startsWith('/') ? '' : '/'}${image}`,
+      alt: 'Imagen del blog'
+    };
+  }
+
+  // Si es un objeto con src
+  if (image && image.src) {
+    if (image.src.startsWith('http') || image.src.startsWith('https')) {
+      return image;
+    }
+    const baseUrl = process.env.NODE_ENV === 'production'
+      ? 'https://goza-madrid.onrender.com'
+      : 'http://localhost:3000';
+    return {
+      ...image,
+      src: `${baseUrl}${image.src.startsWith('/') ? '' : '/'}${image.src}`
+    };
+  }
+
+  return { src: DEFAULT_IMAGE, alt: 'Imagen del blog' };
+};
+
 const BlogCard = ({ blog, index }) => {
   const blogUrl = blog.source === 'wordpress' 
     ? `/blog/${blog.slug}?source=wordpress` 
@@ -110,7 +146,31 @@ const BlogCard = ({ blog, index }) => {
     return DEFAULT_IMAGE;
   };
 
-  const imageUrl = getImageUrl(blog);
+  // Preparar la imagen para el componente BlogImage
+  const prepareImage = (blog) => {
+    if (!blog.image) {
+      return { src: DEFAULT_IMAGE, alt: blog.title || 'Imagen del blog' };
+    }
+    
+    if (typeof blog.image === 'string') {
+      return { src: blog.image, alt: blog.title || 'Imagen del blog' };
+    }
+    
+    if (blog.image.src) {
+      return { 
+        src: blog.image.src, 
+        alt: blog.image.alt || blog.title || 'Imagen del blog' 
+      };
+    }
+    
+    // Si llegamos aquí, usamos la función getImageUrl
+    return { 
+      src: getImageUrl(blog), 
+      alt: blog.title || 'Imagen del blog' 
+    };
+  };
+
+  const imageData = prepareImage(blog);
   const title = typeof blog.title === 'object' ? blog.title.rendered : blog.title;
   
   // Función mejorada para obtener la descripción
@@ -177,15 +237,11 @@ const BlogCard = ({ blog, index }) => {
         title={`Leer más sobre: ${title}`}
       >
         <div className="relative w-full overflow-hidden aspect-[16/9]">
-          <Image 
-            src={imageUrl}
-            alt={title}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover transition-transform duration-700 group-hover:scale-105"
-            unoptimized={!imageUrl.includes('realestategozamadrid.com')}
+          <BlogImage 
+            src={imageData.src}
+            alt={imageData.alt}
+            className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
             priority={index < 2}
-            itemProp="image"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
           {formattedDate && (
@@ -279,6 +335,37 @@ const BlogHome = (props) => {
               // Truncar la descripción
               const truncatedDescription = truncateText(description, 150);
               
+              // Procesar la imagen destacada
+              let featuredImageUrl = null;
+              
+              if (post._embedded && 
+                  post._embedded['wp:featuredmedia'] && 
+                  post._embedded['wp:featuredmedia'][0]) {
+                  
+                  const media = post._embedded['wp:featuredmedia'][0];
+                  
+                  if (media.media_details && media.media_details.sizes) {
+                      const sizePriority = ['medium_large', 'medium', 'large', 'full'];
+                      
+                      for (const size of sizePriority) {
+                          if (media.media_details.sizes[size]) {
+                              featuredImageUrl = media.media_details.sizes[size].source_url;
+                              break;
+                          }
+                      }
+                  }
+                  
+                  if (!featuredImageUrl && media.source_url) {
+                      featuredImageUrl = media.source_url;
+                  }
+              }
+              
+              if (!featuredImageUrl) {
+                  featuredImageUrl = post.uagb_featured_image_src?.medium?.[0] || 
+                                    post.uagb_featured_image_src?.full?.[0] || 
+                                    DEFAULT_IMAGE;
+              }
+              
               const blog = {
                 _id: `wp-${post.id}`,
                 id: post.id,
@@ -292,7 +379,7 @@ const BlogHome = (props) => {
                   day: 'numeric'
                 }),
                 image: {
-                  src: getImageUrl(post),
+                  src: featuredImageUrl,
                   alt: safeRenderValue(post.title)
                 },
                 slug: post.slug,
@@ -321,11 +408,15 @@ const BlogHome = (props) => {
                   const description = blog.description || blog.content || blog.excerpt || '';
                   const truncatedDescription = truncateText(description, 150);
                   
+                  // Procesar la imagen
+                  const processedImage = processImageUrl(blog.image);
+                  
                   uniqueBlogs.set(key, {
                     ...blog,
                     description: truncatedDescription,
                     content: blog.content || description,
                     excerpt: blog.excerpt || description,
+                    image: processedImage,
                     source: 'local'
                   });
                 }
