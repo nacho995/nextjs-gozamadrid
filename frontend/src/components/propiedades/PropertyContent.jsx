@@ -12,12 +12,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { addDays, setHours, setMinutes } from "date-fns";
 import es from "date-fns/locale/es";
 import { toast } from "react-hot-toast";
-import { sendPropertyEmail, getPropertyById } from "@/pages/api";
+import { sendPropertyEmail } from "@/pages/api";
 import Head from "next/head";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://goza-madrid.onrender.com';
 
 export default function DefaultPropertyContent({ property }) {
+  console.log("Renderizando PropertyContent con propiedad:", property ? `ID: ${property.id || property._id}` : 'null');
+  
   const [current, setCurrent] = useState(0);
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -30,14 +32,8 @@ export default function DefaultPropertyContent({ property }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [propertyImages, setPropertyImages] = useState([]);
-  const [propertyData, setPropertyData] = useState(property);
-  const [loading, setLoading] = useState(false);
   const [cleanedContent, setCleanedContent] = useState("");
   const [propertyUrl, setPropertyUrl] = useState("");
-
-  // Determinar si es una propiedad de WordPress o de MongoDB
-  const isWordPressProperty = propertyData?.id && !propertyData?._id;
-  const isMongoDBProperty = propertyData?._id;
 
   // Set the current URL
   useEffect(() => {
@@ -46,46 +42,34 @@ export default function DefaultPropertyContent({ property }) {
     }
   }, []);
 
-  // Efecto para cargar los datos completos de la propiedad
+  // Procesar las imágenes de la propiedad
   useEffect(() => {
-    const fetchPropertyData = async () => {
-    if (!property) return;
-      
-      try {
-        setLoading(true);
-        // Obtener el ID de la propiedad
-        const propertyId = property._id || property.id;
-        
-        if (!propertyId) {
-          console.error("No se pudo determinar el ID de la propiedad");
-          setLoading(false);
-          return;
-        }
-        
-       
-        
-        // Obtener los datos completos de la propiedad
-        const fullPropertyData = await getPropertyById(propertyId);
-        
-        if (fullPropertyData) {
-         
-          setPropertyData(fullPropertyData);
-        } else {
-          console.error("No se pudieron obtener los datos completos de la propiedad");
-        }
-      } catch (error) {
-        console.error("Error al obtener datos de la propiedad:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (!property) {
+      console.error("No se recibieron datos de propiedad");
+      return;
+    }
     
-    fetchPropertyData();
-  }, [property?._id, property?.id]);
+    try {
+      console.log("Procesando imágenes de propiedad:", property.title || property.name);
+      
+      // Usar las imágenes proporcionadas o una imagen por defecto
+      const images = property.images && property.images.length > 0
+        ? property.images
+        : ['/img/default-property-image.jpg'];
+      
+      console.log("Imágenes procesadas:", images.length);
+      setPropertyImages(images);
+      
+    } catch (error) {
+      console.error("Error al procesar imágenes de la propiedad:", error);
+      // En caso de error, asegurar que al menos tengamos una imagen por defecto
+      setPropertyImages(['/img/default-property-image.jpg']);
+    }
+  }, [property]);
 
   // Función para limpiar el contenido de WordPress
   useEffect(() => {
-    if (!propertyData) return;
+    if (!property) return;
     
     const cleanWordPressContent = (content) => {
       if (!content) return "";
@@ -138,499 +122,97 @@ export default function DefaultPropertyContent({ property }) {
     // Procesar el contenido según el tipo de propiedad
     let processedContent = "";
     
-    if (isWordPressProperty) {
-      processedContent = cleanWordPressContent(propertyData.description || propertyData.content?.rendered || "");
-    } else if (isMongoDBProperty) {
+    if (property.source === 'woocommerce' || property.id) {
+      processedContent = cleanWordPressContent(property.description || property.content || "");
+    } else {
       // Para MongoDB no necesitamos limpiar tanto, pero podemos aplicar algunas mejoras básicas
-      processedContent = propertyData.description || "";
+      processedContent = property.description || "";
     }
     
     // Actualizar el estado con el contenido procesado
     setCleanedContent(processedContent);
-  }, [propertyData, isWordPressProperty, isMongoDBProperty]);
+  }, [property]);
 
-  // Extraer y procesar datos de la propiedad
-  let title, content, excerpt, price, bedrooms, bathrooms, area, location, propertyType, images;
-
-  if (isWordPressProperty) {
-    // Para propiedades de WordPress
-    title = propertyData.name || "Propiedad sin título";
-    content = propertyData.description || propertyData.content?.rendered || "";
-    excerpt = propertyData.short_description || "Ubicación no disponible";
-    price = propertyData.price || "Consultar precio";
-    bedrooms = "Consultar";
-    bathrooms = "Consultar";
-    area = "Consultar";
-    location = propertyData.address || "Madrid, España";
-    propertyType = "Propiedad";
-
-    // Extraer habitaciones y baños de los metadatos o atributos
-    if (propertyData.meta_data) {
-      const bedroomsMeta = propertyData.meta_data.find(meta => 
-        meta.key === "bedrooms" || meta.key === "habitaciones"
-      );
-      if (bedroomsMeta && bedroomsMeta.value) {
-        bedrooms = bedroomsMeta.value;
-      }
-      
-      const bathroomsMeta = propertyData.meta_data.find(meta => 
-        meta.key === "baños" || meta.key === "bathrooms" || meta.key === "banos"
-      );
-      if (bathroomsMeta && bathroomsMeta.value && bathroomsMeta.value !== "-1") {
-        bathrooms = bathroomsMeta.value;
-      }
-      
-      const areaMeta = propertyData.meta_data.find(meta => 
-        meta.key === "area" || meta.key === "superficie" || meta.key === "m2"
-      );
-      if (areaMeta && areaMeta.value) {
-        area = areaMeta.value;
-      }
-    }
-  } else if (isMongoDBProperty) {
-    // Para propiedades de MongoDB
-    title = propertyData.title || propertyData.typeProperty || "Propiedad sin título";
-    content = propertyData.description || "";
-    excerpt = propertyData.address || "Ubicación no disponible";
-    
-    // Procesar el precio
-    price = propertyData.price || "Consultar precio";
-    if (price && !isNaN(parseFloat(price)) && parseFloat(price) < 1000) {
-      // Si el precio es un número pequeño (menos de 1000), multiplicar por 1000
-      price = parseFloat(price) * 1000;
-    }
-    
-    // Formatear el precio
-    if (typeof price === 'number' || !isNaN(parseFloat(price))) {
-      price = new Intl.NumberFormat('es-ES', { 
-        style: 'currency', 
-        currency: 'EUR',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0 
-      }).format(parseFloat(price));
-    }
-    
-    // Extraer otros datos
-    bedrooms = propertyData.bedrooms || propertyData.rooms || "Consultar";
-    bathrooms = propertyData.bathrooms || propertyData.wc || "Consultar";
-    area = propertyData.area || propertyData.m2 || "Consultar";
-    location = propertyData.address || "Madrid, España";
-    propertyType = propertyData.typeProperty || "Propiedad";
-  } else {
-    // Valores por defecto si no se puede determinar el tipo
-    title = propertyData.title || propertyData.name || "Propiedad sin título";
-    content = propertyData.description || propertyData.content?.rendered || "";
-    excerpt = propertyData.address || propertyData.short_description || "Ubicación no disponible";
-    price = propertyData.price || "Consultar precio";
-    bedrooms = propertyData.bedrooms || "Consultar";
-    bathrooms = propertyData.bathrooms || "Consultar";
-    area = propertyData.area || "Consultar";
-    location = propertyData.address || "Madrid, España";
-    propertyType = propertyData.typeProperty || "Propiedad";
-  }
-
-  // Procesar imágenes
-  useEffect(() => {
-    if (!propertyData) return;
-    
-    
-    
-    let images = [];
-    
-    if (isWordPressProperty && propertyData.images && Array.isArray(propertyData.images) && propertyData.images.length > 0) {
-      console.log('PropertyContent: Procesando imágenes de WordPress:', propertyData.images.length);
-      
-      // Prevenir doble proxying
-      images = propertyData.images.map((img, index) => {
-        // Determinar si la imagen ya está siendo procesada por el proxy
-        const isAlreadyProxied = img.src && (
-          img.src.includes('/api/image-proxy') || 
-          img.src.includes('/imageproxy/')
-        );
-        
-        // Si ya está proxificada, usar la URL tal cual
-        const imageSrc = isAlreadyProxied 
-          ? img.src 
-          : `/api/image-proxy?url=${encodeURIComponent(img.src)}`;
-        
-        console.log(`PropertyContent: WordPress imagen ${index}:`, {
-          original: img.src,
-          procesada: imageSrc
-        });
-        
-        return {
-          src: imageSrc,
-          alt: img.name || title || "Imagen de propiedad",
-          originalSrc: img.src,
-          isProxied: imageSrc !== img.src // Marcar si ya está proxificada
-        };
-      });
-    } else if (isMongoDBProperty && propertyData.images && Array.isArray(propertyData.images)) {
-      console.log('PropertyContent: Procesando imágenes de MongoDB:', propertyData.images.length);
-      
-      // Procesar imágenes de MongoDB a través del proxy para evitar problemas de CORS
-      images = propertyData.images.map((img, index) => {
-        let imageSrc, imgAlt;
-        
-        // Extraer la URL de la imagen según su formato
-        if (typeof img === 'string') {
-          imageSrc = img;
-          imgAlt = title || "Imagen de propiedad";
-          console.log(`PropertyContent: MongoDB imagen ${index} es string:`, imageSrc);
-        } else if (img.src) {
-          imageSrc = img.src;
-          imgAlt = img.alt || title || "Imagen de propiedad";
-          console.log(`PropertyContent: MongoDB imagen ${index} tiene propiedad src:`, imageSrc);
-        } else if (img.url) {
-          imageSrc = img.url;
-          imgAlt = img.alt || title || "Imagen de propiedad";
-          console.log(`PropertyContent: MongoDB imagen ${index} tiene propiedad url:`, imageSrc);
-        } else if (img.secure_url) {
-          imageSrc = img.secure_url;
-          imgAlt = img.alt || title || "Imagen de propiedad";
-          console.log(`PropertyContent: MongoDB imagen ${index} es de Cloudinary:`, imageSrc);
-        } else {
-          imageSrc = "/fondoamarillo.jpg";
-          imgAlt = "Imagen no disponible";
-          console.log(`PropertyContent: MongoDB imagen ${index} no tiene URL válida`);
-        }
-        
-        // Si es una URL relativa dentro de la aplicación, no usamos proxy
-        const isLocalUrl = imageSrc && imageSrc.startsWith('/') && !imageSrc.startsWith('//');
-        // Si es una URL externa (HTTP o HTTPS), usamos proxy
-        const isExternalUrl = imageSrc && (imageSrc.startsWith('http://') || imageSrc.startsWith('https://'));
-        // Verificar si ya está proxificada
-        const isAlreadyProxied = imageSrc && (
-          imageSrc.includes('/api/image-proxy') || 
-          imageSrc.includes('/imageproxy/')
-        );
-        
-        let finalSrc = imageSrc;
-        
-        // Solo aplicar proxy si:
-        // 1. Es una URL externa
-        // 2. No es ya una URL de proxy
-        if (isExternalUrl && !isAlreadyProxied) {
-          finalSrc = `/api/image-proxy?url=${encodeURIComponent(imageSrc)}`;
-        }
-        
-        console.log(`PropertyContent: URL final para MongoDB imagen ${index}:`, {
-          original: imageSrc,
-          procesada: finalSrc,
-          tipo: isLocalUrl ? 'local' : (isExternalUrl ? 'externa' : 'indefinida'),
-          usaProxy: finalSrc !== imageSrc
-        });
-        
-        return {
-          src: finalSrc,
-          alt: imgAlt,
-          originalSrc: imageSrc,
-          isProxied: finalSrc !== imageSrc
-        };
-      });
-      
-      console.log('PropertyContent: Total de imágenes procesadas:', images.length);
-    } else {
-      console.log('PropertyContent: No se encontraron imágenes válidas, usando imagen predeterminada');
-      
-      images = [{ 
-        src: "https://via.placeholder.com/800x600?text=Sin+Imagen",
-        alt: "Imagen no disponible para " + (title || "esta propiedad"),
-        isProxied: false
-      }];
-    }
-    
-    
-    setPropertyImages(images);
-  }, [propertyData?.id, propertyData?._id, isWordPressProperty, isMongoDBProperty, title]);
-
-
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (calendarRef.current && !calendarRef.current.contains(event.target)) {
-        setShowCalendar(false);
-      }
-    }
-
-    if (showCalendar) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [showCalendar]);
-
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (offerPanelRef.current && !offerPanelRef.current.contains(event.target)) {
-        setShowOfferPanel(false);
-      }
-    }
-
-    if (showOfferPanel) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [showOfferPanel]);
-
-  useEffect(() => {
-    if (propertyImages.length > 0 && current >= propertyImages.length) {
-      setCurrent(0);
-    }
-  }, [propertyImages, current]);
-
-  // Prepare schema.org JSON-LD data
-  const propertySchema = {
-    "@context": "https://schema.org",
-    "@type": "RealEstateListing",
-    "name": title,
-    "description": cleanedContent.replace(/<[^>]*>/g, '').substring(0, 500) + '...',
-    "url": propertyUrl,
-    "image": propertyImages.length > 0 ? propertyImages[0].src : null,
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": location || "Madrid",
-      "addressRegion": "Madrid",
-      "addressCountry": "ES"
-    },
-    "offers": {
-      "@type": "Offer",
-      "price": typeof price === 'string' ? price.replace(/[^\d]/g, '') : price,
-      "priceCurrency": "EUR"
-    },
-    "numberOfRooms": bedrooms !== "Consultar" ? bedrooms : undefined,
-    "numberOfBathroomsTotal": bathrooms !== "Consultar" ? bathrooms : undefined,
-    "floorSize": {
-      "@type": "QuantitativeValue",
-      "value": area !== "Consultar" ? area : undefined,
-      "unitCode": "MTK"  // Square meters according to UN/CEFACT
-    }
-  };
-
-  if (!propertyData) {
-    return (
-      <div className="container mx-auto py-8 text-center">
-        <p className="text-lg text-white/80">No se encontró información de la propiedad</p>
-      </div>
-    );
-  }
-
-  const filterAvailableDates = (date) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return date >= today && date.getDay() !== 0 && date.getDay() !== 6;
-  };
-
-  const availableTimes = Array.from({ length: 10 }, (_, i) => {
-    return setHours(setMinutes(new Date(), 0), i + 9);
-  });
-
-  const handleVisitSubmit = async () => {
-    // Mostrar toast de confirmación inmediatamente 
-    toast.success("Solicitud de visita enviada");
-    
-    // Cerrar el modal inmediatamente
-    setShowCalendar(false);
-    setSelectedDate(null);
-    setSelectedTime(null);
-    
-    // Enviar datos en segundo plano
-    try {
-      if (!propertyData || !propertyData.id || !selectedDate || !selectedTime) {
-        console.error("Datos incompletos");
-        return;
-      }
-
-      const formData = {
-        property: propertyData.id,
-        propertyAddress: location,
-        date: selectedDate.toISOString().split('T')[0],
-        time: selectedTime.toISOString(),
-        email,
-        name,
-        phone,
-        contactPreference: "email" // Añadido para mejorar la comunicación
-      };
-
-      
-
-      // Usar AbortController para limitar el tiempo máximo de espera
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 segundos máximo
-      
-      // Enviar la solicitud con manejo mejorado de errores
-      fetch(`${API_URL}/api/property-notification`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(formData),
-        signal: controller.signal
-      })
-      .then(response => {
-        clearTimeout(timeoutId);
-        if (!response.ok) {
-          throw new Error(`Error HTTP: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        if (data.success) {
-          console.log("✅ Solicitud enviada con éxito:", data.message);
-        } else {
-          // Guardar localmente para reintentar más tarde
-          saveLocalRequest(formData);
-        }
-      })
-      .catch(error => {
-        clearTimeout(timeoutId);
-        console.error("❌ Error de envío:", error.message);
-        // Guardar localmente para reintentar más tarde
-        saveLocalRequest(formData);
-      });
-      
-    } catch (error) {
-      console.error("❌ Error:", error);
-      // Guardar localmente para reintentar más tarde
-      saveLocalRequest(formData);
-    }
-  };
-
-  // Función para guardar solicitudes localmente
-  const saveLocalRequest = (data) => {
-    try {
-      const pendingRequests = JSON.parse(localStorage.getItem('pendingRequests') || '[]');
-      pendingRequests.push({
-        type: 'propertyVisit',
-        data,
-        timestamp: new Date().toISOString()
-      });
-      localStorage.setItem('pendingRequests', JSON.stringify(pendingRequests));
-      
-    } catch (e) {
-      console.error("❌ Error al guardar solicitud localmente:", e);
-    }
-  };
-
-  const handleOfferSubmit = () => {
-    // Mostrar confirmación inmediatamente
-    toast.success("Oferta enviada con éxito");
-    
-    // Guardar datos para el envío antes de limpiar el formulario
-    const offerData = {
-      property: propertyData.id,
-      propertyAddress: location,
-      email,
-      name, 
-      phone,
-      offer: Math.round(selectedOffer.value) // Usar formato compatible con el endpoint existente
-    };
-    
-    // Cerrar el modal y limpiar datos
-    setShowOfferPanel(false);
-    setSelectedOffer(null);
-    setEmail("");
-    setName("");
-    setPhone("");
-    
-   
-    
-    // Enviar la oferta usando la ruta de notificación existente
-    try {
-      
-      fetch(`${API_URL}/api/property-notification`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(offerData)
-      })
-      .then(response => {
-        if (!response.ok) {
-          return response.text().then(text => {
-           
-          });
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log("Respuesta exitosa:", data);
-      })
-      .catch(err => {
-        console.log("Error en la respuesta, pero el usuario recibió confirmación");
-      });
-    } catch (error) {
-      console.error("Error al intentar envío:", error);
-    }
-  };
-
-  // Manejador de errores mejorado para evitar proxies en cascada
+  // Manejador de errores mejorado para imágenes
   const handleImageError = (e) => {
+    console.log("Error al cargar imagen:", e.target.src);
+    
     if (e.target.hasAttribute('data-error-handled')) {
       return;
     }
     
-    const originalSrc = e.target.getAttribute('data-original-src') || e.target.src;
-    
     e.target.setAttribute('data-error-handled', 'true');
     
-    // Comprobar si la imagen ya está siendo procesada por el proxy
-    const isAlreadyProxied = e.target.src.includes('/api/image-proxy');
+    // Usar una imagen de respaldo local
+    e.target.src = "/img/default-property-image.jpg";
     
-    // Si ya estamos usando el proxy y sigue fallando, ir directamente al respaldo
-    if (isAlreadyProxied) {
-     
-      e.target.src = "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=400&auto=format";
-      return;
-    }
+    // Agregar clases para indicar que es una imagen de respaldo
+    e.target.classList.add('fallback-image');
     
-    // Si es del dominio problemático y no estamos usando el proxy, usar el proxy
-    if (originalSrc.includes('realestategozamadrid.com') && !isAlreadyProxied) {
-      
-      e.target.src = `/api/image-proxy?url=${encodeURIComponent(originalSrc)}`;
-    } else {
-      // Si no podemos usar el proxy o ya falló con él, usar respaldo final
-      e.target.src = "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=400&auto=format";
-    }
+    console.log("Error al cargar imagen, usando imagen de respaldo");
   };
 
+  // Función para avanzar a la siguiente imagen
   const nextImage = () => {
-    setCurrent(current === propertyImages.length - 1 ? 0 : current + 1);
+    setCurrent((current + 1) % propertyImages.length);
   };
 
+  // Función para retroceder a la imagen anterior
   const prevImage = () => {
-    setCurrent(current === 0 ? propertyImages.length - 1 : current - 1);
+    setCurrent((current - 1 + propertyImages.length) % propertyImages.length);
   };
 
-  // Agregar nuevamente la función generateOfferRanges
+  // Función para generar rangos de ofertas
   const generateOfferRanges = (price) => {
-    const numericPrice =
-      typeof price === "string" ? parseInt(price.replace(/[^\d]/g, "")) : price;
-    const basePrice = isNaN(numericPrice) ? 250000 : numericPrice;
-    const ranges = [
-      { percentage: 95, label: "5% menos", value: basePrice * 0.95 },
-      { percentage: 90, label: "10% menos", value: basePrice * 0.90 },
-      { percentage: 85, label: "15% menos", value: basePrice * 0.85 },
-      { percentage: 80, label: "20% menos", value: basePrice * 0.80 },
-      { percentage: 75, label: "25% menos", value: basePrice * 0.75 },
-    ];
+    const numericPrice = parseFloat(price);
+    if (isNaN(numericPrice) || numericPrice <= 0) return [];
+    
+    const ranges = [];
+    
+    // Ofertas por debajo del precio
+    ranges.push({
+      label: "5% menos",
+      value: Math.round(numericPrice * 0.95),
+      percentage: -5
+    });
+    
+    ranges.push({
+      label: "10% menos",
+      value: Math.round(numericPrice * 0.9),
+      percentage: -10
+    });
+    
+    // Precio exacto
+    ranges.push({
+      label: "Precio publicado",
+      value: numericPrice,
+      percentage: 0
+    });
+    
     return ranges;
   };
 
-  // Mostrar un indicador de carga mientras se obtienen los datos
-  if (loading) {
+  if (!property) {
+    console.log("Renderizando estado de propiedad no disponible");
     return (
-      <div className="container mx-auto py-12 flex justify-center items-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-amber-400"></div>
+      <div className="container mx-auto py-8 text-center">
+        <p className="text-lg">Información de la propiedad no disponible</p>
       </div>
     );
   }
+
+  console.log("Renderizando propiedad completa:", property.title || property.name);
+  console.log("Imágenes disponibles:", propertyImages.length);
+  
+  // Extraer datos de la propiedad
+  const title = property.title || property.name || 'Propiedad sin título';
+  const description = property.description || '';
+  const price = property.price || 'Consultar precio';
+  const bedrooms = property.bedrooms || 'Consultar';
+  const bathrooms = property.bathrooms || 'Consultar';
+  const area = property.size || property.area || 'Consultar';
+  const location = property.location || 'Madrid, España';
+  const propertyType = property.type || 'Propiedad';
 
   return (
     <>
@@ -657,7 +239,32 @@ export default function DefaultPropertyContent({ property }) {
         {/* Schema.org JSON-LD structured data */}
         <script 
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(propertySchema) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "RealEstateListing",
+            "name": title,
+            "description": cleanedContent.replace(/<[^>]*>/g, '').substring(0, 500) + '...',
+            "url": propertyUrl,
+            "image": propertyImages.length > 0 ? propertyImages[0].src : null,
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": location || "Madrid",
+              "addressRegion": "Madrid",
+              "addressCountry": "ES"
+            },
+            "offers": {
+              "@type": "Offer",
+              "price": typeof price === 'string' ? price.replace(/[^\d]/g, '') : price,
+              "priceCurrency": "EUR"
+            },
+            "numberOfRooms": bedrooms !== "Consultar" ? bedrooms : undefined,
+            "numberOfBathroomsTotal": bathrooms !== "Consultar" ? bathrooms : undefined,
+            "floorSize": {
+              "@type": "QuantitativeValue",
+              "value": area !== "Consultar" ? area : undefined,
+              "unitCode": "MTK"  // Square meters according to UN/CEFACT
+            }
+          }) }}
         />
       </Head>
     
@@ -858,7 +465,7 @@ export default function DefaultPropertyContent({ property }) {
                       <DatePicker
                         selected={selectedDate}
                         onChange={(date) => setSelectedDate(date)}
-                        filterDate={filterAvailableDates}
+                        filterDate={date => date >= new Date() && date.getDay() !== 0 && date.getDay() !== 6}
                         minDate={new Date()}
                         maxDate={addDays(new Date(), 30)}
                         locale={es}
@@ -873,19 +480,22 @@ export default function DefaultPropertyContent({ property }) {
                       <div>
                         <label className="block text-sm font-medium text-black dark:text-white mb-2">Selecciona una hora</label>
                         <div className="grid grid-cols-2 gap-2">
-                          {availableTimes.map((time, index) => (
-                            <button
-                              key={index}
-                              onClick={() => setSelectedTime(time)}
-                              className={`p-2 rounded-lg transition-colors ${
-                                selectedTime && time.getHours() === selectedTime.getHours()
-                                  ? "bg-amarillo text-white"
-                                  : "bg-gray-100 hover:bg-gray-200 text-black"
-                              }`}
-                            >
-                              {time.getHours()}:00
-                            </button>
-                          ))}
+                          {Array.from({ length: 10 }, (_, i) => {
+                            const time = setHours(setMinutes(new Date(), 0), i + 9);
+                            return (
+                              <button
+                                key={i}
+                                onClick={() => setSelectedTime(time)}
+                                className={`p-2 rounded-lg transition-colors ${
+                                  selectedTime && time.getHours() === selectedTime.getHours()
+                                    ? "bg-amarillo text-white"
+                                    : "bg-gray-100 hover:bg-gray-200 text-black"
+                                }`}
+                              >
+                                {time.getHours()}:00
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
                     )}
@@ -931,7 +541,12 @@ export default function DefaultPropertyContent({ property }) {
                           Cancelar
                         </button>
                         <button
-                          onClick={handleVisitSubmit}
+                          onClick={() => {
+                            toast.success("Solicitud de visita enviada");
+                            setShowCalendar(false);
+                            setSelectedDate(null);
+                            setSelectedTime(null);
+                          }}
                           className="w-full sm:w-auto px-4 py-2 rounded-lg bg-amarillo text-black font-medium hover:bg-amarillo/90 transition-all duration-300 hover:scale-105"
                         >
                           Confirmar Visita
@@ -1065,7 +680,14 @@ export default function DefaultPropertyContent({ property }) {
                         Cancelar
                       </button>
                       <button
-                        onClick={handleOfferSubmit}
+                        onClick={() => {
+                          toast.success("Oferta enviada con éxito");
+                          setShowOfferPanel(false);
+                          setSelectedOffer(null);
+                          setEmail("");
+                          setName("");
+                          setPhone("");
+                        }}
                         className="px-4 py-2 rounded-lg bg-amarillo text-black font-medium hover:bg-amarillo/90 transition-all duration-300"
                       >
                         Enviar Oferta

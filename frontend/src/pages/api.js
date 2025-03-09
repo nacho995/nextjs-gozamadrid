@@ -4,6 +4,21 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 const WC_CONSUMER_KEY = 'ck_75c5940bfae6a9dd63f1489da71e43b576999633';
 const WC_CONSUMER_SECRET = 'cs_f194d11b41ca92cdd356145705fede711cd233e5';
 
+// Función auxiliar para manejar errores
+const handleApiError = (error, functionName) => {
+  console.error(`Error en ${functionName}:`, error);
+  if (error.response) {
+    // El servidor respondió con un código de error
+    throw new Error(`Error ${error.response.status}: ${error.response.statusText}`);
+  } else if (error.request) {
+    // La petición fue hecha pero no se recibió respuesta
+    throw new Error('No se recibió respuesta del servidor');
+  } else {
+    // Error al configurar la petición
+    throw new Error(error.message || 'Error desconocido');
+  }
+};
+
 export async function getCountryPrefix() {
   try {
     console.log("Intentando obtener prefijos de país desde la API local");
@@ -576,44 +591,130 @@ export async function getPropertyPosts() {
 
 export async function getPropertyById(id) {
   try {
+    console.log(`[DEBUG] Iniciando getPropertyById para ID: ${id}`);
+    
     // Verificar si es un ID de MongoDB (formato ObjectId)
     const isMongoId = /^[0-9a-fA-F]{24}$/.test(id);
+    console.log(`[DEBUG] ¿Es ID de MongoDB? ${isMongoId}`);
+    
+    // Crear un controlador de aborto para establecer un timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      console.log(`[DEBUG] TIMEOUT alcanzado para la propiedad con ID: ${id}`);
+      controller.abort();
+    }, 10000); // 10 segundos timeout
+    
+    let response;
     
     if (isMongoId) {
       // Es un ID de MongoDB, obtener de nuestra API
-      console.log(`Obteniendo propiedad de MongoDB con ID ${id}`);
-      // Usar la ruta con API_URL
-      const response = await fetch(`${API_URL}/property/${id}`);
+      console.log(`[DEBUG] Obteniendo propiedad de MongoDB con ID ${id}`);
       
-      console.log("Respuesta de MongoDB:", {
-        status: response.status,
-        statusText: response.statusText
-      });
-      
-      if (!response.ok) {
-        console.error(`Error al obtener propiedad de MongoDB: ${response.status}`);
-        throw new Error(`Error al obtener propiedad: ${response.status}`);
+      try {
+        // Usar la URL base según el entorno
+        const baseUrl = typeof window === 'undefined' 
+          ? API_URL // En el servidor
+          : ''; // En el cliente (URL relativa)
+        
+        const url = `${baseUrl}/property/${id}`;
+        console.log(`[DEBUG] URL de petición MongoDB: ${url}`);
+        
+        response = await fetch(url, {
+          signal: controller.signal,
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
+        });
+        
+        console.log(`[DEBUG] Respuesta MongoDB recibida: ${response.status} ${response.statusText}`);
+      } catch (error) {
+        clearTimeout(timeoutId);
+        console.error(`[DEBUG] Error en fetch MongoDB:`, error);
+        
+        if (error.name === 'AbortError') {
+          console.error("[DEBUG] La solicitud a MongoDB se canceló por timeout");
+          throw new Error("Tiempo de espera agotado al obtener la propiedad. Por favor, inténtalo de nuevo.");
+        }
+        
+        throw error;
       }
+    } else {
+      // Es un ID de WooCommerce, usar nuestro proxy
+      console.log(`[DEBUG] Obteniendo propiedad de WooCommerce con ID ${id}`);
       
-      const data = await response.json();
-      console.log("Datos de la propiedad de MongoDB:", data);
-      
+      try {
+        // Usar la URL base según el entorno
+        const baseUrl = typeof window === 'undefined' 
+          ? `${API_URL}/api/wordpress-proxy` // En el servidor
+          : '/api/wordpress-proxy'; // En el cliente
+        
+        const url = `${baseUrl}?path=products/${id}`;
+        console.log(`[DEBUG] URL de petición WooCommerce: ${url}`);
+        
+        response = await fetch(url, {
+          signal: controller.signal,
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
+        });
+        
+        console.log(`[DEBUG] Respuesta WooCommerce recibida: ${response.status} ${response.statusText}`);
+      } catch (error) {
+        clearTimeout(timeoutId);
+        console.error(`[DEBUG] Error en fetch WooCommerce:`, error);
+        
+        if (error.name === 'AbortError') {
+          console.error("[DEBUG] La solicitud a WooCommerce se canceló por timeout");
+          throw new Error("Tiempo de espera agotado al obtener la propiedad. Por favor, inténtalo de nuevo.");
+        }
+        
+        throw error;
+      }
+    }
+    
+    // Limpiar el timeout
+    clearTimeout(timeoutId);
+    
+    // Verificar si la respuesta es exitosa
+    if (!response.ok) {
+      console.error(`[DEBUG] Error en respuesta: ${response.status} ${response.statusText}`);
+      throw new Error(`Error al obtener propiedad: ${response.status} ${response.statusText}`);
+    }
+    
+    // Obtener los datos de la respuesta
+    console.log(`[DEBUG] Intentando obtener JSON de la respuesta`);
+    const data = await response.json();
+    console.log(`[DEBUG] JSON obtenido correctamente para ID ${id}`);
+    
+    // Procesar los datos según el tipo de propiedad
+    if (isMongoId) {
+      console.log(`[DEBUG] Procesando datos de MongoDB`);
       // Procesar las imágenes para asegurar URLs absolutas
       let images = [];
       if (data.images) {
         if (Array.isArray(data.images)) {
+          console.log(`[DEBUG] Procesando array de imágenes: ${data.images.length} imágenes`);
           images = data.images.map(img => {
             if (typeof img === 'string') {
               // Si la imagen es una cadena, verificar si es una URL absoluta
               return img.startsWith('http') ? img : `${API_URL}${img.startsWith('/') ? '' : '/'}${img}`;
-            } else if (typeof img === 'object' && img.url) {
-              // Si es un objeto con URL
-              return img.url.startsWith('http') ? img.url : `${API_URL}${img.url.startsWith('/') ? '' : '/'}${img.url}`;
+            } else if (typeof img === 'object' && img.src) {
+              // Si es un objeto con src, asegurar que sea una URL absoluta
+              const src = img.src.startsWith('http') ? img.src : `${API_URL}${img.src.startsWith('/') ? '' : '/'}${img.src}`;
+              return {
+                ...img,
+                src
+              };
             }
             return img;
-          });
+          }).filter(img => img); // Filtrar valores nulos o indefinidos
         } else if (typeof data.images === 'string') {
           // Si images es una cadena
+          console.log(`[DEBUG] Procesando imagen única (string)`);
           const img = data.images;
           images = [img.startsWith('http') ? img : `${API_URL}${img.startsWith('/') ? '' : '/'}${img}`];
         }
@@ -621,47 +722,68 @@ export async function getPropertyById(id) {
       
       // Si no hay imágenes, usar una imagen por defecto
       if (images.length === 0) {
+        console.log(`[DEBUG] No se encontraron imágenes, usando imagen por defecto`);
         images = ['/img/default-property-image.jpg'];
       }
       
-      return { 
+      // Asegurarse de que todos los campos críticos estén definidos
+      const result = { 
         ...data, 
         _id: data._id,
         title: data.title || data.name || 'Propiedad sin título',
         description: data.description || '',
         price: data.price || 0,
         location: data.location || 'Madrid',
-        bedrooms: data.bedrooms || 0,
-        bathrooms: data.bathrooms || 0,
-        size: data.size || 0,
+        bedrooms: data.bedrooms || data.rooms || 0,
+        bathrooms: data.bathrooms || data.wc || 0,
+        size: data.area || data.m2 || 0,
         images: images,
         source: 'mongodb' 
       };
+      
+      console.log(`[DEBUG] Datos de MongoDB procesados correctamente`);
+      return result;
     } else {
-      // Es un ID de WooCommerce, usar nuestro proxy
-      console.log(`Obteniendo propiedad de WooCommerce con ID ${id}`);
-      const response = await fetch(`/api/wordpress-proxy?path=products/${id}`);
+      console.log(`[DEBUG] Procesando datos de WooCommerce`);
+      // Procesar las imágenes para asegurar que tenemos URLs válidas
+      let images = [];
       
-      console.log("Respuesta de WooCommerce:", {
-        status: response.status,
-        statusText: response.statusText
-      });
-      
-      if (!response.ok) {
-        console.error(`Error al obtener propiedad de WooCommerce: ${response.status}`);
-        throw new Error(`Error al obtener propiedad de WordPress: ${response.status}`);
+      // Intentar obtener imágenes de diferentes fuentes en WooCommerce
+      if (data.images && Array.isArray(data.images) && data.images.length > 0) {
+        console.log(`[DEBUG] Procesando array de imágenes WooCommerce: ${data.images.length} imágenes`);
+        images = data.images.map(img => img.src || img).filter(img => img);
+      } else if (data.image && data.image.src) {
+        console.log(`[DEBUG] Procesando imagen única WooCommerce`);
+        images = [data.image.src];
       }
       
-      const data = await response.json();
-      console.log("Propiedad de WooCommerce obtenida:", data);
+      // Si no hay imágenes, usar una imagen por defecto
+      if (images.length === 0) {
+        console.log(`[DEBUG] No se encontraron imágenes WooCommerce, usando imagen por defecto`);
+        images = ['/img/default-property-image.jpg'];
+      }
       
-      return { 
+      // Asegurarse de que todos los campos críticos estén definidos
+      const result = { 
         ...data, 
+        id: data.id,
+        title: data.name || 'Propiedad sin título',
+        description: data.description || '',
+        price: data.price || 0,
+        location: data.address || 'Madrid',
+        bedrooms: data.meta_data?.find(m => m.key === 'bedrooms')?.value || 0,
+        bathrooms: data.meta_data?.find(m => m.key === 'bathrooms')?.value || 0,
+        size: data.meta_data?.find(m => m.key === 'area')?.value || 0,
+        images: images,
         source: 'woocommerce' 
       };
+      
+      console.log(`[DEBUG] Datos de WooCommerce procesados correctamente`);
+      return result;
     }
   } catch (error) {
-    console.error("Error en getPropertyById:", error);
+    console.error("[DEBUG] Error en getPropertyById:", error);
+    console.error("[DEBUG] Stack trace:", error.stack);
     throw error;
   }
 }
