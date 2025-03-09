@@ -265,13 +265,10 @@ const propertyController = {
             // Procesar imágenes si se han subido
             if (req.files && req.files.length > 0) {
                 propertyData.images = req.files.map(file => {
-                    // Crear URL para la imagen
-                    const serverUrl = process.env.API_BASE_URL || `http://${req.get('host')}`;
-                    const imageUrl = `${serverUrl}/uploads/${file.filename}`;
-                    
                     return {
-                        src: imageUrl,
-                        alt: req.body.title || 'Imagen de propiedad'
+                        src: file.path, // URL de Cloudinary
+                        alt: req.body.title || 'Imagen de propiedad',
+                        public_id: file.filename // ID público de Cloudinary
                     };
                 });
                 
@@ -317,15 +314,12 @@ const propertyController = {
                 const property = await Property.findById(req.params.id);
                 const existingImages = property.images || [];
                 
-                // Procesar las nuevas imágenes
+                // Procesar las nuevas imágenes desde Cloudinary
                 const newImages = req.files.map(file => {
-                    // Crear URL para la imagen
-                    const serverUrl = process.env.API_BASE_URL || `http://${req.get('host')}`;
-                    const imageUrl = `${serverUrl}/uploads/${file.filename}`;
-                    
                     return {
-                        src: imageUrl,
-                        alt: req.body.title || 'Imagen de propiedad'
+                        src: file.path, // URL de Cloudinary
+                        alt: req.body.title || 'Imagen de propiedad',
+                        public_id: file.filename // ID público de Cloudinary
                     };
                 });
                 

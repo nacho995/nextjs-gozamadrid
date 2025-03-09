@@ -31,12 +31,17 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Se requiere el parámetro URL' });
     }
     
+    // Registrar la URL solicitada para depuración
+    console.log(`[Image Proxy] Procesando URL: ${url}`);
+    
     // Validación básica de URL para seguridad
     if (!isValidUrl(url)) {
+      console.error(`[Image Proxy] URL no válida: ${url}`);
       return res.status(400).json({ error: 'URL no válida' });
     }
     
     // Realizar la solicitud a la URL de la imagen
+    console.log(`[Image Proxy] Recuperando imagen de: ${url}`);
     const response = await fetch(url, {
       headers: {
         // Algunos servicios requieren un user-agent para evitar bloqueos
@@ -46,7 +51,7 @@ export default async function handler(req, res) {
     
     // Verificar si la solicitud fue exitosa
     if (!response.ok) {
-      console.error(`Error al obtener imagen: ${response.status} - ${url}`);
+      console.error(`[Image Proxy] Error al obtener imagen: ${response.status} - ${url}`);
       return redirectToPlaceholder(res);
     }
     
@@ -55,7 +60,7 @@ export default async function handler(req, res) {
     
     // Verificar que es una imagen
     if (!contentType || !contentType.includes('image')) {
-      console.error(`Tipo de contenido no válido: ${contentType}`);
+      console.error(`[Image Proxy] Tipo de contenido no válido: ${contentType} para URL: ${url}`);
       return redirectToPlaceholder(res);
     }
     
@@ -67,11 +72,13 @@ export default async function handler(req, res) {
     res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=604800'); // 1 día de caché del navegador, 1 semana en CDN
     res.setHeader('Accept-Ranges', 'bytes');
     
+    console.log(`[Image Proxy] Imagen servida correctamente: ${url} (${contentType}, ${imageBuffer.byteLength} bytes)`);
+    
     // Enviar la imagen
     return res.status(200).send(Buffer.from(imageBuffer));
     
   } catch (error) {
-    console.error('Error al procesar imagen:', error);
+    console.error('[Image Proxy] Error al procesar imagen:', error);
     return redirectToPlaceholder(res);
   }
 }

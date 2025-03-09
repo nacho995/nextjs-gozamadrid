@@ -2,7 +2,16 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Head from "next/head";
-import { FaCalendarAlt, FaUser, FaTags, FaArrowLeft, FaShare, FaFacebook, FaTwitter, FaLinkedin, FaClock } from "react-icons/fa";
+// Importar cada icono individualmente para evitar problemas con la optimización de barriles
+import { FaCalendarAlt } from "react-icons/fa";
+import { FaUser } from "react-icons/fa";
+import { FaTags } from "react-icons/fa";
+import { FaArrowLeft } from "react-icons/fa";
+import { FaShare } from "react-icons/fa";
+import { FaFacebook } from "react-icons/fa";
+import { FaTwitter } from "react-icons/fa";
+import { FaLinkedin } from "react-icons/fa";
+import { FaClock } from "react-icons/fa";
 import { useRouter } from 'next/router';
 import { getBlogPostBySlug } from '@/services/wpApi';
 

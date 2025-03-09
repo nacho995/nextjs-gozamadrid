@@ -1,11 +1,18 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Configuración básica
-  reactStrictMode: false,
+  reactStrictMode: true,
+  swcMinify: true,
   output: 'standalone',
   poweredByHeader: false,
   compress: true,
   generateEtags: true,
+  
+  // Deshabilitar la optimización de barriles para react-icons
+  // Esto resolverá el error "Cannot read properties of undefined (reading 'call')"
+  experimental: {
+    optimizePackageImports: ['other-packages-but-not-react-icons'],
+  },
   
   // Configuración de imágenes
   images: {
@@ -32,8 +39,21 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'via.placeholder.com',
       },
+      {
+        protocol: 'https',
+        hostname: '**.cloudinary.com',
+      },
+      {
+        protocol: 'http',
+        hostname: '**.cloudinary.com',
+      },
     ],
+    domains: ['res.cloudinary.com', 'localhost', 'realestategozamadrid.com', 'images.weserv.nl', 'via.placeholder.com'],
     formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 60,
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   
   pageExtensions: ['jsx', 'js'],
@@ -56,6 +76,14 @@ const nextConfig = {
   // Rewrites para proxies y redirecciones
   async rewrites() {
     return [
+      {
+        source: '/api/woocommerce/:path*',
+        destination: 'https://realestategozamadrid.com/wp-json/wc/v3/:path*',
+      },
+      {
+        source: '/api/wordpress/:path*',
+        destination: '/api/wordpress-proxy',
+      },
       {
         source: '/imageproxy/:path*',
         destination: 'https://images.weserv.nl/?url=https://realestategozamadrid.com/:path*',
@@ -81,6 +109,11 @@ const nextConfig = {
         destination: 'http://localhost:4000/:path*',
       },
     ];
+  },
+  
+  // Configuración de webpack más simple y estable
+  webpack: (config, { isServer }) => {
+    return config;
   },
 }
 
