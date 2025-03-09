@@ -8,6 +8,14 @@ const nextConfig = {
   compress: true,
   generateEtags: true,
   
+  // Configuración para entornos de producción
+  ...(process.env.NODE_ENV === 'production' && {
+    // Configurar assetPrefix para recursos estáticos en producción
+    assetPrefix: '.',
+    // Configurar basePath si es necesario
+    // basePath: '',
+  }),
+  
   // Deshabilitar la optimización de barriles para react-icons
   // Esto resolverá el error "Cannot read properties of undefined (reading 'call')"
   experimental: {
@@ -22,7 +30,9 @@ const nextConfig = {
       'localhost',
       'res.cloudinary.com',
       'images.weserv.nl',
-      'via.placeholder.com'
+      'via.placeholder.com',
+      'goza-madrid.onrender.com',
+      'gozamadrid.com'
     ],
     remotePatterns: [
       {
@@ -38,6 +48,7 @@ const nextConfig = {
     minimumCacheTTL: 60,
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    unoptimized: process.env.NODE_ENV === 'production', // Deshabilitar la optimización de imágenes en producción
   },
   
   // Headers para mejorar el rendimiento
@@ -63,11 +74,39 @@ const nextConfig = {
         source: '/api/wordpress-proxy',
         destination: 'https://realestategozamadrid.com/wp-json/wp/v2/:path*',
       },
+      // Añadir proxy para imágenes
+      {
+        source: '/api/image-proxy',
+        destination: '/api/image-proxy', // Esto asegura que el proxy de imágenes funcione correctamente
+      },
     ];
   },
   
   // Configuración de webpack más simple y estable
   webpack: (config, { isServer }) => {
+    // Optimizaciones para reducir el tamaño del bundle
+    if (!isServer) {
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            default: false,
+            vendors: false,
+            commons: {
+              name: 'commons',
+              chunks: 'all',
+              minChunks: 2,
+            },
+            react: {
+              name: 'commons',
+              chunks: 'all',
+              test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+            },
+          },
+        },
+      };
+    }
     return config;
   },
 }
