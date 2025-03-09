@@ -10,6 +10,14 @@ services:
         value: production
       - key: PORT
         value: 3000
+      - key: NEXT_PUBLIC_SITE_URL
+        value: https://goza-madrid-qbw9.onrender.com
+      - key: NEXT_PUBLIC_ASSET_PREFIX
+        value: .
+      - key: NEXT_PUBLIC_IMAGES_DOMAIN
+        value: goza-madrid-qbw9.onrender.com
+      - key: NEXT_PUBLIC_API_URL
+        value: https://goza-madrid-qbw9.onrender.com/api
     autoDeploy: true
     buildFilter:
       paths:

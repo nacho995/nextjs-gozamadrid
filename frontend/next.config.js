@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Configuración básica
-  reactStrictMode: false,
+  reactStrictMode: true,
   swcMinify: true,
   output: 'standalone',
   poweredByHeader: false,
@@ -31,7 +31,7 @@ const nextConfig = {
       'res.cloudinary.com',
       'images.weserv.nl',
       'via.placeholder.com',
-      'goza-madrid.onrender.com',
+      'goza-madrid-qbw9.onrender.com',
       'gozamadrid.com'
     ],
     remotePatterns: [
@@ -109,6 +109,8 @@ const nextConfig = {
     }
     return config;
   },
+  assetPrefix: process.env.NODE_ENV === 'production' ? '.' : '',
+  trailingSlash: true,
 }
 
 module.exports = nextConfig; 

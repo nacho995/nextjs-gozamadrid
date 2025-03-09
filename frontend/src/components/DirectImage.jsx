@@ -22,28 +22,25 @@ const DirectImage = ({
   const [error, setError] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [imageSrc, setImageSrc] = useState(null);
+  const assetPrefix = process.env.NEXT_PUBLIC_ASSET_PREFIX || '';
 
   useEffect(() => {
-    if (!src) {
+    if (src) {
+      // Si la imagen es una ruta relativa y no una URL completa, añadir el prefijo
+      if (src.startsWith('/') && !src.startsWith('//') && !src.startsWith('http')) {
+        setImageSrc(`${assetPrefix}${src}`);
+      } else {
+        setImageSrc(src);
+      }
+      setError(false);
+    } else {
       setError(true);
-      return;
     }
+  }, [src, assetPrefix]);
 
-    setError(false);
-    setLoaded(false);
-    
-    // Procesar URL
-    let processedSrc = src;
-    
-    // Si es una URL externa y no está ya proxificada, usar el proxy
-    if ((src.startsWith('http://') || src.startsWith('https://')) && 
-        !src.includes('/api/image-proxy') && 
-        !src.includes('/imageproxy/')) {
-      processedSrc = `/api/image-proxy?url=${encodeURIComponent(src)}`;
-    }
-    
-    setImageSrc(processedSrc);
-  }, [src]);
+  const handleError = () => {
+    setError(true);
+  };
 
   if (error || !imageSrc) {
     if (fallbackSrc) {
@@ -63,13 +60,11 @@ const DirectImage = ({
     }
     return (
       <div 
-        className={`flex items-center justify-center bg-gray-100 ${className}`}
-        style={{ 
-          minWidth: width || '100%',
-          minHeight: height || '200px'
-        }}
+        className={`relative flex items-center justify-center bg-gray-200 ${className || ''}`}
+        style={{ width: width || '100%', height: height || '300px' }}
+        {...rest}
       >
-        <span className="text-gray-500">Sin imagen disponible</span>
+        <span className="text-gray-500">Imagen no disponible</span>
       </div>
     );
   }
@@ -99,7 +94,7 @@ const DirectImage = ({
             quality={quality}
             priority={priority}
             loading={loading}
-            onError={() => setError(true)}
+            onError={handleError}
             onLoad={() => setLoaded(true)}
             {...rest}
           />
@@ -110,7 +105,7 @@ const DirectImage = ({
             className={`${className} ${loaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300 w-full h-full object-cover`}
             style={{ width: width || '100%', height: height || '100%' }}
             loading={priority ? 'eager' : loading}
-            onError={() => setError(true)}
+            onError={handleError}
             onLoad={() => setLoaded(true)}
             {...rest}
           />
