@@ -16,15 +16,28 @@ const blogSchema = new mongoose.Schema({
       default: "" 
     },
     tags: [String],
-    image: {
-      src: { type: String },
-      alt: { type: String },
+    images: {
+      type: [{
+        src: { type: String, required: true },
+        alt: { type: String, default: '' }
+      }],
+      default: [],
+      validate: {
+        validator: function(v) {
+          return Array.isArray(v) && v.every(item => 
+            typeof item === 'object' && 
+            typeof item.src === 'string' &&
+            (!item.alt || typeof item.alt === 'string')
+          );
+        },
+        message: 'El campo images debe ser un array de objetos con src (requerido) y alt (opcional)'
+      }
     },
-    readTime: { type: String },
+    readTime: { type: String, default: '5' },
     button: {
       title: { type: String },
-      variant: { type: String },
-      size: { type: String },
+      variant: { type: String, default: 'primary' },
+      size: { type: String, default: 'medium' },
       iconRight: { type: String },
     },
     // Nuevo campo para definir la plantilla a usar

@@ -1,7 +1,4 @@
-"use client";
-
 // Importaciones de componentes
-import Head from 'next/head';
 import Eslogan from "./eslogan";
 import ImageSlider from "./slider";
 import BlogHome from "./blog";
@@ -13,32 +10,7 @@ import RegisterForm from "./FormContact";
 import Guide from "./guia";
 import Agreements from "./Agreements";
 
-// Schema.org para la página principal
-const getHomeSchema = () => ({
-  "@context": "https://schema.org",
-  "@type": "RealEstateAgent",
-  "name": "Goza Madrid",
-  "description": "Agencia inmobiliaria especializada en Madrid. Ofrecemos servicios de compra, venta y alquiler de propiedades, con un enfoque personalizado y profesional.",
-  "url": "https://www.gozamadrid.com",
-  "logo": "https://www.gozamadrid.com/logo.png",
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Madrid",
-    "addressRegion": "Madrid",
-    "addressCountry": "ES"
-  },
-  "sameAs": [
-    "https://www.facebook.com/gozamadrid",
-    "https://www.instagram.com/gozamadrid",
-    "https://www.linkedin.com/company/gozamadrid"
-  ],
-  "areaServed": {
-    "@type": "City",
-    "name": "Madrid"
-  }
-});
-
-export default function Home() {
+export default function HomeComponent() {
   const gradientStyle = {
     backgroundImage: "url('/gozamadridwp.jpg')",
     backgroundAttachment: "fixed",
@@ -46,31 +18,6 @@ export default function Home() {
 
   return (
     <>
-      <Head>
-        <title>Goza Madrid | Agencia Inmobiliaria de Lujo en Madrid</title>
-        <meta name="description" content="Descubre las mejores propiedades inmobiliarias en Madrid. Especialistas en compra, venta y alquiler de viviendas de lujo. Servicio personalizado y profesional." />
-        <meta name="keywords" content="inmobiliaria madrid, propiedades lujo madrid, comprar casa madrid, vender piso madrid, alquiler viviendas madrid" />
-        <link rel="canonical" href="https://www.gozamadrid.com" />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="Goza Madrid | Agencia Inmobiliaria de Lujo en Madrid" />
-        <meta property="og:description" content="Especialistas en propiedades inmobiliarias de lujo en Madrid. Encuentra tu hogar ideal con nosotros." />
-        <meta property="og:url" content="https://www.gozamadrid.com" />
-        <meta property="og:image" content="https://www.gozamadrid.com/og-image.jpg" />
-        <meta property="og:site_name" content="Goza Madrid" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Goza Madrid | Inmobiliaria de Lujo en Madrid" />
-        <meta name="twitter:description" content="Tu agencia inmobiliaria de confianza en Madrid. Propiedades exclusivas y servicio personalizado." />
-        <meta name="twitter:image" content="https://www.gozamadrid.com/twitter-card.jpg" />
-        <meta name="robots" content="index, follow" />
-        <meta name="googlebot" content="index, follow" />
-        <meta name="author" content="Goza Madrid" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(getHomeSchema()) }}
-        />
-      </Head>
-
       <div className="">
         <div className="fixed inset-0 z-0 opacity-100 bg-cover bg-center" style={gradientStyle}></div>
 

@@ -18,38 +18,40 @@ const storage = new CloudinaryStorage({
     transformation: [
       { width: 1920, height: 1080, crop: 'limit' },
       { quality: 'auto' }
-    ]
+    ],
+    // Generar un nombre de archivo único
+    public_id: (req, file) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      return `blog-${uniqueSuffix}`;
+    }
   }
 });
 
 // Middleware de multer con Cloudinary
-const upload = multer({ storage: storage });
+const upload = multer({ 
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB
+  },
+  fileFilter: (req, file, cb) => {
+    // Verificar que sea una imagen
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Solo se permiten archivos de imagen'), false);
+    }
+  }
+});
 
 // Rutas CRUD básicas
 blogRouter.get("/", blogController.getData);
 blogRouter.get("/:id", blogController.getDataById);
-blogRouter.post("/", verifyToken, isAdmin, blogController.addData);
-blogRouter.delete("/:id", verifyToken, isAdmin, blogController.deleteData);
-blogRouter.patch("/:id", verifyToken, isAdmin, blogController.updateData);
+blogRouter.post("/", verifyToken, blogController.addData);
+blogRouter.delete("/:id", verifyToken, blogController.deleteData);
+blogRouter.put("/:id", verifyToken, blogController.updateData);
 
-// Rutas para imágenes
-blogRouter.post("/upload", upload.single('file'), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: "No se ha subido ningún archivo" });
-    }
-    
-    res.status(200).json({ 
-      message: "Imagen subida correctamente",
-      imageUrl: req.file.path
-    });
-  } catch (error) {
-    res.status(500).json({ 
-      message: "Error al subir la imagen",
-      error: error.message 
-    });
-  }
-});
+// Ruta para subir imágenes
+blogRouter.post("/upload", verifyToken, upload.single('image'), blogController.uploadImage);
 
 // Ruta para eliminar una imagen
 blogRouter.delete("/delete-image", async (req, res) => {

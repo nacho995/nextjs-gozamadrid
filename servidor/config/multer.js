@@ -8,6 +8,13 @@ import { CloudinaryStorage } from 'multer-storage-cloudinary';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// Configurar Cloudinary
+cloudinary.v2.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
 // Configuración para Cloudinary (propiedades)
 const cloudinaryStorage = new CloudinaryStorage({
     cloudinary: cloudinary.v2,
@@ -17,7 +24,13 @@ const cloudinaryStorage = new CloudinaryStorage({
         transformation: [
             { width: 2000, height: 1500, crop: 'limit' },
             { quality: 'auto' }
-        ]
+        ],
+        // Generar un nombre de archivo único
+        public_id: (req, file) => {
+            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+            const filename = file.originalname.split('.')[0];
+            return `property-${filename}-${uniqueSuffix}`;
+        }
     }
 });
 
@@ -46,7 +59,7 @@ const fileFilter = (req, file, cb) => {
 
 // Configuración de multer con Cloudinary
 const upload = multer({
-    storage: cloudinaryStorage, // Usar Cloudinary por defecto
+    storage: cloudinaryStorage,
     fileFilter: fileFilter,
     limits: {
         fileSize: 5 * 1024 * 1024 // Límite de 5MB

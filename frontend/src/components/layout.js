@@ -67,7 +67,7 @@ const Layout = ({ children }) => (
 
     <div className="flex flex-col min-h-screen">
       <header className="relative z-50">
-        <ControlMenu />
+        <ControlMenu/>
       </header>
 
       <main className="flex-grow" role="main" id="main-content">

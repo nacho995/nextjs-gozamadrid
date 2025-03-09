@@ -75,7 +75,42 @@ const BlogCard = ({ blog, index }) => {
     ? `/blog/${blog.slug}?source=wordpress` 
     : `/blog/${blog._id || blog.id}`;
   
-  const imageUrl = typeof blog.image === 'string' ? blog.image : (blog.image?.src || DEFAULT_IMAGE);
+  // Función para obtener la URL de la imagen
+  const getImageUrl = (blog) => {
+    if (blog.source === 'wordpress') {
+      if (blog._embedded?.['wp:featuredmedia']?.[0]?.source_url) {
+        return blog._embedded['wp:featuredmedia'][0].source_url;
+      }
+      if (blog.featured_media_url) {
+        return blog.featured_media_url;
+      }
+      if (blog.better_featured_image?.source_url) {
+        return blog.better_featured_image.source_url;
+      }
+      return DEFAULT_IMAGE;
+    }
+    
+    // Para blogs de MongoDB
+    if (!blog.image) return DEFAULT_IMAGE;
+    
+    if (typeof blog.image === 'string') {
+      const baseUrl = process.env.NODE_ENV === 'production'
+        ? 'https://goza-madrid.onrender.com'
+        : 'http://localhost:3000';
+      return blog.image.startsWith('http') ? blog.image : `${baseUrl}${blog.image}`;
+    }
+    
+    if (blog.image.src) {
+      const baseUrl = process.env.NODE_ENV === 'production'
+        ? 'https://goza-madrid.onrender.com'
+        : 'http://localhost:3000';
+      return blog.image.src.startsWith('http') ? blog.image.src : `${baseUrl}${blog.image.src}`;
+    }
+    
+    return DEFAULT_IMAGE;
+  };
+
+  const imageUrl = getImageUrl(blog);
   const title = typeof blog.title === 'object' ? blog.title.rendered : blog.title;
   
   // Función mejorada para obtener la descripción
@@ -146,6 +181,7 @@ const BlogCard = ({ blog, index }) => {
             src={imageUrl}
             alt={title}
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover transition-transform duration-700 group-hover:scale-105"
             unoptimized={!imageUrl.includes('realestategozamadrid.com')}
             priority={index < 2}

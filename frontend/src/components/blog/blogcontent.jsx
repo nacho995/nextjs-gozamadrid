@@ -1,22 +1,28 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import Head from "next/head";
-// Importar cada icono individualmente para evitar problemas con la optimización de barriles
-import { FaCalendarAlt } from "react-icons/fa";
-import { FaUser } from "react-icons/fa";
-import { FaTags } from "react-icons/fa";
-import { FaArrowLeft } from "react-icons/fa";
-import { FaShare } from "react-icons/fa";
-import { FaFacebook } from "react-icons/fa";
-import { FaTwitter } from "react-icons/fa";
-import { FaLinkedin } from "react-icons/fa";
-import { FaClock } from "react-icons/fa";
 import { useRouter } from 'next/router';
 import { getBlogPostBySlug } from '@/services/wpApi';
+import { getBlogPosts, getBlogById } from '@/pages/api';
+import BlogImage from './BlogImage';
 
-// Usar una imagen local en lugar de placeholder.com
-const DEFAULT_IMAGE = '/img/default-image.jpg';
+// Importar iconos individualmente en lugar de usar barrel imports
+import { FaArrowLeft } from "react-icons/fa";
+import { FaCalendarAlt } from "react-icons/fa";
+import { FaClock } from "react-icons/fa";
+import { FaFacebook } from "react-icons/fa";
+import { FaLinkedin } from "react-icons/fa";
+import { FaShare } from "react-icons/fa";
+import { FaTags } from "react-icons/fa";
+import { FaTwitter } from "react-icons/fa";
+import { FaUser } from "react-icons/fa";
+
+// Usar una imagen por defecto que sabemos que existe
+const DEFAULT_IMAGE = process.env.NODE_ENV === 'production'
+  ? 'https://gozamadrid.com/default-blog-image.jpg'
+  : 'http://localhost:3003/default-blog-image.jpg';
 
 const safeRenderValue = (value) => {
   if (value === null || value === undefined) return '';
@@ -29,148 +35,153 @@ const safeRenderValue = (value) => {
   return String(value);
 };
 
-const processHTMLContent = (content) => {
+const getImageSrc = (image, defaultImage) => {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  
+  if (!image) {
+    console.log('No hay imagen, usando imagen por defecto:', defaultImage);
+    return defaultImage;
+  }
+  
+  // Para imágenes de WordPress, devolver la URL con proxy para evitar errores HTTP2_PROTOCOL_ERROR
+  if (image._embedded?.['wp:featuredmedia']?.[0]?.source_url) {
+    const wpImageUrl = image._embedded['wp:featuredmedia'][0].source_url;
+    const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(wpImageUrl)}&default=https://via.placeholder.com/800x600?text=Sin+Imagen`;
+    console.log('Imagen de WordPress (_embedded) con proxy:', { original: wpImageUrl, proxy: proxyUrl });
+    return proxyUrl;
+  }
+  
+  if (image.source_url) {
+    const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(image.source_url)}&default=https://via.placeholder.com/800x600?text=Sin+Imagen`;
+    console.log('Imagen de WordPress (source_url) con proxy:', { original: image.source_url, proxy: proxyUrl });
+    return proxyUrl;
+  }
+  
+  // Para imágenes de MongoDB como objeto
+  if (typeof image === 'object') {
+    if (image.src) {
+      // Si la URL ya es absoluta, usarla directamente
+      if (image.src.startsWith('http') || image.src.startsWith('https')) {
+        console.log('Imagen de MongoDB (objeto con src absoluta):', image.src);
+        return image.src;
+      }
+      
+      // Si la URL es relativa, construir la URL completa
+      const imgSrc = `${API_URL}${image.src.startsWith('/') ? '' : '/'}${image.src}`;
+      console.log('Imagen de MongoDB (objeto con src relativa):', { original: image.src, processed: imgSrc });
+      return imgSrc;
+    }
+    
+    if (image.url) {
+      // Si la URL ya es absoluta, usarla directamente
+      if (image.url.startsWith('http') || image.url.startsWith('https')) {
+        console.log('Imagen de MongoDB (objeto con url absoluta):', image.url);
+        return image.url;
+      }
+      
+      // Si la URL es relativa, construir la URL completa
+      const imgUrl = `${API_URL}${image.url.startsWith('/') ? '' : '/'}${image.url}`;
+      console.log('Imagen de MongoDB (objeto con url relativa):', { original: image.url, processed: imgUrl });
+      return imgUrl;
+    }
+  }
+  
+  // Si es una string
+  if (typeof image === 'string') {
+    // Si es una URL de WordPress, usar proxy
+    if (image.includes('realestategozamadrid.com') || image.includes('gozamadrid.com') || image.includes('wp-content')) {
+      const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(image)}&default=https://via.placeholder.com/800x600?text=Sin+Imagen`;
+      console.log('Imagen de WordPress (string) con proxy:', { original: image, proxy: proxyUrl });
+      return proxyUrl;
+    }
+    
+    // Si la URL ya es absoluta, usarla directamente
+    if (image.startsWith('http') || image.startsWith('https')) {
+      console.log('Imagen con URL absoluta:', image);
+      return image;
+    }
+    
+    // Si la URL es relativa, construir la URL completa
+    const imgStr = `${API_URL}${image.startsWith('/') ? '' : '/'}${image}`;
+    console.log('Imagen con URL relativa:', { original: image, processed: imgStr });
+    return imgStr;
+  }
+  
+  console.log('Tipo de imagen no reconocido, usando imagen por defecto:', { image, defaultImage });
+  return defaultImage;
+};
+
+const processHTMLContent = (content, blogImages) => {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  
   if (!content) return '';
   
-  // Obtén el dominio de WordPress para usarlo en las imágenes
-  const wpDomain = 'https://realestategozamadrid.com';
+  let processedContent = content;
   
-  // Paso 1: Eliminar todas las imágenes conocidas como problemáticas
-  let processedContent = content.replace(
-    /<img[^>]*class="[^"]*wp-image-3397[^"]*"[^>]*>/gi,
-    '' // Eliminar específicamente la imagen con ID 3397 (la que está causando problemas)
-  );
+  // Primero, eliminar atributos srcset y sizes que pueden causar problemas
+  processedContent = processedContent.replace(/srcset="[^"]*"/gi, '');
+  processedContent = processedContent.replace(/sizes="[^"]*"/gi, '');
   
-  // Eliminar imágenes sin src o con src vacío
-  processedContent = processedContent.replace(
-    /<img[^>]*src\s*=\s*["']?\s*["']?[^>]*>/gi,
-    (match) => {
-      if (match.includes('src=""') || !match.includes('src=')) {
-        return ''; // Eliminar imagen problemática
-      }
-      return match; // Mantener imágenes con src
-    }
-  );
+  // Eliminar atributos width y height fijos que pueden romper el diseño responsive
+  processedContent = processedContent.replace(/width="[^"]*"/gi, '');
+  processedContent = processedContent.replace(/height="[^"]*"/gi, '');
   
-  // Paso 2: Reemplazar rutas relativas por absolutas para imágenes restantes
+  // Procesar las imágenes en el contenido HTML
   processedContent = processedContent.replace(
     /<img([^>]*)src="([^"]*)"([^>]*)>/gi,
     (match, before, src, after) => {
-      // Si la URL está vacía o es problemática, usar imagen de placeholder
-      if (!src || src === '' || src === '#') {
-        return ''; // En lugar de reemplazar, eliminar estas imágenes
+      // Eliminar referencias a imageproxy
+      if (src.includes('imageproxy/')) {
+        // Extraer el alt si existe
+        const altMatch = match.match(/alt="([^"]*)"/);
+        const alt = altMatch ? altMatch[1] : '';
+        
+        // Usar una imagen por defecto
+        return `<div class="w-full rounded-lg shadow-lg my-8 bg-gray-200 flex items-center justify-center h-64"><span class="text-gray-500">Imagen no disponible</span></div>`;
       }
       
-      // Si ya es una URL absoluta o una data URI, dejarla como está
-      if (src.startsWith('http') || src.startsWith('data:')) {
-        return match;
+      // Extraer el alt si existe
+      const altMatch = match.match(/alt="([^"]*)"/);
+      const alt = altMatch ? altMatch[1] : '';
+      
+      // Si es una imagen de WordPress, usar proxy
+      if (src.includes('realestategozamadrid.com') || 
+          src.includes('gozamadrid.com') ||
+          src.includes('wp-content') ||
+          before.includes('wp-image')) {
+        
+        // Usar un proxy de imágenes para evitar errores HTTP2_PROTOCOL_ERROR
+        const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(src)}&default=https://via.placeholder.com/800x600?text=Sin+Imagen`;
+        
+        // Devolver una etiqueta de imagen simplificada
+        return `<img src="${proxyUrl}" alt="${alt}" loading="lazy" class="w-full rounded-lg shadow-md my-4 object-contain" />`;
       }
       
-      // Convertir URLs relativas a absolutas
-      let absoluteSrc = src;
-      if (src.startsWith('/')) {
-        absoluteSrc = `${wpDomain}${src}`;
-      } else {
-        absoluteSrc = `${wpDomain}/${src}`;
+      // Para imágenes con URL absoluta
+      if (src.startsWith('http') || src.startsWith('https')) {
+        // Devolver una etiqueta de imagen simplificada
+        return `<img src="${src}" alt="${alt}" loading="lazy" class="w-full rounded-lg shadow-md my-4 object-contain" />`;
       }
       
-      return `<img${before}src="${absoluteSrc}"${after}>`;
+      // Para imágenes con URL relativa (MongoDB)
+      const fullSrc = `${API_URL}${src.startsWith('/') ? '' : '/'}${src}`;
+      
+      // Devolver una etiqueta de imagen simplificada
+      return `<img src="${fullSrc}" alt="${alt}" loading="lazy" class="w-full rounded-lg shadow-md my-4 object-contain" />`;
     }
   );
   
-  // Paso 3: Asegurarse de que las imágenes tengan los atributos necesarios para un buen rendimiento
+  // Procesar párrafos que contienen solo imágenes para evitar problemas de visualización
   processedContent = processedContent.replace(
-    /<img([^>]*)>/gi,
-    (match, attributes) => {
-      // Verificar que no sean imágenes que deberían eliminarse
-      if (attributes.includes('kitchen-living-room-4043091_1280.jpg')) {
-        // Esta es la imagen problemática específica
-        return '';
-      }
-      
-      // Añadir el atributo loading="lazy" si no está presente
-      if (!attributes.includes('loading=')) {
-        attributes += ' loading="lazy"';
-      }
-      
-      // Añadir el atributo de manejo de errores para ocultar la imagen en lugar de mostrar una por defecto
-      if (!attributes.includes('onerror=')) {
-        attributes += ` onerror="this.style.display='none'; console.log('Imagen no disponible');"`;
-      }
-      
-      return `<img${attributes}>`;
+    /<p>\s*(<img[^>]*>)\s*<\/p>/gi,
+    (match, imgTag) => {
+      // Reemplazar el párrafo con la imagen directamente
+      return `<div class="my-4">${imgTag}</div>`;
     }
   );
   
-  // Paso 4: Eliminar cualquier estructura de HTML inválida o huérfana
-  processedContent = processedContent
-    .replace(/<figure[^>]*>\s*<\/figure>/gi, '') // Eliminar elementos figure vacíos
-    .replace(/<p[^>]*>\s*<\/p>/gi, ''); // Eliminar párrafos vacíos
-  
-  // Nuevo paso: Añadir clases adicionales a ciertos párrafos para crear variedad visual
-  let paragraphCount = 0;
-  processedContent = processedContent.replace(
-    /<p([^>]*)>([\s\S]*?)<\/p>/gi,
-    (match, attributes, content) => {
-      paragraphCount++;
-      
-      // Cada cuarto párrafo tendrá un estilo destacado con borde izquierdo
-      if (paragraphCount % 4 === 2) {
-        return `<p${attributes} class="ml-4 pl-4 border-l-4 border-amber-500 italic">${content}</p>`;
-      }
-      
-      // Cada quinto párrafo tendrá texto más grande y destacado
-      if (paragraphCount % 5 === 0) {
-        return `<p${attributes} class="text-lg font-medium text-gray-800">${content}</p>`;
-      }
-      
-      // Cada séptimo párrafo tendrá un fondo
-      if (paragraphCount % 7 === 0) {
-        return `<p${attributes} class="p-4 bg-amber-50 rounded-lg border-l-4 border-amber-500">${content}</p>`;
-      }
-      
-      return match;
-    }
-  );
-  
-  // Mejorar los headings - pero excluir los que contienen imágenes
-  processedContent = processedContent.replace(
-    /<h2([^>]*)>([\s\S]*?)<\/h2>/gi,
-    (match, attributes, content) => {
-      // Si el contenido tiene una imagen, no añadir el span decorativo
-      if (content.includes('<img')) {
-        return `<h2${attributes}>${content}</h2>`;
-      }
-      
-      // Para texto normal, añadir el span decorativo
-      return `<h2${attributes}><span class="relative inline-block pb-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-1 after:bg-gradient-to-r after:from-amber-500 after:to-transparent after:rounded-full">${content}</span></h2>`;
-    }
-  );
-  
-  // Mejorar las imágenes
-  processedContent = processedContent.replace(
-    /<img([^>]*)>/gi,
-    (match, attributes) => {
-      // Si ya procesamos esta imagen o debemos eliminarla, retornar como está
-      if (attributes.includes('kitchen-living-room-4043091_1280.jpg') || 
-          attributes.includes('class="ml-4') || 
-          attributes.includes('class="float-')) {
-        return match;
-      }
-      
-      // Alternar entre float-left y float-right para las imágenes
-      const floatClass = paragraphCount % 2 === 0 ? 
-        'class="float-right ml-6 mb-4 rounded-xl shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl max-w-[40%]"' : 
-        'class="float-left mr-6 mb-4 rounded-xl shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl max-w-[40%]"';
-      
-      // Reemplazar o añadir la clase
-      if (attributes.includes('class="')) {
-        return match.replace(/class="([^"]*)"/i, floatClass);
-      } else {
-        return `<img ${floatClass} ${attributes}>`;
-      }
-    }
-  );
+  // Procesar párrafos vacíos
+  processedContent = processedContent.replace(/<p>\s*<\/p>/gi, '');
   
   return processedContent;
 };
@@ -179,56 +190,45 @@ const processHTMLContent = (content) => {
 const cleanSpecificProblems = (content) => {
   if (!content) return '';
   
-  // Eliminar imágenes de compartir y otros elementos innecesarios
-  let cleaned = content;
+  let cleanedContent = content;
   
-  // Regla específica para eliminar la imagen problemática
-  cleaned = cleaned.replace(
-    /<img[^>]*kitchen-living-room-4043091_1280[^>]*>/gi,
-    ''
+  // Eliminar estilos inline excesivos
+  cleanedContent = cleanedContent.replace(/style="[^"]*"/gi, 'style="max-width: 100%;"');
+  
+  // Eliminar clases de WordPress que pueden causar problemas
+  cleanedContent = cleanedContent.replace(/class="alignnone[^"]*"/gi, 'class="w-full my-4"');
+  cleanedContent = cleanedContent.replace(/class="aligncenter[^"]*"/gi, 'class="w-full my-4 mx-auto"');
+  cleanedContent = cleanedContent.replace(/class="alignleft[^"]*"/gi, 'class="float-left mr-4 mb-4"');
+  cleanedContent = cleanedContent.replace(/class="alignright[^"]*"/gi, 'class="float-right ml-4 mb-4"');
+  
+  // Eliminar atributos width y height fijos que pueden romper el diseño responsive
+  cleanedContent = cleanedContent.replace(/width="[^"]*"/gi, '');
+  cleanedContent = cleanedContent.replace(/height="[^"]*"/gi, '');
+  
+  // Manejar párrafos con múltiples imágenes
+  cleanedContent = cleanedContent.replace(
+    /<p>(\s*<img[^>]*>\s*){2,}<\/p>/gi,
+    (match) => {
+      // Extraer todas las etiquetas de imagen
+      const imgTags = match.match(/<img[^>]*>/gi) || [];
+      
+      // Crear un div con grid para mostrar las imágenes en una cuadrícula
+      return `<div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">${imgTags.join('')}</div>`;
+    }
   );
   
-  // Regla específica para eliminar imágenes con clase wp-image-3397
-  cleaned = cleaned.replace(
-    /<img[^>]*class="[^"]*wp-image-3397[^"]*"[^>]*>/gi,
-    ''
-  );
-  
-  // Eliminar imágenes con atributo width="1280" height="1280" (específico del problema)
-  cleaned = cleaned.replace(
-    /<img[^>]*width="1280"[^>]*height="1280"[^>]*>/gi, 
-    ''
-  );
-  
-  // Eliminar imágenes con srcset que incluyen building-8159002_1280 (muy específico)
-  cleaned = cleaned.replace(
-    /<img[^>]*srcset="[^"]*building-8159002_1280[^"]*"[^>]*>/gi,
-    ''
-  );
-  
-  // Eliminar bloques div que contienen únicamente una imagen de WordPress
-  cleaned = cleaned.replace(
-    /<div[^>]*>\s*<img[^>]*class="[^"]*wp-image-\d+[^"]*"[^>]*>\s*<\/div>/gi,
-    ''
-  );
-  
-  // Eliminar las reglas anteriores
-  cleaned = cleaned.replace(
+  // Eliminar elementos de compartir y otros elementos innecesarios
+  cleanedContent = cleanedContent.replace(
     /<div[^>]*class="[^"]*sharedaddy[^"]*"[^>]*>[\s\S]*?<\/div>/gi, 
     ''
   );
   
-  cleaned = cleaned.replace(
+  cleanedContent = cleanedContent.replace(
     /<div[^>]*class="[^"]*share-buttons[^"]*"[^>]*>[\s\S]*?<\/div>/gi, 
     ''
   );
   
-  cleaned = cleaned.replace(
-    /<figure[^>]*>(?:\s*<figcaption[^>]*>.*?<\/figcaption>\s*)?<\/figure>/gi,
-    ''
-  );
-  
-  return cleaned;
+  return cleanedContent;
 };
 
 const ShareButtons = ({ url, title, description }) => {
@@ -330,43 +330,171 @@ const BlogContent = ({ slug }) => {
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isClient, setIsClient] = useState(false);
   const router = useRouter();
-  const [blogUrl, setBlogUrl] = useState('');
-  
+  const source = router.query.source;
+
+  // Efecto para detectar si estamos en el cliente
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setBlogUrl(window.location.href);
-    }
+    setIsClient(true);
   }, []);
-  
+
+  // Efecto para cargar los datos del blog
   useEffect(() => {
     const fetchBlogData = async () => {
+      if (!slug) return;
+      
+      setLoading(true);
+      setError(null);
+      
       try {
-        if (!slug) throw new Error('Slug no proporcionado');
+        console.log(`Obteniendo blog con slug: ${slug}`);
         
-        setLoading(true);
-        const blogData = await getBlogPostBySlug(slug);
-        
-        if (!blogData) throw new Error('Blog no encontrado');
-        
-        if (!blogData.image && blogData._embedded?.['wp:featuredmedia']?.[0]) {
-          const media = blogData._embedded['wp:featuredmedia'][0];
-          blogData.image = {
-            src: media.source_url,
-            alt: blogData.title?.rendered || "Imagen del blog"
-          };
+        // Si el source es wordpress, buscar por slug
+        if (source === 'wordpress') {
+          console.log('Buscando blog de WordPress por slug');
+          
+          try {
+            // Intentar obtener el blog directamente de la API de WordPress
+            const blogData = await getBlogPostBySlug(slug);
+            
+            if (blogData) {
+              console.log('Blog de WordPress encontrado por slug');
+              
+              // Aplicar limpieza y procesamiento al contenido
+              const cleanedContent = cleanSpecificProblems(blogData.content?.rendered || blogData.content || '');
+              const processedContent = processHTMLContent(cleanedContent);
+              
+              // Procesar la imagen destacada si viene de WordPress
+              if (!blogData.image && blogData._embedded?.['wp:featuredmedia']?.[0]) {
+                const media = blogData._embedded['wp:featuredmedia'][0];
+                blogData.image = {
+                  src: media.source_url,
+                  alt: blogData.title?.rendered || "Imagen del blog"
+                };
+              }
+              
+              setBlog({
+                ...blogData,
+                content: processedContent,
+                title: blogData.title?.rendered || blogData.title,
+                excerpt: blogData.excerpt?.rendered || blogData.excerpt,
+                source: 'wordpress'
+              });
+            } else {
+              // Si no se encuentra, intentar con getBlogPosts
+              const allBlogs = await getBlogPosts();
+              const wpBlog = allBlogs.find(b => b.source === 'wordpress' && b.slug === slug);
+              
+              if (wpBlog) {
+                // Obtener los datos completos del blog
+                const fullBlog = await getBlogById(wpBlog.id);
+                
+                if (fullBlog) {
+                  // Aplicar limpieza y procesamiento al contenido
+                  const cleanedContent = cleanSpecificProblems(fullBlog.content);
+                  const processedContent = processHTMLContent(cleanedContent);
+                  
+                  setBlog({
+                    ...fullBlog,
+                    content: processedContent
+                  });
+                } else {
+                  setBlog(wpBlog);
+                }
+              } else {
+                console.error('Blog de WordPress no encontrado por slug');
+                setError('Blog no encontrado');
+              }
+            }
+          } catch (wpError) {
+            console.error('Error al obtener blog de WordPress:', wpError);
+            
+            // Si falla, intentar con getBlogPosts
+            const allBlogs = await getBlogPosts();
+            const wpBlog = allBlogs.find(b => b.source === 'wordpress' && b.slug === slug);
+            
+            if (wpBlog) {
+              // Obtener los datos completos del blog
+              const fullBlog = await getBlogById(wpBlog.id);
+              
+              if (fullBlog) {
+                // Aplicar limpieza y procesamiento al contenido
+                const cleanedContent = cleanSpecificProblems(fullBlog.content);
+                const processedContent = processHTMLContent(cleanedContent);
+                
+                setBlog({
+                  ...fullBlog,
+                  content: processedContent
+                });
+              } else {
+                setBlog(wpBlog);
+              }
+            } else {
+              console.error('Blog de WordPress no encontrado por slug');
+              setError('Blog no encontrado');
+            }
+          }
+        } else {
+          // Intentar obtener por ID de MongoDB
+          console.log('Buscando blog por ID de MongoDB');
+          
+          try {
+            const data = await getBlogById(slug);
+            
+            if (data) {
+              console.log('Blog encontrado por ID');
+              
+              // Aplicar limpieza y procesamiento al contenido
+              const cleanedContent = cleanSpecificProblems(data.content);
+              const processedContent = processHTMLContent(cleanedContent);
+              
+              setBlog({
+                ...data,
+                content: processedContent
+              });
+            } else {
+              console.error('Blog no encontrado por ID');
+              setError('Blog no encontrado');
+            }
+          } catch (idError) {
+            console.error('Error al obtener blog por ID:', idError);
+            
+            // Si falla, intentar buscar por slug en todos los blogs
+            console.log('Intentando buscar por slug en todos los blogs');
+            
+            const allBlogs = await getBlogPosts();
+            const foundBlog = allBlogs.find(b => b.slug === slug);
+            
+            if (foundBlog) {
+              console.log('Blog encontrado por slug');
+              
+              // Aplicar limpieza y procesamiento al contenido
+              const cleanedContent = cleanSpecificProblems(foundBlog.content);
+              const processedContent = processHTMLContent(cleanedContent);
+              
+              setBlog({
+                ...foundBlog,
+                content: processedContent
+              });
+            } else {
+              console.error('Blog no encontrado por slug');
+              setError('Blog no encontrado');
+            }
+          }
         }
-        
-        setBlog(blogData);
-      } catch (err) {
-        setError(err.message || 'Error desconocido');
+      } catch (error) {
+        console.error('Error al obtener blog:', error);
+        setError('Error al cargar el blog');
       } finally {
         setLoading(false);
       }
     };
     
-    if (slug) fetchBlogData();
-  }, [slug]);
+    if (isClient && slug) {
+      fetchBlogData();
+    }
+  }, [slug, source, isClient]);
   
   useEffect(() => {
     if (blog) {
@@ -407,14 +535,15 @@ const BlogContent = ({ slug }) => {
   
   const {
     title,
-    content: rawContent,  // Renombrar para evitar confusiones
+    content: rawContent,
     image,
+    images,
     date,
     author = "Equipo Goza Madrid",
     category = "Inmobiliaria",
     tags = [],
     excerpt,
-    readTime: blogReadTime,  // Renombrar para evitar confusiones
+    readTime: blogReadTime,
   } = blog || {};
 
   // Asegurar que content y readTime estén disponibles
@@ -425,12 +554,16 @@ const BlogContent = ({ slug }) => {
   console.log('Content procesado:', content);
   console.log('ReadTime procesado:', readTime);
 
-  const imageSrc = typeof image === 'string' 
-    ? image 
-    : (image?.src || DEFAULT_IMAGE);
+  // Procesar la imagen principal usando la función getImageSrc modificada
+  const imageSrc = getImageSrc(image || images, DEFAULT_IMAGE);
 
   const titleText = typeof title === 'object' ? title.rendered : title;
   const excerptText = typeof excerpt === 'object' ? excerpt.rendered : excerpt;
+
+  // Procesar el contenido HTML solo cuando tengamos los datos necesarios
+  const processedContent = typeof content === 'object' 
+    ? processHTMLContent(content.rendered, images) 
+    : processHTMLContent(content || '<p>No hay contenido disponible para este blog.</p>', images);
 
   return (
     <>
@@ -442,12 +575,12 @@ const BlogContent = ({ slug }) => {
         <meta property="og:description" content={excerptText?.replace(/<[^>]*>/g, '').slice(0, 160)} />
         <meta property="og:image" content={imageSrc} />
         <meta property="og:type" content="article" />
-        <meta property="og:url" content={blogUrl} />
+        <meta property="og:url" content={window.location.href} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={titleText} />
         <meta name="twitter:description" content={excerptText?.replace(/<[^>]*>/g, '').slice(0, 160)} />
         <meta name="twitter:image" content={imageSrc} />
-        <link rel="canonical" href={blogUrl} />
+        <link rel="canonical" href={window.location.href} />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
@@ -472,7 +605,7 @@ const BlogContent = ({ slug }) => {
             "keywords": `${category}, ${tags.join(', ')}`,
             "mainEntityOfPage": {
               "@type": "WebPage",
-              "@id": blogUrl
+              "@id": window.location.href
             }
           })}
         </script>
@@ -500,13 +633,12 @@ const BlogContent = ({ slug }) => {
           {/* Imagen destacada con overlay de textura */}
           {imageSrc && (
             <div className="relative w-full h-[350px] md:h-[500px] overflow-hidden rounded-2xl mb-12">
-              <Image 
+              <BlogImage 
                 src={imageSrc}
                 alt={typeof title === 'object' ? title.rendered : title}
-                fill
                 className="object-cover"
-                priority
-                unoptimized={!imageSrc.includes('realestategozamadrid.com')}
+                priority={true}
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent mix-blend-multiply"></div>
               
@@ -648,9 +780,7 @@ const BlogContent = ({ slug }) => {
             
             sm:prose-p:text-base sm:prose-h2:text-xl sm:prose-h3:text-lg"
           dangerouslySetInnerHTML={{
-            __html: typeof content === 'object' 
-              ? processHTMLContent(content.rendered) 
-              : processHTMLContent(content || '<p>No hay contenido disponible para este blog.</p>')
+            __html: processedContent
           }}
         />
 
@@ -671,7 +801,7 @@ const BlogContent = ({ slug }) => {
           </div>
 
           {/* Compartir en redes sociales mejorado */}
-          <ShareButtons url={blogUrl} title={titleText} description={excerptText} />
+          <ShareButtons url={window.location.href} title={titleText} description={excerptText} />
           
           {/* Sección "Artículos relacionados" - esto sería ideal si tienes la información */}
           <div className="mt-12 bg-gray-50 rounded-2xl p-8">

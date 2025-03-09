@@ -1,8 +1,6 @@
-"use client";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import Head from "next/head";
 import FadeInView from './animations/FadeInView';
 import ScaleInView from './animations/ScaleInView';
 import { FaHome, FaExchangeAlt, FaCity, FaMoneyBillWave, FaQuoteLeft, FaArrowRight } from "react-icons/fa";
@@ -104,12 +102,6 @@ const Eslogan = () => {
 
     return (
         <>
-            <Head>
-                <script type="application/ld+json">
-                    {JSON.stringify(SCHEMA_DATA)}
-                </script>
-            </Head>
-
             <section 
                 className="relative w-full py-24 lg:py-32 overflow-hidden"
                 aria-label="Servicios inmobiliarios personalizados"

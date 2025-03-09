@@ -26,14 +26,14 @@ import propertyOfferRoutes from './routes/propertyOfferRoutes.js';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 
 // Definir los orígenes permitidos
 const allowedOrigins = [
   'https://goza-madrid-qbw9.onrender.com', 
   'https://goza-madrid.onrender.com',
   'https://blogsypropiedades.onrender.com', 
-  'http://localhost:4000',
+  'http://localhost:3000',
   'http://localhost:5173',
   'http://localhost:3000',
   'https://realestategozamadrid.com'  // Añadir el dominio de WordPress
