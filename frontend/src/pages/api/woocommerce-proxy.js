@@ -1,6 +1,47 @@
 /**
- * API Proxy para WooCommerce
+ * API Proxy para WooCommerce con reintentos
  */
+
+const MAX_RETRIES = 8;
+const INITIAL_RETRY_DELAY = 1000;
+const MAX_RETRY_DELAY = 32000;
+const EXPONENTIAL_BACKOFF = true;
+
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+const fetchWithRetry = async (url, options, retries = MAX_RETRIES, attempt = 1) => {
+  try {
+    const response = await fetch(url, {
+      ...options,
+      timeout: 60000 // 60 segundos
+    });
+    
+    // Si es un error 503 o 502, intentar de nuevo con backoff exponencial
+    if ((response.status === 503 || response.status === 502) && retries > 0) {
+      const delay = EXPONENTIAL_BACKOFF 
+        ? Math.min(INITIAL_RETRY_DELAY * Math.pow(2, attempt - 1), MAX_RETRY_DELAY)
+        : INITIAL_RETRY_DELAY;
+      
+      console.log(`[WooCommerce Proxy] Error ${response.status} - Reintentando (${retries} intentos restantes) después de ${delay}ms...`);
+      await sleep(delay);
+      return fetchWithRetry(url, options, retries - 1, attempt + 1);
+    }
+    
+    return response;
+  } catch (error) {
+    if (retries > 0) {
+      const delay = EXPONENTIAL_BACKOFF 
+        ? Math.min(INITIAL_RETRY_DELAY * Math.pow(2, attempt - 1), MAX_RETRY_DELAY)
+        : INITIAL_RETRY_DELAY;
+      
+      console.log(`[WooCommerce Proxy] Error en la petición: ${error.message} - Reintentando (${retries} intentos restantes) después de ${delay}ms...`);
+      await sleep(delay);
+      return fetchWithRetry(url, options, retries - 1, attempt + 1);
+    }
+    throw error;
+  }
+};
+
 export default async function handler(req, res) {
   try {
     // Obtener parámetros de la consulta
@@ -25,10 +66,10 @@ export default async function handler(req, res) {
       }
     });
     
-    console.log('Conectando a WooCommerce:', wooCommerceUrl.replace(/consumer_secret=([^&]*)/, 'consumer_secret=XXXXX')); // Log seguro ocultando secreto
+    console.log('[WooCommerce Proxy] Conectando a WooCommerce:', wooCommerceUrl.replace(/consumer_secret=([^&]*)/, 'consumer_secret=XXXXX'));
     
-    // Realizar la solicitud desde el servidor
-    const response = await fetch(wooCommerceUrl, {
+    // Realizar la solicitud con reintentos
+    const response = await fetchWithRetry(wooCommerceUrl, {
       method: 'GET',
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -36,86 +77,34 @@ export default async function handler(req, res) {
         'Expires': '0',
         'Accept': 'application/json',
         'User-Agent': 'Mozilla/5.0 (Node.js API Proxy)'
-      },
-      timeout: 30000
+      }
     });
     
     if (!response.ok) {
-      console.error(`Error en la respuesta de WooCommerce: ${response.status} ${response.statusText}`);
-      console.error('URL que falló:', wooCommerceUrl.replace(/consumer_secret=([^&]*)/, 'consumer_secret=XXXXX')); // Log seguro
+      console.error(`[WooCommerce Proxy] Error en la respuesta después de ${MAX_RETRIES} intentos: ${response.status} ${response.statusText}`);
+      console.error('[WooCommerce Proxy] URL que falló:', wooCommerceUrl.replace(/consumer_secret=([^&]*)/, 'consumer_secret=XXXXX'));
       
-      // Si es un error 503, devolver un array vacío
-      if (response.status === 503) {
-        console.log('WooCommerce - Servicio no disponible, devolviendo array vacío');
+      // Si es un error 503 o 502, devolver un array vacío
+      if (response.status === 503 || response.status === 502) {
+        console.log('[WooCommerce Proxy] Servicio no disponible después de todos los reintentos, devolviendo array vacío');
         return res.status(200).json([]);
       }
       
       // Intentar leer el cuerpo del error
       try {
         const errorBody = await response.text();
-        console.error('Cuerpo del error:', errorBody);
+        console.error('[WooCommerce Proxy] Cuerpo del error:', errorBody);
       } catch (e) {
-        console.error('No se pudo leer el cuerpo del error');
+        console.error('[WooCommerce Proxy] No se pudo leer el cuerpo del error');
       }
       
       throw new Error(`Error ${response.status} al conectar con WooCommerce`);
     }
     
-    // Obtener los datos y registrar información
-    let data = await response.json();
-    data = Array.isArray(data) ? data : [data];
-    
-    // Obtener el total de páginas y elementos
-    const totalPages = parseInt(response.headers.get('X-WP-TotalPages') || '1');
-    const totalItems = parseInt(response.headers.get('X-WP-Total') || '0');
-    
-    // En producción, obtener todas las páginas si hay más de una y no se especificó una página específica
-    if (process.env.NODE_ENV === 'production' && totalPages > 1 && !queryParams.page) {
-      console.log(`WooCommerce - Obteniendo todas las páginas (${totalPages} páginas en total)`);
-      
-      const remainingPages = Array.from({ length: totalPages - 1 }, (_, i) => i + 2);
-      const pagePromises = remainingPages.map(async (page) => {
-        const pageUrl = `${wooCommerceUrl}&page=${page}`;
-        const pageResponse = await fetch(pageUrl, {
-          method: 'GET',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-            'Expires': '0',
-            'Accept': 'application/json',
-            'User-Agent': 'Mozilla/5.0 (Node.js API Proxy)'
-          },
-          timeout: 30000
-        });
-        
-        if (!pageResponse.ok) {
-          console.error(`Error al obtener página ${page}: ${pageResponse.status}`);
-          return [];
-        }
-        
-        const pageData = await pageResponse.json();
-        return Array.isArray(pageData) ? pageData : [pageData];
-      });
-      
-      const additionalData = await Promise.all(pagePromises);
-      additionalData.forEach(pageData => {
-        data.push(...pageData);
-      });
-    }
-    
-    console.log(`Recibidos ${data.length} elementos de WooCommerce`);
-    
-    // Si hay headers de paginación, incluirlos en la respuesta
-    if (totalItems) {
-      res.setHeader('X-WP-Total', totalItems);
-    }
-    if (totalPages) {
-      res.setHeader('X-WP-TotalPages', totalPages);
-    }
-    
+    const data = await response.json();
     return res.status(200).json(data);
   } catch (error) {
-    console.error('Error en el proxy de WooCommerce:', error);
+    console.error('[WooCommerce Proxy] Error:', error);
     // En caso de error irrecuperable, devolver un array vacío
     return res.status(200).json([]);
   }
