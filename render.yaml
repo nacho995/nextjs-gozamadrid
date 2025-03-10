@@ -13,7 +13,7 @@ services:
       - key: NEXT_PUBLIC_SITE_URL
         value: https://goza-madrid-qbw9.onrender.com
       - key: NEXT_PUBLIC_ASSET_PREFIX
-        value: .
+        value: ""
       - key: NEXT_PUBLIC_IMAGES_DOMAIN
         value: goza-madrid-qbw9.onrender.com
       - key: NEXT_PUBLIC_API_URL
@@ -32,6 +32,12 @@ services:
       - type: rewrite
         source: /api/image-proxy
         destination: /api/image-proxy
+      - type: rewrite
+        source: /_next/*
+        destination: /_next/*
+      - type: rewrite
+        source: /static/*
+        destination: /static/*
     headers:
       - path: /*
         name: Cache-Control

@@ -3,8 +3,10 @@ const nextConfig = {
   // Configuración básica
   reactStrictMode: true,
   swcMinify: true,
-  // Cambiar output a 'standalone' en producción en lugar de 'export'
+  // Usar 'standalone' para producción
   output: 'standalone',
+  // Especificar el directorio de salida
+  distDir: 'dist',
   poweredByHeader: false,
   compress: true,
   generateEtags: true,
