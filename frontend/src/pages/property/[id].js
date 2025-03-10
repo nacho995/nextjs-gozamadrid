@@ -44,10 +44,49 @@ const fetchProperty = async (id, source, isServer = false) => {
 
 // Añadir getStaticPaths para manejar rutas dinámicas
 export async function getStaticPaths() {
-  return {
-    paths: [], // No pre-renderizar ninguna ruta
-    fallback: 'blocking' // Generar nuevas páginas en el servidor según sea necesario
-  };
+  try {
+    // Intentar obtener todas las propiedades para pre-renderizar
+    // Primero, intentar obtener propiedades de MongoDB
+    let mongodbIds = [];
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://goza-madrid.onrender.com';
+      const mongoResponse = await fetch(`${apiUrl}/property`);
+      if (mongoResponse.ok) {
+        const mongoProperties = await mongoResponse.json();
+        mongodbIds = mongoProperties.map(prop => prop._id.toString());
+      }
+    } catch (error) {
+      console.error('Error al obtener propiedades de MongoDB:', error);
+    }
+
+    // Luego, intentar obtener propiedades de WooCommerce
+    let woocommerceIds = [];
+    try {
+      const wooResponse = await fetch('https://realestategozamadrid.com/wp-json/wc/v3/products?consumer_key=ck_75c5940bfae6a9dd63f1489da71e43b576999633&consumer_secret=cs_f194d11b41ca92cdd356145705fede711cd233e5');
+      if (wooResponse.ok) {
+        const wooProducts = await wooResponse.json();
+        woocommerceIds = wooProducts.map(prod => prod.id.toString());
+      }
+    } catch (error) {
+      console.error('Error al obtener propiedades de WooCommerce:', error);
+    }
+
+    // Combinar todos los IDs
+    const allIds = [...mongodbIds, ...woocommerceIds];
+    
+    // Generar las rutas para todos los IDs conocidos
+    return {
+      paths: allIds.map(id => ({ params: { id } })),
+      fallback: 'blocking' // Para IDs que no conocemos aún
+    };
+  } catch (error) {
+    console.error('Error en getStaticPaths:', error);
+    // En caso de error, no pre-renderizar ninguna ruta
+    return {
+      paths: [],
+      fallback: 'blocking'
+    };
+  }
 }
 
 // Necesario junto con getStaticPaths

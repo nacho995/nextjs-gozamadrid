@@ -1,0 +1,13 @@
+# Configuración global
+/*
+  Cache-Control: public, max-age=3600
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# Rutas dinámicas - reducir caché para actualizaciones más frecuentes
+/blog/*
+  Cache-Control: public, max-age=600
+
+/property/*
+  Cache-Control: public, max-age=600 

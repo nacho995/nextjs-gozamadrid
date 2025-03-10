@@ -3,21 +3,19 @@ const nextConfig = {
   // Configuración básica
   reactStrictMode: true,
   swcMinify: true,
-  output: 'standalone',
+  // Cambiar output a 'export' solo en producción
+  output: process.env.NODE_ENV === 'production' ? 'export' : 'standalone',
   poweredByHeader: false,
   compress: true,
   generateEtags: true,
   
   // Configuración para entornos de producción
   ...(process.env.NODE_ENV === 'production' && {
-    // Configurar assetPrefix para recursos estáticos en producción
-    assetPrefix: '.',
-    // Configurar basePath si es necesario
-    // basePath: '',
+    // Eliminar assetPrefix para evitar problemas con rutas
+    // assetPrefix: '.',
   }),
   
   // Deshabilitar la optimización de barriles para react-icons
-  // Esto resolverá el error "Cannot read properties of undefined (reading 'call')"
   experimental: {
     optimizePackageImports: ['other-packages-but-not-react-icons'],
   },
@@ -48,10 +46,11 @@ const nextConfig = {
     minimumCacheTTL: 60,
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    unoptimized: process.env.NODE_ENV === 'production', // Deshabilitar la optimización de imágenes en producción
+    // Siempre deshabilitar la optimización de imágenes en producción para sitios estáticos
+    unoptimized: process.env.NODE_ENV === 'production',
   },
   
-  // Headers para mejorar el rendimiento
+  // Headers para mejorar el rendimiento, pero con caché más corto
   async headers() {
     return [
       {
@@ -59,7 +58,8 @@ const nextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            // Reducir el tiempo de caché para permitir actualizaciones más frecuentes
+            value: 'public, max-age=3600',
           },
         ],
       },
@@ -83,6 +83,11 @@ const nextConfig = {
       {
         source: '/property/:id',
         destination: '/property/:id',
+      },
+      // Asegurar que las rutas de blog se manejen correctamente
+      {
+        source: '/blog/:id',
+        destination: '/blog/:id',
       }
     ];
   },
@@ -114,7 +119,8 @@ const nextConfig = {
     }
     return config;
   },
-  assetPrefix: process.env.NODE_ENV === 'production' ? '.' : '',
+  // Eliminar assetPrefix global y usar trailingSlash para mejor compatibilidad con sitios estáticos
+  // assetPrefix: process.env.NODE_ENV === 'production' ? '.' : '',
   trailingSlash: true,
 }
 

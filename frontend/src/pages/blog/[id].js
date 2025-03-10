@@ -662,8 +662,55 @@ const identifyBlogType = (id, source) => {
   return false;
 };
 
-// SSR para manejar tanto IDs numéricos como slugs de WordPress
-export async function getServerSideProps(context) {
+// Añadir getStaticPaths para pre-renderizar rutas conocidas
+export async function getStaticPaths() {
+  try {
+    // Intentar obtener todos los blogs para pre-renderizar
+    // Primero, intentar obtener blogs de MongoDB
+    let mongodbIds = [];
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://goza-madrid.onrender.com';
+      const mongoResponse = await fetch(`${apiUrl}/blog`);
+      if (mongoResponse.ok) {
+        const mongoBlogs = await mongoResponse.json();
+        mongodbIds = mongoBlogs.map(blog => blog._id.toString());
+      }
+    } catch (error) {
+      console.error('Error al obtener blogs de MongoDB:', error);
+    }
+
+    // Luego, intentar obtener blogs de WordPress
+    let wordpressIds = [];
+    try {
+      const wpResponse = await fetch('https://realestategozamadrid.com/wp-json/wp/v2/posts');
+      if (wpResponse.ok) {
+        const wpPosts = await wpResponse.json();
+        wordpressIds = wpPosts.map(post => post.slug);
+      }
+    } catch (error) {
+      console.error('Error al obtener blogs de WordPress:', error);
+    }
+
+    // Combinar todos los IDs
+    const allIds = [...mongodbIds, ...wordpressIds];
+    
+    // Generar las rutas para todos los IDs conocidos
+    return {
+      paths: allIds.map(id => ({ params: { id } })),
+      fallback: 'blocking' // Para IDs que no conocemos aún
+    };
+  } catch (error) {
+    console.error('Error en getStaticPaths:', error);
+    // En caso de error, no pre-renderizar ninguna ruta
+    return {
+      paths: [],
+      fallback: 'blocking'
+    };
+  }
+}
+
+// Cambiar a getStaticProps para sitios estáticos
+export async function getStaticProps(context) {
   const { id } = context.params;
   
   try {
@@ -678,7 +725,9 @@ export async function getServerSideProps(context) {
           initialBlog: blog || null, 
           id, 
           isWordPress: false
-        } 
+        },
+        // Revalidar cada hora para permitir actualizaciones
+        revalidate: 3600
       };
     } else {
       // WordPress
@@ -686,7 +735,7 @@ export async function getServerSideProps(context) {
       let slug = id;
       if (id.startsWith('wp-')) slug = id.substring(3);
       
-      console.log("SSR: Obteniendo blog de WordPress con slug:", slug);
+      console.log("Static: Obteniendo blog de WordPress con slug:", slug);
       
       // Obtener datos de WordPress
       const wpPost = await getBlogPostBySlug(slug);
@@ -698,29 +747,35 @@ export async function getServerSideProps(context) {
             initialBlog: blogData, 
             id, 
             isWordPress: true
-          } 
+          },
+          // Revalidar cada hora para permitir actualizaciones
+          revalidate: 3600
         };
       } else {
-        console.log("SSR: No se encontró blog de WordPress con slug:", slug);
+        console.log("Static: No se encontró blog de WordPress con slug:", slug);
         return { 
           props: { 
             initialBlog: null, 
             id, 
             isWordPress: true, 
             error: "No se encontró el blog en WordPress"
-          } 
+          },
+          // Revalidar cada hora para permitir actualizaciones
+          revalidate: 3600
         };
       }
     }
   } catch (error) {
-    console.error("Error en SSR:", error);
+    console.error("Error en Static Props:", error);
     return { 
       props: { 
         initialBlog: null, 
         id, 
         isWordPress: false, 
         error: error.message 
-      } 
+      },
+      // Revalidar cada hora para permitir actualizaciones
+      revalidate: 3600
     };
   }
 }
