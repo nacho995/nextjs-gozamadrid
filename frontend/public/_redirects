@@ -1,0 +1,8 @@
+# Manejar rutas dinámicas de blog
+/blog/*    /blog/[id].html    200
+
+# Manejar rutas dinámicas de propiedades
+/property/*    /property/[id].html    200
+
+# Fallback para otras rutas
+/*    /index.html    200
