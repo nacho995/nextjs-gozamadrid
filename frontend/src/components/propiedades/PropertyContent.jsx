@@ -458,430 +458,412 @@ export default function DefaultPropertyContent({ property }) {
       </Head>
     
       <div className="container mx-auto px-4 py-8">
-        <AnimatedOnScroll>
-          <article className="relative" itemScope itemType="https://schema.org/RealEstateListing">
-            {/* Hidden SEO metadata */}
-            <meta itemProp="name" content={title} />
-            <meta itemProp="description" content={cleanedContent?.replace(/<[^>]*>/g, '').substring(0, 500)} />
-            <meta itemProp="url" content={propertyUrl} />
+        <article className="relative" itemScope itemType="https://schema.org/RealEstateListing">
+          {/* Hidden SEO metadata */}
+          <meta itemProp="name" content={title} />
+          <meta itemProp="description" content={cleanedContent?.replace(/<[^>]*>/g, '').substring(0, 500)} />
+          <meta itemProp="url" content={propertyUrl} />
+
+          {/* Contenedor principal de imágenes */}
+          <section aria-label="Galería de imágenes" className="flex flex-col mb-8">
+            {/* Imagen principal arriba */}
+            <div className="relative w-full h-[60vh] mb-8 rounded-xl overflow-hidden shadow-xl">
+              {propertyImages && propertyImages.length > 0 && propertyImages[current] ? (
+                <motion.img
+                  key={current}
+                  src={propertyImages[current].src}
+                  alt={propertyImages[current].alt}
+                  className="w-full h-full object-cover"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  onError={handleImageError}
+                />
+              ) : (
+                <img 
+                  src="/img/default-property-image.jpg" 
+                  alt="Imagen por defecto"
+                  className="w-full h-full object-cover"
+                />
+              )}
+            </div>
             
-            {/* Contenedor principal de imágenes */}
-            <section aria-label="Galería de imágenes" className="flex flex-col mb-8">
-              {/* Imagen principal arriba */}
-              <div className="relative w-full h-[60vh] mb-8 rounded-xl overflow-hidden shadow-xl">
-                {propertyImages && propertyImages.length > 0 && propertyImages[current] ? (
-                  <motion.img
-                    key={current}
-                    src={propertyImages[current].src}
-                    alt={propertyImages[current].alt}
-                    className="w-full h-full object-cover"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.5 }}
-                    onError={handleImageError}
-                  />
-                ) : (
-                  <img 
-                    src="/img/default-property-image.jpg" 
-                    alt="Imagen por defecto"
-                    className="w-full h-full object-cover"
-                  />
+            <div className="bg-gray-50 dark:bg-gray-900 p-2 rounded-lg hidden sm:block">
+              <div className="flex flex-wrap justify-center gap-2">
+                {propertyImages.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrent(index)}
+                    className={`relative w-[80px] h-[60px] md:w-[100px] md:h-[75px] rounded-lg overflow-hidden border-2 transition-all duration-300 ${
+                      index === current
+                        ? "border-amarillo shadow-md scale-105"
+                        : "border-gray-200 hover:border-amarillo/50 hover:shadow-sm hover:scale-105"
+                    }`}
+                  >
+                    <img
+                      src={image.src}
+                      alt={image.alt}
+                      className="h-full w-full object-cover"
+                      data-original-src={image.originalSrc || ""}
+                      data-is-proxied={image.isProxied ? "true" : "false"}
+                      onError={handleImageError}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Información principal */}
+          <div className="mt-8 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-xl shadow-lg p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 mt-4">
+              <h2 className="text-2xl font-bold mb-4">Características</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {propertyData?.livingArea > 0 && (
+                  <div className="flex items-center gap-2 p-4 bg-gray-50 rounded-lg shadow">
+                    <FaRuler className="text-2xl text-primary" />
+                    <div>
+                      <p className="text-lg font-medium">{propertyData.livingArea} m²</p>
+                      <p className="text-sm text-gray-500">Superficie</p>
+                    </div>
+                  </div>
+                )}
+                
+                {propertyData?.bedrooms > 0 && (
+                  <div className="flex items-center gap-2 p-4 bg-gray-50 rounded-lg shadow">
+                    <FaBed className="text-2xl text-primary" />
+                    <div>
+                      <p className="text-lg font-medium">{propertyData.bedrooms}</p>
+                      <p className="text-sm text-gray-500">Habitaciones</p>
+                    </div>
+                  </div>
+                )}
+                
+                {propertyData?.bathrooms > 0 && (
+                  <div className="flex items-center gap-2 p-4 bg-gray-50 rounded-lg shadow">
+                    <FaBath className="text-2xl text-primary" />
+                    <div>
+                      <p className="text-lg font-medium">{propertyData.bathrooms}</p>
+                      <p className="text-sm text-gray-500">Baños</p>
+                    </div>
+                  </div>
+                )}
+                
+                {propertyData?.floor > 0 && (
+                  <div className="flex items-center gap-2 p-4 bg-gray-50 rounded-lg shadow">
+                    <FaBuilding className="text-2xl text-primary" />
+                    <div>
+                      <p className="text-lg font-medium">{propertyData.floor}ª</p>
+                      <p className="text-sm text-gray-500">Planta</p>
+                    </div>
+                  </div>
                 )}
               </div>
-              
-              {/* Miniaturas horizontales debajo - ocultas en móvil */}
-              <div className="bg-gray-50 dark:bg-gray-900 p-2 rounded-lg hidden sm:block">
-                <div className="flex flex-wrap justify-center gap-2">
-                  {propertyImages.map((image, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrent(index)}
-                      className={`relative w-[80px] h-[60px] md:w-[100px] md:h-[75px] rounded-lg overflow-hidden border-2 transition-all duration-300 ${
-                        index === current
-                          ? "border-amarillo shadow-md scale-105"
-                          : "border-gray-200 hover:border-amarillo/50 hover:shadow-sm hover:scale-105"
-                      }`}
-                    >
-                      <img
-                        src={image.src}
-                        alt={image.alt}
-                        className="h-full w-full object-cover"
-                        data-original-src={image.originalSrc || ""}
-                        data-is-proxied={image.isProxied ? "true" : "false"}
-                        onError={handleImageError}
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </section>
-
-            {/* Información principal */}
-            <div className="mt-8 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-xl shadow-lg p-6">
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 mt-4">
-                {/* Título de la propiedad con responsive */}
-                <h1 className="text-3xl font-bold mb-2 text-black dark:text-white" itemProp="name">{title}</h1>
-                
-                {/* Ubicación con responsive */}
-                <div className="flex items-center gap-2 text-amber-400 mb-3">
-                  <FaMapMarkerAlt className="text-sm sm:text-base" />
-                  <p className="text-lg text-gray-700 dark:text-white" itemProp="address">{location}</p>
-                </div>
-                
-                {/* Mostrar las características de la propiedad */}
-                <div className="mb-8">
-                  <h2 className="text-2xl font-bold mb-4">Características</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {propertyData?.livingArea > 0 && (
-                      <div className="flex items-center gap-2 p-4 bg-gray-50 rounded-lg shadow">
-                        <FaRuler className="text-2xl text-primary" />
-                        <div>
-                          <p className="text-lg font-medium">{propertyData.livingArea} m²</p>
-                          <p className="text-sm text-gray-500">Superficie</p>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {propertyData?.bedrooms > 0 && (
-                      <div className="flex items-center gap-2 p-4 bg-gray-50 rounded-lg shadow">
-                        <FaBed className="text-2xl text-primary" />
-                        <div>
-                          <p className="text-lg font-medium">{propertyData.bedrooms}</p>
-                          <p className="text-sm text-gray-500">Habitaciones</p>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {propertyData?.bathrooms > 0 && (
-                      <div className="flex items-center gap-2 p-4 bg-gray-50 rounded-lg shadow">
-                        <FaBath className="text-2xl text-primary" />
-                        <div>
-                          <p className="text-lg font-medium">{propertyData.bathrooms}</p>
-                          <p className="text-sm text-gray-500">Baños</p>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {propertyData?.floor > 0 && (
-                      <div className="flex items-center gap-2 p-4 bg-gray-50 rounded-lg shadow">
-                        <FaBuilding className="text-2xl text-primary" />
-                        <div>
-                          <p className="text-lg font-medium">{propertyData.floor}ª</p>
-                          <p className="text-sm text-gray-500">Planta</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                {/* Precio con responsive */}
-                <div className="flex items-center gap-2 mt-4">
-                  <FaEuroSign className="text-amber-400 text-lg sm:text-xl" />
-                  <p className="text-sm sm:text-base md:text-lg font-semibold text-black dark:text-white" itemProp="offers">{formattedPrice}</p>
-                </div>
-              </div>
-
-              {/* Descripción con responsive */}
-              <div className="mt-6">
-                <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Descripción</h2>
-                <div 
-                  className="prose prose-lg max-w-none 
-                    text-black dark:text-white 
-                    dark:prose-headings:text-white 
-                    dark:prose-h1:text-white dark:prose-h2:!text-white dark:prose-h3:text-white
-                    dark:prose-p:text-white 
-                    dark:prose-li:text-white 
-                    dark:prose-strong:!text-white
-                    dark:prose-a:text-amarillo
-                    dark:prose-code:text-white
-                    dark:prose-figcaption:text-white
-                    dark:prose-blockquote:text-white" 
-                  dangerouslySetInnerHTML={{ __html: cleanedContent }} 
-                  itemProp="description"
-                />
-              </div>
-
-              {/* Botones de acción con responsive */}
-              <div className="flex flex-col sm:flex-row justify-center gap-3 md:gap-4 mb-6 md:mb-8 mt-8">
-                <button
-                  onClick={() => setShowCalendar(true)}
-                  className="group relative inline-flex items-center gap-1 sm:gap-2 overflow-hidden rounded-full bg-white/20 dark:bg-white/20 px-4 sm:px-6 md:px-8 py-2 sm:py-3 transition-all duration-300 hover:bg-white/30 dark:hover:bg-white/30 backdrop-blur-sm"
-                >
-                  <FaCalendarAlt className="text-base sm:text-lg text-black dark:text-white" />
-                  <span className="relative text-sm sm:text-base md:text-lg font-semibold text-black dark:text-white">
-                    Agendar una visita
-                  </span>
-                  <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-white via-amarillo to-white transition-transform duration-300 group-hover:translate-x-full"></span>
-                </button>
-
-                <button
-                  onClick={() => setShowOfferPanel(true)}
-                  className="group relative inline-flex items-center gap-1 sm:gap-2 overflow-hidden rounded-full bg-white/20 dark:bg-white/20 px-4 sm:px-6 md:px-8 py-2 sm:py-3 transition-all duration-300 hover:bg-white/30 dark:hover:bg-white/30 backdrop-blur-sm"
-                >
-                  <FaHandshake className="text-base sm:text-lg text-black dark:text-white" />
-                  <span className="relative text-sm sm:text-base md:text-lg font-semibold text-black dark:text-white">
-                    Hacer Oferta
-                  </span>
-                  <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-white via-amarillo to-white transition-transform duration-300 group-hover:translate-x-full"></span>
-                </button>
-              </div>
             </div>
+            
+            <div className="flex items-center gap-2 mt-4">
+              <FaEuroSign className="text-amber-400 text-lg sm:text-xl" />
+              <p className="text-sm sm:text-base md:text-lg font-semibold text-black dark:text-white" itemProp="offers">{formattedPrice}</p>
+            </div>
+          </div>
 
-            {/* Calendario de visitas */}
-            {showCalendar && (
-              <div className="fixed inset-0 bg-black/50 dark:bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                <div 
-                  ref={calendarRef} 
-                  className="bg-white dark:bg-gray-900 rounded-xl p-6 max-w-sm w-full mx-auto shadow-lg overflow-y-auto max-h-[90vh]"
-                >
-                  <button
-                    onClick={() => setShowCalendar(false)}
-                    className="absolute top-4 right-4 text-black dark:text-white hover:text-amarillo dark:hover:text-amarillo transition-colors duration-300"
-                  >
-                    <FaTimes className="text-xl" />
-                  </button>
-                  <h3 className="text-2xl font-bold mb-4 text-black dark:text-white">Agenda una visita</h3>
-                  <div className="space-y-6">
-                    <div>
-                      <label className="block text-sm font-medium text-black dark:text-white mb-2">Selecciona un día</label>
-                      <DatePicker
-                        selected={selectedDate}
-                        onChange={(date) => setSelectedDate(date)}
-                        filterDate={date => date >= new Date() && date.getDay() !== 0 && date.getDay() !== 6}
-                        minDate={new Date()}
-                        maxDate={addDays(new Date(), 30)}
-                        locale={es}
-                        placeholderText="Selecciona una fecha"
-                        className="w-full p-2 border rounded-lg text-black bg-white dark:text-white dark:bg-gray-800"
-                        dateFormat="dd/MM/yyyy"
-                        required
-                      />
-                    </div>
+          <div className="mt-6">
+            <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Descripción</h2>
+            <div 
+              className="prose prose-lg max-w-none 
+                text-black dark:text-white 
+                dark:prose-headings:text-white 
+                dark:prose-h1:text-white dark:prose-h2:!text-white dark:prose-h3:text-white
+                dark:prose-p:text-white 
+                dark:prose-li:text-white 
+                dark:prose-strong:!text-white
+                dark:prose-a:text-amarillo
+                dark:prose-code:text-white
+                dark:prose-figcaption:text-white
+                dark:prose-blockquote:text-white" 
+              dangerouslySetInnerHTML={{ __html: cleanedContent }} 
+              itemProp="description"
+            />
+          </div>
 
-                    {selectedDate && (
-                      <div>
-                        <label className="block text-sm font-medium text-black dark:text-white mb-2">Selecciona una hora</label>
-                        <div className="grid grid-cols-2 gap-2">
-                          {Array.from({ length: 10 }, (_, i) => {
-                            const time = setHours(setMinutes(new Date(), 0), i + 9);
-                            return (
-                              <button
-                                key={i}
-                                onClick={() => setSelectedTime(time)}
-                                className={`p-2 rounded-lg transition-colors ${
-                                  selectedTime && time.getHours() === selectedTime.getHours()
-                                    ? "bg-amarillo text-white"
-                                    : "bg-gray-100 hover:bg-gray-200 text-black"
-                                }`}
-                              >
-                                {time.getHours()}:00
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
+          <div className="flex flex-col sm:flex-row justify-center gap-3 md:gap-4 mb-6 md:mb-8 mt-8">
+            <button
+              onClick={() => setShowCalendar(true)}
+              className="group relative inline-flex items-center gap-1 sm:gap-2 overflow-hidden rounded-full bg-white/20 dark:bg-white/20 px-4 sm:px-6 md:px-8 py-2 sm:py-3 transition-all duration-300 hover:bg-white/30 dark:hover:bg-white/30 backdrop-blur-sm"
+            >
+              <FaCalendarAlt className="text-base sm:text-lg text-black dark:text-white" />
+              <span className="relative text-sm sm:text-base md:text-lg font-semibold text-black dark:text-white">
+                Agendar una visita
+              </span>
+              <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-white via-amarillo to-white transition-transform duration-300 group-hover:translate-x-full"></span>
+            </button>
 
-                    {selectedDate && selectedTime && (
-                      <div>
-                        <h3 className="text-lg font-semibold mb-2 flex items-center text-black dark:text-amarillo">
-                          <FaUser className="mr-2 text-amarillo" />
-                          Datos de contacto
-                        </h3>
-                        <div className="space-y-3">
-                          <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="Email de contacto"
-                            className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-amarillo/70"
-                          />
-                          <input
-                            type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="Nombre completo"
-                            className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-amarillo/70"
-                          />
-                          <input
-                            type="tel"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            placeholder="Teléfono"
-                            className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-amarillo/70"
-                          />
-                        </div>
-                      </div>
-                    )}
+            <button
+              onClick={() => setShowOfferPanel(true)}
+              className="group relative inline-flex items-center gap-1 sm:gap-2 overflow-hidden rounded-full bg-white/20 dark:bg-white/20 px-4 sm:px-6 md:px-8 py-2 sm:py-3 transition-all duration-300 hover:bg-white/30 dark:hover:bg-white/30 backdrop-blur-sm"
+            >
+              <FaHandshake className="text-base sm:text-lg text-black dark:text-white" />
+              <span className="relative text-sm sm:text-base md:text-lg font-semibold text-black dark:text-white">
+                Hacer Oferta
+              </span>
+              <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-white via-amarillo to-white transition-transform duration-300 group-hover:translate-x-full"></span>
+            </button>
+          </div>
+        </article>
 
-                    {selectedDate && selectedTime && email && name && phone && (
-                      <div className="flex flex-col sm:flex-row justify-end gap-2 mt-4">
-                        <button
-                          onClick={() => setShowCalendar(false)}
-                          className="w-full sm:w-auto px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-all duration-300 hover:scale-105"
-                        >
-                          Cancelar
-                        </button>
-                        <button
-                          onClick={() => {
-                            toast.success("Solicitud de visita enviada");
-                            setShowCalendar(false);
-                            setSelectedDate(null);
-                            setSelectedTime(null);
-                          }}
-                          className="w-full sm:w-auto px-4 py-2 rounded-lg bg-amarillo text-black font-medium hover:bg-amarillo/90 transition-all duration-300 hover:scale-105"
-                        >
-                          Confirmar Visita
-                        </button>
-                      </div>
-                    )}
-                  </div>
+        {/* Calendario de visitas */}
+        {showCalendar && (
+          <div className="fixed inset-0 bg-black/50 dark:bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div 
+              ref={calendarRef} 
+              className="bg-white dark:bg-gray-900 rounded-xl p-6 max-w-sm w-full mx-auto shadow-lg overflow-y-auto max-h-[90vh]"
+            >
+              <button
+                onClick={() => setShowCalendar(false)}
+                className="absolute top-4 right-4 text-black dark:text-white hover:text-amarillo dark:hover:text-amarillo transition-colors duration-300"
+              >
+                <FaTimes className="text-xl" />
+              </button>
+              <h3 className="text-2xl font-bold mb-4 text-black dark:text-white">Agenda una visita</h3>
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-black dark:text-white mb-2">Selecciona un día</label>
+                  <DatePicker
+                    selected={selectedDate}
+                    onChange={(date) => setSelectedDate(date)}
+                    filterDate={date => date >= new Date() && date.getDay() !== 0 && date.getDay() !== 6}
+                    minDate={new Date()}
+                    maxDate={addDays(new Date(), 30)}
+                    locale={es}
+                    placeholderText="Selecciona una fecha"
+                    className="w-full p-2 border rounded-lg text-black bg-white dark:text-white dark:bg-gray-800"
+                    dateFormat="dd/MM/yyyy"
+                    required
+                  />
                 </div>
-              </div>
-            )}
 
-            {/* Mapa de Google */}
-            <div className="mt-8 bg-white dark:bg-gray-900 backdrop-blur-sm rounded-xl shadow-lg p-6">
-              <h2 className="text-2xl font-bold mb-4 text-black dark:text-amarillo">Ubicación</h2>
-              <div className="relative w-full h-[400px] rounded-lg overflow-hidden">
-                <iframe
-                  src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyAZAI0_oecmQkuzwZ4IM2H_NLynxD2Lkxo&q=${encodeURIComponent(
-                    title + ', ' + location
-                  )}&zoom=15`}
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen=""
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  className="rounded-lg shadow-md"
-                ></iframe>
-              </div>
-            </div>
-
-            {/* Sección de preguntas */}
-            <div className="bg-gradient-to-br from-amber-100 to-amber-200 dark:from-gray-900 dark:to-gray-800 rounded-2xl shadow-lg p-8 text-center mt-8">
-              <h3 className="text-2xl font-semibold text-black dark:text-amarillo mb-6">¿Tienes preguntas sobre esta propiedad?</h3>
-              <Link href="/contacto">
-                <button className="group relative inline-flex items-center gap-1 sm:gap-2 overflow-hidden rounded-full bg-white/20 dark:bg-white/20 px-4 sm:px-6 md:px-8 py-2 sm:py-3 transition-all duration-300 hover:bg-white/30 dark:hover:bg-white/30 backdrop-blur-sm">
-                  <FaEnvelope className="text-base sm:text-lg text-black dark:text-white" />
-                  <span className="relative text-sm sm:text-base md:text-lg font-semibold text-black dark:text-white">
-                    Contáctanos
-                  </span>
-                  <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-white via-amarillo to-white transition-transform duration-300 group-hover:translate-x-full"></span>
-                </button>
-              </Link>
-            </div>
-
-            {/* Panel de ofertas */}
-            {showOfferPanel && (
-              <div className="fixed inset-0 bg-black/50 dark:bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                <div 
-                  ref={offerPanelRef} 
-                  className="bg-white dark:bg-black rounded-xl p-6 max-w-sm w-full mx-auto relative overflow-y-auto max-h-[90vh]"
-                >
-                  <button
-                    onClick={() => setShowOfferPanel(false)}
-                    className="absolute top-4 right-4 text-black dark:text-white hover:text-amarillo dark:hover:text-amarillo transition-colors duration-300"
-                  >
-                    <FaTimes className="text-xl" />
-                  </button>
-                  <h3 className="text-2xl font-bold mb-6 text-black dark:text-white">Hacer una oferta</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-black dark:text-white mb-2">Selecciona tu oferta</label>
-                      <div className="space-y-2">
-                        {generateOfferRanges(formattedPrice).map((range, index) => (
+                {selectedDate && (
+                  <div>
+                    <label className="block text-sm font-medium text-black dark:text-white mb-2">Selecciona una hora</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {Array.from({ length: 10 }, (_, i) => {
+                        const time = setHours(setMinutes(new Date(), 0), i + 9);
+                        return (
                           <button
-                            key={index}
-                            onClick={() => setSelectedOffer(range)}
-                            className={`w-full p-3 rounded-lg transition-all duration-300 flex justify-between items-center ${
-                              selectedOffer?.percentage === range.percentage 
-                                ? "bg-amarillo text-black font-semibold"
-                                : "bg-gray-100 hover:bg-gray-200 text-black dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800"
+                            key={i}
+                            onClick={() => setSelectedTime(time)}
+                            className={`p-2 rounded-lg transition-colors ${
+                              selectedTime && time.getHours() === selectedTime.getHours()
+                                ? "bg-amarillo text-white"
+                                : "bg-gray-100 hover:bg-gray-200 text-black"
                             }`}
                           >
-                            <span>{range.label}</span>
-                            <span className="font-semibold">{Math.round(range.value).toLocaleString()}€</span>
+                            {time.getHours()}:00
                           </button>
-                        ))}
-                      </div>
+                        );
+                      })}
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-black dark:text-white mb-2">Introduce tu oferta</label>
+                  </div>
+                )}
+
+                {selectedDate && selectedTime && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2 flex items-center text-black dark:text-amarillo">
+                      <FaUser className="mr-2 text-amarillo" />
+                      Datos de contacto
+                    </h3>
+                    <div className="space-y-3">
                       <input
-                        type="number"
-                        placeholder="Introduce tu oferta"
-                        className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-white/70"
-                        onChange={(e) =>
-                          setSelectedOffer({
-                            value: parseInt(e.target.value),
-                            label: "Oferta personalizada",
-                          })
-                        }
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Email de contacto"
+                        className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-amarillo/70"
+                      />
+                      <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Nombre completo"
+                        className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-amarillo/70"
+                      />
+                      <input
+                        type="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="Teléfono"
+                        className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-amarillo/70"
                       />
                     </div>
                   </div>
-                  {selectedOffer && (
-                    <div className="mt-6 space-y-4 border-t pt-4">
-                      <h3 className="text-lg font-semibold mb-2 flex items-center text-black dark:text-amarillo">
-                        <FaUser className="mr-2 text-amarillo" />
-                        Datos de contacto
-                      </h3>
-                      <div className="space-y-3">
-                        <input
-                          type="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder="Email de contacto"
-                          className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-white/70"
-                        />
-                        <input
-                          type="text"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          placeholder="Nombre completo"
-                          className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-white/70"
-                        />
-                        <input
-                          type="tel"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          placeholder="Teléfono"
-                          className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-white/70"
-                        />
-                      </div>
-                    </div>
-                  )}
-                  {selectedOffer && email && name && phone && (
-                    <div className="flex justify-end gap-2 mt-4">
+                )}
+
+                {selectedDate && selectedTime && email && name && phone && (
+                  <div className="flex flex-col sm:flex-row justify-end gap-2 mt-4">
+                    <button
+                      onClick={() => setShowCalendar(false)}
+                      className="w-full sm:w-auto px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-all duration-300 hover:scale-105"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={() => {
+                        toast.success("Solicitud de visita enviada");
+                        setShowCalendar(false);
+                        setSelectedDate(null);
+                        setSelectedTime(null);
+                      }}
+                      className="w-full sm:w-auto px-4 py-2 rounded-lg bg-amarillo text-black font-medium hover:bg-amarillo/90 transition-all duration-300 hover:scale-105"
+                    >
+                      Confirmar Visita
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Mapa de Google */}
+        <div className="mt-8 bg-white dark:bg-gray-900 backdrop-blur-sm rounded-xl shadow-lg p-6">
+          <h2 className="text-2xl font-bold mb-4 text-black dark:text-amarillo">Ubicación</h2>
+          <div className="relative w-full h-[400px] rounded-lg overflow-hidden">
+            <iframe
+              src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyAZAI0_oecmQkuzwZ4IM2H_NLynxD2Lkxo&q=${encodeURIComponent(
+                title + ', ' + location
+              )}&zoom=15`}
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen=""
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="rounded-lg shadow-md"
+            ></iframe>
+          </div>
+        </div>
+
+        {/* Sección de preguntas */}
+        <div className="bg-gradient-to-br from-amber-100 to-amber-200 dark:from-gray-900 dark:to-gray-800 rounded-2xl shadow-lg p-8 text-center mt-8">
+          <h3 className="text-2xl font-semibold text-black dark:text-amarillo mb-6">¿Tienes preguntas sobre esta propiedad?</h3>
+          <Link href="/contacto">
+            <button className="group relative inline-flex items-center gap-1 sm:gap-2 overflow-hidden rounded-full bg-white/20 dark:bg-white/20 px-4 sm:px-6 md:px-8 py-2 sm:py-3 transition-all duration-300 hover:bg-white/30 dark:hover:bg-white/30 backdrop-blur-sm">
+              <FaEnvelope className="text-base sm:text-lg text-black dark:text-white" />
+              <span className="relative text-sm sm:text-base md:text-lg font-semibold text-black dark:text-white">
+                Contáctanos
+              </span>
+              <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-white via-amarillo to-white transition-transform duration-300 group-hover:translate-x-full"></span>
+            </button>
+          </Link>
+        </div>
+
+        {/* Panel de ofertas */}
+        {showOfferPanel && (
+          <div className="fixed inset-0 bg-black/50 dark:bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div 
+              ref={offerPanelRef} 
+              className="bg-white dark:bg-black rounded-xl p-6 max-w-sm w-full mx-auto relative overflow-y-auto max-h-[90vh]"
+            >
+              <button
+                onClick={() => setShowOfferPanel(false)}
+                className="absolute top-4 right-4 text-black dark:text-white hover:text-amarillo dark:hover:text-amarillo transition-colors duration-300"
+              >
+                <FaTimes className="text-xl" />
+              </button>
+              <h3 className="text-2xl font-bold mb-6 text-black dark:text-white">Hacer una oferta</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-black dark:text-white mb-2">Selecciona tu oferta</label>
+                  <div className="space-y-2">
+                    {generateOfferRanges(formattedPrice).map((range, index) => (
                       <button
-                        onClick={() => setShowOfferPanel(false)}
-                        className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-all duration-300"
+                        key={index}
+                        onClick={() => setSelectedOffer(range)}
+                        className={`w-full p-3 rounded-lg transition-all duration-300 flex justify-between items-center ${
+                          selectedOffer?.percentage === range.percentage 
+                            ? "bg-amarillo text-black font-semibold"
+                            : "bg-gray-100 hover:bg-gray-200 text-black dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800"
+                        }`}
                       >
-                        Cancelar
+                        <span>{range.label}</span>
+                        <span className="font-semibold">{Math.round(range.value).toLocaleString()}€</span>
                       </button>
-                      <button
-                        onClick={() => {
-                          toast.success("Oferta enviada con éxito");
-                          setShowOfferPanel(false);
-                          setSelectedOffer(null);
-                          setEmail("");
-                          setName("");
-                          setPhone("");
-                        }}
-                        className="px-4 py-2 rounded-lg bg-amarillo text-black font-medium hover:bg-amarillo/90 transition-all duration-300"
-                      >
-                        Enviar Oferta
-                      </button>
-                    </div>
-                  )}
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-black dark:text-white mb-2">Introduce tu oferta</label>
+                  <input
+                    type="number"
+                    placeholder="Introduce tu oferta"
+                    className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-white/70"
+                    onChange={(e) =>
+                      setSelectedOffer({
+                        value: parseInt(e.target.value),
+                        label: "Oferta personalizada",
+                      })
+                    }
+                  />
                 </div>
               </div>
-            )}
-          </article>
-        </AnimatedOnScroll>
+              {selectedOffer && (
+                <div className="mt-6 space-y-4 border-t pt-4">
+                  <h3 className="text-lg font-semibold mb-2 flex items-center text-black dark:text-amarillo">
+                    <FaUser className="mr-2 text-amarillo" />
+                    Datos de contacto
+                  </h3>
+                  <div className="space-y-3">
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Email de contacto"
+                      className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-white/70"
+                    />
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Nombre completo"
+                      className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-white/70"
+                    />
+                    <input
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="Teléfono"
+                      className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-white/70"
+                    />
+                  </div>
+                </div>
+              )}
+              {selectedOffer && email && name && phone && (
+                <div className="flex justify-end gap-2 mt-4">
+                  <button
+                    onClick={() => setShowOfferPanel(false)}
+                    className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-all duration-300"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={() => {
+                      toast.success("Oferta enviada con éxito");
+                      setShowOfferPanel(false);
+                      setSelectedOffer(null);
+                      setEmail("");
+                      setName("");
+                      setPhone("");
+                    }}
+                    className="px-4 py-2 rounded-lg bg-amarillo text-black font-medium hover:bg-amarillo/90 transition-all duration-300"
+                  >
+                    Enviar Oferta
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

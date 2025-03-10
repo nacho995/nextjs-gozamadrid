@@ -25,11 +25,16 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
+    "/blog": [
+      "static/chunks/webpack.js",
+      "static/chunks/commons.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/blog.js"
+    ],
     "/vender/comprar": [
       "static/chunks/webpack.js",
       "static/chunks/commons.js",
       "static/chunks/main.js",
-      "static/chunks/vendors-node_modules_framer-motion_dist_es_index_mjs.js",
       "static/chunks/pages/vender/comprar.js"
     ]
   },
