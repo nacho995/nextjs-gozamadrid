@@ -5,134 +5,170 @@ import Layout from '@/components/layout';
 import DefaultPropertyContent from '@/components/propiedades/PropertyContent';
 
 // Función para obtener una propiedad por ID
-const fetchProperty = async (id) => {
-  console.log(`Intentando obtener propiedad con ID: ${id}`);
+const fetchProperty = async (id, source, isServer = false) => {
+  console.log(`Intentando obtener propiedad con ID: ${id}, Source: ${source}, IsServer: ${isServer}`);
   
-  // Lista de URLs a probar, en orden de preferencia
-  const urls = [
-    `/api/wordpress-proxy?path=products/${id}`, // Intentar primero con el proxy de WordPress
-    `https://goza-madrid.onrender.com/property/${id}`, // Luego con la URL directa al servidor
-    `/property/${id}` // Finalmente con la URL relativa
-  ];
+  // Determinar la URL correcta según el origen de la propiedad
+  let url;
   
-  let lastError = null;
-  
-  // Probar cada URL hasta que una funcione
-  for (const url of urls) {
-    try {
-      console.log(`Probando URL: ${url}`);
-      
-      const response = await fetch(url, {
-        headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0'
-        }
-      });
-      
-      console.log(`Respuesta de ${url}: ${response.status} ${response.statusText}`);
-      
-      if (!response.ok) {
-        console.log(`Error en respuesta de ${url}: ${response.status}`);
-        lastError = new Error(`Error ${response.status}: ${response.statusText}`);
-        continue; // Probar la siguiente URL
-      }
-      
-      // Verificar el tipo de contenido
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        console.log(`Tipo de contenido no válido: ${contentType}`);
-        lastError = new Error(`Tipo de contenido no válido: ${contentType}`);
-        continue; // Probar la siguiente URL
-      }
-      
-      // Intentar analizar la respuesta como JSON
-      const data = await response.json();
-      console.log(`Datos obtenidos correctamente de ${url}`);
-      
-      // Verificar que los datos sean válidos
-      if (!data) {
-        console.log(`Datos vacíos de ${url}`);
-        lastError = new Error('Datos vacíos');
-        continue; // Probar la siguiente URL
-      }
-      
-      // Procesar los datos según la fuente
-      const isWooCommerce = url.includes('wordpress-proxy');
-      
-      // Procesar las imágenes
-      let images = [];
-      if (data.images) {
-        if (Array.isArray(data.images)) {
-          images = data.images.map(img => typeof img === 'string' ? img : (img.src || img));
-        } else if (typeof data.images === 'string') {
-          images = [data.images];
-        }
-      } else if (data.image && data.image.src) {
-        images = [data.image.src];
-      }
-      
-      // Si no hay imágenes, usar una imagen por defecto
-      if (!images.length) {
-        images = ['/img/default-property-image.jpg'];
-      }
-      
-      // Devolver los datos procesados
-      return {
-        ...data,
-        id: data.id || data._id,
-        title: data.title || data.name || 'Propiedad sin título',
-        description: data.description || '',
-        price: data.price || 0,
-        location: data.location || data.address || 'Madrid',
-        bedrooms: data.bedrooms || 0,
-        bathrooms: data.bathrooms || 0,
-        size: data.size || data.area || 0,
-        images: images,
-        source: isWooCommerce ? 'woocommerce' : 'mongodb'
-      };
-    } catch (error) {
-      console.error(`Error al obtener propiedad de ${url}:`, error);
-      lastError = error;
-      // Continuar con la siguiente URL
+  if (source === 'mongodb') {
+    // Si es una propiedad de MongoDB
+    url = `https://goza-madrid.onrender.com/property/${id}`;
+  } else {
+    // Si es una propiedad de WooCommerce
+    if (isServer) {
+      // En el servidor necesitamos URL absoluta
+      url = `https://realestategozamadrid.com/wp-json/wc/v3/products/${id}?consumer_key=ck_75c5940bfae6a9dd63f1489da71e43b576999633&consumer_secret=cs_f194d11b41ca92cdd356145705fede711cd233e5`;
+    } else {
+      // En el cliente podemos usar URL relativa
+      url = `/api/wordpress-proxy?path=products/${id}`;
     }
   }
   
-  // Si llegamos aquí, ninguna URL funcionó
-  throw lastError || new Error('No se pudo obtener la propiedad');
+  console.log('Usando URL:', url);
+  
+  try {
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`Error al obtener la propiedad: ${response.status} ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    return { property: data, error: null };
+  } catch (error) {
+    console.error('Error al obtener propiedad:', error);
+    return { property: null, error: error.message };
+  }
 };
 
-export default function PropertyDetail() {
+// Añadir getStaticPaths para manejar rutas dinámicas
+export async function getStaticPaths() {
+  return {
+    paths: [], // No pre-renderizar ninguna ruta
+    fallback: 'blocking' // Generar nuevas páginas en el servidor según sea necesario
+  };
+}
+
+// Necesario junto con getStaticPaths
+export async function getStaticProps({ params }) {
+  try {
+    const id = params.id;
+    
+    // Intentar determinar el origen basado en el formato del ID
+    // Si contiene letras y tiene más de 10 caracteres, probablemente es de MongoDB
+    const source = /[a-zA-Z]/.test(id) && id.length > 10 ? 'mongodb' : 'woocommerce';
+    
+    // Obtener la propiedad, indicando que estamos en el servidor
+    const { property, error } = await fetchProperty(id, source, true);
+    
+    if (error) {
+      console.error(`Error al obtener la propiedad con ID ${id}:`, error);
+      return {
+        props: {
+          id,
+          error: `No se pudo cargar la propiedad: ${error}`,
+          source
+        },
+        revalidate: 60 // Reintentar después de 60 segundos
+      };
+    }
+    
+    if (!property) {
+      return {
+        props: {
+          id,
+          error: 'No se encontró la propiedad',
+          source
+        },
+        revalidate: 60 // Reintentar después de 60 segundos
+      };
+    }
+    
+    // Devolver los datos procesados
+    return {
+      props: {
+        id,
+        preloadedProperty: {
+          ...property,
+          id: property.id || property._id,
+          title: property.title || property.name || 'Propiedad sin título',
+          source
+        }
+      },
+      revalidate: 3600 // Revalidar cada hora
+    };
+  } catch (error) {
+    console.error(`Error en getStaticProps:`, error);
+    return {
+      props: {
+        id: params.id,
+        error: `No se pudo cargar la propiedad: ${error.message}`,
+        source: 'unknown'
+      },
+      revalidate: 60 // Reintentar después de 60 segundos
+    };
+  }
+}
+
+export default function PropertyDetail({ 
+  id: preloadedId, 
+  error: preloadedError,
+  preloadedProperty,
+  source: initialSource
+}) {
   const router = useRouter();
-  const { id } = router.query;
-  const [property, setProperty] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { id: routerId, source: routerSource } = router.query;
+  
+  const [loading, setLoading] = useState(!preloadedProperty);
+  const [property, setProperty] = useState(preloadedProperty || null);
+  const [error, setError] = useState(preloadedError || null);
+  
+  const propertyId = preloadedId || routerId;
+  const source = routerSource || initialSource || (propertyId && /[a-zA-Z]/.test(propertyId) && propertyId.length > 10 ? 'mongodb' : 'woocommerce');
 
   useEffect(() => {
-    if (!id) return;
-
+    // Si ya tenemos la propiedad precargada y no hay error, no cargar de nuevo
+    if (preloadedProperty && !preloadedError) {
+      console.log("Usando propiedad precargada:", preloadedProperty);
+      setProperty(preloadedProperty);
+      setLoading(false);
+      return;
+    }
+    
+    // Si router no está listo o no tenemos ID, no hacer nada
+    if (!router.isReady || !propertyId) return;
+    
     const loadProperty = async () => {
+      setLoading(true);
+      setError(null);
+      
       try {
-        setLoading(true);
-        setError(null);
+        console.log(`Cargando propiedad con ID: ${propertyId}, Source: ${source}`);
         
-        console.log(`Cargando propiedad con ID: ${id}`);
+        // Llamar a fetchProperty indicando que estamos en el cliente (isServer = false)
+        const { property: propertyData, error: fetchError } = await fetchProperty(propertyId, source, false);
         
-        const propertyData = await fetchProperty(id);
+        if (fetchError) {
+          throw new Error(fetchError);
+        }
+        
+        if (!propertyData) {
+          throw new Error('No se pudo obtener la información de la propiedad');
+        }
         
         console.log("Propiedad cargada correctamente:", propertyData);
         setProperty(propertyData);
       } catch (err) {
         console.error("Error al cargar la propiedad:", err);
-        setError(err.message || "Error al cargar la propiedad");
+        setError(err.message || 'Error al cargar la propiedad');
       } finally {
         setLoading(false);
       }
     };
-
+    
     loadProperty();
-  }, [id]);
+  }, [router.isReady, propertyId, source, preloadedProperty, preloadedError]);
 
   // Función para generar la descripción meta
   const generateMetaDescription = (property) => {
@@ -210,14 +246,14 @@ export default function PropertyDetail() {
         <title>{`${property.type || 'Propiedad'} en ${property.location || 'Madrid'} | Goza Madrid`}</title>
         <meta name="description" content={generateMetaDescription(property)} />
         <meta name="robots" content="index, follow" />
-        <link rel="canonical" href={`https://gozamadrid.com/property/${id}`} />
+        <link rel="canonical" href={`https://gozamadrid.com/property/${propertyId}`} />
 
         {/* Open Graph */}
         <meta property="og:type" content="website" />
         <meta property="og:title" content={`${property.type || 'Propiedad'} en ${property.location || 'Madrid'}`} />
         <meta property="og:description" content={generateMetaDescription(property)} />
         <meta property="og:image" content={property.images?.[0] || '/img/default-property-image.jpg'} />
-        <meta property="og:url" content={`https://gozamadrid.com/property/${id}`} />
+        <meta property="og:url" content={`https://gozamadrid.com/property/${propertyId}`} />
         <meta property="og:site_name" content="Goza Madrid Inmobiliaria" />
 
         {/* Twitter Card */}
@@ -233,7 +269,7 @@ export default function PropertyDetail() {
             "@type": "RealEstateListing",
             "name": `${property.type || 'Propiedad'} en ${property.location || 'Madrid'}`,
             "description": property.description,
-            "url": `https://gozamadrid.com/property/${id}`,
+            "url": `https://gozamadrid.com/property/${propertyId}`,
             "datePosted": property.createdAt,
             "image": property.images || ['/img/default-property.jpg'],
             "price": {

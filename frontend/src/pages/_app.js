@@ -54,7 +54,7 @@ function MyApp({ Component, pageProps }) {
         <title>Goza Madrid | Inmobiliaria de Lujo en Madrid</title>
         <meta name="description" content="Expertos en servicios inmobiliarios de lujo en Madrid. Compra, venta y alquiler de propiedades exclusivas. Asesoramiento personalizado para inversores nacionales e internacionales." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href={`${assetPrefix}/favicon.ico`} />
+        <link rel="icon" href={`${assetPrefix}/logo.png`} />
         
         {/* Metadatos básicos */}
         <meta charSet="UTF-8" />

@@ -7,7 +7,7 @@ const WP_API_URL = '/api/wordpress-proxy?endpoint=wp&path=posts';
 
 // Añadir esta función de utilidad en la parte superior del archivo
 const proxyImage = (url) => {
-  if (!url) return '/img/default-logo.jpg';
+  if (!url) return '/img/default-logo.png';
   
   // Si la URL ya es un proxy o una ruta local, devuélvela tal cual
   if (url.startsWith('/') && !url.startsWith('//')) return url;
@@ -247,7 +247,7 @@ export function transformWordPressPost(wpPost, cleanSlug) {
     }
     
     // Siempre utilizar el proxy para URLs externas
-    return imageUrl ? proxyImage(imageUrl) : '/img/default-logo.jpg';
+    return imageUrl ? proxyImage(imageUrl) : '/img/default-logo.png';
   };
 
   // Resto del código de transformación...

@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { HiMiniSquare3Stack3D } from "react-icons/hi2";
 import { MdMeetingRoom } from "react-icons/md";
-import { FaRestroom, FaBuilding, FaEuroSign, FaCalendarAlt, FaClock, FaHandshake, FaEnvelope, FaUser, FaTimes, FaMapMarkerAlt, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaRestroom, FaBuilding, FaEuroSign, FaCalendarAlt, FaClock, FaHandshake, FaEnvelope, FaUser, FaTimes, FaMapMarkerAlt, FaChevronLeft, FaChevronRight, FaRuler, FaBed, FaBath } from "react-icons/fa";
 import Link from "next/link";
 import Image from "next/image";
 import AnimatedOnScroll from "../AnimatedScroll";
@@ -16,6 +16,99 @@ import { sendPropertyEmail } from "@/pages/api";
 import Head from "next/head";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://goza-madrid.onrender.com';
+
+// Extraer datos de características de la propiedad
+const extractPropertyData = (property) => {
+  if (!property) {
+    console.error("No se puede extraer datos de una propiedad que es null");
+    return {
+      livingArea: 0,
+      bedrooms: 0,
+      bathrooms: 0,
+      floor: 0
+    };
+  }
+
+  try {
+    // Para propiedades de WordPress (WooCommerce)
+    if (property.source === 'woocommerce' || (!property.source && property.meta_data)) {
+      console.log("Extrayendo datos de propiedad WooCommerce");
+      
+      let livingArea = 0;
+      let bedrooms = 0;
+      let bathrooms = 0;
+      let floor = 0;
+      
+      // Buscar en meta_data los valores específicos
+      if (property.meta_data && Array.isArray(property.meta_data)) {
+        property.meta_data.forEach(meta => {
+          if (meta.key === 'living_area' && meta.value) {
+            livingArea = parseInt(meta.value, 10) || 0;
+          }
+          if (meta.key === 'bedrooms' && meta.value) {
+            bedrooms = parseInt(meta.value, 10) || 0;
+          }
+          if (meta.key === 'baños' && meta.value && meta.value !== "-1") {
+            bathrooms = parseInt(meta.value, 10) || 0;
+          }
+          if (meta.key === 'Planta' && meta.value) {
+            floor = parseInt(meta.value, 10) || 0;
+          }
+        });
+      }
+      
+      return {
+        livingArea,
+        bedrooms,
+        bathrooms,
+        floor
+      };
+    } 
+    // Para propiedades de MongoDB
+    else if (property.source === 'mongodb') {
+      console.log("Extrayendo datos de propiedad MongoDB");
+      return {
+        livingArea: property.size || 0,
+        bedrooms: property.bedrooms || 0,
+        bathrooms: property.bathrooms || 0,
+        floor: property.floor || 0
+      };
+    } 
+    // Fallback general
+    else {
+      console.log("Usando fallback para extracción de datos");
+      return {
+        livingArea: property.living_area || property.size || 0,
+        bedrooms: property.bedrooms || 0,
+        bathrooms: property.bathrooms || property.baños || 0,
+        floor: property.floor || property.Planta || 0
+      };
+    }
+  } catch (error) {
+    console.error("Error al extraer datos de la propiedad:", error);
+    return {
+      livingArea: 0,
+      bedrooms: 0,
+      bathrooms: 0,
+      floor: 0
+    };
+  }
+};
+
+// Función para obtener la URL de la imagen a través del proxy
+const getProxiedImageUrl = (originalUrl) => {
+  if (!originalUrl) {
+    return '/img/default-property-image.jpg';
+  }
+  
+  // Si la URL ya es local o ya es un proxy, devolverla tal cual
+  if (originalUrl.startsWith('/') || originalUrl.includes('/api/proxy-image')) {
+    return originalUrl;
+  }
+  
+  // Convertir a URL de proxy
+  return `/api/proxy-image?url=${encodeURIComponent(originalUrl)}`;
+};
 
 export default function DefaultPropertyContent({ property }) {
   console.log("Renderizando PropertyContent con propiedad:", property ? `ID: ${property.id || property._id}` : 'null');
@@ -34,6 +127,12 @@ export default function DefaultPropertyContent({ property }) {
   const [propertyImages, setPropertyImages] = useState([]);
   const [cleanedContent, setCleanedContent] = useState("");
   const [propertyUrl, setPropertyUrl] = useState("");
+  const [propertyData, setPropertyData] = useState({
+    livingArea: 0,
+    bedrooms: 0,
+    bathrooms: 0,
+    floor: 0
+  });
 
   // Set the current URL
   useEffect(() => {
@@ -41,6 +140,16 @@ export default function DefaultPropertyContent({ property }) {
       setPropertyUrl(window.location.href);
     }
   }, []);
+
+  // Extraer y procesar los datos de la propiedad
+  useEffect(() => {
+    if (property) {
+      // Extraer y configurar los datos de la propiedad
+      const data = extractPropertyData(property);
+      setPropertyData(data);
+      console.log("Datos extraídos de la propiedad:", data);
+    }
+  }, [property]);
 
   // Procesar las imágenes de la propiedad
   useEffect(() => {
@@ -52,18 +161,60 @@ export default function DefaultPropertyContent({ property }) {
     try {
       console.log("Procesando imágenes de propiedad:", property.title || property.name);
       
-      // Usar las imágenes proporcionadas o una imagen por defecto
-      const images = property.images && property.images.length > 0
-        ? property.images
-        : ['/img/default-property-image.jpg'];
+      let images = [];
+      const defaultImage = {
+        src: '/img/default-property-image.jpg',
+        alt: 'Imagen por defecto',
+        isDefault: true
+      };
+      
+      // Procesar imágenes de WordPress
+      if (property.source === 'woocommerce' || (!property.source && property.images)) {
+        if (property.images && Array.isArray(property.images)) {
+          // Convertir cada imagen a formato proxy
+          images = property.images.map(img => {
+            const imageUrl = img.src || (typeof img === 'string' ? img : '');
+            // Usar imagen proxy para evitar errores CORS y HTTP2
+            const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(imageUrl)}`;
+            
+            return {
+              src: proxyUrl,
+              alt: img.alt || `${property.name || 'Propiedad'} - Imagen`,
+              originalSrc: imageUrl
+            };
+          });
+        }
+      } 
+      // Procesar imágenes de MongoDB
+      else if (property.source === 'mongodb' && property.images) {
+        if (Array.isArray(property.images)) {
+          images = property.images.map(img => {
+            const imageUrl = typeof img === 'string' ? img : (img.src || img.url || '');
+            return {
+              src: imageUrl,
+              alt: `${property.title || 'Propiedad'} - Imagen`,
+              originalSrc: imageUrl
+            };
+          });
+        }
+      }
+      
+      // Si no hay imágenes, usar imagen por defecto
+      if (!images || images.length === 0) {
+        console.log("No se encontraron imágenes. Usando imagen por defecto");
+        images = [defaultImage];
+      }
       
       console.log("Imágenes procesadas:", images.length);
       setPropertyImages(images);
       
     } catch (error) {
       console.error("Error al procesar imágenes de la propiedad:", error);
-      // En caso de error, asegurar que al menos tengamos una imagen por defecto
-      setPropertyImages(['/img/default-property-image.jpg']);
+      setPropertyImages([{
+        src: '/img/default-property-image.jpg',
+        alt: 'Imagen por defecto',
+        isDefault: true
+      }]);
     }
   }, [property]);
 
@@ -133,23 +284,11 @@ export default function DefaultPropertyContent({ property }) {
     setCleanedContent(processedContent);
   }, [property]);
 
-  // Manejador de errores mejorado para imágenes
+  // Actualizar el manejo de errores de imágenes
   const handleImageError = (e) => {
-    console.log("Error al cargar imagen:", e.target.src);
-    
-    if (e.target.hasAttribute('data-error-handled')) {
-      return;
-    }
-    
-    e.target.setAttribute('data-error-handled', 'true');
-    
-    // Usar una imagen de respaldo local
-    e.target.src = "/img/default-property-image.jpg";
-    
-    // Agregar clases para indicar que es una imagen de respaldo
-    e.target.classList.add('fallback-image');
-    
-    console.log("Error al cargar imagen, usando imagen de respaldo");
+    console.error("Error al cargar imagen:", e.target.src);
+    e.target.src = '/img/default-property-image.jpg';
+    e.target.alt = 'Imagen por defecto (error al cargar)';
   };
 
   // Función para avanzar a la siguiente imagen
@@ -204,13 +343,17 @@ export default function DefaultPropertyContent({ property }) {
   console.log("Renderizando propiedad completa:", property.title || property.name);
   console.log("Imágenes disponibles:", propertyImages.length);
   
-  // Extraer datos de la propiedad
+  // Extraer datos básicos de la propiedad
   const title = property.title || property.name || 'Propiedad sin título';
-  const description = property.description || '';
-  const price = property.price || 'Consultar precio';
-  const bedrooms = property.bedrooms || 'Consultar';
-  const bathrooms = property.bathrooms || 'Consultar';
-  const area = property.size || property.area || 'Consultar';
+  const description = cleanedContent || property.description || '';
+  const price = property.price 
+    ? new Intl.NumberFormat('es-ES', {
+        style: 'currency',
+        currency: 'EUR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(property.price)
+    : 'Consultar precio';
   const location = property.location || 'Madrid, España';
   const propertyType = property.type || 'Propiedad';
 
@@ -219,22 +362,22 @@ export default function DefaultPropertyContent({ property }) {
       {/* Add Head with SEO meta tags */}
       <Head>
         <title>{title} | Propiedad en {location}</title>
-        <meta name="description" content={`${propertyType} en ${location}. ${bedrooms !== 'Consultar' ? bedrooms + ' habitaciones, ' : ''}${bathrooms !== 'Consultar' ? bathrooms + ' baños, ' : ''}${area !== 'Consultar' ? area + ' m². ' : ''}${cleanedContent?.replace(/<[^>]*>/g, '').substring(0, 120)}...`} />
+        <meta name="description" content={`${propertyType} en ${location}. ${propertyData.bedrooms > 0 ? propertyData.bedrooms + ' habitaciones, ' : ''}${propertyData.bathrooms > 0 ? propertyData.bathrooms + ' baños, ' : ''}${propertyData.livingArea > 0 ? propertyData.livingArea + ' m². ' : ''}${cleanedContent ? cleanedContent.replace(/<[^>]*>/g, '').substring(0, 120) : ''}...`} />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href={propertyUrl} />
         
         {/* OpenGraph tags for social sharing */}
         <meta property="og:title" content={`${title} | ${price}`} />
-        <meta property="og:description" content={`${propertyType} en ${location}. ${cleanedContent?.replace(/<[^>]*>/g, '').substring(0, 150)}...`} />
-        <meta property="og:image" content={propertyImages.length > 0 ? propertyImages[0].src : '/img/default-property.jpg'} />
+        <meta property="og:description" content={`${propertyType} en ${location}. ${cleanedContent ? cleanedContent.replace(/<[^>]*>/g, '').substring(0, 150) : ''}...`} />
+        <meta property="og:image" content={propertyImages && propertyImages.length > 0 ? propertyImages[0].src : '/img/default-property-image.jpg'} />
         <meta property="og:url" content={propertyUrl} />
         <meta property="og:type" content="website" />
         
         {/* Twitter Card data */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`${title} | ${price}`} />
-        <meta name="twitter:description" content={`${propertyType} en ${location}. ${cleanedContent?.replace(/<[^>]*>/g, '').substring(0, 120)}...`} />
-        <meta name="twitter:image" content={propertyImages.length > 0 ? propertyImages[0].src : '/img/default-property.jpg'} />
+        <meta name="twitter:description" content={`${propertyType} en ${location}. ${cleanedContent ? cleanedContent.replace(/<[^>]*>/g, '').substring(0, 120) : ''}...`} />
+        <meta name="twitter:image" content={propertyImages && propertyImages.length > 0 ? propertyImages[0].src : '/img/default-property-image.jpg'} />
         
         {/* Schema.org JSON-LD structured data */}
         <script 
@@ -257,11 +400,11 @@ export default function DefaultPropertyContent({ property }) {
               "price": typeof price === 'string' ? price.replace(/[^\d]/g, '') : price,
               "priceCurrency": "EUR"
             },
-            "numberOfRooms": bedrooms !== "Consultar" ? bedrooms : undefined,
-            "numberOfBathroomsTotal": bathrooms !== "Consultar" ? bathrooms : undefined,
+            "numberOfRooms": propertyData?.bedrooms !== 0 ? propertyData.bedrooms : undefined,
+            "numberOfBathroomsTotal": propertyData?.bathrooms !== 0 ? propertyData.bathrooms : undefined,
             "floorSize": {
               "@type": "QuantitativeValue",
-              "value": area !== "Consultar" ? area : undefined,
+              "value": propertyData?.livingArea !== 0 ? propertyData.livingArea : undefined,
               "unitCode": "MTK"  // Square meters according to UN/CEFACT
             }
           }) }}
@@ -279,46 +422,26 @@ export default function DefaultPropertyContent({ property }) {
             {/* Contenedor principal de imágenes */}
             <section aria-label="Galería de imágenes" className="flex flex-col mb-8">
               {/* Imagen principal arriba */}
-              <div className="w-full mb-4">
-                <div className="relative aspect-[4/3] md:aspect-[16/9] rounded-xl overflow-hidden shadow-lg">
-                  {propertyImages.length > 0 && propertyImages[current]?.src && (
-                    <>
-                      <img 
-                        src={propertyImages[current].src}
-                        alt={propertyImages[current].alt || `${title} - Imagen ${current + 1} de ${propertyImages.length}`}
-                        className="h-full w-full object-cover"
-                        data-original-src={propertyImages[current].originalSrc || ""}
-                        data-is-proxied={propertyImages[current].isProxied ? "true" : "false"}
-                        onError={handleImageError}
-                        itemProp="image"
-                      />
-                      
-                      {/* Botones de navegación mejorados */}
-                      <div className="absolute inset-0 flex items-center justify-between p-3">
-                        <button
-                          onClick={() => setCurrent((prev) => (prev === 0 ? propertyImages.length - 1 : prev - 1))}
-                          className="bg-black/50 hover:bg-black/70 text-white rounded-full p-3 backdrop-blur-sm transition-all duration-300"
-                          aria-label="Ver imagen anterior"
-                        >
-                          <FaChevronLeft className="text-xl" aria-hidden="true" />
-                        </button>
-                        
-                        <button
-                          onClick={() => setCurrent((prev) => (prev === propertyImages.length - 1 ? 0 : prev + 1))}
-                          className="bg-black/50 hover:bg-black/70 text-white rounded-full p-3 backdrop-blur-sm transition-all duration-300"
-                          aria-label="Ver imagen siguiente"
-                        >
-                          <FaChevronRight className="text-xl" aria-hidden="true" />
-                        </button>
-                      </div>
-                      
-                      {/* Indicador de posición para todos los tamaños de pantalla */}
-                      <div className="absolute bottom-3 right-3 bg-black/50 text-white text-sm px-3 py-1 rounded-full backdrop-blur-sm">
-                        {current + 1} / {propertyImages.length}
-                      </div>
-                    </>
-                  )}
-                </div>
+              <div className="relative w-full h-[60vh] mb-8 rounded-xl overflow-hidden shadow-xl">
+                {propertyImages && propertyImages.length > 0 && propertyImages[current] ? (
+                  <motion.img
+                    key={current}
+                    src={propertyImages[current].src}
+                    alt={propertyImages[current].alt}
+                    className="w-full h-full object-cover"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.5 }}
+                    onError={handleImageError}
+                  />
+                ) : (
+                  <img 
+                    src="/img/default-property-image.jpg" 
+                    alt="Imagen por defecto"
+                    className="w-full h-full object-cover"
+                  />
+                )}
               </div>
               
               {/* Miniaturas horizontales debajo - ocultas en móvil */}
@@ -360,35 +483,49 @@ export default function DefaultPropertyContent({ property }) {
                   <p className="text-lg text-gray-700 dark:text-white" itemProp="address">{location}</p>
                 </div>
                 
-                {/* Detalles de la propiedad con responsive */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                  <div className="bg-white dark:bg-gray-900 p-4 rounded-lg flex items-center gap-3">
-                    <MdMeetingRoom className="text-amarillo text-xl" />
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-amarillo">Habitaciones</p>
-                      <p className="font-medium text-black dark:text-white" itemProp="numberOfRooms">{bedrooms}</p>
-                    </div>
-                  </div>
-                  <div className="bg-white dark:bg-gray-900 p-4 rounded-lg flex items-center gap-3">
-                    <FaRestroom className="text-amarillo text-xl" />
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-amarillo">Baños</p>
-                      <p className="font-medium text-black dark:text-white" itemProp="numberOfBathroomsTotal">{bathrooms}</p>
-                    </div>
-                  </div>
-                  <div className="bg-white dark:bg-gray-900 p-4 rounded-lg flex items-center gap-3">
-                    <HiMiniSquare3Stack3D className="text-amarillo text-xl" />
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-amarillo">Área</p>
-                      <p className="font-medium text-black dark:text-white" itemProp="floorSize">{area} m²</p>
-                    </div>
-                  </div>
-                  <div className="bg-white dark:bg-gray-900 p-4 rounded-lg flex items-center gap-3">
-                    <FaBuilding className="text-amarillo text-xl" />
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-amarillo">Tipo</p>
-                      <p className="font-medium text-black dark:text-white">{propertyType}</p>
-                    </div>
+                {/* Mostrar las características de la propiedad */}
+                <div className="mb-8">
+                  <h2 className="text-2xl font-bold mb-4">Características</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {propertyData?.livingArea > 0 && (
+                      <div className="flex items-center gap-2 p-4 bg-gray-50 rounded-lg shadow">
+                        <FaRuler className="text-2xl text-primary" />
+                        <div>
+                          <p className="text-lg font-medium">{propertyData.livingArea} m²</p>
+                          <p className="text-sm text-gray-500">Superficie</p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {propertyData?.bedrooms > 0 && (
+                      <div className="flex items-center gap-2 p-4 bg-gray-50 rounded-lg shadow">
+                        <FaBed className="text-2xl text-primary" />
+                        <div>
+                          <p className="text-lg font-medium">{propertyData.bedrooms}</p>
+                          <p className="text-sm text-gray-500">Habitaciones</p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {propertyData?.bathrooms > 0 && (
+                      <div className="flex items-center gap-2 p-4 bg-gray-50 rounded-lg shadow">
+                        <FaBath className="text-2xl text-primary" />
+                        <div>
+                          <p className="text-lg font-medium">{propertyData.bathrooms}</p>
+                          <p className="text-sm text-gray-500">Baños</p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {propertyData?.floor > 0 && (
+                      <div className="flex items-center gap-2 p-4 bg-gray-50 rounded-lg shadow">
+                        <FaBuilding className="text-2xl text-primary" />
+                        <div>
+                          <p className="text-lg font-medium">{propertyData.floor}ª</p>
+                          <p className="text-sm text-gray-500">Planta</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
                 

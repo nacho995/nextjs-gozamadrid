@@ -77,8 +77,13 @@ const nextConfig = {
       // Añadir proxy para imágenes
       {
         source: '/api/image-proxy',
-        destination: '/api/image-proxy', // Esto asegura que el proxy de imágenes funcione correctamente
+        destination: '/api/image-proxy',
       },
+      // Asegurar que las rutas de property se manejen correctamente
+      {
+        source: '/property/:id',
+        destination: '/property/:id',
+      }
     ];
   },
   
