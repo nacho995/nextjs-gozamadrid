@@ -557,11 +557,12 @@ export async function getPropertyPosts() {
             _id: property._id,
             title: property.title || property.name || 'Propiedad sin título',
             description: property.description || '',
-            price: property.price || 0,
+            price: property.price || '0', // Mantener como string
             location: property.location || 'Madrid',
             bedrooms: property.bedrooms || 0,
             bathrooms: property.bathrooms || 0,
-            size: property.size || 0,
+            size: property.m2 || property.area || property.size || 0,
+            livingArea: property.m2 || property.area || property.size || 0,
             images: images,
             source: 'mongodb'
           };
@@ -733,7 +734,7 @@ export async function getPropertyById(id) {
         _id: data._id,
         title: data.title || data.name || 'Propiedad sin título',
         description: data.description || '',
-        price: data.price || 0,
+        price: data.price || '0', // Mantener como string
         location: data.location || 'Madrid',
         bedrooms: data.bedrooms || data.rooms || 0,
         bathrooms: data.bathrooms || data.wc || 0,
@@ -770,7 +771,7 @@ export async function getPropertyById(id) {
         id: data.id,
         title: data.name || 'Propiedad sin título',
         description: data.description || '',
-        price: data.price || 0,
+        price: data.price || '0', // Mantener como string
         location: data.address || 'Madrid',
         bedrooms: data.meta_data?.find(m => m.key === 'bedrooms')?.value || 0,
         bathrooms: data.meta_data?.find(m => m.key === 'bathrooms')?.value || 0,

@@ -67,11 +67,11 @@ export default async function handler(req, res) {
     const { path = 'products', ...queryParams } = req.query;
     
     // Obtener las claves de WooCommerce
-    const NEXT_PUBLIC_WOO_COMMERCE_KEY = process.env.NEXT_PUBLIC_NEXT_PUBLIC_WOO_COMMERCE_KEY;
-    const WOO_COMMERCE_SECRET = process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET;
+    const WOO_COMMERCE_KEY = process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY || 'ck_75c5940bfae6a9dd63f1489da71e43b576999633';
+    const WOO_COMMERCE_SECRET = process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET || 'cs_f194d11b41ca92cdd356145705fede711cd233e5';
     
     // Construir la URL base de WooCommerce
-    let wooCommerceUrl = `https://realestategozamadrid.com/wp-json/wc/v3/${path}?consumer_key=${NEXT_PUBLIC_WOO_COMMERCE_KEY}&consumer_secret=${WOO_COMMERCE_SECRET}`;
+    let wooCommerceUrl = `https://realestategozamadrid.com/wp-json/wc/v3/${path}?consumer_key=${WOO_COMMERCE_KEY}&consumer_secret=${WOO_COMMERCE_SECRET}`;
     
     // En producción, siempre intentamos obtener el máximo de elementos por página
     if (process.env.NODE_ENV === 'production' && !queryParams.per_page) {
