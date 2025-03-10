@@ -1,29 +1,33 @@
 /**
- * API Proxy para WordPress con reintentos
+ * API Proxy para WordPress con reintentos y obtención de todos los elementos en producción
  */
 
-const MAX_RETRIES = 3;
-const RETRY_DELAY = 1000; // 1 segundo entre reintentos
+const MAX_RETRIES = 5;
+const RETRY_DELAY = 2000; // 2 segundos entre reintentos
+const EXPONENTIAL_BACKOFF = true; // Nueva constante para backoff exponencial
+const MAX_PER_PAGE = 100; // Máximo permitido por WordPress
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-const fetchWithRetry = async (url, options, retries = MAX_RETRIES) => {
+const fetchWithRetry = async (url, options, retries = MAX_RETRIES, attempt = 1) => {
   try {
     const response = await fetch(url, options);
     
-    // Si es un error 503, intentar de nuevo
+    // Si es un error 503, intentar de nuevo con backoff exponencial
     if (response.status === 503 && retries > 0) {
-      console.log(`Reintentando petición (${retries} intentos restantes)...`);
-      await sleep(RETRY_DELAY);
-      return fetchWithRetry(url, options, retries - 1);
+      const delay = EXPONENTIAL_BACKOFF ? RETRY_DELAY * Math.pow(2, attempt - 1) : RETRY_DELAY;
+      console.log(`Reintentando petición (${retries} intentos restantes) después de ${delay}ms...`);
+      await sleep(delay);
+      return fetchWithRetry(url, options, retries - 1, attempt + 1);
     }
     
     return response;
   } catch (error) {
     if (retries > 0) {
-      console.log(`Error en la petición, reintentando (${retries} intentos restantes)...`);
-      await sleep(RETRY_DELAY);
-      return fetchWithRetry(url, options, retries - 1);
+      const delay = EXPONENTIAL_BACKOFF ? RETRY_DELAY * Math.pow(2, attempt - 1) : RETRY_DELAY;
+      console.log(`Error en la petición, reintentando (${retries} intentos restantes) después de ${delay}ms...`);
+      await sleep(delay);
+      return fetchWithRetry(url, options, retries - 1, attempt + 1);
     }
     throw error;
   }
@@ -42,15 +46,15 @@ export default async function handler(req, res) {
   let baseUrl = 'https://realestategozamadrid.com/wp-json/';
   let url = '';
   
+  // En producción, siempre intentamos obtener el máximo de elementos por página
+  if (process.env.NODE_ENV === 'production') {
+    queryParams.per_page = MAX_PER_PAGE;
+  }
+  
   if (endpoint === 'wp') {
     // API de WordPress (posts, etc.)
     baseUrl += 'wp/v2/';
     url = `${baseUrl}${path || 'posts'}`;
-    
-    // En producción, obtener todos los posts
-    if (process.env.NODE_ENV === 'production' && !queryParams.per_page) {
-      queryParams.per_page = 100; // Máximo número de posts por página
-    }
     
     // Añadir parámetros de consulta
     const queryString = Object.entries(queryParams)
@@ -64,11 +68,6 @@ export default async function handler(req, res) {
     // API de WooCommerce (productos)
     baseUrl += 'wc/v3/';
     url = `${baseUrl}${path || 'products'}`;
-    
-    // En producción, obtener todos los productos
-    if (process.env.NODE_ENV === 'production' && !queryParams.per_page) {
-      queryParams.per_page = 100; // Máximo número de productos por página
-    }
     
     // Añadir las claves de API
     url += `?consumer_key=${WC_CONSUMER_KEY}&consumer_secret=${WC_CONSUMER_SECRET}`;
@@ -87,8 +86,11 @@ export default async function handler(req, res) {
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Pragma': 'no-cache',
-        'Expires': '0'
-      }
+        'Expires': '0',
+        'User-Agent': 'Mozilla/5.0 (compatible; GozaMadridBot/1.0)',
+        'Accept': 'application/json'
+      },
+      timeout: 30000 // 30 segundos de timeout
     });
     
     console.log('WordPress Proxy - Respuesta recibida:', {
@@ -98,10 +100,8 @@ export default async function handler(req, res) {
     });
     
     // Obtener los headers para el total de páginas
-    const totalPages = response.headers.get('X-WP-TotalPages');
-    if (totalPages) {
-      res.setHeader('X-WP-TotalPages', totalPages);
-    }
+    const totalPages = parseInt(response.headers.get('X-WP-TotalPages') || '1');
+    const totalItems = parseInt(response.headers.get('X-WP-Total') || '0');
     
     // Si después de los reintentos aún tenemos un error
     if (!response.ok) {
@@ -128,40 +128,47 @@ export default async function handler(req, res) {
     }
     
     // Obtener los datos de la respuesta
-    const data = await response.json();
+    let data = await response.json();
+    data = Array.isArray(data) ? data : [data];
     
-    // En producción, si hay más páginas, obtenerlas todas
+    // En producción, obtener todas las páginas si hay más de una
     if (process.env.NODE_ENV === 'production' && totalPages > 1) {
-      const allData = [...(Array.isArray(data) ? data : [data])];
-      const remainingPages = Array.from({ length: totalPages - 1 }, (_, i) => i + 2);
+      console.log(`WordPress Proxy - Obteniendo todas las páginas (${totalPages} páginas en total)`);
       
-      // Obtener todas las páginas restantes en paralelo
-      const promises = remainingPages.map(page => {
+      const remainingPages = Array.from({ length: totalPages - 1 }, (_, i) => i + 2);
+      const pagePromises = remainingPages.map(async (page) => {
         const pageUrl = `${url}${url.includes('?') ? '&' : '?'}page=${page}`;
-        return fetchWithRetry(pageUrl, {
+        const pageResponse = await fetchWithRetry(pageUrl, {
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
             'Pragma': 'no-cache',
             'Expires': '0'
           }
-        }).then(r => r.json());
-      });
-      
-      const results = await Promise.all(promises);
-      results.forEach(pageData => {
-        if (Array.isArray(pageData)) {
-          allData.push(...pageData);
+        });
+        
+        if (!pageResponse.ok) {
+          console.error(`Error al obtener página ${page}: ${pageResponse.status}`);
+          return [];
         }
+        
+        const pageData = await pageResponse.json();
+        return Array.isArray(pageData) ? pageData : [pageData];
       });
       
-      console.log('WordPress Proxy - Datos totales recibidos:', 
-        Array.isArray(allData) ? `Array con ${allData.length} elementos` : 'Objeto singular');
-      
-      return res.status(200).json(allData);
+      const additionalData = await Promise.all(pagePromises);
+      additionalData.forEach(pageData => {
+        data.push(...pageData);
+      });
     }
     
-    console.log('WordPress Proxy - Datos recibidos:', 
-      Array.isArray(data) ? `Array con ${data.length} elementos` : 'Objeto singular');
+    console.log(`WordPress Proxy - Total de elementos obtenidos: ${data.length}`);
+    
+    if (totalItems) {
+      res.setHeader('X-WP-Total', totalItems);
+    }
+    if (totalPages) {
+      res.setHeader('X-WP-TotalPages', totalPages);
+    }
     
     // Devolver los datos
     return res.status(200).json(data);
