@@ -25,7 +25,10 @@ services:
     routes:
       - type: rewrite
         source: /api/wordpress-proxy
-        destination: https://realestategozamadrid.com/wp-json/wp/v2/:path*
+        destination: /api/wordpress-proxy
+      - type: rewrite
+        source: /api/woocommerce-proxy
+        destination: /api/woocommerce-proxy
       - type: rewrite
         source: /api/image-proxy
         destination: /api/image-proxy
