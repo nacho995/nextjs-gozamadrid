@@ -2,21 +2,28 @@
  * API Proxy para WordPress con reintentos y obtención de todos los elementos en producción
  */
 
-const MAX_RETRIES = 5;
-const RETRY_DELAY = 2000; // 2 segundos entre reintentos
-const EXPONENTIAL_BACKOFF = true; // Nueva constante para backoff exponencial
+const MAX_RETRIES = 8; // Aumentado de 5 a 8 reintentos
+const INITIAL_RETRY_DELAY = 1000; // 1 segundo inicial
+const MAX_RETRY_DELAY = 32000; // Máximo 32 segundos entre reintentos
+const EXPONENTIAL_BACKOFF = true;
 const MAX_PER_PAGE = 100; // Máximo permitido por WordPress
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 const fetchWithRetry = async (url, options, retries = MAX_RETRIES, attempt = 1) => {
   try {
-    const response = await fetch(url, options);
+    const response = await fetch(url, {
+      ...options,
+      timeout: 60000 // Aumentado a 60 segundos
+    });
     
-    // Si es un error 503, intentar de nuevo con backoff exponencial
-    if (response.status === 503 && retries > 0) {
-      const delay = EXPONENTIAL_BACKOFF ? RETRY_DELAY * Math.pow(2, attempt - 1) : RETRY_DELAY;
-      console.log(`Reintentando petición (${retries} intentos restantes) después de ${delay}ms...`);
+    // Si es un error 503 o 502, intentar de nuevo con backoff exponencial
+    if ((response.status === 503 || response.status === 502) && retries > 0) {
+      const delay = EXPONENTIAL_BACKOFF 
+        ? Math.min(INITIAL_RETRY_DELAY * Math.pow(2, attempt - 1), MAX_RETRY_DELAY)
+        : INITIAL_RETRY_DELAY;
+      
+      console.log(`[WordPress Proxy] Error ${response.status} - Reintentando (${retries} intentos restantes) después de ${delay}ms...`);
       await sleep(delay);
       return fetchWithRetry(url, options, retries - 1, attempt + 1);
     }
@@ -24,8 +31,11 @@ const fetchWithRetry = async (url, options, retries = MAX_RETRIES, attempt = 1) 
     return response;
   } catch (error) {
     if (retries > 0) {
-      const delay = EXPONENTIAL_BACKOFF ? RETRY_DELAY * Math.pow(2, attempt - 1) : RETRY_DELAY;
-      console.log(`Error en la petición, reintentando (${retries} intentos restantes) después de ${delay}ms...`);
+      const delay = EXPONENTIAL_BACKOFF 
+        ? Math.min(INITIAL_RETRY_DELAY * Math.pow(2, attempt - 1), MAX_RETRY_DELAY)
+        : INITIAL_RETRY_DELAY;
+      
+      console.log(`[WordPress Proxy] Error en la petición: ${error.message} - Reintentando (${retries} intentos restantes) después de ${delay}ms...`);
       await sleep(delay);
       return fetchWithRetry(url, options, retries - 1, attempt + 1);
     }
@@ -89,8 +99,7 @@ export default async function handler(req, res) {
         'Expires': '0',
         'User-Agent': 'Mozilla/5.0 (compatible; GozaMadridBot/1.0)',
         'Accept': 'application/json'
-      },
-      timeout: 30000 // 30 segundos de timeout
+      }
     });
     
     console.log('WordPress Proxy - Respuesta recibida:', {
@@ -105,11 +114,11 @@ export default async function handler(req, res) {
     
     // Si después de los reintentos aún tenemos un error
     if (!response.ok) {
-      console.error(`WordPress Proxy - Error en la respuesta: ${response.status} ${response.statusText}`);
+      console.error(`[WordPress Proxy] Error en la respuesta después de ${MAX_RETRIES} intentos: ${response.status} ${response.statusText}`);
       
-      // Si es un error 503, devolver una respuesta vacía en lugar de un error
-      if (response.status === 503) {
-        console.log('WordPress Proxy - Servicio no disponible, devolviendo array vacío');
+      // Si es un error 503 o 502, devolver una respuesta vacía
+      if (response.status === 503 || response.status === 502) {
+        console.log('[WordPress Proxy] Servicio no disponible después de todos los reintentos, devolviendo array vacío');
         return res.status(200).json([]);
       }
       
