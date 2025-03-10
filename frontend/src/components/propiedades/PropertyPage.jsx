@@ -212,13 +212,14 @@ const extractLocations = (properties) => {
 
 export default function PropertyPage() {
   const [properties, setProperties] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const router = useRouter();
   const [currentUrl, setCurrentUrl] = useState('');
+  const [initialized, setInitialized] = useState(false);
 
   // Para SEO - Metadatos dinámicos
   const [pageTitle, setPageTitle] = useState('Propiedades Inmobiliarias en Madrid | Goza Madrid');
@@ -261,7 +262,7 @@ export default function PropertyPage() {
         if (isWordPressProperty) {
           title = property.name || "Propiedad sin título";
         } else if (isMongoDBProperty) {
-          title = property.title || property.typeProperty || "Propiedad sin título";
+          title = property.title || property.name || "Propiedad sin título";
         }
 
         // Extraer la ubicación
@@ -270,9 +271,19 @@ export default function PropertyPage() {
         // Extraer precio
         let price = "Consultar";
         if (isWordPressProperty && property.price) {
-          price = property.price;
+          price = new Intl.NumberFormat('es-ES', {
+            style: 'currency',
+            currency: 'EUR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+          }).format(parseInt(property.price));
         } else if (isMongoDBProperty && property.price) {
-          price = property.price;
+          price = new Intl.NumberFormat('es-ES', {
+            style: 'currency',
+            currency: 'EUR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+          }).format(property.price);
         }
 
         // Obtener la imagen principal
@@ -327,79 +338,46 @@ export default function PropertyPage() {
     };
   };
 
-  // Modifica este useEffect para manejar mejor los estados
   useEffect(() => {
-    // Evitar procesamiento antes de que el router esté listo
-    if (!router.isReady) return;
-    
-    const fetchPropertiesData = async () => {
-      // Si ya estamos cargando, no hacer nada
-      if (loading) return;
-      
-      // Obtener el número de página actual de la URL
-      const pageToLoad = router.query.page ? parseInt(router.query.page) : 1;
-      
-      // Actualizar el estado de la página actual
-      setCurrentPage(pageToLoad);
-      
-      // Cargar los datos
-      setLoading(true);
-      setError(null); // Resetear el error al inicio de la carga
-      
+    const fetchProperties = async () => {
+      if (!router.isReady || initialized) return;
+
       try {
-        console.log('Iniciando carga de propiedades...');
-        // Usar getPropertyPosts en lugar del fetch directo
+        setLoading(true);
+        setError(null);
+        
         const data = await getPropertyPosts();
-        console.log('Propiedades cargadas:', data?.length || 0);
         
         if (!data || !Array.isArray(data)) {
           throw new Error('No se recibieron datos válidos de las propiedades');
         }
 
-        // Verificar si hay propiedades de MongoDB
         const mongoDBProperties = data.filter(p => p.source === 'mongodb');
-        console.log('Propiedades MongoDB:', mongoDBProperties.length);
-        
-        // Verificar si hay propiedades de WordPress
         const wordPressProperties = data.filter(p => p.source === 'woocommerce');
-        console.log('Propiedades WordPress:', wordPressProperties.length);
-        
-        // Reordenar las propiedades para mostrar primero las de MongoDB
         const reorderedData = [...mongoDBProperties, ...wordPressProperties];
         
-        // Como getPropertyPosts no incluye paginación, tenemos que implementarla manualmente
-        const startIndex = (pageToLoad - 1) * propertiesPerPage;
-        const endIndex = startIndex + propertiesPerPage;
-        const paginatedData = reorderedData.slice(startIndex, endIndex);
-        
-        setProperties(paginatedData);
-        
-        // Calcular el número total de páginas
-        const calculatedTotalPages = Math.ceil(reorderedData.length / propertiesPerPage);
-        setTotalPages(calculatedTotalPages);
+        setProperties(reorderedData);
+        setTotalPages(Math.ceil(reorderedData.length / propertiesPerPage));
+        setInitialized(true);
 
-        // Actualizar metadatos dinámicos para SEO
         if (reorderedData.length > 0) {
           const propertyTypes = extractPropertyTypes(reorderedData);
           const locations = extractLocations(reorderedData);
           
-          // Título dinámico basado en tipos y ubicaciones
           setPageTitle(`${propertyTypes.slice(0, 2).join(', ')} en ${locations.slice(0, 2).join(', ')} | Goza Madrid`);
-          
-          // Descripción dinámica
           setPageDescription(`Explore nuestra selección de ${propertyTypes.slice(0, 3).join(', ')} disponibles en ${locations.slice(0, 3).join(', ')}. Encuentre su propiedad ideal con Goza Madrid.`);
         }
-      } catch (error) {
-        console.error("Error detallado al cargar propiedades:", error);
-        setError("No pudimos cargar las propiedades. Por favor, intenta de nuevo más tarde.");
-        setProperties([]); // Asegurarnos de que properties es un array vacío en caso de error
+      } catch (err) {
+        console.error("Error al cargar propiedades:", err);
+        setError(err.message || "No pudimos cargar las propiedades. Por favor, intenta de nuevo más tarde.");
+        setProperties([]);
       } finally {
         setLoading(false);
       }
     };
-    
-    fetchPropertiesData();
-  }, [router.isReady, router.query.page]);
+
+    fetchProperties();
+  }, [router.isReady, propertiesPerPage, initialized]);
 
   // Filtrar propiedades asegurando que properties es un array
   const filteredProperties = Array.isArray(properties) 
@@ -422,34 +400,43 @@ export default function PropertyPage() {
     return filteredProperties;
   };
 
+  // Renderizar estado de carga
   if (loading) {
     return (
       <div className="container mx-auto py-12 flex justify-center items-center min-h-[60vh]">
-        <div className="bg-white/10 backdrop-blur-sm p-8 rounded-xl shadow-lg">
+        <div className="bg-white/10 backdrop-blur-sm p-8 rounded-xl shadow-lg text-center">
           <div className="flex flex-col items-center">
             <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-amber-400 mb-4"></div>
-            <p className="text-lg text-white" style={textShadowStyle}>Cargando propiedades...</p>
+            <p className="text-lg text-white mb-2">Cargando propiedades...</p>
+            <p className="text-sm text-gray-300">Esto puede tardar unos segundos</p>
           </div>
         </div>
       </div>
     );
   }
 
+  // Renderizar estado de error
   if (error) {
     return (
       <div className="container mx-auto py-12 flex justify-center items-center min-h-[60vh]">
-        <div className="bg-white/10 backdrop-blur-sm p-8 rounded-xl shadow-lg text-center max-w-xl">
-          <h2 className="text-2xl font-bold text-white mb-4" style={textShadowStyle}>
-            Algo salió mal
-          </h2>
-          <p className="text-white/90 mb-6" style={textShadowLightStyle}>{error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="bg-amber-400 hover:bg-amber-500 text-black font-bold py-2 px-6 rounded-lg transition-all duration-300"
-            aria-label="Reintentar cargar las propiedades"
-          >
-            Reintentar
-          </button>
+        <div className="bg-white/10 backdrop-blur-sm p-8 rounded-xl shadow-lg text-center max-w-md">
+          <div className="flex flex-col items-center">
+            <div className="text-red-500 text-6xl mb-4">
+              <i className="mdi mdi-alert-circle"></i>
+            </div>
+            <h3 className="text-xl text-white font-semibold mb-2">Algo salió mal</h3>
+            <p className="text-gray-300 mb-6">{error}</p>
+            <button 
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                setInitialized(false);
+              }}
+              className="px-6 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors"
+            >
+              Reintentar
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -561,44 +548,62 @@ export default function PropertyPage() {
                     // Extraer los datos según el tipo de propiedad
                     const id = isWordPressProperty ? property.id : property._id;
                     
-                    // Obtener el título de la propiedad
-                    let title = property.title || property.name || "Propiedad sin título";
+                    // Obtener el título de la propiedad (nombre de la calle para propiedades españolas)
+                    let title = "";
+                    if (isWordPressProperty) {
+                      title = property.name || "Propiedad sin título";
+                    } else if (isMongoDBProperty) {
+                      title = property.title || property.name || "Propiedad sin título";
+                    }
                     
                     // Obtener la descripción
                     const description = property.description || "Sin descripción disponible";
                     
                     // Obtener la ubicación
-                    const location = getCorrectLocation(property);
+                    const location = property.name || getCorrectLocation(property);
                     
                     // Extraer el precio y formatear sin decimales
                     let price = "Consultar";
-                    if (property.price) {
-                      const priceValue = typeof property.price === 'string' 
-                        ? parseFloat(property.price.replace(/[^\d.-]/g, '')) 
-                        : property.price;
-                      
-                      if (!isNaN(priceValue)) {
-                        price = new Intl.NumberFormat('es-ES', {
-                          style: 'currency',
-                          currency: 'EUR',
-                          minimumFractionDigits: 0,
-                          maximumFractionDigits: 0
-                        }).format(priceValue);
-                      }
+                    if (isWordPressProperty && property.price) {
+                      price = new Intl.NumberFormat('es-ES', {
+                        style: 'currency',
+                        currency: 'EUR',
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                      }).format(parseInt(property.price));
+                    } else if (isMongoDBProperty && property.price) {
+                      price = new Intl.NumberFormat('es-ES', {
+                        style: 'currency',
+                        currency: 'EUR',
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                      }).format(property.price);
                     }
                     
                     // Obtener características
-                    const bedrooms = isMongoDBProperty 
-                      ? property.bedrooms || 0 
-                      : (property.attributes?.find(attr => attr.name === 'Habitaciones')?.options?.[0] || 0);
-                    
-                    const bathrooms = isMongoDBProperty 
-                      ? property.bathrooms || 0 
-                      : (property.attributes?.find(attr => attr.name === 'Baños')?.options?.[0] || 0);
-                    
-                    const size = isMongoDBProperty 
-                      ? property.size || 0 
-                      : (property.attributes?.find(attr => attr.name === 'Metros')?.options?.[0] || 0);
+                    let bedrooms = 0;
+                    let bathrooms = 0;
+                    let size = 0;
+
+                    if (isWordPressProperty) {
+                      // Buscar en meta_data para WordPress
+                      if (property.meta_data) {
+                        const livingArea = property.meta_data.find(meta => meta.key === "living_area");
+                        const bedroomsData = property.meta_data.find(meta => meta.key === "bedrooms");
+                        const banosData = property.meta_data.find(meta => meta.key === "baños");
+                        
+                        size = livingArea ? parseInt(livingArea.value) || 0 : 0;
+                        bedrooms = bedroomsData ? parseInt(bedroomsData.value) || 0 : 0;
+                        bathrooms = banosData ? parseInt(banosData.value) || 0 : 0;
+
+                        // Si los baños son -1 (valor por defecto), establecer a 0
+                        if (bathrooms < 0) bathrooms = 0;
+                      }
+                    } else if (isMongoDBProperty) {
+                      bedrooms = property.bedrooms || 0;
+                      bathrooms = property.bathrooms || 0;
+                      size = property.size || 0;
+                    }
                     
                     // Obtener la imagen principal
                     let mainImage = '/img/default-property-image.jpg';
@@ -634,6 +639,26 @@ export default function PropertyPage() {
                         <Link
                           href={`/property/${id}`}
                           className="group block rounded-xl dark:text-white dark:hover:text-black bg-white dark:bg-slate-900 shadow hover:bg-gold dark:hover:shadow-xl dark:shadow-gray-700 dark:hover:shadow-gray-700 overflow-hidden ease-in-out duration-500"
+                          onClick={(e) => {
+                            // Prevenir la navegación por defecto y usar programática
+                            e.preventDefault();
+                            
+                            // Limpiar el ID y asegurarse que es una cadena
+                            const cleanId = String(id).trim();
+                            
+                            // Determinar el origen de la propiedad basado en el ID
+                            // Si contiene letras y tiene más de 10 caracteres, es de MongoDB
+                            const isMongoProperty = /[a-zA-Z]/.test(cleanId) && cleanId.length > 10;
+                            
+                            console.log(`Navegando a propiedad ${isMongoProperty ? 'MongoDB' : 'WooCommerce'}:`, cleanId);
+                            
+                            // Crear URL con el origen correcto
+                            const url = `/property/${cleanId}?source=${isMongoProperty ? 'mongodb' : 'woocommerce'}`;
+                            console.log('URL de navegación:', url);
+                            
+                            // Navegar programáticamente
+                            window.location.href = url;
+                          }}
                         >
                           <div className="relative">
                             <div className="relative w-full aspect-video">
@@ -673,9 +698,9 @@ export default function PropertyPage() {
                             </div>
 
                             <ul className="py-6 border-y border-slate-100 dark:border-gray-800 flex flex-wrap items-center list-none">
-                              {/* Superficie en lugar de tipo de propiedad */}
+                              {/* Superficie */}
                               <li className="flex items-center me-4 mb-2">
-                                <i className="mdi mdi-arrow-expand-all text-2xl me-2 text-amarillo"></i>
+                                <FaRulerCombined className="text-2xl me-2 text-amarillo" />
                                 <span>
                                   <span className="block text-xs text-gray-500 dark:text-gray-400">Superficie</span>
                                   {size} m²
@@ -683,7 +708,7 @@ export default function PropertyPage() {
                               </li>
                               {/* Habitaciones */}
                               <li className="flex items-center me-4 mb-2">
-                                <i className="mdi mdi-bed text-2xl me-2 text-amarillo"></i>
+                                <FaBed className="text-2xl me-2 text-amarillo" />
                                 <span>
                                   <span className="block text-xs text-gray-500 dark:text-gray-400">Habitaciones</span>
                                   {bedrooms}
@@ -691,7 +716,7 @@ export default function PropertyPage() {
                               </li>
                               {/* Baños */}
                               <li className="flex items-center me-4 mb-2">
-                                <i className="mdi mdi-shower text-2xl me-2 text-amarillo"></i>
+                                <FaBath className="text-2xl me-2 text-amarillo" />
                                 <span>
                                   <span className="block text-xs text-gray-500 dark:text-gray-400">Baños</span>
                                   {bathrooms}
@@ -701,8 +726,9 @@ export default function PropertyPage() {
 
                             <ul className="pt-6 flex justify-between items-center list-none">
                               <li>
-                                <span>Precio</span>
-                                <p className="text-lg font-medium">
+                                <span className="text-gray-500 dark:text-gray-400">Precio</span>
+                                <p className="text-lg font-medium flex items-center">
+                                  <FaEuroSign className="text-amarillo mr-1" />
                                   {price}
                                 </p>
                               </li>

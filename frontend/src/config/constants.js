@@ -18,7 +18,7 @@ export const WP_FETCH_OPTIONS = {
 export const DEFAULT_IMAGES = {
   BLOG: '/images/default-blog-image.jpg',
   LOGO: '/images/logo.png',
-  FAVICON: '/favicon.ico'
+  FAVICON: '/logo.png'
 };
 
 // Timeouts y reintentos
