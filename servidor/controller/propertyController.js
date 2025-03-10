@@ -254,106 +254,52 @@ const propertyController = {
     // Crear una nueva propiedad
     createProperty: async (req, res) => {
         try {
-            console.log('Datos recibidos para crear propiedad:', JSON.stringify(req.body, null, 2));
-            console.log('Archivos recibidos:', req.files);
+            const propertyData = req.body;
             
-            // Crear un objeto con los campos necesarios
-            const propertyData = {
-                title: req.body.title,
-                description: req.body.description,
-                price: req.body.price,
-                location: req.body.location,
-                bedrooms: req.body.bedrooms,
-                bathrooms: req.body.bathrooms,
-                area: req.body.area,
-                propertyType: req.body.propertyType,
-                features: req.body.features || [],
-                address: req.body.address || req.body.location,
-                rooms: req.body.bedrooms,
-                wc: req.body.bathrooms,
-                piso: req.body.piso || '1',
-                m2: req.body.area,
-                priceM2: req.body.priceM2 || '',
-                images: [] // Inicializar el array de imágenes
-            };
-
-            // Procesar imágenes del cuerpo de la solicitud
-            if (req.body.images && Array.isArray(req.body.images)) {
-                propertyData.images = req.body.images.map(img => ({
-                    src: img.src || img,
-                    alt: img.alt || 'Imagen de propiedad'
-                })).filter(img => img.src);
-            }
-            
-            // Procesar imágenes subidas como archivos
+            // Procesar imágenes si se han subido
             if (req.files && req.files.length > 0) {
-                const fileImages = req.files.map(file => ({
+                propertyData.images = req.files.map(file => ({
                     src: file.path,
-                    alt: 'Imagen de propiedad',
-                    public_id: file.filename
+                    alt: propertyData.title || 'Imagen de propiedad'
                 }));
-                propertyData.images = [...propertyData.images, ...fileImages];
             }
-
-            console.log('Datos finales de la propiedad:', JSON.stringify(propertyData, null, 2));
             
             const newProperty = new Property(propertyData);
-            const savedProperty = await newProperty.save();
+            await newProperty.save();
             
-            console.log('Propiedad guardada:', JSON.stringify(savedProperty, null, 2));
-            
-            res.status(201).json(savedProperty);
+            res.status(201).json({
+                message: 'Propiedad creada con éxito',
+                property: newProperty
+            });
         } catch (error) {
             console.error('Error al crear propiedad:', error);
             res.status(500).json({ message: 'Error al crear propiedad', error: error.message });
         }
     },
 
-    // Actualizar una propiedad
+    // Actualizar una propiedad existente
     updateProperty: async (req, res) => {
         try {
-            console.log('Actualizando propiedad:', req.params.id);
-            console.log('Datos recibidos:', req.body);
-            console.log('Archivos recibidos:', req.files);
-            
-            // Preparar el objeto de actualización
-            const updateData = { ...req.body };
+            const propertyData = req.body;
             
             // Procesar imágenes si se han subido
             if (req.files && req.files.length > 0) {
-                // Obtener la propiedad actual para añadir a las imágenes existentes
-                const property = await Property.findById(req.params.id);
-                const existingImages = property.images || [];
-                
-                // Procesar las nuevas imágenes desde Cloudinary
-                const newImages = req.files.map(file => {
-                    return {
-                        src: file.path, // URL de Cloudinary
-                        alt: req.body.title || 'Imagen de propiedad',
-                        public_id: file.filename // ID público de Cloudinary
-                    };
-                });
-                
-                // Combinar imágenes existentes con nuevas
-                updateData.images = [...existingImages, ...newImages];
-                console.log('Imágenes actualizadas:', updateData.images);
-            }
-            
-            // Si se enviaron URLs de imágenes en el cuerpo (para imágenes externas)
-            if (req.body.imageUrls && Array.isArray(req.body.imageUrls)) {
-                const existingImages = updateData.images || [];
-                const externalImages = req.body.imageUrls.map((url, index) => ({
-                    src: url,
-                    alt: (req.body.imageAlts && req.body.imageAlts[index]) || 'Imagen de propiedad'
+                const newImages = req.files.map(file => ({
+                    src: file.path,
+                    alt: propertyData.title || 'Imagen de propiedad'
                 }));
                 
-                updateData.images = [...existingImages, ...externalImages];
+                // Si ya hay imágenes, añadir las nuevas
+                if (propertyData.images && Array.isArray(propertyData.images)) {
+                    propertyData.images = [...propertyData.images, ...newImages];
+                } else {
+                    propertyData.images = newImages;
+                }
             }
             
-            // Actualizar la propiedad
             const updatedProperty = await Property.findByIdAndUpdate(
                 req.params.id,
-                updateData,
+                propertyData,
                 { new: true, runValidators: true }
             );
             
@@ -361,7 +307,10 @@ const propertyController = {
                 return res.status(404).json({ message: 'Propiedad no encontrada' });
             }
             
-            res.status(200).json(updatedProperty);
+            res.status(200).json({
+                message: 'Propiedad actualizada con éxito',
+                property: updatedProperty
+            });
         } catch (error) {
             console.error('Error al actualizar propiedad:', error);
             res.status(500).json({ message: 'Error al actualizar propiedad', error: error.message });
