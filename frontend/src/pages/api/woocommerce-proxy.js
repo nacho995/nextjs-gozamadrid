@@ -2,18 +2,19 @@
  * API Proxy para WooCommerce con reintentos y obtención de todos los elementos en producción
  */
 
-const MAX_RETRIES = 8; // Aumentado de 5 a 8 reintentos
-const INITIAL_RETRY_DELAY = 1000; // 1 segundo inicial
-const MAX_RETRY_DELAY = 32000; // Máximo 32 segundos entre reintentos
+const MAX_RETRIES = 10; // Aumentado a 10 reintentos
+const INITIAL_RETRY_DELAY = 2000; // 2 segundos inicial
+const MAX_RETRY_DELAY = 60000; // Máximo 60 segundos entre reintentos
 const EXPONENTIAL_BACKOFF = true;
 const MAX_PER_PAGE = 100; // Máximo permitido por WooCommerce
+const TIMEOUT = 180000; // 3 minutos timeout
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 const fetchWithRetry = async (url, options, retries = MAX_RETRIES, attempt = 1) => {
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 segundos timeout
+    const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
 
     const response = await fetch(url, {
       ...options,
@@ -31,7 +32,7 @@ const fetchWithRetry = async (url, options, retries = MAX_RETRIES, attempt = 1) 
     clearTimeout(timeoutId);
     
     // Si es un error 503 o 502, intentar de nuevo con backoff exponencial
-    if ((response.status === 503 || response.status === 502) && retries > 0) {
+    if ((response.status === 503 || response.status === 502 || response.status === 504 || response.status === 404) && retries > 0) {
       const delay = EXPONENTIAL_BACKOFF 
         ? Math.min(INITIAL_RETRY_DELAY * Math.pow(2, attempt - 1), MAX_RETRY_DELAY)
         : INITIAL_RETRY_DELAY;
@@ -45,6 +46,15 @@ const fetchWithRetry = async (url, options, retries = MAX_RETRIES, attempt = 1) 
   } catch (error) {
     if (error.name === 'AbortError') {
       console.error('[WooCommerce Proxy] Timeout - La solicitud tardó demasiado');
+      if (retries > 0) {
+        const delay = EXPONENTIAL_BACKOFF 
+          ? Math.min(INITIAL_RETRY_DELAY * Math.pow(2, attempt - 1), MAX_RETRY_DELAY)
+          : INITIAL_RETRY_DELAY;
+        
+        console.log(`[WooCommerce Proxy] Reintentando después del timeout después de ${delay}ms...`);
+        await sleep(delay);
+        return fetchWithRetry(url, options, retries - 1, attempt + 1);
+      }
       throw new Error('Timeout - La solicitud tardó demasiado');
     }
 

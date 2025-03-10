@@ -107,11 +107,12 @@ export const getBlogPostsFromServer = async (page = 1, perPage = 9) => {
 };
 
 /**
- * Obtiene un post específico por su slug
+ * Obtiene un post específico por su slug con reintentos
  * @param {string} slug - Slug del post
+ * @param {number} retries - Número de reintentos (por defecto 5)
  * @returns {Promise} - Promesa con el post
  */
-export async function getBlogPostBySlug(slug) {
+export async function getBlogPostBySlug(slug, retries = 5) {
   try {
     console.log(`WP API: Buscando blog con slug "${slug}"`);
     
@@ -135,13 +136,29 @@ export async function getBlogPostBySlug(slug) {
     
     console.log(`WP API: URL de petición (${isServer ? 'servidor' : 'cliente'}): ${url}`);
     
+    // Añadir timeout para evitar que la petición se quede colgada
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 segundos timeout
+    
     const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
       },
       cache: 'no-store', // Evitar caché en Next.js
+      signal: controller.signal
     });
+    
+    clearTimeout(timeoutId);
+    
+    // Si obtenemos un error 503, intentar de nuevo después de un retraso
+    if (response.status === 503 && retries > 0) {
+      console.log(`Error 503 al obtener blog con slug ${slug}. Reintentando en 5 segundos... (${retries} intentos restantes)`);
+      await new Promise(resolve => setTimeout(resolve, 5000)); // Esperar 5 segundos
+      return getBlogPostBySlug(slug, retries - 1);
+    }
     
     if (!response.ok) {
       console.error(`Error al obtener el post: ${response.status} ${response.statusText}`);
@@ -161,39 +178,22 @@ export async function getBlogPostBySlug(slug) {
       post.content = safeRenderValue(post.content);
       post.excerpt = safeRenderValue(post.excerpt);
       
-      // Obtener la imagen destacada correctamente
-      if (post._embedded && post._embedded['wp:featuredmedia'] && post._embedded['wp:featuredmedia'][0]) {
-        const featuredMedia = post._embedded['wp:featuredmedia'][0];
-        
-        // Añadir un campo de imagen más accesible usando la API simple
-        if (featuredMedia.source_url) {
-          post.imageUrl = `/api?url=${encodeURIComponent(featuredMedia.source_url)}`;
-        }
-      }
-      
-      // Procesar contenido para usar el proxy en todas las imágenes
-      if (post.content && post.content.rendered) {
-        // Reemplazar todas las imágenes en el contenido HTML para usar el proxy
-        post.content.rendered = post.content.rendered.replace(
-          /<img(.+?)src="([^"]+)"(.+?)>/g,
-          (match, prefix, src, suffix) => {
-            // No procesar imágenes que ya son locales
-            if (src.startsWith('/') || src.startsWith('data:')) {
-              return match;
-            }
-            return `<img${prefix}src="/api?url=${encodeURIComponent(src)}"${suffix}>`;
-          }
-        );
-      }
-      
       return post;
+    } else {
+      console.log(`WP API: No se encontró blog de WordPress con slug: ${slug}`);
+      return null;
+    }
+  } catch (error) {
+    console.error(`Error en getBlogPostBySlug:`, error);
+    
+    // Si es un error de timeout o de red y aún tenemos reintentos, intentar de nuevo
+    if ((error.name === 'AbortError' || error.name === 'TypeError') && retries > 0) {
+      console.log(`Error de red al obtener blog con slug ${slug}. Reintentando en 5 segundos... (${retries} intentos restantes)`);
+      await new Promise(resolve => setTimeout(resolve, 5000)); // Esperar 5 segundos
+      return getBlogPostBySlug(slug, retries - 1);
     }
     
-    console.log(`WP API: No se encontró ningún post con slug "${slug}"`);
-    return null;
-  } catch (error) {
-    console.error('Error en getBlogPostBySlug:', error);
-    return null;
+    throw error;
   }
 }
 

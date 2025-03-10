@@ -2,12 +2,12 @@
  * API Proxy para WordPress con reintentos y obtención de todos los elementos en producción
  */
 
-const MAX_RETRIES = 8;
-const INITIAL_RETRY_DELAY = 1000;
-const MAX_RETRY_DELAY = 32000;
+const MAX_RETRIES = 10;
+const INITIAL_RETRY_DELAY = 2000;
+const MAX_RETRY_DELAY = 60000;
 const EXPONENTIAL_BACKOFF = true;
 const MAX_PER_PAGE = 100;
-const TIMEOUT = process.env.NODE_ENV === 'production' ? 120000 : 60000;
+const TIMEOUT = process.env.NODE_ENV === 'production' ? 180000 : 120000; // 3 minutos en producción, 2 minutos en desarrollo
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 

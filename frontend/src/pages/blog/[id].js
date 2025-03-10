@@ -719,14 +719,28 @@ export async function getStaticProps(context) {
     
     if (isMongoId) {
       // MongoDB
-      const blog = await getBlogById(id);
-      return { 
-        props: { 
-          initialBlog: blog || null, 
-          id, 
-          isWordPress: false
-        }
-      };
+      try {
+        const blog = await getBlogById(id);
+        return { 
+          props: { 
+            initialBlog: blog || null, 
+            id, 
+            isWordPress: false
+          },
+          revalidate: 3600 // Revalidar cada hora
+        };
+      } catch (error) {
+        console.error(`Error al obtener blog de MongoDB con ID ${id}:`, error);
+        return { 
+          props: { 
+            initialBlog: null, 
+            id, 
+            isWordPress: false,
+            error: error.message
+          },
+          revalidate: 300 // Revalidar cada 5 minutos en caso de error
+        };
+      }
     } else {
       // WordPress
       // Extraer el slug real
@@ -735,39 +749,70 @@ export async function getStaticProps(context) {
       
       console.log("Static: Obteniendo blog de WordPress con slug:", slug);
       
-      // Obtener datos de WordPress
-      const wpPost = await getBlogPostBySlug(slug);
-      if (wpPost) {
-        // Transformar a formato común
-        const blogData = transformWordPressPost(wpPost, slug);
-        return { 
-          props: { 
-            initialBlog: blogData, 
-            id, 
-            isWordPress: true
-          }
-        };
-      } else {
-        console.log("Static: No se encontró blog de WordPress con slug:", slug);
+      try {
+        // Obtener datos de WordPress
+        const wpPost = await getBlogPostBySlug(slug);
+        
+        if (wpPost) {
+          // Transformar a formato común
+          const blogData = transformWordPressPost(wpPost, slug);
+          return { 
+            props: { 
+              initialBlog: blogData, 
+              id, 
+              isWordPress: true
+            },
+            revalidate: 3600 // Revalidar cada hora
+          };
+        } else {
+          console.log(`No se encontró blog de WordPress con slug: ${slug}`);
+          return { 
+            props: { 
+              initialBlog: null, 
+              id, 
+              isWordPress: true,
+              error: `No se encontró el blog con slug: ${slug}`
+            },
+            revalidate: 300 // Revalidar cada 5 minutos
+          };
+        }
+      } catch (error) {
+        // Si es un error 503, configurar revalidación rápida
+        if (error.message && error.message.includes('503')) {
+          console.log(`Error 503 al obtener blog de WordPress con slug ${slug}. Configurando revalidación rápida.`);
+          return { 
+            props: { 
+              initialBlog: null, 
+              id, 
+              isWordPress: true,
+              error: null // No mostrar error al usuario
+            },
+            revalidate: 60 // Revalidar después de 1 minuto
+          };
+        }
+        
+        console.error(`Error al obtener blog de WordPress con slug ${slug}:`, error);
         return { 
           props: { 
             initialBlog: null, 
             id, 
-            isWordPress: true, 
-            error: "No se encontró el blog en WordPress"
-          }
+            isWordPress: true,
+            error: `Error al cargar el blog: ${error.message}`
+          },
+          revalidate: 300 // Revalidar cada 5 minutos en caso de error
         };
       }
     }
   } catch (error) {
-    console.error("Error en Static Props:", error);
+    console.error('Error general en getStaticProps:', error);
     return { 
       props: { 
         initialBlog: null, 
         id, 
-        isWordPress: false, 
-        error: error.message 
-      }
+        isWordPress: false,
+        error: `Error al cargar el blog: ${error.message}`
+      },
+      revalidate: 300 // Revalidar cada 5 minutos en caso de error
     };
   }
 }
