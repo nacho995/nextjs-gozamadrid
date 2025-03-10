@@ -1,11 +1,12 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+// Exportar solo las funciones de utilidad sin crear una ruta API
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
 // Definir las claves de API de WooCommerce
-const WC_CONSUMER_KEY = 'ck_75c5940bfae6a9dd63f1489da71e43b576999633';
-const WC_CONSUMER_SECRET = 'cs_f194d11b41ca92cdd356145705fede711cd233e5';
+export const WC_CONSUMER_KEY = process.env.NEXT_PUBLIC_NEXT_PUBLIC_WOO_COMMERCE_KEY;
+export const WC_CONSUMER_SECRET = process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET;
 
 // Función auxiliar para manejar errores
-const handleApiError = (error, functionName) => {
+export const handleApiError = (error, functionName) => {
   console.error(`Error en ${functionName}:`, error);
   if (error.response) {
     // El servidor respondió con un código de error
