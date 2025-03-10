@@ -68,10 +68,10 @@ const extractPropertyData = (property) => {
     else if (property.source === 'mongodb') {
       console.log("Extrayendo datos de propiedad MongoDB");
       return {
-        livingArea: property.size || 0,
+        livingArea: property.m2 || property.area || property.livingArea || property.size || 0,
         bedrooms: property.bedrooms || 0,
         bathrooms: property.bathrooms || 0,
-        floor: property.floor || 0
+        floor: property.piso || property.floor || 0
       };
     } 
     // Fallback general
@@ -303,7 +303,17 @@ export default function DefaultPropertyContent({ property }) {
 
   // Función para generar rangos de ofertas
   const generateOfferRanges = (price) => {
-    const numericPrice = parseFloat(price);
+    // Si el precio es una cadena formateada (ej: "350.000 €"), extraer el valor numérico
+    let numericPrice;
+    
+    if (typeof price === 'string') {
+      // Eliminar símbolos de moneda, puntos y espacios
+      const cleanPrice = price.replace(/[€$.\s]/g, '').replace(',', '.');
+      numericPrice = parseFloat(cleanPrice);
+    } else {
+      numericPrice = price;
+    }
+    
     if (isNaN(numericPrice) || numericPrice <= 0) return [];
     
     const ranges = [];
@@ -346,14 +356,50 @@ export default function DefaultPropertyContent({ property }) {
   // Extraer datos básicos de la propiedad
   const title = property.title || property.name || 'Propiedad sin título';
   const description = cleanedContent || property.description || '';
-  const price = property.price 
-    ? new Intl.NumberFormat('es-ES', {
+  
+  // Formatear el precio correctamente
+  let priceValue = property.price;
+  let formattedPrice = 'Consultar precio';
+  
+  if (priceValue) {
+    // Si es un string, intentar convertirlo a número para formatear
+    if (typeof priceValue === 'string') {
+      // Eliminar cualquier carácter que no sea número o punto
+      const cleanPrice = priceValue.replace(/[^\d.-]/g, '');
+      
+      // Convertir a número
+      const numericPrice = parseFloat(cleanPrice);
+      
+      if (!isNaN(numericPrice)) {
+        // Si el precio parece ser un precio reducido (menos de 10000), multiplicarlo por 1000
+        // Esto es para corregir casos donde el precio se guarda como "350" en lugar de "350000"
+        const adjustedPrice = numericPrice < 10000 ? numericPrice * 1000 : numericPrice;
+        
+        // Formatear con separador de miles
+        formattedPrice = new Intl.NumberFormat('es-ES', {
+          style: 'currency',
+          currency: 'EUR',
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        }).format(adjustedPrice);
+      } else {
+        // Si no se puede convertir a número, usar el string original
+        formattedPrice = priceValue;
+      }
+    } else if (typeof priceValue === 'number') {
+      // Si ya es un número, formatear directamente
+      // Si el precio parece ser un precio reducido (menos de 10000), multiplicarlo por 1000
+      const adjustedPrice = priceValue < 10000 ? priceValue * 1000 : priceValue;
+      
+      formattedPrice = new Intl.NumberFormat('es-ES', {
         style: 'currency',
         currency: 'EUR',
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
-      }).format(property.price)
-    : 'Consultar precio';
+      }).format(adjustedPrice);
+    }
+  }
+  
   const location = property.location || 'Madrid, España';
   const propertyType = property.type || 'Propiedad';
 
@@ -367,7 +413,7 @@ export default function DefaultPropertyContent({ property }) {
         <link rel="canonical" href={propertyUrl} />
         
         {/* OpenGraph tags for social sharing */}
-        <meta property="og:title" content={`${title} | ${price}`} />
+        <meta property="og:title" content={`${title} | ${formattedPrice}`} />
         <meta property="og:description" content={`${propertyType} en ${location}. ${cleanedContent ? cleanedContent.replace(/<[^>]*>/g, '').substring(0, 150) : ''}...`} />
         <meta property="og:image" content={propertyImages && propertyImages.length > 0 ? propertyImages[0].src : '/img/default-property-image.jpg'} />
         <meta property="og:url" content={propertyUrl} />
@@ -375,7 +421,7 @@ export default function DefaultPropertyContent({ property }) {
         
         {/* Twitter Card data */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${title} | ${price}`} />
+        <meta name="twitter:title" content={`${title} | ${formattedPrice}`} />
         <meta name="twitter:description" content={`${propertyType} en ${location}. ${cleanedContent ? cleanedContent.replace(/<[^>]*>/g, '').substring(0, 120) : ''}...`} />
         <meta name="twitter:image" content={propertyImages && propertyImages.length > 0 ? propertyImages[0].src : '/img/default-property-image.jpg'} />
         
@@ -397,7 +443,7 @@ export default function DefaultPropertyContent({ property }) {
             },
             "offers": {
               "@type": "Offer",
-              "price": typeof price === 'string' ? price.replace(/[^\d]/g, '') : price,
+              "price": typeof formattedPrice === 'string' ? formattedPrice.replace(/[^\d]/g, '') : formattedPrice,
               "priceCurrency": "EUR"
             },
             "numberOfRooms": propertyData?.bedrooms !== 0 ? propertyData.bedrooms : undefined,
@@ -532,7 +578,7 @@ export default function DefaultPropertyContent({ property }) {
                 {/* Precio con responsive */}
                 <div className="flex items-center gap-2 mt-4">
                   <FaEuroSign className="text-amber-400 text-lg sm:text-xl" />
-                  <p className="text-sm sm:text-base md:text-lg font-semibold text-black dark:text-white" itemProp="offers">{price}</p>
+                  <p className="text-sm sm:text-base md:text-lg font-semibold text-black dark:text-white" itemProp="offers">{formattedPrice}</p>
                 </div>
               </div>
 
@@ -746,7 +792,7 @@ export default function DefaultPropertyContent({ property }) {
                     <div>
                       <label className="block text-sm font-medium text-black dark:text-white mb-2">Selecciona tu oferta</label>
                       <div className="space-y-2">
-                        {generateOfferRanges(price).map((range, index) => (
+                        {generateOfferRanges(formattedPrice).map((range, index) => (
                           <button
                             key={index}
                             onClick={() => setSelectedOffer(range)}

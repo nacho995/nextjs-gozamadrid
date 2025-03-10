@@ -3,8 +3,8 @@ const nextConfig = {
   // Configuración básica
   reactStrictMode: true,
   swcMinify: true,
-  // Cambiar output a 'export' solo en producción
-  output: process.env.NODE_ENV === 'production' ? 'export' : 'standalone',
+  // Cambiar output a 'standalone' en producción en lugar de 'export'
+  output: 'standalone',
   poweredByHeader: false,
   compress: true,
   generateEtags: true,
@@ -54,71 +54,63 @@ const nextConfig = {
     minimumCacheTTL: 60,
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    // Siempre deshabilitar la optimización de imágenes en producción para sitios estáticos
-    unoptimized: process.env.NODE_ENV === 'production',
+    // Deshabilitar unoptimized para permitir la optimización de imágenes
+    unoptimized: false,
   },
   
   // Headers para mejorar el rendimiento y la resiliencia
-  // Deshabilitar headers en producción con output: 'export'
-  ...(process.env.NODE_ENV !== 'production' && {
-    async headers() {
-      return [
-        {
-          source: '/:path*',
-          headers: [
-            {
-              key: 'Cache-Control',
-              value: 'public, max-age=3600, stale-while-revalidate=60',
-            },
-            {
-              key: 'X-DNS-Prefetch-Control',
-              value: 'on',
-            },
-            {
-              key: 'X-Content-Type-Options',
-              value: 'nosniff',
-            },
-          ],
-        },
-      ];
-    }
-  }),
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=3600, stale-while-revalidate=60',
+          },
+          {
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+        ],
+      },
+    ];
+  },
   
   // Rewrites para proxies y redirecciones
-  // Deshabilitar rewrites en producción con output: 'export'
-  ...(process.env.NODE_ENV !== 'production' && {
-    async rewrites() {
-      return [
-        // Proxy de WordPress con timeout aumentado
-        {
-          source: '/api/wordpress-proxy',
-          destination: 'https://realestategozamadrid.com/wp-json/wp/v2/:path*',
-          has: [
-            {
-              type: 'header',
-              key: 'x-timeout',
-              value: '(?<timeout>.*)',
-            },
-          ],
-        },
-        // Proxy para imágenes con timeout
-        {
-          source: '/api/image-proxy',
-          destination: '/api/image-proxy',
-        },
-        // Rutas de property
-        {
-          source: '/property/:id',
-          destination: '/property/:id',
-        },
-        // Rutas de blog
-        {
-          source: '/blog/:id',
-          destination: '/blog/:id',
-        }
-      ];
-    }
-  }),
+  async rewrites() {
+    return [
+      // Proxy de WordPress con timeout aumentado
+      {
+        source: '/api/wordpress-proxy',
+        destination: '/api/wordpress-proxy',
+      },
+      // Proxy de WooCommerce
+      {
+        source: '/api/woocommerce-proxy',
+        destination: '/api/woocommerce-proxy',
+      },
+      // Proxy para imágenes con timeout
+      {
+        source: '/api/image-proxy',
+        destination: '/api/image-proxy',
+      },
+      // Rutas de property
+      {
+        source: '/property/:id',
+        destination: '/property/:id',
+      },
+      // Rutas de blog
+      {
+        source: '/blog/:id',
+        destination: '/blog/:id',
+      }
+    ];
+  },
   
   // Configuración de webpack optimizada
   webpack: (config, { isServer }) => {
