@@ -13,6 +13,8 @@ const nextConfig = {
   ...(process.env.NODE_ENV === 'production' && {
     // Eliminar assetPrefix para evitar problemas con rutas
     // assetPrefix: '.',
+    // Aumentar el timeout en producción
+    serverTimeout: 60000, // 60 segundos
   }),
   
   // Deshabilitar la optimización de barriles para react-icons
@@ -20,6 +22,10 @@ const nextConfig = {
     optimizePackageImports: ['other-packages-but-not-react-icons'],
     // Habilitar Webpack Build Worker para mejorar el rendimiento del build
     webpackBuildWorker: true,
+    // Configuraciones experimentales para mejorar la resiliencia
+    workerThreads: true,
+    // Aumentar el límite de memoria para el build
+    memoryLimit: 4096,
   },
   
   // Configuración de imágenes
@@ -52,7 +58,7 @@ const nextConfig = {
     unoptimized: process.env.NODE_ENV === 'production',
   },
   
-  // Headers para mejorar el rendimiento, pero con caché más corto
+  // Headers para mejorar el rendimiento y la resiliencia
   // Deshabilitar headers en producción con output: 'export'
   ...(process.env.NODE_ENV !== 'production' && {
     async headers() {
@@ -62,8 +68,15 @@ const nextConfig = {
           headers: [
             {
               key: 'Cache-Control',
-              // Reducir el tiempo de caché para permitir actualizaciones más frecuentes
-              value: 'public, max-age=3600',
+              value: 'public, max-age=3600, stale-while-revalidate=60',
+            },
+            {
+              key: 'X-DNS-Prefetch-Control',
+              value: 'on',
+            },
+            {
+              key: 'X-Content-Type-Options',
+              value: 'nosniff',
             },
           ],
         },
@@ -76,22 +89,29 @@ const nextConfig = {
   ...(process.env.NODE_ENV !== 'production' && {
     async rewrites() {
       return [
-        // Solo mantener el proxy de WordPress
+        // Proxy de WordPress con timeout aumentado
         {
           source: '/api/wordpress-proxy',
           destination: 'https://realestategozamadrid.com/wp-json/wp/v2/:path*',
+          has: [
+            {
+              type: 'header',
+              key: 'x-timeout',
+              value: '(?<timeout>.*)',
+            },
+          ],
         },
-        // Añadir proxy para imágenes
+        // Proxy para imágenes con timeout
         {
           source: '/api/image-proxy',
           destination: '/api/image-proxy',
         },
-        // Asegurar que las rutas de property se manejen correctamente
+        // Rutas de property
         {
           source: '/property/:id',
           destination: '/property/:id',
         },
-        // Asegurar que las rutas de blog se manejen correctamente
+        // Rutas de blog
         {
           source: '/blog/:id',
           destination: '/blog/:id',
@@ -100,9 +120,9 @@ const nextConfig = {
     }
   }),
   
-  // Configuración de webpack más simple y estable
+  // Configuración de webpack optimizada
   webpack: (config, { isServer }) => {
-    // Optimizaciones para reducir el tamaño del bundle
+    // Optimizaciones para reducir el tamaño del bundle y mejorar la resiliencia
     if (!isServer) {
       config.optimization = {
         ...config.optimization,
@@ -124,9 +144,21 @@ const nextConfig = {
           },
         },
       };
+      
+      // Configuración para mejorar el manejo de errores
+      config.optimization.splitChunks.maxInitialRequests = 25;
+      config.optimization.splitChunks.minSize = 20000;
     }
+    
     return config;
   },
+  
+  // Configuración para mejorar la resiliencia
+  onDemandEntries: {
+    maxInactiveAge: 60 * 60 * 1000, // 1 hora
+    pagesBufferLength: 5,
+  },
+  
   // Eliminar assetPrefix global y usar trailingSlash para mejor compatibilidad con sitios estáticos
   // assetPrefix: process.env.NODE_ENV === 'production' ? '.' : '',
   trailingSlash: true,

@@ -12,10 +12,23 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 const fetchWithRetry = async (url, options, retries = MAX_RETRIES, attempt = 1) => {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 segundos timeout
+
     const response = await fetch(url, {
       ...options,
-      timeout: 60000 // Aumentado a 60 segundos
+      signal: controller.signal,
+      headers: {
+        ...options.headers,
+        'User-Agent': 'Mozilla/5.0 (compatible; GozaMadridBot/1.0)',
+        'Accept': 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
     });
+
+    clearTimeout(timeoutId);
     
     // Si es un error 503 o 502, intentar de nuevo con backoff exponencial
     if ((response.status === 503 || response.status === 502) && retries > 0) {
@@ -30,6 +43,11 @@ const fetchWithRetry = async (url, options, retries = MAX_RETRIES, attempt = 1) 
     
     return response;
   } catch (error) {
+    if (error.name === 'AbortError') {
+      console.error('[WordPress Proxy] Timeout - La solicitud tardó demasiado');
+      throw new Error('Timeout - La solicitud tardó demasiado');
+    }
+
     if (retries > 0) {
       const delay = EXPONENTIAL_BACKOFF 
         ? Math.min(INITIAL_RETRY_DELAY * Math.pow(2, attempt - 1), MAX_RETRY_DELAY)
@@ -166,9 +184,13 @@ export default async function handler(req, res) {
         return Array.isArray(pageData) ? pageData : [pageData];
       });
       
-      const additionalData = await Promise.all(pagePromises);
-      additionalData.forEach(pageData => {
-        data.push(...pageData);
+      const additionalData = await Promise.allSettled(pagePromises);
+      additionalData.forEach(result => {
+        if (result.status === 'fulfilled') {
+          data.push(...result.value);
+        } else {
+          console.error('Error al obtener página adicional:', result.reason);
+        }
       });
     }
     
