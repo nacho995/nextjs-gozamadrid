@@ -64,9 +64,8 @@ export const getPropertyPosts = async () => {
         : '';
       
       const fetchWordPress = async () => {
-        // En producción, solicitar el máximo de elementos por página
-        const per_page = process.env.NODE_ENV === 'production' ? 100 : 10;
-        const wpResponse = await fetch(`${baseUrl}/api/wordpress-proxy?path=products&per_page=${per_page}`, {
+        // En producción, no especificamos per_page para usar el valor por defecto del proxy
+        const wpResponse = await fetch(`${baseUrl}/api/wordpress-proxy?path=products`, {
           method: 'GET',
           headers: { 
             'Content-Type': 'application/json',
