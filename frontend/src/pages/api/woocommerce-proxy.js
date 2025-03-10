@@ -7,23 +7,23 @@ export default async function handler(req, res) {
     const { path = 'products', ...queryParams } = req.query;
     
     // Obtener las claves de WooCommerce
-    const NEXT_PUBLIC_WOO_COMMERCE_KEY = 'ck_75c5940bfae6a9dd63f1489da71e43b576999633';
-    const WOO_COMMERCE_SECRET = 'cs_f194d11b41ca92cdd356145705fede711cd233e5';
+    const NEXT_PUBLIC_WOO_COMMERCE_KEY = process.env.NEXT_PUBLIC_NEXT_PUBLIC_WOO_COMMERCE_KEY;
+    const WOO_COMMERCE_SECRET = process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET;
     
     // Construir la URL base de WooCommerce
     let wooCommerceUrl = `https://realestategozamadrid.com/wp-json/wc/v3/${path}?consumer_key=${NEXT_PUBLIC_WOO_COMMERCE_KEY}&consumer_secret=${WOO_COMMERCE_SECRET}`;
     
+    // En producción, siempre intentamos obtener el máximo de elementos por página
+    if (process.env.NODE_ENV === 'production' && !queryParams.per_page) {
+      queryParams.per_page = 100; // Máximo permitido por WooCommerce
+    }
+    
     // Añadir parámetros adicionales a la URL
     Object.entries(queryParams).forEach(([key, value]) => {
       if (key !== 'path') {
-        wooCommerceUrl += `&${key}=${value}`;
+        wooCommerceUrl += `&${key}=${encodeURIComponent(value)}`;
       }
     });
-    
-    // Si no se especifican más parámetros, añadir per_page=50 por defecto
-    if (!queryParams.per_page) {
-      wooCommerceUrl += '&per_page=50';
-    }
     
     console.log('Conectando a WooCommerce:', wooCommerceUrl.replace(/consumer_secret=([^&]*)/, 'consumer_secret=XXXXX')); // Log seguro ocultando secreto
     
@@ -44,6 +44,12 @@ export default async function handler(req, res) {
       console.error(`Error en la respuesta de WooCommerce: ${response.status} ${response.statusText}`);
       console.error('URL que falló:', wooCommerceUrl.replace(/consumer_secret=([^&]*)/, 'consumer_secret=XXXXX')); // Log seguro
       
+      // Si es un error 503, devolver un array vacío
+      if (response.status === 503) {
+        console.log('WooCommerce - Servicio no disponible, devolviendo array vacío');
+        return res.status(200).json([]);
+      }
+      
       // Intentar leer el cuerpo del error
       try {
         const errorBody = await response.text();
@@ -56,20 +62,61 @@ export default async function handler(req, res) {
     }
     
     // Obtener los datos y registrar información
-    const data = await response.json();
-    console.log(`Recibidos ${Array.isArray(data) ? data.length + ' productos' : 'objeto singular'} de WooCommerce`);
+    let data = await response.json();
+    data = Array.isArray(data) ? data : [data];
+    
+    // Obtener el total de páginas y elementos
+    const totalPages = parseInt(response.headers.get('X-WP-TotalPages') || '1');
+    const totalItems = parseInt(response.headers.get('X-WP-Total') || '0');
+    
+    // En producción, obtener todas las páginas si hay más de una y no se especificó una página específica
+    if (process.env.NODE_ENV === 'production' && totalPages > 1 && !queryParams.page) {
+      console.log(`WooCommerce - Obteniendo todas las páginas (${totalPages} páginas en total)`);
+      
+      const remainingPages = Array.from({ length: totalPages - 1 }, (_, i) => i + 2);
+      const pagePromises = remainingPages.map(async (page) => {
+        const pageUrl = `${wooCommerceUrl}&page=${page}`;
+        const pageResponse = await fetch(pageUrl, {
+          method: 'GET',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+            'Accept': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (Node.js API Proxy)'
+          },
+          timeout: 30000
+        });
+        
+        if (!pageResponse.ok) {
+          console.error(`Error al obtener página ${page}: ${pageResponse.status}`);
+          return [];
+        }
+        
+        const pageData = await pageResponse.json();
+        return Array.isArray(pageData) ? pageData : [pageData];
+      });
+      
+      const additionalData = await Promise.all(pagePromises);
+      additionalData.forEach(pageData => {
+        data.push(...pageData);
+      });
+    }
+    
+    console.log(`Recibidos ${data.length} elementos de WooCommerce`);
     
     // Si hay headers de paginación, incluirlos en la respuesta
-    if (response.headers.get('X-WP-Total')) {
-      res.setHeader('X-WP-Total', response.headers.get('X-WP-Total'));
+    if (totalItems) {
+      res.setHeader('X-WP-Total', totalItems);
     }
-    if (response.headers.get('X-WP-TotalPages')) {
-      res.setHeader('X-WP-TotalPages', response.headers.get('X-WP-TotalPages'));
+    if (totalPages) {
+      res.setHeader('X-WP-TotalPages', totalPages);
     }
     
     return res.status(200).json(data);
   } catch (error) {
     console.error('Error en el proxy de WooCommerce:', error);
-    return res.status(500).json({ error: 'Error al obtener datos de WooCommerce: ' + error.message });
+    // En caso de error irrecuperable, devolver un array vacío
+    return res.status(200).json([]);
   }
 } 

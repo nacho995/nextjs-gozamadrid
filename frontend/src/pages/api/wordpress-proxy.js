@@ -39,15 +39,15 @@ export default async function handler(req, res) {
   console.log('WordPress Proxy - Parámetros recibidos:', { path, endpoint, queryParams });
   
   // Claves de API de WooCommerce
-  const WC_CONSUMER_KEY = 'ck_75c5940bfae6a9dd63f1489da71e43b576999633';
-  const WC_CONSUMER_SECRET = 'cs_f194d11b41ca92cdd356145705fede711cd233e5';
+  const WC_CONSUMER_KEY = process.env.NEXT_PUBLIC_NEXT_PUBLIC_WOO_COMMERCE_KEY;
+  const WC_CONSUMER_SECRET = process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET;
   
   // Determinar qué API usar (WooCommerce o WordPress)
   let baseUrl = 'https://realestategozamadrid.com/wp-json/';
   let url = '';
   
   // En producción, siempre intentamos obtener el máximo de elementos por página
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'production' && !queryParams.per_page) {
     queryParams.per_page = MAX_PER_PAGE;
   }
   
@@ -131,8 +131,8 @@ export default async function handler(req, res) {
     let data = await response.json();
     data = Array.isArray(data) ? data : [data];
     
-    // En producción, obtener todas las páginas si hay más de una
-    if (process.env.NODE_ENV === 'production' && totalPages > 1) {
+    // En producción, obtener todas las páginas si hay más de una y no se especificó una página específica
+    if (process.env.NODE_ENV === 'production' && totalPages > 1 && !queryParams.page) {
       console.log(`WordPress Proxy - Obteniendo todas las páginas (${totalPages} páginas en total)`);
       
       const remainingPages = Array.from({ length: totalPages - 1 }, (_, i) => i + 2);
@@ -142,7 +142,9 @@ export default async function handler(req, res) {
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
             'Pragma': 'no-cache',
-            'Expires': '0'
+            'Expires': '0',
+            'User-Agent': 'Mozilla/5.0 (compatible; GozaMadridBot/1.0)',
+            'Accept': 'application/json'
           }
         });
         
