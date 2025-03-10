@@ -108,8 +108,7 @@ export async function getStaticProps({ params }) {
           id,
           error: `No se pudo cargar la propiedad: ${error}`,
           source
-        },
-        revalidate: 60 // Reintentar después de 60 segundos
+        }
       };
     }
     
@@ -119,8 +118,7 @@ export async function getStaticProps({ params }) {
           id,
           error: 'No se encontró la propiedad',
           source
-        },
-        revalidate: 60 // Reintentar después de 60 segundos
+        }
       };
     }
     
@@ -134,8 +132,7 @@ export async function getStaticProps({ params }) {
           title: property.title || property.name || 'Propiedad sin título',
           source
         }
-      },
-      revalidate: 3600 // Revalidar cada hora
+      }
     };
   } catch (error) {
     console.error(`Error en getStaticProps:`, error);
@@ -144,8 +141,7 @@ export async function getStaticProps({ params }) {
         id: params.id,
         error: `No se pudo cargar la propiedad: ${error.message}`,
         source: 'unknown'
-      },
-      revalidate: 60 // Reintentar después de 60 segundos
+      }
     };
   }
 }

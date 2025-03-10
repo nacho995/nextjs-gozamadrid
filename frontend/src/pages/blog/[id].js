@@ -725,9 +725,7 @@ export async function getStaticProps(context) {
           initialBlog: blog || null, 
           id, 
           isWordPress: false
-        },
-        // Revalidar cada hora para permitir actualizaciones
-        revalidate: 3600
+        }
       };
     } else {
       // WordPress
@@ -747,9 +745,7 @@ export async function getStaticProps(context) {
             initialBlog: blogData, 
             id, 
             isWordPress: true
-          },
-          // Revalidar cada hora para permitir actualizaciones
-          revalidate: 3600
+          }
         };
       } else {
         console.log("Static: No se encontró blog de WordPress con slug:", slug);
@@ -759,9 +755,7 @@ export async function getStaticProps(context) {
             id, 
             isWordPress: true, 
             error: "No se encontró el blog en WordPress"
-          },
-          // Revalidar cada hora para permitir actualizaciones
-          revalidate: 3600
+          }
         };
       }
     }
@@ -773,9 +767,7 @@ export async function getStaticProps(context) {
         id, 
         isWordPress: false, 
         error: error.message 
-      },
-      // Revalidar cada hora para permitir actualizaciones
-      revalidate: 3600
+      }
     };
   }
 }
