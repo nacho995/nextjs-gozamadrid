@@ -30,7 +30,12 @@ export const getPropertyPosts = async () => {
     // Intentar obtener propiedades de WordPress
     try {
       console.log('Obteniendo propiedades de WordPress...');
-      const wpResponse = await fetch(`${window.location.origin}/api/wordpress-proxy?path=products`, {
+      // Construir la URL base según el entorno
+      const baseUrl = process.env.NODE_ENV === 'development' 
+        ? 'http://localhost:3000'  // URL de desarrollo
+        : '';  // En producción, usar path relativo
+      
+      const wpResponse = await fetch(`${baseUrl}/api/wordpress-proxy?path=products`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         cache: 'no-store' // Evitar caché
