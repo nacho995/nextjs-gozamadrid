@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useRouter } from 'next/router';
 import { motion } from "framer-motion";
 import { FaBed, FaBath, FaRulerCombined, FaMapMarkerAlt, FaEuroSign } from "react-icons/fa";
-import AnimatedOnScroll from "../AnimatedScroll";
 import { getPropertyPosts } from "../../pages/api";
 import PropertyImage from './PropertyImage';
 import Head from 'next/head';
@@ -531,269 +530,267 @@ export default function PropertyPage() {
       ></div>
 
       <div className="relative min-h-screen py-8">
-        <AnimatedOnScroll>
-          <main className="relative container mx-auto px-3">
-            <div className="layout-specing">
-              <div className="md:flex justify-center items-center mb-8">
-                <h1 className="text-3xl font-semibold text-center">
-                  Propiedades inmobiliarias en venta y alquiler
-                </h1>
-              </div>
+        <main className="relative container mx-auto px-3">
+          <div className="layout-specing">
+            <div className="md:flex justify-center items-center mb-8">
+              <h1 className="text-3xl font-semibold text-center">
+                Propiedades inmobiliarias en venta y alquiler
+              </h1>
+            </div>
 
-              {/* Buscador por dirección */}
-              <div className="mb-8 flex justify-center">
-                <label className="sr-only" htmlFor="property-search">Buscar propiedades por dirección</label>
-                <input
-                  id="property-search"
-                  type="text"
-                  placeholder="Buscar por dirección..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                  aria-label="Buscar propiedades por dirección"
-                />
-              </div>
-
-              {/* Lista de propiedades en grid */}
-              {filteredProperties && filteredProperties.length > 0 ? (
-                <section 
-                  aria-label="Listado de propiedades"
-                  className="grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6 mt-6"
-                >
-                  {getCurrentProperties().map((property, index) => {
-                    // Determinar si es una propiedad de WordPress o de MongoDB
-                    const isWordPressProperty = property.source === 'woocommerce';
-                    const isMongoDBProperty = property.source === 'mongodb';
-                    
-                    // Extraer los datos según el tipo de propiedad
-                    const id = isWordPressProperty ? property.id : property._id;
-                    
-                    // Obtener el título de la propiedad (nombre de la calle para propiedades españolas)
-                    let title = "";
-                    if (isWordPressProperty) {
-                      title = property.name || "Propiedad sin título";
-                    } else if (isMongoDBProperty) {
-                      title = property.title || property.name || "Propiedad sin título";
-                    }
-                    
-                    // Obtener la descripción
-                    const description = property.description || "Sin descripción disponible";
-                    
-                    // Obtener la ubicación
-                    const location = property.name || getCorrectLocation(property);
-                    
-                    // Extraer el precio y formatear sin decimales
-                    let price = "Consultar";
-                    if (isWordPressProperty && property.price) {
-                      price = new Intl.NumberFormat('es-ES', {
-                        style: 'currency',
-                        currency: 'EUR',
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0
-                      }).format(parseInt(property.price));
-                    } else if (isMongoDBProperty && property.price) {
-                      // Convertir el precio a número si es una cadena
-                      let numericPrice;
-                      if (typeof property.price === 'string') {
-                        // Eliminar cualquier carácter que no sea número o punto
-                        const cleanPrice = property.price.replace(/[^\d.-]/g, '');
-                        numericPrice = parseFloat(cleanPrice);
-                        
-                        // Si el precio parece ser un precio reducido (menos de 10000), multiplicarlo por 1000
-                        // Esto es para corregir casos donde el precio se guarda como "350" en lugar de "350000"
-                        if (!isNaN(numericPrice) && numericPrice < 10000) {
-                          numericPrice = numericPrice * 1000;
-                        }
-                      } else {
-                        numericPrice = property.price;
-                        // Si el precio parece ser un precio reducido (menos de 10000), multiplicarlo por 1000
-                        if (numericPrice < 10000) {
-                          numericPrice = numericPrice * 1000;
-                        }
-                      }
-                      
-                      price = new Intl.NumberFormat('es-ES', {
-                        style: 'currency',
-                        currency: 'EUR',
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0
-                      }).format(numericPrice);
-                    }
-                    
-                    // Obtener características
-                    let bedrooms = 0;
-                    let bathrooms = 0;
-                    let size = 0;
-
-                    if (isWordPressProperty) {
-                      // Buscar en meta_data para WordPress
-                      if (property.meta_data) {
-                        const livingArea = property.meta_data.find(meta => meta.key === "living_area");
-                        const bedroomsData = property.meta_data.find(meta => meta.key === "bedrooms");
-                        const banosData = property.meta_data.find(meta => meta.key === "baños");
-                        
-                        size = livingArea ? parseInt(livingArea.value) || 0 : 0;
-                        bedrooms = bedroomsData ? parseInt(bedroomsData.value) || 0 : 0;
-                        bathrooms = banosData ? parseInt(banosData.value) || 0 : 0;
-
-                        // Si los baños son -1 (valor por defecto), establecer a 0
-                        if (bathrooms < 0) bathrooms = 0;
-                      }
-                    } else if (isMongoDBProperty) {
-                      bedrooms = property.bedrooms || 0;
-                      bathrooms = property.bathrooms || 0;
-                      size = property.size || 0;
-                    }
-                    
-                    // Obtener la imagen principal
-                    let mainImage = '/img/default-property-image.jpg';
-                    
-                    if (isWordPressProperty && property.images && Array.isArray(property.images) && property.images.length > 0) {
-                      const firstImage = property.images[0];
-                      if (typeof firstImage === 'string') {
-                        mainImage = firstImage;
-                      } else if (typeof firstImage === 'object') {
-                        mainImage = firstImage.src || firstImage.url || firstImage.source_url || '/img/default-property-image.jpg';
-                      }
-                    } else if (isMongoDBProperty && property.images && Array.isArray(property.images) && property.images.length > 0) {
-                      const firstImage = property.images[0];
-                      if (typeof firstImage === 'string') {
-                        mainImage = firstImage;
-                      } else if (typeof firstImage === 'object') {
-                        mainImage = firstImage.src || firstImage.url || firstImage.source_url || '/img/default-property-image.jpg';
-                      }
-                    }
-                    
-                    // Procesar la URL de la imagen
-                    const imageUrl = getProxiedImageUrl(mainImage);
-                    
-                    return (
-                      <motion.div
-                        key={id || index}
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ delay: Math.min(index * 0.05, 0.3) }}
-                        viewport={{ once: true }}
-                        className="bg-white/5 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden hover:scale-[1.03]"
-                      >
-                        <Link
-                          href={`/property/${id}`}
-                          className="group block rounded-xl dark:text-white dark:hover:text-black bg-white dark:bg-slate-900 shadow hover:bg-gold dark:hover:shadow-xl dark:shadow-gray-700 dark:hover:shadow-gray-700 overflow-hidden ease-in-out duration-500"
-                          onClick={(e) => {
-                            // Prevenir la navegación por defecto y usar programática
-                            e.preventDefault();
-                            
-                            // Limpiar el ID y asegurarse que es una cadena
-                            const cleanId = String(id).trim();
-                            
-                            // Determinar el origen de la propiedad basado en el ID
-                            // Si contiene letras y tiene más de 10 caracteres, es de MongoDB
-                            const isMongoProperty = /[a-zA-Z]/.test(cleanId) && cleanId.length > 10;
-                            
-                            console.log(`Navegando a propiedad ${isMongoProperty ? 'MongoDB' : 'WooCommerce'}:`, cleanId);
-                            
-                            // Crear URL con el origen correcto
-                            const url = `/property/${cleanId}?source=${isMongoProperty ? 'mongodb' : 'woocommerce'}`;
-                            console.log('URL de navegación:', url);
-                            
-                            // Navegar programáticamente
-                            window.location.href = url;
-                          }}
-                        >
-                          <div className="relative">
-                            <div className="relative w-full aspect-video">
-                              <PropertyImage 
-                                  src={imageUrl}
-                                  alt={title}
-                                className="w-full h-full"
-                              />
-                            </div>
-
-                            <div className="absolute top-4 end-4">
-                              <button
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  // Aquí la lógica para "like" si lo deseas
-                                }}
-                                className="btn btn-icon bg-white dark:bg-slate-900 shadow dark:shadow-gray-700 rounded-full text-slate-100 dark:text-slate-700 focus:text-red-600 dark:focus:text-red-600 hover:text-red-600 dark:hover:text-red-600"
-                              >
-                                <i className="mdi mdi-heart text-[20px]"></i>
-                              </button>
-                            </div>
-                          </div>
-
-                          <div className="p-6">
-                            <div className="pb-6">
-                              {/* Mostrar la dirección como título principal */}
-                              <h3 className="text-lg hover:text-amarillo font-medium ease-in-out duration-500">
-                                {location}
-                              </h3>
-                              {/* Mostrar el título original como subtítulo si es diferente de la dirección */}
-                              {title !== location && (
-                                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                  {title}
-                                </p>
-                              )}
-                            </div>
-
-                            <ul className="py-6 border-y border-slate-100 dark:border-gray-800 flex flex-wrap items-center list-none">
-                              {/* Superficie */}
-                              <li className="flex items-center me-4 mb-2">
-                                <FaRulerCombined className="text-2xl me-2 text-amarillo" />
-                                <span>
-                                  <span className="block text-xs text-gray-500 dark:text-gray-400">Superficie</span>
-                                  {size} m²
-                                </span>
-                              </li>
-                              {/* Habitaciones */}
-                              <li className="flex items-center me-4 mb-2">
-                                <FaBed className="text-2xl me-2 text-amarillo" />
-                                <span>
-                                  <span className="block text-xs text-gray-500 dark:text-gray-400">Habitaciones</span>
-                                  {bedrooms}
-                                </span>
-                              </li>
-                              {/* Baños */}
-                              <li className="flex items-center me-4 mb-2">
-                                <FaBath className="text-2xl me-2 text-amarillo" />
-                                <span>
-                                  <span className="block text-xs text-gray-500 dark:text-gray-400">Baños</span>
-                                  {bathrooms}
-                                </span>
-                              </li>
-                            </ul>
-
-                            <ul className="pt-6 flex justify-between items-center list-none">
-                              <li>
-                                <span className="text-gray-500 dark:text-gray-400">Precio</span>
-                                <p className="text-lg font-medium flex items-center">
-                                  <FaEuroSign className="text-amarillo mr-1" />
-                                  {price}
-                                </p>
-                              </li>
-                            </ul>
-                          </div>
-                        </Link>
-                      </motion.div>
-                    );
-                  })}
-                </section>
-              ) : (
-                <p className="text-center text-gray-500">
-                  No hay propiedades disponibles.
-                </p>
-              )}
-
-              {/* Componente de paginación */}
-              <Pagination
-                totalPages={totalPages}
-                currentPage={currentPage}
-                onPageChange={handlePageChange}
+            {/* Buscador por dirección */}
+            <div className="mb-8 flex justify-center">
+              <label className="sr-only" htmlFor="property-search">Buscar propiedades por dirección</label>
+              <input
+                id="property-search"
+                type="text"
+                placeholder="Buscar por dirección..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                aria-label="Buscar propiedades por dirección"
               />
             </div>
-          </main>
-        </AnimatedOnScroll>
+
+            {/* Lista de propiedades en grid */}
+            {filteredProperties && filteredProperties.length > 0 ? (
+              <section 
+                aria-label="Listado de propiedades"
+                className="grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6 mt-6"
+              >
+                {getCurrentProperties().map((property, index) => {
+                  // Determinar si es una propiedad de WordPress o de MongoDB
+                  const isWordPressProperty = property.source === 'woocommerce';
+                  const isMongoDBProperty = property.source === 'mongodb';
+                  
+                  // Extraer los datos según el tipo de propiedad
+                  const id = isWordPressProperty ? property.id : property._id;
+                  
+                  // Obtener el título de la propiedad (nombre de la calle para propiedades españolas)
+                  let title = "";
+                  if (isWordPressProperty) {
+                    title = property.name || "Propiedad sin título";
+                  } else if (isMongoDBProperty) {
+                    title = property.title || property.name || "Propiedad sin título";
+                  }
+                  
+                  // Obtener la descripción
+                  const description = property.description || "Sin descripción disponible";
+                  
+                  // Obtener la ubicación
+                  const location = property.name || getCorrectLocation(property);
+                  
+                  // Extraer el precio y formatear sin decimales
+                  let price = "Consultar";
+                  if (isWordPressProperty && property.price) {
+                    price = new Intl.NumberFormat('es-ES', {
+                      style: 'currency',
+                      currency: 'EUR',
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0
+                    }).format(parseInt(property.price));
+                  } else if (isMongoDBProperty && property.price) {
+                    // Convertir el precio a número si es una cadena
+                    let numericPrice;
+                    if (typeof property.price === 'string') {
+                      // Eliminar cualquier carácter que no sea número o punto
+                      const cleanPrice = property.price.replace(/[^\d.-]/g, '');
+                      numericPrice = parseFloat(cleanPrice);
+                      
+                      // Si el precio parece ser un precio reducido (menos de 10000), multiplicarlo por 1000
+                      // Esto es para corregir casos donde el precio se guarda como "350" en lugar de "350000"
+                      if (!isNaN(numericPrice) && numericPrice < 10000) {
+                        numericPrice = numericPrice * 1000;
+                      }
+                    } else {
+                      numericPrice = property.price;
+                      // Si el precio parece ser un precio reducido (menos de 10000), multiplicarlo por 1000
+                      if (numericPrice < 10000) {
+                        numericPrice = numericPrice * 1000;
+                      }
+                    }
+                    
+                    price = new Intl.NumberFormat('es-ES', {
+                      style: 'currency',
+                      currency: 'EUR',
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0
+                    }).format(numericPrice);
+                  }
+                  
+                  // Obtener características
+                  let bedrooms = 0;
+                  let bathrooms = 0;
+                  let size = 0;
+
+                  if (isWordPressProperty) {
+                    // Buscar en meta_data para WordPress
+                    if (property.meta_data) {
+                      const livingArea = property.meta_data.find(meta => meta.key === "living_area");
+                      const bedroomsData = property.meta_data.find(meta => meta.key === "bedrooms");
+                      const banosData = property.meta_data.find(meta => meta.key === "baños");
+                      
+                      size = livingArea ? parseInt(livingArea.value) || 0 : 0;
+                      bedrooms = bedroomsData ? parseInt(bedroomsData.value) || 0 : 0;
+                      bathrooms = banosData ? parseInt(banosData.value) || 0 : 0;
+
+                      // Si los baños son -1 (valor por defecto), establecer a 0
+                      if (bathrooms < 0) bathrooms = 0;
+                    }
+                  } else if (isMongoDBProperty) {
+                    bedrooms = property.bedrooms || 0;
+                    bathrooms = property.bathrooms || 0;
+                    size = property.size || 0;
+                  }
+                  
+                  // Obtener la imagen principal
+                  let mainImage = '/img/default-property-image.jpg';
+                  
+                  if (isWordPressProperty && property.images && Array.isArray(property.images) && property.images.length > 0) {
+                    const firstImage = property.images[0];
+                    if (typeof firstImage === 'string') {
+                      mainImage = firstImage;
+                    } else if (typeof firstImage === 'object') {
+                      mainImage = firstImage.src || firstImage.url || firstImage.source_url || '/img/default-property-image.jpg';
+                    }
+                  } else if (isMongoDBProperty && property.images && Array.isArray(property.images) && property.images.length > 0) {
+                    const firstImage = property.images[0];
+                    if (typeof firstImage === 'string') {
+                      mainImage = firstImage;
+                    } else if (typeof firstImage === 'object') {
+                      mainImage = firstImage.src || firstImage.url || firstImage.source_url || '/img/default-property-image.jpg';
+                    }
+                  }
+                  
+                  // Procesar la URL de la imagen
+                  const imageUrl = getProxiedImageUrl(mainImage);
+                  
+                  return (
+                    <motion.div
+                      key={id || index}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ delay: Math.min(index * 0.05, 0.3) }}
+                      viewport={{ once: true }}
+                      className="bg-white/5 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden hover:scale-[1.03]"
+                    >
+                      <Link
+                        href={`/property/${id}`}
+                        className="group block rounded-xl dark:text-white dark:hover:text-black bg-white dark:bg-slate-900 shadow hover:bg-gold dark:hover:shadow-xl dark:shadow-gray-700 dark:hover:shadow-gray-700 overflow-hidden ease-in-out duration-500"
+                        onClick={(e) => {
+                          // Prevenir la navegación por defecto y usar programática
+                          e.preventDefault();
+                          
+                          // Limpiar el ID y asegurarse que es una cadena
+                          const cleanId = String(id).trim();
+                          
+                          // Determinar el origen de la propiedad basado en el ID
+                          // Si contiene letras y tiene más de 10 caracteres, es de MongoDB
+                          const isMongoProperty = /[a-zA-Z]/.test(cleanId) && cleanId.length > 10;
+                          
+                          console.log(`Navegando a propiedad ${isMongoProperty ? 'MongoDB' : 'WooCommerce'}:`, cleanId);
+                          
+                          // Crear URL con el origen correcto
+                          const url = `/property/${cleanId}?source=${isMongoProperty ? 'mongodb' : 'woocommerce'}`;
+                          console.log('URL de navegación:', url);
+                          
+                          // Navegar programáticamente
+                          window.location.href = url;
+                        }}
+                      >
+                        <div className="relative">
+                          <div className="relative w-full aspect-video">
+                            <PropertyImage 
+                                src={imageUrl}
+                                alt={title}
+                              className="w-full h-full"
+                            />
+                          </div>
+
+                          <div className="absolute top-4 end-4">
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                // Aquí la lógica para "like" si lo deseas
+                              }}
+                              className="btn btn-icon bg-white dark:bg-slate-900 shadow dark:shadow-gray-700 rounded-full text-slate-100 dark:text-slate-700 focus:text-red-600 dark:focus:text-red-600 hover:text-red-600 dark:hover:text-red-600"
+                            >
+                              <i className="mdi mdi-heart text-[20px]"></i>
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="p-6">
+                          <div className="pb-6">
+                            {/* Mostrar la dirección como título principal */}
+                            <h3 className="text-lg hover:text-amarillo font-medium ease-in-out duration-500">
+                              {location}
+                            </h3>
+                            {/* Mostrar el título original como subtítulo si es diferente de la dirección */}
+                            {title !== location && (
+                              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                {title}
+                              </p>
+                            )}
+                          </div>
+
+                          <ul className="py-6 border-y border-slate-100 dark:border-gray-800 flex flex-wrap items-center list-none">
+                            {/* Superficie */}
+                            <li className="flex items-center me-4 mb-2">
+                              <FaRulerCombined className="text-2xl me-2 text-amarillo" />
+                              <span>
+                                <span className="block text-xs text-gray-500 dark:text-gray-400">Superficie</span>
+                                {size} m²
+                              </span>
+                            </li>
+                            {/* Habitaciones */}
+                            <li className="flex items-center me-4 mb-2">
+                              <FaBed className="text-2xl me-2 text-amarillo" />
+                              <span>
+                                <span className="block text-xs text-gray-500 dark:text-gray-400">Habitaciones</span>
+                                {bedrooms}
+                              </span>
+                            </li>
+                            {/* Baños */}
+                            <li className="flex items-center me-4 mb-2">
+                              <FaBath className="text-2xl me-2 text-amarillo" />
+                              <span>
+                                <span className="block text-xs text-gray-500 dark:text-gray-400">Baños</span>
+                                {bathrooms}
+                              </span>
+                            </li>
+                          </ul>
+
+                          <ul className="pt-6 flex justify-between items-center list-none">
+                            <li>
+                              <span className="text-gray-500 dark:text-gray-400">Precio</span>
+                              <p className="text-lg font-medium flex items-center">
+                                <FaEuroSign className="text-amarillo mr-1" />
+                                {price}
+                              </p>
+                            </li>
+                          </ul>
+                        </div>
+                      </Link>
+                    </motion.div>
+                  );
+                })}
+              </section>
+            ) : (
+              <p className="text-center text-gray-500">
+                No hay propiedades disponibles.
+              </p>
+            )}
+
+            {/* Componente de paginación */}
+            <Pagination
+              totalPages={totalPages}
+              currentPage={currentPage}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        </main>
       </div>
     </>
   );
