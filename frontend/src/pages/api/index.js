@@ -10,8 +10,12 @@ export const getPropertyPosts = async () => {
       console.log('Obteniendo propiedades de MongoDB...');
       const mongoResponse = await fetch('https://goza-madrid.onrender.com/property', {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        cache: 'no-store' // Evitar caché
+        headers: { 
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
       });
 
       if (mongoResponse.ok) {
@@ -37,14 +41,21 @@ export const getPropertyPosts = async () => {
       
       const wpResponse = await fetch(`${baseUrl}/api/wordpress-proxy?path=products`, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        cache: 'no-store' // Evitar caché
+        headers: { 
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
       });
 
       if (wpResponse.ok) {
         const wpData = await wpResponse.json();
-        console.log(`Propiedades WordPress obtenidas: ${wpData.length}`);
-        wpProperties = wpData.map(prop => ({ ...prop, source: 'woocommerce' }));
+        // Si wpData es un array vacío debido a un error 503, no lo consideramos un error
+        if (Array.isArray(wpData)) {
+          console.log(`Propiedades WordPress obtenidas: ${wpData.length}`);
+          wpProperties = wpData.map(prop => ({ ...prop, source: 'woocommerce' }));
+        }
       } else {
         console.error(`Error WordPress: ${wpResponse.status} ${wpResponse.statusText}`);
         errors.push(`Error al obtener propiedades de WordPress: ${wpResponse.statusText}`);
@@ -58,17 +69,16 @@ export const getPropertyPosts = async () => {
     const allProperties = [...mongoProperties, ...wpProperties];
     
     // Si no hay propiedades de ninguna fuente y hay errores, lanzar excepción
-    if (allProperties.length === 0) {
-      if (errors.length > 0) {
-        throw new Error(errors.join('. '));
-      } else {
-        throw new Error('No se encontraron propiedades disponibles');
-      }
+    // pero solo si AMBAS fuentes fallaron
+    if (allProperties.length === 0 && errors.length >= 2) {
+      throw new Error(errors.join('. '));
     }
 
+    // Devolver las propiedades que pudimos obtener
     return allProperties;
   } catch (error) {
     console.error('Error al obtener las propiedades:', error);
-    throw error;
+    // En caso de error total, devolver array vacío en lugar de lanzar error
+    return [];
   }
 }; 
