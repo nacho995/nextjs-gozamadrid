@@ -5,9 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "npx serve@latest out",
     "lint": "next lint",
-    "export": "next build && next export",
+    "export": "next build",
     "generate-sitemap": "next-sitemap",
     "analyze": "ANALYZE=true next build"
   },
