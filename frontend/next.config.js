@@ -13,8 +13,8 @@ const nextConfig = {
   ...(process.env.NODE_ENV === 'production' && {
     // Eliminar assetPrefix para evitar problemas con rutas
     // assetPrefix: '.',
-    // Aumentar el timeout en producción
-    serverTimeout: 60000, // 60 segundos
+    // Aumentar el timeout en producción al máximo
+    serverTimeout: 300000, // 5 minutos (300 segundos)
   }),
   
   // Deshabilitar la optimización de barriles para react-icons
@@ -25,7 +25,9 @@ const nextConfig = {
     // Configuraciones experimentales para mejorar la resiliencia
     workerThreads: true,
     // Aumentar el límite de memoria para el build
-    memoryLimit: 4096,
+    memoryLimit: 8192, // 8GB
+    // Aumentar el timeout para la generación estática al máximo
+    staticPageGenerationTimeout: 600, // 10 minutos en segundos
   },
   
   // Configuración de imágenes
@@ -51,7 +53,7 @@ const nextConfig = {
       }
     ],
     formats: ['image/avif', 'image/webp'],
-    minimumCacheTTL: 60,
+    minimumCacheTTL: 3600, // 1 hora
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     // Deshabilitar unoptimized para permitir la optimización de imágenes
@@ -66,7 +68,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=3600, stale-while-revalidate=60',
+            value: 'public, max-age=3600, stale-while-revalidate=600',
           },
           {
             key: 'X-DNS-Prefetch-Control',
@@ -147,8 +149,8 @@ const nextConfig = {
   
   // Configuración para mejorar la resiliencia
   onDemandEntries: {
-    maxInactiveAge: 60 * 60 * 1000, // 1 hora
-    pagesBufferLength: 5,
+    maxInactiveAge: 24 * 60 * 60 * 1000, // 24 horas
+    pagesBufferLength: 10,
   },
   
   // Eliminar assetPrefix global y usar trailingSlash para mejor compatibilidad con sitios estáticos

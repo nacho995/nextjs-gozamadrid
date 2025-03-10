@@ -4,8 +4,8 @@ import Head from 'next/head';
 import Layout from '@/components/layout';
 import DefaultPropertyContent from '@/components/propiedades/PropertyContent';
 
-// Función para obtener una propiedad por ID
-const fetchProperty = async (id, source, isServer = false) => {
+// Función para obtener una propiedad por ID con reintentos
+const fetchProperty = async (id, source, isServer = false, retries = 5) => {
   console.log(`Intentando obtener propiedad con ID: ${id}, Source: ${source}, IsServer: ${isServer}`);
   
   // Determinar la URL correcta según el origen de la propiedad
@@ -28,7 +28,25 @@ const fetchProperty = async (id, source, isServer = false) => {
   console.log('Usando URL:', url);
   
   try {
-    const response = await fetch(url);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 segundos timeout
+    
+    const response = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
+      }
+    });
+    
+    clearTimeout(timeoutId);
+    
+    // Si obtenemos un error 503, intentar de nuevo después de un retraso
+    if (response.status === 503 && retries > 0) {
+      console.log(`Error 503 al obtener propiedad ${id}. Reintentando en 5 segundos... (${retries} intentos restantes)`);
+      await new Promise(resolve => setTimeout(resolve, 5000)); // Esperar 5 segundos
+      return fetchProperty(id, source, isServer, retries - 1);
+    }
     
     if (!response.ok) {
       throw new Error(`Error al obtener la propiedad: ${response.status} ${response.statusText}`);
@@ -38,6 +56,14 @@ const fetchProperty = async (id, source, isServer = false) => {
     return { property: data, error: null };
   } catch (error) {
     console.error('Error al obtener propiedad:', error);
+    
+    // Si es un error de timeout o de red y aún tenemos reintentos, intentar de nuevo
+    if ((error.name === 'AbortError' || error.name === 'TypeError') && retries > 0) {
+      console.log(`Error de red al obtener propiedad ${id}. Reintentando en 5 segundos... (${retries} intentos restantes)`);
+      await new Promise(resolve => setTimeout(resolve, 5000)); // Esperar 5 segundos
+      return fetchProperty(id, source, isServer, retries - 1);
+    }
+    
     return { property: null, error: error.message };
   }
 };
@@ -89,59 +115,65 @@ export async function getStaticPaths() {
   }
 }
 
-// Necesario junto con getStaticPaths
+// Añadir getStaticProps para pre-renderizar la página
 export async function getStaticProps({ params }) {
+  const { id } = params;
+  
+  // Determinar si es una propiedad de MongoDB o WooCommerce
+  const source = id && /[a-zA-Z]/.test(id) && id.length > 10 ? 'mongodb' : 'woocommerce';
+  
   try {
-    const id = params.id;
-    
-    // Intentar determinar el origen basado en el formato del ID
-    // Si contiene letras y tiene más de 10 caracteres, probablemente es de MongoDB
-    const source = /[a-zA-Z]/.test(id) && id.length > 10 ? 'mongodb' : 'woocommerce';
-    
-    // Obtener la propiedad, indicando que estamos en el servidor
+    // Intentar obtener la propiedad
     const { property, error } = await fetchProperty(id, source, true);
     
+    // Si hay un error 503, devolver una página con revalidación rápida
+    if (error && error.includes('503')) {
+      console.log(`Error 503 al obtener la propiedad con ID ${id}. Configurando revalidación rápida.`);
+      return {
+        props: {
+          preloadedId: id,
+          error: null,
+          preloadedProperty: null,
+          source
+        },
+        revalidate: 60 // Revalidar después de 60 segundos
+      };
+    }
+    
+    // Si hay otro tipo de error, registrarlo
     if (error) {
-      console.error(`Error al obtener la propiedad con ID ${id}:`, error);
+      console.log(`Error al obtener la propiedad con ID ${id}: ${error}`);
       return {
         props: {
-          id,
-          error: `No se pudo cargar la propiedad: ${error}`,
+          preloadedId: id,
+          error,
+          preloadedProperty: null,
           source
-        }
+        },
+        revalidate: 300 // Revalidar después de 5 minutos
       };
     }
     
-    if (!property) {
-      return {
-        props: {
-          id,
-          error: 'No se encontró la propiedad',
-          source
-        }
-      };
-    }
-    
-    // Devolver los datos procesados
+    // Si todo va bien, devolver la propiedad
     return {
       props: {
-        id,
-        preloadedProperty: {
-          ...property,
-          id: property.id || property._id,
-          title: property.title || property.name || 'Propiedad sin título',
-          source
-        }
-      }
+        preloadedId: id,
+        error: null,
+        preloadedProperty: property,
+        source
+      },
+      revalidate: 3600 // Revalidar después de 1 hora
     };
   } catch (error) {
-    console.error(`Error en getStaticProps:`, error);
+    console.error(`Error en getStaticProps para propiedad ${id}:`, error);
     return {
       props: {
-        id: params.id,
-        error: `No se pudo cargar la propiedad: ${error.message}`,
-        source: 'unknown'
-      }
+        preloadedId: id,
+        error: error.message,
+        preloadedProperty: null,
+        source
+      },
+      revalidate: 300 // Revalidar después de 5 minutos
     };
   }
 }
