@@ -32,24 +32,11 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
-    "/blog": [
+    "/vender": [
       "static/chunks/webpack.js",
       "static/chunks/commons.js",
       "static/chunks/main.js",
-      "static/chunks/pages/blog.js"
-    ],
-    "/blog/[id]": [
-      "static/chunks/webpack.js",
-      "static/chunks/commons.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/blog/[id].js"
-    ],
-    "/property/[id]": [
-      "static/chunks/webpack.js",
-      "static/chunks/commons.js",
-      "static/chunks/main.js",
-      "static/chunks/vendors-node_modules_date-fns_esm_locale_es_index_js-node_modules_react-datepicker_dist_react-b6a742.js",
-      "static/chunks/pages/property/[id].js"
+      "static/chunks/pages/vender.js"
     ],
     "/vender/comprar": [
       "static/chunks/webpack.js",

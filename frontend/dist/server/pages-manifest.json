@@ -5,7 +5,5 @@
   "/": "pages/index.js",
   "/api/wordpress-proxy": "pages/api/wordpress-proxy.js",
   "/vender/comprar": "pages/vender/comprar.js",
-  "/property/[id]": "pages/property/[id].js",
-  "/blog": "pages/blog.js",
-  "/blog/[id]": "pages/blog/[id].js"
+  "/vender": "pages/vender.js"
 }
