@@ -263,15 +263,36 @@ export async function deleteBlogPost(id) {
 
 export async function getBlogById(id) {
   try {
+    // Verificar si estamos en producción
+    const isProduction = process.env.NODE_ENV === 'production';
+    console.log(`[DEBUG] ¿Estamos en producción? ${isProduction}`);
+    
+    // En producción, añadimos un pequeño retraso para asegurar que los datos se carguen
+    if (isProduction) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    
     // Verificar si es un ID de MongoDB (formato ObjectId)
     const isMongoId = /^[0-9a-fA-F]{24}$/.test(id);
     
     if (isMongoId) {
       // Es un ID de MongoDB, obtener de nuestra API
       console.log(`Obteniendo blog de MongoDB con ID ${id}`);
-      // Usar la ruta con API_URL
-      const response = await fetch(`${API_URL}/blog/${id}`);
       
+      // Usar la ruta con API_URL y un timeout más largo en producción
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), isProduction ? 20000 : 10000);
+      
+      const response = await fetch(`${API_URL}/blog/${id}`, {
+        signal: controller.signal,
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
+      
+      clearTimeout(timeoutId);
+
       console.log("Respuesta de MongoDB:", {
         status: response.status,
         statusText: response.statusText
@@ -595,16 +616,25 @@ export async function getPropertyById(id) {
   try {
     console.log(`[DEBUG] Iniciando getPropertyById para ID: ${id}`);
     
+    // Verificar si estamos en producción
+    const isProduction = process.env.NODE_ENV === 'production';
+    console.log(`[DEBUG] ¿Estamos en producción? ${isProduction}`);
+    
     // Verificar si es un ID de MongoDB (formato ObjectId)
     const isMongoId = /^[0-9a-fA-F]{24}$/.test(id);
     console.log(`[DEBUG] ¿Es ID de MongoDB? ${isMongoId}`);
     
-    // Crear un controlador de aborto para establecer un timeout
+    // En producción, añadimos un pequeño retraso para asegurar que los datos se carguen
+    if (isProduction) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    
+    // Crear un controlador de aborto para establecer un timeout más largo en producción
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
       console.log(`[DEBUG] TIMEOUT alcanzado para la propiedad con ID: ${id}`);
       controller.abort();
-    }, 10000); // 10 segundos timeout
+    }, isProduction ? 20000 : 10000); // 20 segundos en producción, 10 en desarrollo
     
     let response;
     
@@ -861,17 +891,21 @@ export const sendEmail = async (data) => {
 
 export const sendPropertyEmail = async (data) => {
   try {
-    // Usamos la constante API_URL que ya está definida en el archivo
-    let endpoint = `${API_URL}/api/property-notification`;
-    
-    // Si es una oferta, usar la nueva ruta
-
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://goza-madrid.onrender.com';
     
     if (data.type === 'offer') {
-      endpoint = `${API_URL}/api/property-offer/create`;
+      const endpoint = `${API_URL}/api/property-offer/create`;
       
-      // Renombrar campos si es necesario para mantener compatibilidad
-      const { type, ...offerData } = data;
+      // Mapear los campos correctamente para la oferta
+      const offerData = {
+        offerPrice: data.offerAmount,
+        offerPercentage: data.offerLabel,
+        email: data.email,
+        name: data.name,
+        phone: data.phone,
+        property: data.propertyId,
+        propertyAddress: data.propertyTitle
+      };
     
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -883,31 +917,46 @@ export const sendPropertyEmail = async (data) => {
       });
       
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error en respuesta:', errorText);
-        throw new Error('Error en la respuesta del servidor');
+        const errorData = await response.json();
+        console.error('Error en respuesta:', errorData);
+        throw new Error(errorData.message || 'Error en la respuesta del servidor');
+      }
+      
+      return await response.json();
+    } else if (data.type === 'visit') {
+      const endpoint = `${API_URL}/api/property-visit/create`;
+      
+      // Mapear los campos correctamente para la visita
+      const visitData = {
+        date: data.visitDate,
+        time: data.visitTime,
+        email: data.email,
+        name: data.name,
+        phone: data.phone,
+        property: data.propertyId,
+        propertyAddress: data.propertyTitle,
+        message: data.message
+      };
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(visitData),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error en respuesta:', errorData);
+        throw new Error(errorData.message || 'Error en la respuesta del servidor');
       }
       
       return await response.json();
     }
     
-    // Para otros tipos (visitas), usar la ruta original
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(data),
-    });
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Error en respuesta:', errorText);
-      throw new Error('Error en la respuesta del servidor');
-    }
-    
-    return await response.json();
+    throw new Error('Tipo de solicitud no válido');
   } catch (error) {
     console.error('Error al enviar email:', error);
     return {

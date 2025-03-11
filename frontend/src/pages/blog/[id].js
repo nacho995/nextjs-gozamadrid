@@ -3,6 +3,7 @@ import Head from 'next/head';
 import { getBlogById } from '@/pages/api'; // API local
 import { getBlogPostBySlug } from '@/services/wpApi'; // API WordPress
 import { useRouter } from 'next/router';
+import LoadingScreen from '@/components/LoadingScreen';
 
 import DirectImage from '@/components/DirectImage';
 import Error from 'next/error';
@@ -57,6 +58,7 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
   const [loading, setLoading] = useState(!initialBlog);
   const [source, setSource] = useState(isWordPress ? 'wordpress' : 'local');
   const [error, setError] = useState(null);
+  const isProduction = process.env.NODE_ENV === 'production';
 
   // Si no tenemos blog inicial, intentamos cargarlo en el cliente
   useEffect(() => {
@@ -206,12 +208,17 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
         console.error("Error cargando blog:", err);
         setError(err.message);
       } finally {
-        setLoading(false);
+        // En producción, mantenemos el loading un poco más para asegurar que todo se cargue
+        if (isProduction) {
+          setTimeout(() => setLoading(false), 1000);
+        } else {
+          setLoading(false);
+        }
       }
     };
     
     fetchBlogData();
-  }, [id, blog]);
+  }, [id, blog, isProduction]);
 
   // Función para transformar datos de WordPress al formato común
   const processContent = (content) => {
@@ -366,6 +373,10 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
 
   // Usar siempre el componente disponible
   const BlogContentComponent = DefaultBlogContent;
+
+  if (loading && isProduction) {
+    return <LoadingScreen />;
+  }
 
   return (
     <>
