@@ -38,6 +38,18 @@
       "static/chunks/main.js",
       "static/chunks/pages/blog.js"
     ],
+    "/blog/[id]": [
+      "static/chunks/webpack.js",
+      "static/chunks/commons.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/blog/[id].js"
+    ],
+    "/contacto": [
+      "static/chunks/webpack.js",
+      "static/chunks/commons.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/contacto.js"
+    ],
     "/property/[id]": [
       "static/chunks/webpack.js",
       "static/chunks/commons.js",

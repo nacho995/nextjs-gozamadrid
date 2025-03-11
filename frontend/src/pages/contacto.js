@@ -1,5 +1,5 @@
 import Head from "next/head";
-import RegisterForm from "@/components/FormContact";
+import FormContact from "@/components/FormContact";
 
 export default function Contact() {
     const pageTitle = "Contacto | Goza Madrid Inmobiliaria";
@@ -106,7 +106,7 @@ export default function Contact() {
                         backgroundImage: "url('/gozamadridwp.jpg')",
                     }}>
                 </div>
-                <RegisterForm />
+                <FormContact />
             </div>
         </>
     );
