@@ -1,35 +1,5 @@
 import emailConfig from '../config/emailConfig.js';
-import mongoose from 'mongoose';
-
-// Intentar importar los modelos (si existen)
-let PropertyVisit;
-try {
-  PropertyVisit = mongoose.model('PropertyVisit');
-} catch (e) {
-  // Crear el modelo si no existe
-  const PropertyVisitSchema = new mongoose.Schema({
-    property: String,
-    propertyAddress: String,
-    date: Date,
-    time: Date,
-    email: String,
-    name: String,
-    phone: String,
-    status: {
-      type: String,
-      enum: ['pending', 'confirmed', 'cancelled'],
-      default: 'pending'
-    },
-    emailSent: {
-      success: Boolean,
-      error: String,
-      attempts: Number,
-      lastAttempt: Date
-    }
-  }, { timestamps: true });
-  
-  PropertyVisit = mongoose.model('PropertyVisit', PropertyVisitSchema);
-}
+import PropertyVisit from '../models/propertyVisitSchema.js';
 
 export const sendPropertyNotification = async (req, res) => {
     // Asegurarse que la respuesta sea JSON
@@ -38,7 +8,7 @@ export const sendPropertyNotification = async (req, res) => {
     try {
         console.log('📩 Recibida solicitud de notificación:', req.body);
         
-        const { date, time, email, name, phone, property, propertyAddress, offer } = req.body;
+        const { date, time, email, name, phone, property, propertyAddress, message } = req.body;
 
         // Validar que se recibieron los datos necesarios
         if (!email || !name || !phone) {
@@ -48,10 +18,10 @@ export const sendPropertyNotification = async (req, res) => {
             });
         }
 
-        if (!property || !propertyAddress) {
+        if (!property || !propertyAddress || !date || !time) {
             return res.status(400).json({
                 success: false,
-                message: 'Faltan datos de la propiedad'
+                message: 'Faltan datos de la visita'
             });
         }
 
@@ -64,94 +34,50 @@ export const sendPropertyNotification = async (req, res) => {
             });
         }
 
-        let emailContent;
-        let emailSubject;
-        let visitData = null;
-
-        // Si hay una oferta, es una notificación de oferta
-        if (offer !== undefined) {
-            emailContent = `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                    <h2 style="color: #333;">Nueva Oferta de Propiedad</h2>
-                    <div style="background-color: #f5f5f5; padding: 20px; border-radius: 5px;">
-                        <p><strong>Propiedad:</strong> ${propertyAddress}</p>
-                        <p><strong>Oferta:</strong> ${offer}€</p>
-                        <p><strong>Nombre:</strong> ${name}</p>
-                        <p><strong>Email:</strong> ${email}</p>
-                        <p><strong>Teléfono:</strong> ${phone}</p>
-                    </div>
-                </div>
-            `;
-            emailSubject = `Nueva oferta para ${propertyAddress}`;
-        } 
-        // Si hay fecha y hora, es una solicitud de visita
-        else if (date && time) {
-            // Convertir a objetos Date si vienen como strings
-            const visitDate = typeof date === 'string' ? new Date(date) : date;
-            const visitTime = typeof time === 'string' ? new Date(time) : time;
-            
-            // Asegurarse de que son fechas válidas
-            if (isNaN(visitDate.getTime()) || isNaN(visitTime.getTime())) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'La fecha o la hora no son válidas'
-                });
-            }
-            
-            const formattedDate = visitDate.toLocaleDateString('es-ES', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-            });
-            
-            const formattedTime = visitTime.toLocaleTimeString('es-ES', {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-
-            emailContent = `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                    <h2 style="color: #333;">Nueva Solicitud de Visita</h2>
-                    <div style="background-color: #f5f5f5; padding: 20px; border-radius: 5px;">
-                        <p><strong>Propiedad:</strong> ${propertyAddress}</p>
-                        <p><strong>Fecha:</strong> ${formattedDate}</p>
-                        <p><strong>Hora:</strong> ${formattedTime}</p>
-                        <p><strong>Nombre:</strong> ${name}</p>
-                        <p><strong>Email:</strong> ${email}</p>
-                        <p><strong>Teléfono:</strong> ${phone}</p>
-                    </div>
-                </div>
-            `;
-            emailSubject = `Nueva solicitud de visita para ${propertyAddress}`;
-            
-            // Guardar la visita en la base de datos
-            if (mongoose.connection.readyState === 1) { // Verificar conexión a MongoDB
-                try {
-                    visitData = await PropertyVisit.create({
-                        property,
-                        propertyAddress,
-                        date: visitDate,
-                        time: visitTime,
-                        email,
-                        name,
-                        phone,
-                        emailSent: {
-                            success: false,
-                            attempts: 0
-                        }
-                    });
-                    console.log('✅ Visita guardada en base de datos:', visitData._id);
-                } catch (dbError) {
-                    console.error('❌ Error al guardar visita en base de datos:', dbError);
-                    // Continuamos para intentar enviar el email de todas formas
-                }
-            }
-        } else {
-            return res.status(400).json({
+        // Guardar la visita en la base de datos
+        const visitData = await PropertyVisit.create({
+            property,
+            propertyAddress,
+            date: new Date(date),
+            time: new Date(time),
+            email,
+            name,
+            phone,
+            message,
+            emailSent: {
                 success: false,
-                message: 'Tipo de notificación no válido'
-            });
-        }
+                attempts: 0
+            }
+        });
+
+        // Formatear la fecha y hora para el email
+        const formattedDate = new Date(date).toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+        
+        const formattedTime = new Date(time).toLocaleTimeString('es-ES', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        const emailContent = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #333;">Nueva Solicitud de Visita</h2>
+                <div style="background-color: #f5f5f5; padding: 20px; border-radius: 5px;">
+                    <p><strong>Propiedad:</strong> ${propertyAddress}</p>
+                    <p><strong>Fecha:</strong> ${formattedDate}</p>
+                    <p><strong>Hora:</strong> ${formattedTime}</p>
+                    <p><strong>Nombre:</strong> ${name}</p>
+                    <p><strong>Email:</strong> ${email}</p>
+                    <p><strong>Teléfono:</strong> ${phone}</p>
+                    ${message ? `<p><strong>Mensaje:</strong> ${message}</p>` : ''}
+                </div>
+            </div>
+        `;
+
+        const emailSubject = `Nueva solicitud de visita para ${propertyAddress}`;
 
         try {
             // Obtener los emails y dividirlos en un array
@@ -175,19 +101,13 @@ export const sendPropertyNotification = async (req, res) => {
                 }
             }
 
-            // Actualizar el estado de la visita si existe
-            if (visitData) {
-                try {
-                    await PropertyVisit.findByIdAndUpdate(visitData._id, {
-                        'emailSent.success': successCount > 0,
-                        'emailSent.error': errorMessages.join('; '),
-                        'emailSent.attempts': 1,
-                        'emailSent.lastAttempt': new Date()
-                    });
-                } catch (updateError) {
-                    console.error('❌ Error al actualizar estado de la visita:', updateError);
-                }
-            }
+            // Actualizar el estado de la visita
+            await PropertyVisit.findByIdAndUpdate(visitData._id, {
+                'emailSent.success': successCount > 0,
+                'emailSent.error': errorMessages.join('; '),
+                'emailSent.attempts': 1,
+                'emailSent.lastAttempt': new Date()
+            });
 
             // Si al menos un email se envió correctamente, considerar éxito
             if (successCount > 0) {
@@ -207,7 +127,6 @@ export const sendPropertyNotification = async (req, res) => {
                 error: emailError.message
             });
         }
-
     } catch (error) {
         console.error('❌ Error en propertyNotificationController:', error);
         return res.status(500).json({
