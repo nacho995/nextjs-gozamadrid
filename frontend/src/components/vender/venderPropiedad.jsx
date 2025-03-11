@@ -41,37 +41,35 @@ export default function VenderPropiedad() {
             {/* Sección 1: Vender Propiedad */}
             <AnimatedOnScroll>
                 <section 
-                    className="relative w-full h-[40vh] sm:h-[80vh] bg-cover bg-center border-y-amarillo/20 border-y-8"
+                    className="relative w-full h-[50vh] xs:h-[90vh] sm:h-[80vh] md:h-[80vh] bg-cover bg-center border-y-amarillo/20 border-y-8"
                     style={{ backgroundImage: "url('/casaVender.jpg')" }}
                     aria-label="Venta de propiedades"
                 >             
-                    <div className="relative flex items-center justify-end h-full px-4 bg-gradient-to-l from-white/30 to-transparent">
-                        <article className="bg-black/20 backdrop-blur-md rounded-lg border border-white py-12 w-11/12 sm:w-2/5 text-center flex flex-col gap-6 mr-[5%]">
+                    <div className="relative flex items-start sm:items-center justify-center sm:justify-end h-full px-2 sm:px-4 bg-gradient-to-l from-white/30 to-transparent pt-8 sm:pt-0">
+                        <article className="bg-black/20 backdrop-blur-md rounded-lg border border-white py-3 sm:py-6 md:py-8 lg:py-12 w-[85%] sm:w-3/4 md:w-2/5 text-center flex flex-col gap-2 sm:gap-3 md:gap-4 lg:gap-6 mx-auto sm:mr-[5%] max-h-[105%] xs:max-h-[80%] sm:max-h-[75%] md:max-h-[70%] overflow-y-auto">
                             <h1 
-                                className="text-white font-bold text-2xl sm:text-4xl md:text-5xl"
-                                style={{ textShadow: "4px 4px 5px black"}}
+                                className="text-white font-bold text-lg sm:text-xl md:text-3xl lg:text-5xl px-2"
+                                style={{ textShadow: "2px 2px 3px black"}}
                                 itemProp="name"
                             >
-                                Vende tu Propiedad con Expertos
+                                Vende tu Propiedad en Madrid
                             </h1>
                             <p 
-                                className="text-white text-sm sm:text-base md:text-lg"
-                                style={{ textShadow: "4px 4px 5px black"}}
+                                className="text-white text-xs sm:text-sm md:text-base lg:text-lg px-2"
+                                style={{ textShadow: "2px 2px 3px black"}}
                                 itemProp="description"
                             >
-                                Simplificamos el proceso de venta de tu propiedad. Nuestros expertos inmobiliarios 
-                                te acompañan en cada etapa, desde la valoración hasta el cierre, garantizando una 
-                                experiencia profesional y sin complicaciones.
+                                Maximiza el valor de tu inmueble con nuestra tasación gratuita y asesoramiento inmobiliario profesional. Vende tu piso o casa en Madrid con expertos del sector.
                             </p>
-                            <div>
+                            <div className="mb-2">
                                 <a
                                     href="https://valuation.lystos.com?clientId=cd55b10c-5ba6-4f65-854e-5c8adaf88a34"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="block w-full text-sm sm:w-3/4 md:w-1/2 lg:w-[15vw] mx-auto rounded-full bg-white text-black px-4 py-2 font-bold hover:bg-black hover:text-white transition-colors"
+                                    className="block w-[80%] text-xs sm:text-sm md:w-1/2 lg:w-[15vw] mx-auto rounded-full bg-white text-black px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 font-bold hover:bg-black hover:text-white transition-colors"
                                     title="Obtén una valoración profesional gratuita de tu propiedad"
                                 >
-                                    Valoración Gratuita de tu Propiedad
+                                    Valoración Inmobiliaria Gratuita
                                 </a>
                             </div>
                         </article>
@@ -82,7 +80,7 @@ export default function VenderPropiedad() {
             {/* Sección 2: Encontrar Hogar */}
             <AnimatedOnScroll>
                 <section
-                    className="relative w-full mt-0 h-[40vh] sm:h-[80vh] border-y-white/50 border-y-8 bg-center"
+                    className="relative w-full mt-0 h-[50vh] xs:h-[90vh] sm:h-[80vh] md:h-[80vh] border-y-white/50 border-y-8 bg-center"
                     style={{ 
                         backgroundImage: "url('/casaVender2.jpg')",
                         backgroundSize: "cover",
@@ -91,31 +89,29 @@ export default function VenderPropiedad() {
                     }}
                     aria-label="Búsqueda de propiedades"
                 >             
-                    <div className="relative flex items-center justify-start h-full px-4 bg-gradient-to-r from-white/20 to-transparent w-full">
-                        <article className="bg-black/20 backdrop-blur-md rounded-lg border border-white py-12 w-11/12 sm:w-2/5 text-center flex flex-col gap-6 ml-[5%]">
+                    <div className="relative flex items-start sm:items-center justify-center sm:justify-start h-full px-2 sm:px-4 bg-gradient-to-r from-white/20 to-transparent w-full pt-8 sm:pt-0">
+                        <article className="bg-black/20 backdrop-blur-md rounded-lg border border-white py-3 sm:py-6 md:py-8 lg:py-12 w-[85%] sm:w-3/4 md:w-2/5 text-center flex flex-col gap-2 sm:gap-3 md:gap-4 lg:gap-6 mx-auto sm:ml-[5%] max-h-[105%] xs:max-h-[80%] sm:max-h-[75%] md:max-h-[70%] overflow-y-auto">
                             <h2 
-                                className="text-white font-bold text-2xl sm:text-4xl md:text-5xl"
-                                style={{ textShadow: "4px 4px 5px black"}}
+                                className="text-white font-bold text-lg sm:text-xl md:text-3xl lg:text-5xl px-2"
+                                style={{ textShadow: "2px 2px 3px black"}}
                                 itemProp="name"
                             >
                                 Encuentra tu Hogar Ideal en Madrid
                             </h2>
                             <p 
-                                className="text-white text-sm sm:text-base md:text-lg"
-                                style={{ textShadow: "4px 4px 5px black"}}
+                                className="text-white text-xs sm:text-sm md:text-base lg:text-lg px-2"
+                                style={{ textShadow: "2px 2px 3px black"}}
                                 itemProp="description"
                             >
-                                Explora nuestra selección exclusiva de propiedades en Madrid. Contamos con 
-                                una amplia cartera de inmuebles y un equipo especializado que te ayudará a 
-                                encontrar la casa que mejor se adapte a tus necesidades y preferencias.
+                                Pisos y casas en venta en las mejores zonas de Madrid. Propiedades exclusivas, áticos, chalets y apartamentos con las mejores condiciones del mercado inmobiliario.
                             </p>
-                            <div>
+                            <div className="mb-2">
                                 <Link
                                     href="/vender/comprar"
-                                    className="block w-full text-sm sm:w-3/4 md:w-1/2 lg:w-[15vw] mx-auto rounded-full bg-white text-black px-4 py-2 font-bold hover:bg-black hover:text-white transition-colors"
+                                    className="block w-[80%] text-xs sm:text-sm md:w-1/2 lg:w-[15vw] mx-auto rounded-full bg-white text-black px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 font-bold hover:bg-black hover:text-white transition-colors"
                                     title="Explora nuestro catálogo de propiedades disponibles"
                                 >
-                                    Explorar Propiedades Disponibles
+                                    Buscar Propiedades en Madrid
                                 </Link>
                             </div>
                         </article>
@@ -126,7 +122,7 @@ export default function VenderPropiedad() {
             {/* Sección 3: Acompañamiento */}
             <AnimatedOnScroll>
                 <section
-                    className="relative w-full mt-0 h-[40vh] sm:h-[80vh] bg-center border-y-amarillo/20 border-y-8"
+                    className="relative w-full mt-0 h-[50vh] xs:h-[90vh] sm:h-[80vh] md:h-[80vh] bg-center border-y-amarillo/20 border-y-8"
                     style={{ 
                         backgroundImage: "url('/casaVender3.jpg')",
                         backgroundSize: "cover",
@@ -135,29 +131,29 @@ export default function VenderPropiedad() {
                     }}
                     aria-label="Servicios de asesoramiento"
                 >             
-                    <div className="relative flex items-center justify-start h-full px-4 ml-[5%] bg-gradient-to-l from-white/50 to-transparent">
-                        <article className="bg-black/20 backdrop-blur-md rounded-lg border border-white py-12 w-11/12 sm:w-2/5 text-center flex flex-col gap-6 ml-auto mr-[5%]">
+                    <div className="relative flex items-start sm:items-center justify-center sm:justify-end h-full px-2 sm:px-4 bg-gradient-to-l from-white/50 to-transparent pt-8 sm:pt-0">
+                        <article className="bg-black/20 backdrop-blur-md rounded-lg border border-white py-3 sm:py-6 md:py-8 lg:py-12 w-[85%] sm:w-3/4 md:w-2/5 text-center flex flex-col gap-2 sm:gap-3 md:gap-4 lg:gap-6 mx-auto sm:mr-[5%] max-h-[105%] sm:max-h-[75%] md:max-h-[70%] overflow-y-auto">
                             <h2 
-                                className="text-white font-bold text-2xl sm:text-4xl md:text-5xl"
-                                style={{ textShadow: "4px 4px 5px black"}}
+                                className="text-white font-bold text-lg sm:text-xl md:text-3xl lg:text-5xl px-2"
+                                style={{ textShadow: "2px 2px 3px black"}}
                                 itemProp="name"
                             >
                                 Asesoramiento Inmobiliario Integral
                             </h2>
                             <div 
-                                className="text-white text-sm sm:text-base md:text-lg"
-                                style={{ textShadow: "4px 4px 5px black"}}
+                                className="text-white text-xs sm:text-sm md:text-base lg:text-lg px-2"
+                                style={{ textShadow: "2px 2px 3px black"}}
                                 itemProp="description"
                             >
-                                <p className="mb-4">
-                                    Nuestro equipo de asesores inmobiliarios te acompaña en cada fase del proceso:
+                                <p className="mb-1 sm:mb-2 md:mb-4">
+                                    Servicios inmobiliarios premium en Madrid:
                                 </p>
-                                <ul className="text-left space-y-2 px-4">
-                                    <li>• Valoración profesional de mercado</li>
-                                    <li>• Estrategia de marketing personalizada</li>
-                                    <li>• Gestión de visitas y negociaciones</li>
+                                <ul className="text-left space-y-0.5 sm:space-y-1 md:space-y-2 px-2 sm:px-4 lg:text-lg text-xs sm:text-sm">
+                                    <li>• Tasación y valoración de mercado</li>
+                                    <li>• Marketing inmobiliario digital</li>
+                                    <li>• Gestión de visitas y ofertas</li>
                                     <li>• Asesoramiento legal y fiscal</li>
-                                    <li>• Acompañamiento hasta la escrituración</li>
+                                    <li>• Acompañamiento hasta escrituración</li>
                                 </ul>
                             </div>
                         </article>
