@@ -802,10 +802,10 @@ export default function DefaultPropertyContent({ property }) {
 
         {/* Modales con diseño premium */}
         {showCalendar && (
-          <div className="fixed inset-0 bg-black/90 backdrop-blur-xl z-50 flex items-center justify-center p-4 animate-fadeIn">
+          <div className="fixed inset-0 bg-black/90 backdrop-blur-xl z-50 flex items-start justify-center p-4 pt-8 animate-fadeIn overflow-y-auto">
             <div 
               ref={calendarRef} 
-              className="bg-black/95 rounded-[2rem] p-10 max-w-xl w-full mx-auto shadow-2xl overflow-y-auto max-h-[90vh] border border-amarillo/20 animate-scaleIn backdrop-blur-xl"
+              className="bg-black/95 rounded-[2rem] p-10 max-w-xl w-full mx-auto shadow-2xl border border-amarillo/20 animate-scaleIn backdrop-blur-xl my-4"
             >
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-2xl font-bold text-white">Agenda una visita</h3>
@@ -818,7 +818,7 @@ export default function DefaultPropertyContent({ property }) {
               </div>
               
               <div className="space-y-6">
-                <div>
+                <div className="relative z-50">
                   <label className="block text-sm font-medium text-gray-300 mb-2">Selecciona un día</label>
                   <DatePicker
                     selected={selectedDate}
@@ -831,6 +831,17 @@ export default function DefaultPropertyContent({ property }) {
                     className="w-full p-3 border border-gray-700 rounded-lg text-white bg-gray-800 focus:ring-2 focus:ring-amarillo focus:border-amarillo outline-none"
                     dateFormat="dd/MM/yyyy"
                     required
+                    popperClassName="date-picker-popper"
+                    popperPlacement="bottom"
+                    popperModifiers={[
+                      {
+                        name: "preventOverflow",
+                        options: {
+                          boundary: "viewport",
+                          padding: 20
+                        }
+                      }
+                    ]}
                   />
                 </div>
 
