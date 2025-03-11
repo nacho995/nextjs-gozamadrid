@@ -1,14 +1,11 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import { HiMiniSquare3Stack3D } from "react-icons/hi2";
-import { MdMeetingRoom } from "react-icons/md";
 import { FaRestroom, FaBuilding, FaEuroSign, FaCalendarAlt, FaClock, FaHandshake, FaEnvelope, FaUser, FaTimes, FaMapMarkerAlt, FaChevronLeft, FaChevronRight, FaRuler, FaBed, FaBath } from "react-icons/fa";
 import Link from "next/link";
-import Image from "next/image";
-import AnimatedOnScroll from "../AnimatedScroll";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { addDays, setHours, setMinutes } from "date-fns";
 import es from "date-fns/locale/es";
 import { toast } from "react-hot-toast";
@@ -128,6 +125,7 @@ export default function DefaultPropertyContent({ property }) {
   const [cleanedContent, setCleanedContent] = useState("");
   const [propertyUrl, setPropertyUrl] = useState("");
   const [imageLoading, setImageLoading] = useState(true);
+  const [loadedImages, setLoadedImages] = useState({});
   const [propertyData, setPropertyData] = useState({
     livingArea: 0,
     bedrooms: 0,
@@ -290,16 +288,33 @@ export default function DefaultPropertyContent({ property }) {
     console.error("Error al cargar imagen:", e.target.src);
     e.target.src = '/img/default-property-image.jpg';
     e.target.alt = 'Imagen por defecto (error al cargar)';
+    setImageLoading(false); // Ocultar el loader incluso si hay un error
+    
+    // Marcar la imagen actual como cargada (aunque sea la de error)
+    setLoadedImages(prev => ({
+      ...prev,
+      [current]: true
+    }));
   };
 
   // Función para avanzar a la siguiente imagen
   const nextImage = () => {
-    setCurrent((current + 1) % propertyImages.length);
+    const newIndex = (current + 1) % propertyImages.length;
+    setCurrent(newIndex);
+    // Restablecer el estado de carga si la imagen no está en la caché
+    if (!loadedImages[newIndex]) {
+      setImageLoading(true);
+    }
   };
 
   // Función para retroceder a la imagen anterior
   const prevImage = () => {
-    setCurrent((current - 1 + propertyImages.length) % propertyImages.length);
+    const newIndex = (current - 1 + propertyImages.length) % propertyImages.length;
+    setCurrent(newIndex);
+    // Restablecer el estado de carga si la imagen no está en la caché
+    if (!loadedImages[newIndex]) {
+      setImageLoading(true);
+    }
   };
 
   // Función para generar rangos de ofertas
@@ -341,6 +356,49 @@ export default function DefaultPropertyContent({ property }) {
     
     return ranges;
   };
+
+  // Efecto para actualizar imageLoading cuando cambie current
+  useEffect(() => {
+    // Si la imagen actual ya está en la caché de imágenes cargadas, no mostrar el loader
+    if (loadedImages[current]) {
+      setImageLoading(false);
+    } else {
+      // De lo contrario, mostrar el loader hasta que se cargue
+      setImageLoading(true);
+    }
+  }, [current, loadedImages]);
+
+  // Efecto para pre-cargar las imágenes adyacentes
+  useEffect(() => {
+    if (propertyImages.length <= 1) return;
+    
+    const nextIndex = (current + 1) % propertyImages.length;
+    const prevIndex = (current - 1 + propertyImages.length) % propertyImages.length;
+    
+    // Pre-cargar la siguiente imagen
+    if (propertyImages[nextIndex] && !loadedImages[nextIndex]) {
+      const nextImg = new Image();
+      nextImg.src = propertyImages[nextIndex].src;
+      nextImg.onload = () => {
+        setLoadedImages(prev => ({
+          ...prev,
+          [nextIndex]: true
+        }));
+      };
+    }
+    
+    // Pre-cargar la imagen anterior
+    if (propertyImages[prevIndex] && !loadedImages[prevIndex]) {
+      const prevImg = new Image();
+      prevImg.src = propertyImages[prevIndex].src;
+      prevImg.onload = () => {
+        setLoadedImages(prev => ({
+          ...prev,
+          [prevIndex]: true
+        }));
+      };
+    }
+  }, [current, propertyImages, loadedImages]);
 
   if (!property) {
     console.log("Renderizando estado de propiedad no disponible");
@@ -494,7 +552,8 @@ export default function DefaultPropertyContent({ property }) {
           <section aria-label="Galería de imágenes" className="flex flex-col mb-16">
             {/* Imagen principal con marco elegante */}
             <div className="relative w-full h-[75vh] mb-8 rounded-[2rem] overflow-hidden shadow-2xl border border-amarillo/20 group">
-              {imageLoading && (
+              {/* Indicador de carga mejorado que solo aparece cuando la imagen actual está cargando */}
+              {imageLoading && !loadedImages[current] && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/90">
                   <div className="w-24 h-12 relative">
                     <div className="absolute left-0 w-12 h-12 rounded-full border-4 border-amarillo animate-[spin_2s_linear_infinite]"></div>
@@ -514,7 +573,14 @@ export default function DefaultPropertyContent({ property }) {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.7 }}
                   onError={handleImageError}
-                  onLoad={() => setImageLoading(false)}
+                  onLoad={() => {
+                    setImageLoading(false);
+                    // Guardar en caché que esta imagen ya se ha cargado
+                    setLoadedImages(prev => ({
+                      ...prev,
+                      [current]: true
+                    }));
+                  }}
                   loading="eager"
                 />
               ) : (
@@ -833,11 +899,44 @@ export default function DefaultPropertyContent({ property }) {
                       Cancelar
                     </button>
                     <button
-                      onClick={() => {
-                        toast.success("Solicitud de visita enviada");
-                        setShowCalendar(false);
-                        setSelectedDate(null);
-                        setSelectedTime(null);
+                      onClick={async () => {
+                        try {
+                          // Preparar los datos para enviar
+                          const visitData = {
+                            type: 'visit',
+                            name: name,
+                            email: email,
+                            phone: phone,
+                            propertyTitle: property.title || property.name || 'Propiedad sin título',
+                            propertyId: property.id || property._id || '',
+                            propertyUrl: propertyUrl,
+                            visitDate: selectedDate ? selectedDate.toLocaleDateString('es-ES') : '',
+                            visitTime: selectedTime ? selectedTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '',
+                            price: formattedPrice,
+                            message: `Solicitud de visita para la propiedad ${property.title || property.name || 'Propiedad sin título'} el día ${selectedDate ? selectedDate.toLocaleDateString('es-ES') : ''} a las ${selectedTime ? selectedTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : ''}`
+                          };
+                          
+                          // Enviar los datos
+                          const response = await sendPropertyEmail(visitData);
+                          
+                          if (response.success) {
+                            toast.success("Solicitud de visita enviada correctamente");
+                          } else {
+                            toast.error(response.message || "Error al enviar la solicitud");
+                            console.error("Error al enviar solicitud de visita:", response);
+                          }
+                          
+                          // Cerrar el modal y limpiar los datos
+                          setShowCalendar(false);
+                          setSelectedDate(null);
+                          setSelectedTime(null);
+                          setName("");
+                          setEmail("");
+                          setPhone("");
+                        } catch (error) {
+                          console.error("Error al procesar la solicitud:", error);
+                          toast.error("Ha ocurrido un error al enviar la solicitud");
+                        }
                       }}
                       className="px-4 py-3 rounded-lg bg-amarillo hover:bg-amber-600 text-white font-medium transition-all duration-300 shadow-md hover:shadow-lg"
                     >
@@ -944,13 +1043,44 @@ export default function DefaultPropertyContent({ property }) {
                     Cancelar
                   </button>
                   <button
-                    onClick={() => {
-                      toast.success("Oferta enviada con éxito");
-                      setShowOfferPanel(false);
-                      setSelectedOffer(null);
-                      setEmail("");
-                      setName("");
-                      setPhone("");
+                    onClick={async () => {
+                      try {
+                        // Preparar los datos para enviar
+                        const offerData = {
+                          type: 'offer',
+                          name: name,
+                          email: email,
+                          phone: phone,
+                          propertyTitle: property.title || property.name || 'Propiedad sin título',
+                          propertyId: property.id || property._id || '',
+                          propertyUrl: propertyUrl,
+                          offerAmount: selectedOffer.value,
+                          offerLabel: selectedOffer.label,
+                          originalPrice: formattedPrice,
+                          percentage: selectedOffer.percentage || 0,
+                          message: `Oferta de ${selectedOffer.value.toLocaleString()}€ (${selectedOffer.label}) para la propiedad "${property.title || property.name || 'Propiedad sin título'}" por parte de ${name}`
+                        };
+                        
+                        // Enviar los datos
+                        const response = await sendPropertyEmail(offerData);
+                        
+                        if (response.success) {
+                          toast.success("Oferta enviada correctamente");
+                        } else {
+                          toast.error(response.message || "Error al enviar la oferta");
+                          console.error("Error al enviar oferta:", response);
+                        }
+                        
+                        // Cerrar el modal y limpiar los datos
+                        setShowOfferPanel(false);
+                        setSelectedOffer(null);
+                        setEmail("");
+                        setName("");
+                        setPhone("");
+                      } catch (error) {
+                        console.error("Error al procesar la oferta:", error);
+                        toast.error("Ha ocurrido un error al enviar la oferta");
+                      }
                     }}
                     className="px-4 py-3 rounded-lg bg-amarillo hover:bg-amber-600 text-white font-medium transition-all duration-300 shadow-md hover:shadow-lg"
                   >
