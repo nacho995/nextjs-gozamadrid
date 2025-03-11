@@ -127,6 +127,7 @@ export default function DefaultPropertyContent({ property }) {
   const [propertyImages, setPropertyImages] = useState([]);
   const [cleanedContent, setCleanedContent] = useState("");
   const [propertyUrl, setPropertyUrl] = useState("");
+  const [imageLoading, setImageLoading] = useState(true);
   const [propertyData, setPropertyData] = useState({
     livingArea: 0,
     bedrooms: 0,
@@ -459,54 +460,115 @@ export default function DefaultPropertyContent({ property }) {
     
       <div className="container mx-auto px-4 py-8">
         <article className="relative" itemScope itemType="https://schema.org/RealEstateListing">
-          {/* Hidden SEO metadata */}
+          {/* SEO metadata */}
           <meta itemProp="name" content={title} />
           <meta itemProp="description" content={cleanedContent?.replace(/<[^>]*>/g, '').substring(0, 500)} />
           <meta itemProp="url" content={propertyUrl} />
 
-          {/* Contenedor principal de imágenes */}
-          <section aria-label="Galería de imágenes" className="flex flex-col mb-8">
-            {/* Imagen principal arriba */}
-            <div className="relative w-full h-[60vh] mb-8 rounded-xl overflow-hidden shadow-xl">
+          {/* Cabecera de lujo con efecto de cristal y oro */}
+          <div className="mb-12 bg-gradient-to-r from-black/80 via-black/70 to-black/80 backdrop-blur-xl p-10 rounded-[2rem] border border-amarillo/20 shadow-2xl relative overflow-hidden">
+            {/* Efecto de brillo dorado */}
+            <div className="absolute inset-0 bg-gradient-to-r from-amarillo/5 via-amarillo/10 to-amarillo/5 animate-shimmer"></div>
+            
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between relative z-10">
+              <div className="lg:mr-8">
+                <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight leading-tight">{title}</h1>
+                <div className=" items-center mt-4 bg-black/30 backdrop-blur-md px-4 py-3 rounded-xl inline-block">
+                  <div className="bg-amarillo p-2 rounded-lg mr-3">
+                    <FaMapMarkerAlt className="text-black text-xl" />
+                  </div>
+                  <p className="text-xl text-white font-light">{location}</p>
+                </div>
+              </div>
+              
+              <div className="mt-8 lg:mt-0">
+                <div className="bg-amarillo py-4 px-8 rounded-2xl inline-flex items-center shadow-xl transform hover:scale-105 transition-all duration-500 group">
+                  <FaEuroSign className="text-3xl text-black mr-3" />
+                  <p className="text-3xl font-bold text-black tracking-wide" itemProp="offers">{formattedPrice}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Galería de imágenes de lujo */}
+          <section aria-label="Galería de imágenes" className="flex flex-col mb-16">
+            {/* Imagen principal con marco elegante */}
+            <div className="relative w-full h-[75vh] mb-8 rounded-[2rem] overflow-hidden shadow-2xl border border-amarillo/20 group">
+              {imageLoading && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/90">
+                  <div className="w-24 h-12 relative">
+                    <div className="absolute left-0 w-12 h-12 rounded-full border-4 border-amarillo animate-[spin_2s_linear_infinite]"></div>
+                    <div className="absolute right-0 w-12 h-12 rounded-full border-4 border-amarillo animate-[spin_2s_linear_infinite_reverse]"></div>
+                  </div>
+                </div>
+              )}
+              
               {propertyImages && propertyImages.length > 0 && propertyImages[current] ? (
                 <motion.img
                   key={current}
                   src={propertyImages[current].src}
                   alt={propertyImages[current].alt}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-3000 group-hover:scale-110"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.5 }}
+                  transition={{ duration: 0.7 }}
                   onError={handleImageError}
+                  onLoad={() => setImageLoading(false)}
+                  loading="eager"
                 />
               ) : (
                 <img 
                   src="/img/default-property-image.jpg" 
                   alt="Imagen por defecto"
                   className="w-full h-full object-cover"
+                  onLoad={() => setImageLoading(false)}
                 />
               )}
+              
+              {/* Controles de navegación elegantes */}
+              {propertyImages.length > 1 && (
+                <>
+                  <button 
+                    onClick={prevImage}
+                    className="absolute left-6 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-amarillo text-white hover:text-black p-6 rounded-full transition-all duration-500 hover:scale-110 shadow-xl group"
+                    aria-label="Imagen anterior"
+                  >
+                    <FaChevronLeft className="text-xl group-hover:transform group-hover:-translate-x-1 transition-transform" />
+                  </button>
+                  <button 
+                    onClick={nextImage}
+                    className="absolute right-6 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-amarillo text-white hover:text-black p-6 rounded-full transition-all duration-500 hover:scale-110 shadow-xl group"
+                    aria-label="Imagen siguiente"
+                  >
+                    <FaChevronRight className="text-xl group-hover:transform group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </>
+              )}
+              
+              {/* Contador de imágenes elegante */}
+              <div className="absolute bottom-6 right-6 bg-black/60 backdrop-blur-xl text-white px-6 py-3 rounded-2xl text-lg font-light tracking-wider shadow-xl border border-white/10">
+                {current + 1} / {propertyImages.length}
+              </div>
             </div>
             
-            <div className="bg-gray-50 dark:bg-gray-900 p-2 rounded-lg hidden sm:block">
-              <div className="flex flex-wrap justify-center gap-2">
+            {/* Miniaturas con efecto premium */}
+            <div className="bg-black/80 backdrop-blur-xl p-6 rounded-[2rem] border border-amarillo/20 shadow-2xl hidden sm:block">
+              <div className="flex flex-wrap justify-center gap-4">
                 {propertyImages.map((image, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrent(index)}
-                    className={`relative w-[80px] h-[60px] md:w-[100px] md:h-[75px] rounded-lg overflow-hidden border-2 transition-all duration-300 ${
+                    className={`relative w-[120px] h-[90px] md:w-[150px] md:h-[100px] rounded-xl overflow-hidden transition-all duration-500 ${
                       index === current
-                        ? "border-amarillo shadow-md scale-105"
-                        : "border-gray-200 hover:border-amarillo/50 hover:shadow-sm hover:scale-105"
+                        ? "ring-4 ring-amarillo shadow-2xl scale-110 z-10"
+                        : "ring-1 ring-white/10 hover:ring-amarillo hover:shadow-xl hover:scale-105"
                     }`}
                   >
                     <img
                       src={image.src}
                       alt={image.alt}
-                      className="h-full w-full object-cover"
-                      data-original-src={image.originalSrc || ""}
-                      data-is-proxied={image.isProxied ? "true" : "false"}
+                      className="h-full w-full object-cover transition-transform duration-3000 hover:scale-125"
                       onError={handleImageError}
                     />
                   </button>
@@ -515,120 +577,183 @@ export default function DefaultPropertyContent({ property }) {
             </div>
           </section>
 
-          {/* Información principal */}
-          <div className="mt-8 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-xl shadow-lg p-6">
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 mt-4">
-              <h2 className="text-2xl font-bold mb-4">Características</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {propertyData?.livingArea > 0 && (
-                  <div className="flex items-center gap-2 p-4 bg-gray-50 rounded-lg shadow">
-                    <FaRuler className="text-2xl text-primary" />
-                    <div>
-                      <p className="text-lg font-medium">{propertyData.livingArea} m²</p>
-                      <p className="text-sm text-gray-500">Superficie</p>
-                    </div>
-                  </div>
-                )}
-                
-                {propertyData?.bedrooms > 0 && (
-                  <div className="flex items-center gap-2 p-4 bg-gray-50 rounded-lg shadow">
-                    <FaBed className="text-2xl text-primary" />
-                    <div>
-                      <p className="text-lg font-medium">{propertyData.bedrooms}</p>
-                      <p className="text-sm text-gray-500">Habitaciones</p>
-                    </div>
-                  </div>
-                )}
-                
-                {propertyData?.bathrooms > 0 && (
-                  <div className="flex items-center gap-2 p-4 bg-gray-50 rounded-lg shadow">
-                    <FaBath className="text-2xl text-primary" />
-                    <div>
-                      <p className="text-lg font-medium">{propertyData.bathrooms}</p>
-                      <p className="text-sm text-gray-500">Baños</p>
-                    </div>
-                  </div>
-                )}
-                
-                {propertyData?.floor > 0 && (
-                  <div className="flex items-center gap-2 p-4 bg-gray-50 rounded-lg shadow">
-                    <FaBuilding className="text-2xl text-primary" />
-                    <div>
-                      <p className="text-lg font-medium">{propertyData.floor}ª</p>
-                      <p className="text-sm text-gray-500">Planta</p>
-                    </div>
-                  </div>
-                )}
-              </div>
+          {/* Características premium */}
+          <div className="mt-12 mb-16 bg-black/80 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-amarillo/20 overflow-hidden">
+            <div className="p-8 border-b border-amarillo/20 flex items-center">
+              <HiMiniSquare3Stack3D className="text-amarillo mr-4 text-4xl" />
+              <h2 className="text-3xl font-bold  tracking-wide !text-amarillo">Características Premium</h2>
             </div>
             
-            <div className="flex items-center gap-2 mt-4">
-              <FaEuroSign className="text-amber-400 text-lg sm:text-xl" />
-              <p className="text-sm sm:text-base md:text-lg font-semibold text-black dark:text-white" itemProp="offers">{formattedPrice}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 p-10">
+              {propertyData?.livingArea > 0 && (
+                <div className="bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-xl rounded-2xl shadow-2xl transition-transform hover:scale-105 border border-amarillo/20 overflow-hidden group">
+                  <div className="bg-gradient-to-r from-amarillo to-amarillo/90 p-6 flex justify-center">
+                    <FaRuler className="text-3xl text-black" />
+                  </div>
+                  <div className="p-6 flex flex-col items-center">
+                    <p className="text-4xl font-bold text-white mb-2">{propertyData.livingArea} m²</p>
+                    <p className="text-lg text-gray-300 group-hover:text-amarillo transition-colors">Superficie</p>
+                  </div>
+                </div>
+              )}
+              
+              {propertyData?.bedrooms > 0 && (
+                <div className="bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-xl rounded-2xl shadow-2xl transition-transform hover:scale-105 border border-amarillo/20 overflow-hidden group">
+                  <div className="bg-gradient-to-r from-amarillo to-amarillo/90 p-6 flex justify-center">
+                    <FaBed className="text-3xl text-black" />
+                  </div>
+                  <div className="p-6 flex flex-col items-center">
+                    <p className="text-4xl font-bold text-white mb-2">{propertyData.bedrooms}</p>
+                    <p className="text-lg text-gray-300 group-hover:text-amarillo transition-colors">Habitaciones</p>
+                  </div>
+                </div>
+              )}
+              
+              {propertyData?.bathrooms > 0 && (
+                <div className="bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-xl rounded-2xl shadow-2xl transition-transform hover:scale-105 border border-amarillo/20 overflow-hidden group">
+                  <div className="bg-gradient-to-r from-amarillo to-amarillo/90 p-6 flex justify-center">
+                    <FaBath className="text-3xl text-black" />
+                  </div>
+                  <div className="p-6 flex flex-col items-center">
+                    <p className="text-4xl font-bold text-white mb-2">{propertyData.bathrooms}</p>
+                    <p className="text-lg text-gray-300 group-hover:text-amarillo transition-colors">Baños</p>
+                  </div>
+                </div>
+              )}
+              
+              {propertyData?.floor > 0 && (
+                <div className="bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-xl rounded-2xl shadow-2xl transition-transform hover:scale-105 border border-amarillo/20 overflow-hidden group">
+                  <div className="bg-gradient-to-r from-amarillo to-amarillo/90 p-6 flex justify-center">
+                    <FaBuilding className="text-3xl text-black" />
+                  </div>
+                  <div className="p-6 flex flex-col items-center">
+                    <p className="text-4xl font-bold text-white mb-2">{propertyData.floor}ª</p>
+                    <p className="text-lg text-gray-300 group-hover:text-amarillo transition-colors">Planta</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
-          <div className="mt-6">
-            <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Descripción</h2>
-            <div 
-              className="prose prose-lg max-w-none 
-                text-black dark:text-white 
-                dark:prose-headings:text-white 
-                dark:prose-h1:text-white dark:prose-h2:!text-white dark:prose-h3:text-white
-                dark:prose-p:text-white 
-                dark:prose-li:text-white 
-                dark:prose-strong:!text-white
-                dark:prose-a:text-amarillo
-                dark:prose-code:text-white
-                dark:prose-figcaption:text-white
-                dark:prose-blockquote:text-white" 
-              dangerouslySetInnerHTML={{ __html: cleanedContent }} 
-              itemProp="description"
-            />
+          {/* Descripción de lujo */}
+          <div className="mt-12 bg-black/80 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-amarillo/20 overflow-hidden">
+            <div className="p-8 border-b border-amarillo/20">
+              <h2 className="text-3xl font-bold tracking-wide !text-white">Descripción Exclusiva</h2>
+            </div>
+            
+            <div className="p-10">
+              <div 
+                className="prose prose-xl max-w-none 
+                  text-gray-100 
+                  prose-headings:text-white 
+                  prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl
+                  prose-h1:font-bold prose-h2:font-bold prose-h3:font-medium
+                  prose-p:text-gray-200 prose-p:leading-relaxed
+                  prose-li:text-gray-200
+                  prose-strong:text-amarillo
+                  prose-a:text-amarillo hover:prose-a:text-amarillo/80
+                  prose-img:rounded-2xl
+                  prose-h2:!text-white
+                  prose-h2:before:!text-amarillo
+                  prose-h2:after:!text-amarillo
+                  [&>h2]:!text-white
+                  [&>h2]:before:!text-amarillo
+                  [&>h2]:after:!text-amarillo" 
+                dangerouslySetInnerHTML={{ __html: cleanedContent }} 
+                itemProp="description"
+              />
+            </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-center gap-3 md:gap-4 mb-6 md:mb-8 mt-8">
+          {/* Mapa con estilo premium */}
+          <div className="mt-16 bg-black/80 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-amarillo/20 overflow-hidden">
+            <div className="p-8 border-b border-amarillo/20 flex items-center">
+              <FaMapMarkerAlt className="text-amarillo mr-4 text-3xl" />
+              <h2 className="text-3xl font-bold  tracking-wide !text-white">Ubicación Privilegiada</h2>
+            </div>
+            
+            <div className="p-10">
+              <div className="relative w-full h-[500px] rounded-2xl overflow-hidden shadow-2xl border border-amarillo/10">
+                <iframe
+                  src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyAZAI0_oecmQkuzwZ4IM2H_NLynxD2Lkxo&q=${encodeURIComponent(
+                    title + ', ' + location
+                  )}&zoom=15`}
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="rounded-2xl"
+                ></iframe>
+              </div>
+            </div>
+          </div>
+
+          {/* Botones de acción premium */}
+          <div className="flex flex-col sm:flex-row justify-center gap-6 md:gap-8 my-16">
             <button
               onClick={() => setShowCalendar(true)}
-              className="group relative inline-flex items-center gap-1 sm:gap-2 overflow-hidden rounded-full bg-white/20 dark:bg-white/20 px-4 sm:px-6 md:px-8 py-2 sm:py-3 transition-all duration-300 hover:bg-white/30 dark:hover:bg-white/30 backdrop-blur-sm"
+              className="group relative inline-flex items-center gap-3 overflow-hidden rounded-2xl bg-black/80 px-8 py-6 transition-all duration-500 hover:bg-black backdrop-blur-xl border border-amarillo/20 shadow-2xl hover:shadow-amarillo/20"
             >
-              <FaCalendarAlt className="text-base sm:text-lg text-black dark:text-white" />
-              <span className="relative text-sm sm:text-base md:text-lg font-semibold text-black dark:text-white">
-                Agendar una visita
+              <div className="bg-amarillo p-3 rounded-xl">
+                <FaCalendarAlt className="text-2xl text-black" />
+              </div>
+              <span className="text-xl font-semibold text-white tracking-wide group-hover:text-amarillo transition-colors">
+                Agendar Visita Privada
               </span>
-              <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-white via-amarillo to-white transition-transform duration-300 group-hover:translate-x-full"></span>
             </button>
 
             <button
               onClick={() => setShowOfferPanel(true)}
-              className="group relative inline-flex items-center gap-1 sm:gap-2 overflow-hidden rounded-full bg-white/20 dark:bg-white/20 px-4 sm:px-6 md:px-8 py-2 sm:py-3 transition-all duration-300 hover:bg-white/30 dark:hover:bg-white/30 backdrop-blur-sm"
+              className="group relative inline-flex items-center gap-3 overflow-hidden rounded-2xl bg-black/80 px-8 py-6 transition-all duration-500 hover:bg-black backdrop-blur-xl border border-amarillo/20 shadow-2xl hover:shadow-amarillo/20"
             >
-              <FaHandshake className="text-base sm:text-lg text-black dark:text-white" />
-              <span className="relative text-sm sm:text-base md:text-lg font-semibold text-black dark:text-white">
-                Hacer Oferta
+              <div className="bg-amarillo p-3 rounded-xl">
+                <FaHandshake className="text-2xl text-black" />
+              </div>
+              <span className="text-xl font-semibold text-white tracking-wide group-hover:text-amarillo transition-colors">
+                Realizar Oferta
               </span>
-              <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-white via-amarillo to-white transition-transform duration-300 group-hover:translate-x-full"></span>
             </button>
+          </div>
+
+          {/* Sección de contacto premium */}
+          <div className="bg-gradient-to-br from-black/90 to-black/80 rounded-[2rem] shadow-2xl p-12 text-center mt-16 border border-amarillo/20 backdrop-blur-xl relative overflow-hidden">
+            {/* Efecto de brillo */}
+            <div className="absolute inset-0 bg-gradient-to-r from-amarillo/5 via-amarillo/10 to-amarillo/5 animate-shimmer"></div>
+            
+            <h3 className="text-3xl font-semibold text-white mb-8 tracking-wide relative z-10">¿Desea más información sobre esta propiedad exclusiva?</h3>
+            <Link href="/contacto">
+              <button className="group relative inline-flex items-center gap-3 overflow-hidden rounded-2xl bg-amarillo px-8 py-6 transition-all duration-500 hover:bg-amarillo/90 shadow-2xl hover:scale-105">
+                <FaEnvelope className="text-2xl text-black" />
+                <span className="text-xl font-semibold text-black tracking-wide">
+                  Contacto Personalizado
+                </span>
+              </button>
+            </Link>
           </div>
         </article>
 
-        {/* Calendario de visitas */}
+        {/* Modales con diseño premium */}
         {showCalendar && (
-          <div className="fixed inset-0 bg-black/50 dark:bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/90 backdrop-blur-xl z-50 flex items-center justify-center p-4 animate-fadeIn">
             <div 
               ref={calendarRef} 
-              className="bg-white dark:bg-gray-900 rounded-xl p-6 max-w-sm w-full mx-auto shadow-lg overflow-y-auto max-h-[90vh]"
+              className="bg-black/95 rounded-[2rem] p-10 max-w-xl w-full mx-auto shadow-2xl overflow-y-auto max-h-[90vh] border border-amarillo/20 animate-scaleIn backdrop-blur-xl"
             >
-              <button
-                onClick={() => setShowCalendar(false)}
-                className="absolute top-4 right-4 text-black dark:text-white hover:text-amarillo dark:hover:text-amarillo transition-colors duration-300"
-              >
-                <FaTimes className="text-xl" />
-              </button>
-              <h3 className="text-2xl font-bold mb-4 text-black dark:text-white">Agenda una visita</h3>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-bold text-white">Agenda una visita</h3>
+                <button
+                  onClick={() => setShowCalendar(false)}
+                  className="text-gray-400 hover:text-white transition-colors duration-300 p-2 rounded-full hover:bg-white/10"
+                >
+                  <FaTimes className="text-xl" />
+                </button>
+              </div>
+              
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-black dark:text-white mb-2">Selecciona un día</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Selecciona un día</label>
                   <DatePicker
                     selected={selectedDate}
                     onChange={(date) => setSelectedDate(date)}
@@ -637,7 +762,7 @@ export default function DefaultPropertyContent({ property }) {
                     maxDate={addDays(new Date(), 30)}
                     locale={es}
                     placeholderText="Selecciona una fecha"
-                    className="w-full p-2 border rounded-lg text-black bg-white dark:text-white dark:bg-gray-800"
+                    className="w-full p-3 border border-gray-700 rounded-lg text-white bg-gray-800 focus:ring-2 focus:ring-amarillo focus:border-amarillo outline-none"
                     dateFormat="dd/MM/yyyy"
                     required
                   />
@@ -645,7 +770,7 @@ export default function DefaultPropertyContent({ property }) {
 
                 {selectedDate && (
                   <div>
-                    <label className="block text-sm font-medium text-black dark:text-white mb-2">Selecciona una hora</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Selecciona una hora</label>
                     <div className="grid grid-cols-2 gap-2">
                       {Array.from({ length: 10 }, (_, i) => {
                         const time = setHours(setMinutes(new Date(), 0), i + 9);
@@ -653,10 +778,10 @@ export default function DefaultPropertyContent({ property }) {
                           <button
                             key={i}
                             onClick={() => setSelectedTime(time)}
-                            className={`p-2 rounded-lg transition-colors ${
+                            className={`p-3 rounded-lg transition-transform hover:scale-105 font-medium ${
                               selectedTime && time.getHours() === selectedTime.getHours()
-                                ? "bg-amarillo text-white"
-                                : "bg-gray-100 hover:bg-gray-200 text-black"
+                                ? "bg-amarillo text-white shadow-md"
+                                : "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700"
                             }`}
                           >
                             {time.getHours()}:00
@@ -668,42 +793,42 @@ export default function DefaultPropertyContent({ property }) {
                 )}
 
                 {selectedDate && selectedTime && (
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2 flex items-center text-black dark:text-amarillo">
+                  <div className="bg-gray-800/70 p-5 rounded-lg border border-gray-700">
+                    <h3 className="text-lg font-semibold mb-4 flex items-center text-white">
                       <FaUser className="mr-2 text-amarillo" />
                       Datos de contacto
                     </h3>
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       <input
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="Email de contacto"
-                        className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-amarillo/70"
+                        className="w-full p-3 border border-gray-700 rounded-lg text-white bg-gray-800/90 placeholder-gray-400 focus:ring-2 focus:ring-amarillo focus:border-amarillo outline-none"
                       />
                       <input
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="Nombre completo"
-                        className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-amarillo/70"
+                        className="w-full p-3 border border-gray-700 rounded-lg text-white bg-gray-800/90 placeholder-gray-400 focus:ring-2 focus:ring-amarillo focus:border-amarillo outline-none"
                       />
                       <input
                         type="tel"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         placeholder="Teléfono"
-                        className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-amarillo/70"
+                        className="w-full p-3 border border-gray-700 rounded-lg text-white bg-gray-800/90 placeholder-gray-400 focus:ring-2 focus:ring-amarillo focus:border-amarillo outline-none"
                       />
                     </div>
                   </div>
                 )}
 
                 {selectedDate && selectedTime && email && name && phone && (
-                  <div className="flex flex-col sm:flex-row justify-end gap-2 mt-4">
+                  <div className="flex flex-col sm:flex-row justify-end gap-3 mt-6">
                     <button
                       onClick={() => setShowCalendar(false)}
-                      className="w-full sm:w-auto px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-all duration-300 hover:scale-105"
+                      className="px-4 py-3 rounded-lg bg-gray-800 hover:bg-gray-700 text-white transition-all duration-300 font-medium border border-gray-700"
                     >
                       Cancelar
                     </button>
@@ -714,7 +839,7 @@ export default function DefaultPropertyContent({ property }) {
                         setSelectedDate(null);
                         setSelectedTime(null);
                       }}
-                      className="w-full sm:w-auto px-4 py-2 rounded-lg bg-amarillo text-black font-medium hover:bg-amarillo/90 transition-all duration-300 hover:scale-105"
+                      className="px-4 py-3 rounded-lg bg-amarillo hover:bg-amber-600 text-white font-medium transition-all duration-300 shadow-md hover:shadow-lg"
                     >
                       Confirmar Visita
                     </button>
@@ -725,65 +850,34 @@ export default function DefaultPropertyContent({ property }) {
           </div>
         )}
 
-        {/* Mapa de Google */}
-        <div className="mt-8 bg-white dark:bg-gray-900 backdrop-blur-sm rounded-xl shadow-lg p-6">
-          <h2 className="text-2xl font-bold mb-4 text-black dark:text-amarillo">Ubicación</h2>
-          <div className="relative w-full h-[400px] rounded-lg overflow-hidden">
-            <iframe
-              src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyAZAI0_oecmQkuzwZ4IM2H_NLynxD2Lkxo&q=${encodeURIComponent(
-                title + ', ' + location
-              )}&zoom=15`}
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              allowFullScreen=""
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              className="rounded-lg shadow-md"
-            ></iframe>
-          </div>
-        </div>
-
-        {/* Sección de preguntas */}
-        <div className="bg-gradient-to-br from-amber-100 to-amber-200 dark:from-gray-900 dark:to-gray-800 rounded-2xl shadow-lg p-8 text-center mt-8">
-          <h3 className="text-2xl font-semibold text-black dark:text-amarillo mb-6">¿Tienes preguntas sobre esta propiedad?</h3>
-          <Link href="/contacto">
-            <button className="group relative inline-flex items-center gap-1 sm:gap-2 overflow-hidden rounded-full bg-white/20 dark:bg-white/20 px-4 sm:px-6 md:px-8 py-2 sm:py-3 transition-all duration-300 hover:bg-white/30 dark:hover:bg-white/30 backdrop-blur-sm">
-              <FaEnvelope className="text-base sm:text-lg text-black dark:text-white" />
-              <span className="relative text-sm sm:text-base md:text-lg font-semibold text-black dark:text-white">
-                Contáctanos
-              </span>
-              <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-white via-amarillo to-white transition-transform duration-300 group-hover:translate-x-full"></span>
-            </button>
-          </Link>
-        </div>
-
-        {/* Panel de ofertas */}
         {showOfferPanel && (
-          <div className="fixed inset-0 bg-black/50 dark:bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/90 backdrop-blur-xl z-50 flex items-center justify-center p-4 animate-fadeIn">
             <div 
               ref={offerPanelRef} 
-              className="bg-white dark:bg-black rounded-xl p-6 max-w-sm w-full mx-auto relative overflow-y-auto max-h-[90vh]"
+              className="bg-black/95 rounded-[2rem] p-10 max-w-xl w-full mx-auto shadow-2xl overflow-y-auto max-h-[90vh] border border-amarillo/20 animate-scaleIn backdrop-blur-xl"
             >
-              <button
-                onClick={() => setShowOfferPanel(false)}
-                className="absolute top-4 right-4 text-black dark:text-white hover:text-amarillo dark:hover:text-amarillo transition-colors duration-300"
-              >
-                <FaTimes className="text-xl" />
-              </button>
-              <h3 className="text-2xl font-bold mb-6 text-black dark:text-white">Hacer una oferta</h3>
-              <div className="space-y-4">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-bold text-white">Hacer una oferta</h3>
+                <button
+                  onClick={() => setShowOfferPanel(false)}
+                  className="text-gray-400 hover:text-white transition-colors duration-300 p-2 rounded-full hover:bg-white/10"
+                >
+                  <FaTimes className="text-xl" />
+                </button>
+              </div>
+              
+              <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-black dark:text-white mb-2">Selecciona tu oferta</label>
-                  <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-3">Selecciona tu oferta</label>
+                  <div className="space-y-3">
                     {generateOfferRanges(formattedPrice).map((range, index) => (
                       <button
                         key={index}
                         onClick={() => setSelectedOffer(range)}
-                        className={`w-full p-3 rounded-lg transition-all duration-300 flex justify-between items-center ${
+                        className={`w-full p-4 rounded-lg transition-all duration-300 flex justify-between items-center ${
                           selectedOffer?.percentage === range.percentage 
-                            ? "bg-amarillo text-black font-semibold"
-                            : "bg-gray-100 hover:bg-gray-200 text-black dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800"
+                            ? "bg-amarillo text-white font-semibold shadow-md"
+                            : "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700"
                         }`}
                       >
                         <span>{range.label}</span>
@@ -792,12 +886,13 @@ export default function DefaultPropertyContent({ property }) {
                     ))}
                   </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-black dark:text-white mb-2">Introduce tu oferta</label>
+                
+                <div className="border-t border-gray-700 pt-4">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Introduce tu oferta</label>
                   <input
                     type="number"
                     placeholder="Introduce tu oferta"
-                    className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-white/70"
+                    className="w-full p-3 border border-gray-700 rounded-lg text-white bg-gray-800/90 placeholder-gray-400 focus:ring-2 focus:ring-amarillo focus:border-amarillo outline-none"
                     onChange={(e) =>
                       setSelectedOffer({
                         value: parseInt(e.target.value),
@@ -807,42 +902,44 @@ export default function DefaultPropertyContent({ property }) {
                   />
                 </div>
               </div>
+              
               {selectedOffer && (
-                <div className="mt-6 space-y-4 border-t pt-4">
-                  <h3 className="text-lg font-semibold mb-2 flex items-center text-black dark:text-amarillo">
+                <div className="mt-6 space-y-4 border-t border-gray-700 pt-4">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center text-white">
                     <FaUser className="mr-2 text-amarillo" />
                     Datos de contacto
                   </h3>
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Email de contacto"
-                      className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-white/70"
+                      className="w-full p-3 border border-gray-700 rounded-lg text-white bg-gray-800/90 placeholder-gray-400 focus:ring-2 focus:ring-amarillo focus:border-amarillo outline-none"
                     />
                     <input
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Nombre completo"
-                      className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-white/70"
+                      className="w-full p-3 border border-gray-700 rounded-lg text-white bg-gray-800/90 placeholder-gray-400 focus:ring-2 focus:ring-amarillo focus:border-amarillo outline-none"
                     />
                     <input
                       type="tel"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="Teléfono"
-                      className="w-full p-2 border rounded-lg text-black dark:text-white bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-white/70"
+                      className="w-full p-3 border border-gray-700 rounded-lg text-white bg-gray-800/90 placeholder-gray-400 focus:ring-2 focus:ring-amarillo focus:border-amarillo outline-none"
                     />
                   </div>
                 </div>
               )}
+              
               {selectedOffer && email && name && phone && (
-                <div className="flex justify-end gap-2 mt-4">
+                <div className="flex flex-col sm:flex-row justify-end gap-3 mt-6">
                   <button
                     onClick={() => setShowOfferPanel(false)}
-                    className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-all duration-300"
+                    className="px-4 py-3 rounded-lg bg-gray-800 hover:bg-gray-700 text-white transition-all duration-300 font-medium border border-gray-700"
                   >
                     Cancelar
                   </button>
@@ -855,7 +952,7 @@ export default function DefaultPropertyContent({ property }) {
                       setName("");
                       setPhone("");
                     }}
-                    className="px-4 py-2 rounded-lg bg-amarillo text-black font-medium hover:bg-amarillo/90 transition-all duration-300"
+                    className="px-4 py-3 rounded-lg bg-amarillo hover:bg-amber-600 text-white font-medium transition-all duration-300 shadow-md hover:shadow-lg"
                   >
                     Enviar Oferta
                   </button>
@@ -865,6 +962,63 @@ export default function DefaultPropertyContent({ property }) {
           </div>
         )}
       </div>
+      
+      <style jsx global>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        
+        @keyframes scaleIn {
+          from { transform: scale(0.95); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+        
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+        
+        .animate-fadeIn {
+          animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .animate-scaleIn {
+          animation: scaleIn 0.5s ease-out forwards;
+        }
+        
+        .animate-shimmer {
+          animation: shimmer 3s infinite;
+        }
+        
+        .text-shadow-sm {
+          text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+        }
+        
+        .drop-shadow-md {
+          filter: drop-shadow(0 4px 3px rgb(0 0 0 / 0.3)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.2));
+        }
+        
+        .shadow-amarillo {
+          box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+        }
+
+        /* Estilos unificados para los h2 */
+        h2,
+        .prose h2,
+        article h2 {
+          @apply text-amarillo !important;
+        }
+
+        h2::before,
+        h2::after,
+        .prose h2::before,
+        .prose h2::after,
+        article h2::before,
+        article h2::after {
+          @apply text-amarillo !important;
+        }
+      `}</style>
     </>
   );
 }

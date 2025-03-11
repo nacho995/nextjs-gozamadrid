@@ -425,8 +425,26 @@ export default function PropertyPage() {
       <div className="container mx-auto py-12 flex justify-center items-center min-h-[60vh]">
         <div className="bg-white/10 backdrop-blur-sm p-8 rounded-xl shadow-lg text-center">
           <div className="flex flex-col items-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-amber-400 mb-4"></div>
-            <p className="text-lg text-white mb-2">Cargando propiedades...</p>
+            <svg className="w-16 h-16 mb-4" viewBox="0 0 24 24">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+                fill="none"
+                stroke="#FFD700"
+                strokeWidth="2"
+                strokeDasharray="60"
+                strokeDashoffset="60"
+                strokeLinecap="round"
+              >
+                <animate
+                  attributeName="stroke-dashoffset"
+                  dur="1.5s"
+                  from="60"
+                  to="-60"
+                  repeatCount="indefinite"
+                />
+              </path>
+            </svg>
+            <p className="text-lg text-white font-medium mb-2 text-shadow-sm">Cargando propiedades...</p>
             <p className="text-sm text-gray-300">Esto puede tardar unos segundos</p>
           </div>
         </div>
@@ -521,42 +539,53 @@ export default function PropertyPage() {
 
       {/* Fondo */}
       <div 
-        className="fixed inset-0 z-0 opacity-100 bg-cover bg-center"
+        className="fixed inset-0 z-0 opacity-90"
         style={{
-          backgroundImage: "url('/gozamadridwp2.jpg')",
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.4)), url("/gozamadridwp2.jpg")',
+          
           backgroundAttachment: "fixed",
         }}
         aria-hidden="true"
       ></div>
 
-      <div className="relative min-h-screen py-8">
-        <main className="relative container mx-auto px-3">
+      <div className="relative min-h-screen py-12">
+        <main className="relative container mx-auto px-4">
           <div className="layout-specing">
-            <div className="md:flex justify-center items-center mb-8">
-              <h1 className="text-3xl font-semibold text-center">
-                Propiedades inmobiliarias en venta y alquiler
+            <div className="md:flex justify-center items-center mb-12">
+              <h1 className="text-4xl md:text-5xl font-bold text-center text-white" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+                Propiedades Exclusivas
+                <span className="block text-xl md:text-2xl mt-2 font-light text-amarillo">
+                  Inversiones Premium en Madrid
+                </span>
               </h1>
             </div>
 
             {/* Buscador por dirección */}
-            <div className="mb-8 flex justify-center">
-              <label className="sr-only" htmlFor="property-search">Buscar propiedades por dirección</label>
-              <input
-                id="property-search"
-                type="text"
-                placeholder="Buscar por dirección..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full max-w-md p-3 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                aria-label="Buscar propiedades por dirección"
-              />
+            <div className="mb-12 flex justify-center">
+              <div className="relative w-full max-w-2xl">
+                <input
+                  id="property-search"
+                  type="text"
+                  placeholder="Buscar por ubicación..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full p-4 pl-6 border-2 border-amarillo/30 rounded-xl shadow-xl focus:outline-none focus:border-amarillo bg-black/20 backdrop-blur-md text-white placeholder-gray-400 transition-all duration-300"
+                  style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.2)' }}
+                  aria-label="Buscar propiedades por dirección"
+                />
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                  <svg className="w-6 h-6 text-amarillo" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+              </div>
             </div>
 
             {/* Lista de propiedades en grid */}
             {filteredProperties && filteredProperties.length > 0 ? (
               <section 
                 aria-label="Listado de propiedades"
-                className="grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6 mt-6"
+                className="grid xl:grid-cols-3 lg:grid-cols-2 grid-cols-1 gap-8 mt-8"
               >
                 {getCurrentProperties().map((property, index) => {
                   // Determinar si es una propiedad de WordPress o de MongoDB
@@ -670,13 +699,13 @@ export default function PropertyPage() {
                       key={id || index}
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ delay: Math.min(index * 0.05, 0.3) }}
+                      transition={{ delay: Math.min(index * 0.1, 0.3) }}
                       viewport={{ once: true }}
-                      className="bg-white/5 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden hover:scale-[1.03]"
+                      className="group bg-black/30 backdrop-blur-md rounded-xl overflow-hidden hover:shadow-2xl hover:shadow-amarillo/20 transition-all duration-500 transform hover:scale-[1.02]"
                     >
                       <Link
                         href={`/property/${id}`}
-                        className="group block rounded-xl dark:text-white dark:hover:text-black bg-white dark:bg-slate-900 shadow hover:bg-gold dark:hover:shadow-xl dark:shadow-gray-700 dark:hover:shadow-gray-700 overflow-hidden ease-in-out duration-500"
+                        className="block"
                         onClick={(e) => {
                           // Prevenir la navegación por defecto y usar programática
                           e.preventDefault();
@@ -699,12 +728,13 @@ export default function PropertyPage() {
                         }}
                       >
                         <div className="relative">
-                          <div className="relative w-full aspect-video">
+                          <div className="relative w-full aspect-[16/10] overflow-hidden">
                             <PropertyImage 
-                                src={imageUrl}
-                                alt={title}
-                              className="w-full h-full"
+                              src={imageUrl}
+                              alt={title}
+                              className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                             />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                           </div>
 
                           <div className="absolute top-4 end-4">
@@ -712,65 +742,59 @@ export default function PropertyPage() {
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                // Aquí la lógica para "like" si lo deseas
                               }}
-                              className="btn btn-icon bg-white dark:bg-slate-900 shadow dark:shadow-gray-700 rounded-full text-slate-100 dark:text-slate-700 focus:text-red-600 dark:focus:text-red-600 hover:text-red-600 dark:hover:text-red-600"
+                              className="p-2 bg-black/30 backdrop-blur-sm rounded-full text-white hover:text-amarillo transition-colors duration-300"
                             >
-                              <i className="mdi mdi-heart text-[20px]"></i>
+                              <i className="mdi mdi-heart text-2xl"></i>
                             </button>
                           </div>
+
+                          {price !== "Consultar" && (
+                            <div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm px-4 py-2 rounded-lg">
+                              <span className="text-amarillo font-semibold">{price}</span>
+                            </div>
+                          )}
                         </div>
 
                         <div className="p-6">
                           <div className="pb-6">
-                            {/* Mostrar la dirección como título principal */}
-                            <h3 className="text-lg hover:text-amarillo font-medium ease-in-out duration-500">
+                            <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-amarillo transition-colors duration-300">
                               {location}
                             </h3>
-                            {/* Mostrar el título original como subtítulo si es diferente de la dirección */}
                             {title !== location && (
-                              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                              <p className="text-sm text-gray-300">
                                 {title}
                               </p>
                             )}
                           </div>
 
-                          <ul className="py-6 border-y border-slate-100 dark:border-gray-800 flex flex-wrap items-center list-none">
-                            {/* Superficie */}
-                            <li className="flex items-center me-4 mb-2">
-                              <FaRulerCombined className="text-2xl me-2 text-amarillo" />
-                              <span>
-                                <span className="block text-xs text-gray-500 dark:text-gray-400">Superficie</span>
-                                {size} m²
-                              </span>
-                            </li>
-                            {/* Habitaciones */}
-                            <li className="flex items-center me-4 mb-2">
-                              <FaBed className="text-2xl me-2 text-amarillo" />
-                              <span>
-                                <span className="block text-xs text-gray-500 dark:text-gray-400">Habitaciones</span>
-                                {bedrooms}
-                              </span>
-                            </li>
-                            {/* Baños */}
-                            <li className="flex items-center me-4 mb-2">
-                              <FaBath className="text-2xl me-2 text-amarillo" />
-                              <span>
-                                <span className="block text-xs text-gray-500 dark:text-gray-400">Baños</span>
-                                {bathrooms}
-                              </span>
-                            </li>
-                          </ul>
+                          <div className="grid grid-cols-3 gap-4 py-6 border-t border-b border-white/10">
+                            <div className="text-center">
+                              <FaRulerCombined className="text-2xl mx-auto mb-2 text-amarillo" />
+                              <span className="block text-xs text-gray-400">Superficie</span>
+                              <span className="text-white font-medium">{size} m²</span>
+                            </div>
+                            <div className="text-center">
+                              <FaBed className="text-2xl mx-auto mb-2 text-amarillo" />
+                              <span className="block text-xs text-gray-400">Habitaciones</span>
+                              <span className="text-white font-medium">{bedrooms}</span>
+                            </div>
+                            <div className="text-center">
+                              <FaBath className="text-2xl mx-auto mb-2 text-amarillo" />
+                              <span className="block text-xs text-gray-400">Baños</span>
+                              <span className="text-white font-medium">{bathrooms}</span>
+                            </div>
+                          </div>
 
-                          <ul className="pt-6 flex justify-between items-center list-none">
-                            <li>
-                              <span className="text-gray-500 dark:text-gray-400">Precio</span>
-                              <p className="text-lg font-medium flex items-center">
-                                <FaEuroSign className="text-amarillo mr-1" />
-                                {price}
-                              </p>
-                            </li>
-                          </ul>
+                          <div className="pt-6 flex justify-between items-center">
+                            <div className="flex items-center">
+                              <FaMapMarkerAlt className="text-amarillo mr-2" />
+                              <span className="text-sm text-gray-300">Madrid</span>
+                            </div>
+                            <button className="px-4 py-2 bg-amarillo/10 text-amarillo rounded-lg hover:bg-amarillo hover:text-black transition-all duration-300">
+                              Ver Detalles
+                            </button>
+                          </div>
                         </div>
                       </Link>
                     </motion.div>
@@ -778,17 +802,23 @@ export default function PropertyPage() {
                 })}
               </section>
             ) : (
-              <p className="text-center text-gray-500">
-                No hay propiedades disponibles.
-              </p>
+              <div className="flex justify-center items-center py-12">
+                <div className="bg-black/30 backdrop-blur-md p-8 rounded-xl text-center max-w-lg">
+                  <p className="text-xl text-white font-light">
+                    No hay propiedades disponibles que coincidan con su búsqueda.
+                  </p>
+                </div>
+              </div>
             )}
 
-            {/* Componente de paginación */}
-            <Pagination
-              totalPages={totalPages}
-              currentPage={currentPage}
-              onPageChange={handlePageChange}
-            />
+            {/* Paginación con estilo mejorado */}
+            <div className="mt-12">
+              <Pagination
+                totalPages={totalPages}
+                currentPage={currentPage}
+                onPageChange={handlePageChange}
+              />
+            </div>
           </div>
         </main>
       </div>

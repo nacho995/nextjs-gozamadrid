@@ -12,6 +12,13 @@
   ],
   "rootMainFiles": [],
   "pages": {
+    "/": [
+      "static/chunks/webpack.js",
+      "static/chunks/commons.js",
+      "static/chunks/main.js",
+      "static/chunks/vendors-node_modules_relume_io_relume-ui_dist_index_js-node_modules_react-icons_rx_index_mjs.js",
+      "static/chunks/pages/index.js"
+    ],
     "/_app": [
       "static/chunks/webpack.js",
       "static/chunks/commons.js",
@@ -30,6 +37,19 @@
       "static/chunks/commons.js",
       "static/chunks/main.js",
       "static/chunks/pages/blog.js"
+    ],
+    "/property/[id]": [
+      "static/chunks/webpack.js",
+      "static/chunks/commons.js",
+      "static/chunks/main.js",
+      "static/chunks/vendors-node_modules_date-fns_esm_locale_es_index_js-node_modules_react-datepicker_dist_react-b6a742.js",
+      "static/chunks/pages/property/[id].js"
+    ],
+    "/servicios": [
+      "static/chunks/webpack.js",
+      "static/chunks/commons.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/servicios.js"
     ],
     "/vender/comprar": [
       "static/chunks/webpack.js",
