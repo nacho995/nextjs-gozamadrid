@@ -261,200 +261,216 @@ export async function deleteBlogPost(id) {
   return response.json();
 }
 
+// Función de utilidad para reintentos con backoff exponencial
+async function fetchConReintentos(fetchFn, options = {}) {
+  const {
+    maxRetries = 5,
+    initialTimeout = 2000,
+    maxTimeout = 30000,
+    factor = 2,
+    isProduction = process.env.NODE_ENV === 'production'
+  } = options;
+
+  let intento = 1;
+  let timeout = initialTimeout;
+  let lastError = null;
+
+  while (intento <= (isProduction ? maxRetries : 2)) {
+    try {
+      console.log(`[DEBUG] Intento ${intento} de ${isProduction ? maxRetries : 2}`);
+      
+      // Añadir jitter aleatorio para evitar thundering herd
+      const jitter = Math.random() * 1000;
+      const timeoutWithJitter = Math.min(timeout + jitter, maxTimeout);
+      
+      if (intento > 1) {
+        console.log(`[DEBUG] Esperando ${Math.round(timeoutWithJitter)}ms antes del siguiente intento`);
+        await new Promise(resolve => setTimeout(resolve, timeoutWithJitter));
+      }
+      
+      const result = await fetchFn();
+      return result;
+      
+    } catch (error) {
+      console.error(`[DEBUG] Error en intento ${intento}:`, error);
+      lastError = error;
+      
+      // Incrementar el timeout de forma exponencial
+      timeout = Math.min(timeout * factor, maxTimeout);
+      intento++;
+      
+      // Si es el último intento, lanzar el error
+      if (intento > (isProduction ? maxRetries : 2)) {
+        throw lastError;
+      }
+    }
+  }
+  
+  throw lastError || new Error('Error después de múltiples intentos');
+}
+
 export async function getBlogById(id) {
   try {
-    // Verificar si estamos en producción
+    console.log(`[DEBUG] Iniciando getBlogById para ID: ${id}`);
+    
     const isProduction = process.env.NODE_ENV === 'production';
-    console.log(`[DEBUG] ¿Estamos en producción? ${isProduction}`);
-    
-    // En producción, añadimos un pequeño retraso para asegurar que los datos se carguen
-    if (isProduction) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    }
-    
-    // Verificar si es un ID de MongoDB (formato ObjectId)
     const isMongoId = /^[0-9a-fA-F]{24}$/.test(id);
     
-    if (isMongoId) {
-      // Es un ID de MongoDB, obtener de nuestra API
-      console.log(`Obteniendo blog de MongoDB con ID ${id}`);
-      
-      // Usar la ruta con API_URL y un timeout más largo en producción
+    const fetchData = async () => {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), isProduction ? 20000 : 10000);
+      const timeoutId = setTimeout(() => {
+        console.log('[DEBUG] Timeout alcanzado, abortando petición');
+        controller.abort();
+      }, isProduction ? 30000 : 10000);
       
-      const response = await fetch(`${API_URL}/blog/${id}`, {
-        signal: controller.signal,
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
-        }
-      });
-      
-      clearTimeout(timeoutId);
-
-      console.log("Respuesta de MongoDB:", {
-        status: response.status,
-        statusText: response.statusText
-      });
-      
-      if (!response.ok) {
-        console.error(`Error al obtener blog de MongoDB: ${response.status}`);
-        throw new Error(`Error al obtener blog: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      console.log("Datos del blog de MongoDB:", data);
-      
-      // Procesar las imágenes según el esquema
-      let blogImages = [];
-      
-      // Verificar si el blog tiene imágenes
-      if (data.images && Array.isArray(data.images) && data.images.length > 0) {
-        // Usar las imágenes del esquema
-        blogImages = data.images.map(img => {
-          // Asegurarse de que la URL sea absoluta
-          const src = typeof img === 'string' 
-            ? img 
-            : (img.src || '');
-          
-          const imgSrc = src.startsWith('http') 
-            ? src 
-            : `${API_URL}${src.startsWith('/') ? '' : '/'}${src}`;
-          
-          return {
-            src: imgSrc,
-            alt: (typeof img === 'object' && img.alt) ? img.alt : (data.title || 'Imagen del blog')
-          };
-        });
-      } else if (data.image) {
-        // Compatibilidad con el formato anterior
-        if (typeof data.image === 'string') {
-          // Si la imagen es una cadena, crear un objeto de imagen
-          const baseUrl = API_URL;
-          const imageSrc = data.image.startsWith('http') 
-            ? data.image 
-            : `${baseUrl}${data.image.startsWith('/') ? '' : '/'}${data.image}`;
-          
-          blogImages = [{ 
-            src: imageSrc, 
-            alt: data.title || 'Imagen del blog' 
-          }];
-        } else {
-          // Si ya es un objeto, asegurarse de que la URL sea absoluta
-          const baseUrl = API_URL;
-          const src = data.image.src || data.image.url || '';
-          
-          blogImages = [{
-            ...data.image,
-            src: src.startsWith('http') 
-              ? src 
-              : `${baseUrl}${src.startsWith('/') ? '' : '/'}${src}`
-          }];
-        }
-      } else {
-        // Si no hay imágenes, usar una por defecto
-        blogImages = [{ 
-          src: '/img/default-blog-image.jpg', 
-          alt: data.title || 'Imagen del blog' 
-        }];
-      }
-      
-      // Asegurarse de que el blog tenga todos los campos necesarios
-      return {
-        ...data,
-        _id: data._id,
-        title: data.title || 'Sin título',
-        content: data.content || data.description || '',
-        description: data.description || data.excerpt || '',
-        date: data.createdAt || data.date || new Date().toISOString(),
-        dateFormatted: data.dateFormatted || (data.createdAt ? new Date(data.createdAt).toLocaleDateString('es-ES') : new Date().toLocaleDateString('es-ES')),
-        images: blogImages, // Guardar el array completo de imágenes
-        image: blogImages[0] || { src: '/img/default-blog-image.jpg', alt: 'Imagen del blog' }, // Compatibilidad con el formato anterior
-        imageUrl: blogImages[0]?.src || '/img/default-blog-image.jpg',
-        source: 'mongodb'
-      };
-    } else {
-      // Es un ID de WordPress, usar nuestro proxy
-      console.log(`Obteniendo blog de WordPress con ID ${id}`);
-      const response = await fetch(`/api/wordpress-proxy?endpoint=wp&path=posts/${id}&_embed=true`);
-      
-      console.log("Respuesta de WordPress:", {
-        status: response.status,
-        statusText: response.statusText
-      });
-      
-      if (!response.ok) {
-        console.error(`Error al obtener blog de WordPress: ${response.status}`);
-        throw new Error(`Error al obtener blog de WordPress: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      console.log("Datos del blog de WordPress:", data);
-      
-      // Procesar la imagen destacada
-      let featuredImage = null;
-      
-      // Intentar obtener la imagen destacada desde _embedded
-      if (data._embedded && data._embedded['wp:featuredmedia'] && data._embedded['wp:featuredmedia'][0]) {
-        const media = data._embedded['wp:featuredmedia'][0];
+      try {
+        let response;
         
-        if (media.media_details && media.media_details.sizes) {
-          // Buscar la mejor imagen disponible
-          const sizePriority = ['medium_large', 'medium', 'large', 'full'];
+        if (isMongoId) {
+          const baseUrl = typeof window === 'undefined' ? API_URL : '';
+          const url = `${baseUrl}/blog/${id}`;
           
-          for (const size of sizePriority) {
-            if (media.media_details.sizes[size]) {
-              featuredImage = media.media_details.sizes[size].source_url;
-              break;
+          response = await fetch(url, {
+            signal: controller.signal,
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+              'Expires': '0'
             }
-          }
+          });
+        } else {
+          const url = `/api/wordpress-proxy?endpoint=wp&path=posts/${id}&_embed=true`;
+          
+          response = await fetch(url, {
+            signal: controller.signal,
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+              'Expires': '0'
+            }
+          });
         }
         
-        // Si no se encontró ninguna imagen en los tamaños, usar la URL de origen
-        if (!featuredImage && media.source_url) {
-          featuredImage = media.source_url;
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}`);
         }
+        
+        const data = await response.json();
+        return isMongoId ? procesarBlogMongoDB(data) : procesarBlogWordPress(data);
+        
+      } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
       }
-      
-      // Si no hay imagen destacada, intentar obtenerla de uagb_featured_image_src
-      if (!featuredImage && data.uagb_featured_image_src) {
-        featuredImage = data.uagb_featured_image_src.medium?.[0] || 
-                        data.uagb_featured_image_src.full?.[0];
-      }
-      
-      // Si aún no hay imagen, usar una imagen por defecto
-      if (!featuredImage) {
-        featuredImage = '/img/default-blog-image.jpg';
-      }
-      
-      // Crear el objeto de blog con la imagen procesada
-      return {
-        ...data,
-        _id: `wp-${data.id}`,
-        id: data.id,
-        title: data.title?.rendered || data.title || '',
-        content: data.content?.rendered || data.content || '',
-        excerpt: data.excerpt?.rendered || data.excerpt || '',
-        date: data.date,
-        dateFormatted: new Date(data.date).toLocaleDateString('es-ES'),
-        images: [{ 
-          src: featuredImage, 
-          alt: data.title?.rendered || data.title || 'Imagen del blog' 
-        }],
-        image: {
-          src: featuredImage,
-          alt: data.title?.rendered || data.title || 'Imagen del blog'
-        },
-        imageUrl: featuredImage,
-        slug: data.slug,
-        source: 'wordpress'
-      };
-    }
+    };
+    
+    return await fetchConReintentos(fetchData, {
+      maxRetries: 7,
+      initialTimeout: 2000,
+      maxTimeout: 30000,
+      factor: 1.5,
+      isProduction
+    });
+    
   } catch (error) {
-    console.error("Error en getBlogById:", error);
+    console.error("[DEBUG] Error final en getBlogById:", error);
     throw error;
   }
+}
+
+// Función auxiliar para procesar blogs de MongoDB
+function procesarBlogMongoDB(data) {
+  let blogImages = [];
+  
+  if (data.images && Array.isArray(data.images) && data.images.length > 0) {
+    blogImages = data.images.map(img => {
+      const src = typeof img === 'string' ? img : (img.src || '');
+      const imgSrc = src.startsWith('http') ? src : `${API_URL}${src.startsWith('/') ? '' : '/'}${src}`;
+      return {
+        src: imgSrc,
+        alt: (typeof img === 'object' && img.alt) ? img.alt : (data.title || 'Imagen del blog')
+      };
+    });
+  } else if (data.image) {
+    if (typeof data.image === 'string') {
+      const imageSrc = data.image.startsWith('http') ? data.image : `${API_URL}${data.image.startsWith('/') ? '' : '/'}${data.image}`;
+      blogImages = [{ src: imageSrc, alt: data.title || 'Imagen del blog' }];
+    } else {
+      const src = data.image.src || data.image.url || '';
+      blogImages = [{
+        ...data.image,
+        src: src.startsWith('http') ? src : `${API_URL}${src.startsWith('/') ? '' : '/'}${src}`
+      }];
+    }
+  }
+  
+  if (blogImages.length === 0) {
+    blogImages = [{ src: '/img/default-blog-image.jpg', alt: data.title || 'Imagen del blog' }];
+  }
+  
+  return {
+    ...data,
+    _id: data._id,
+    title: data.title || 'Sin título',
+    content: data.content || data.description || '',
+    description: data.description || data.excerpt || '',
+    date: data.createdAt || data.date || new Date().toISOString(),
+    dateFormatted: data.dateFormatted || (data.createdAt ? new Date(data.createdAt).toLocaleDateString('es-ES') : new Date().toLocaleDateString('es-ES')),
+    images: blogImages,
+    image: blogImages[0],
+    imageUrl: blogImages[0]?.src || '/img/default-blog-image.jpg',
+    source: 'mongodb'
+  };
+}
+
+// Función auxiliar para procesar blogs de WordPress
+function procesarBlogWordPress(data) {
+  let featuredImage = null;
+  
+  if (data._embedded && data._embedded['wp:featuredmedia'] && data._embedded['wp:featuredmedia'][0]) {
+    const media = data._embedded['wp:featuredmedia'][0];
+    
+    if (media.media_details && media.media_details.sizes) {
+      const sizePriority = ['medium_large', 'medium', 'large', 'full'];
+      
+      for (const size of sizePriority) {
+        if (media.media_details.sizes[size]) {
+          featuredImage = media.media_details.sizes[size].source_url;
+          break;
+        }
+      }
+    }
+    
+    if (!featuredImage && media.source_url) {
+      featuredImage = media.source_url;
+    }
+  }
+  
+  if (!featuredImage && data.uagb_featured_image_src) {
+    featuredImage = data.uagb_featured_image_src.medium?.[0] || data.uagb_featured_image_src.full?.[0];
+  }
+  
+  if (!featuredImage) {
+    featuredImage = '/img/default-blog-image.jpg';
+  }
+  
+  return {
+    ...data,
+    _id: `wp-${data.id}`,
+    id: data.id,
+    title: data.title?.rendered || data.title || '',
+    content: data.content?.rendered || data.content || '',
+    excerpt: data.excerpt?.rendered || data.excerpt || '',
+    date: data.date,
+    dateFormatted: new Date(data.date).toLocaleDateString('es-ES'),
+    images: [{ src: featuredImage, alt: data.title?.rendered || data.title || 'Imagen del blog' }],
+    image: { src: featuredImage, alt: data.title?.rendered || data.title || 'Imagen del blog' },
+    imageUrl: featuredImage,
+    slug: data.slug,
+    source: 'wordpress'
+  };
 }
 
 export async function getPropertyPosts() {
@@ -616,208 +632,144 @@ export async function getPropertyById(id) {
   try {
     console.log(`[DEBUG] Iniciando getPropertyById para ID: ${id}`);
     
-    // Verificar si estamos en producción
     const isProduction = process.env.NODE_ENV === 'production';
-    console.log(`[DEBUG] ¿Estamos en producción? ${isProduction}`);
-    
-    // Verificar si es un ID de MongoDB (formato ObjectId)
     const isMongoId = /^[0-9a-fA-F]{24}$/.test(id);
-    console.log(`[DEBUG] ¿Es ID de MongoDB? ${isMongoId}`);
     
-    // En producción, añadimos un pequeño retraso para asegurar que los datos se carguen
-    if (isProduction) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    }
-    
-    // Crear un controlador de aborto para establecer un timeout más largo en producción
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => {
-      console.log(`[DEBUG] TIMEOUT alcanzado para la propiedad con ID: ${id}`);
-      controller.abort();
-    }, isProduction ? 20000 : 10000); // 20 segundos en producción, 10 en desarrollo
-    
-    let response;
-    
-    if (isMongoId) {
-      // Es un ID de MongoDB, obtener de nuestra API
-      console.log(`[DEBUG] Obteniendo propiedad de MongoDB con ID ${id}`);
+    const fetchData = async () => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        console.log('[DEBUG] Timeout alcanzado, abortando petición');
+        controller.abort();
+      }, isProduction ? 30000 : 10000);
       
       try {
-        // Usar la URL base según el entorno
-        const baseUrl = typeof window === 'undefined' 
-          ? API_URL // En el servidor
-          : ''; // En el cliente (URL relativa)
+        let response;
         
-        const url = `${baseUrl}/property/${id}`;
-        console.log(`[DEBUG] URL de petición MongoDB: ${url}`);
-        
-        response = await fetch(url, {
-          signal: controller.signal,
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-            'Expires': '0'
-          }
-        });
-        
-        console.log(`[DEBUG] Respuesta MongoDB recibida: ${response.status} ${response.statusText}`);
-      } catch (error) {
-        clearTimeout(timeoutId);
-        console.error(`[DEBUG] Error en fetch MongoDB:`, error);
-        
-        if (error.name === 'AbortError') {
-          console.error("[DEBUG] La solicitud a MongoDB se canceló por timeout");
-          throw new Error("Tiempo de espera agotado al obtener la propiedad. Por favor, inténtalo de nuevo.");
-        }
-        
-        throw error;
-      }
-    } else {
-      // Es un ID de WooCommerce, usar nuestro proxy
-      console.log(`[DEBUG] Obteniendo propiedad de WooCommerce con ID ${id}`);
-      
-      try {
-        // Usar la URL base según el entorno
-        const baseUrl = typeof window === 'undefined' 
-          ? `${API_URL}/api/wordpress-proxy` // En el servidor
-          : '/api/wordpress-proxy'; // En el cliente
-        
-        const url = `${baseUrl}?path=products/${id}`;
-        console.log(`[DEBUG] URL de petición WooCommerce: ${url}`);
-        
-        response = await fetch(url, {
-          signal: controller.signal,
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-            'Expires': '0'
-          }
-        });
-        
-        console.log(`[DEBUG] Respuesta WooCommerce recibida: ${response.status} ${response.statusText}`);
-      } catch (error) {
-        clearTimeout(timeoutId);
-        console.error(`[DEBUG] Error en fetch WooCommerce:`, error);
-        
-        if (error.name === 'AbortError') {
-          console.error("[DEBUG] La solicitud a WooCommerce se canceló por timeout");
-          throw new Error("Tiempo de espera agotado al obtener la propiedad. Por favor, inténtalo de nuevo.");
-        }
-        
-        throw error;
-      }
-    }
-    
-    // Limpiar el timeout
-    clearTimeout(timeoutId);
-    
-    // Verificar si la respuesta es exitosa
-    if (!response.ok) {
-      console.error(`[DEBUG] Error en respuesta: ${response.status} ${response.statusText}`);
-      throw new Error(`Error al obtener propiedad: ${response.status} ${response.statusText}`);
-    }
-    
-    // Obtener los datos de la respuesta
-    console.log(`[DEBUG] Intentando obtener JSON de la respuesta`);
-    const data = await response.json();
-    console.log(`[DEBUG] JSON obtenido correctamente para ID ${id}`);
-    
-    // Procesar los datos según el tipo de propiedad
-    if (isMongoId) {
-      console.log(`[DEBUG] Procesando datos de MongoDB`);
-      // Procesar las imágenes para asegurar URLs absolutas
-      let images = [];
-      if (data.images) {
-        if (Array.isArray(data.images)) {
-          console.log(`[DEBUG] Procesando array de imágenes: ${data.images.length} imágenes`);
-          images = data.images.map(img => {
-            if (typeof img === 'string') {
-              // Si la imagen es una cadena, verificar si es una URL absoluta
-              return img.startsWith('http') ? img : `${API_URL}${img.startsWith('/') ? '' : '/'}${img}`;
-            } else if (typeof img === 'object' && img.src) {
-              // Si es un objeto con src, asegurar que sea una URL absoluta
-              const src = img.src.startsWith('http') ? img.src : `${API_URL}${img.src.startsWith('/') ? '' : '/'}${img.src}`;
-              return {
-                ...img,
-                src
-              };
+        if (isMongoId) {
+          const baseUrl = typeof window === 'undefined' ? API_URL : '';
+          const url = `${baseUrl}/property/${id}`;
+          
+          response = await fetch(url, {
+            signal: controller.signal,
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+              'Expires': '0'
             }
-            return img;
-          }).filter(img => img); // Filtrar valores nulos o indefinidos
-        } else if (typeof data.images === 'string') {
-          // Si images es una cadena
-          console.log(`[DEBUG] Procesando imagen única (string)`);
-          const img = data.images;
-          images = [img.startsWith('http') ? img : `${API_URL}${img.startsWith('/') ? '' : '/'}${img}`];
+          });
+        } else {
+          const baseUrl = typeof window === 'undefined' 
+            ? `${API_URL}/api/wordpress-proxy` 
+            : '/api/wordpress-proxy';
+          
+          const url = `${baseUrl}?path=products/${id}`;
+          
+          response = await fetch(url, {
+            signal: controller.signal,
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+              'Expires': '0'
+            }
+          });
         }
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        return isMongoId ? procesarDatosMongoDB(data) : procesarDatosWooCommerce(data);
+        
+      } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
       }
-      
-      // Si no hay imágenes, usar una imagen por defecto
-      if (images.length === 0) {
-        console.log(`[DEBUG] No se encontraron imágenes, usando imagen por defecto`);
-        images = ['/img/default-property-image.jpg'];
-      }
-      
-      // Asegurarse de que todos los campos críticos estén definidos
-      const result = { 
-        ...data, 
-        _id: data._id,
-        title: data.title || data.name || 'Propiedad sin título',
-        description: data.description || '',
-        price: data.price || '0', // Mantener como string
-        location: data.location || 'Madrid',
-        bedrooms: data.bedrooms || data.rooms || 0,
-        bathrooms: data.bathrooms || data.wc || 0,
-        size: data.area || data.m2 || 0,
-        images: images,
-        source: 'mongodb' 
-      };
-      
-      console.log(`[DEBUG] Datos de MongoDB procesados correctamente`);
-      return result;
-    } else {
-      console.log(`[DEBUG] Procesando datos de WooCommerce`);
-      // Procesar las imágenes para asegurar que tenemos URLs válidas
-      let images = [];
-      
-      // Intentar obtener imágenes de diferentes fuentes en WooCommerce
-      if (data.images && Array.isArray(data.images) && data.images.length > 0) {
-        console.log(`[DEBUG] Procesando array de imágenes WooCommerce: ${data.images.length} imágenes`);
-        images = data.images.map(img => img.src || img).filter(img => img);
-      } else if (data.image && data.image.src) {
-        console.log(`[DEBUG] Procesando imagen única WooCommerce`);
-        images = [data.image.src];
-      }
-      
-      // Si no hay imágenes, usar una imagen por defecto
-      if (images.length === 0) {
-        console.log(`[DEBUG] No se encontraron imágenes WooCommerce, usando imagen por defecto`);
-        images = ['/img/default-property-image.jpg'];
-      }
-      
-      // Asegurarse de que todos los campos críticos estén definidos
-      const result = { 
-        ...data, 
-        id: data.id,
-        title: data.name || 'Propiedad sin título',
-        description: data.description || '',
-        price: data.price || '0', // Mantener como string
-        location: data.address || 'Madrid',
-        bedrooms: data.meta_data?.find(m => m.key === 'bedrooms')?.value || 0,
-        bathrooms: data.meta_data?.find(m => m.key === 'bathrooms')?.value || 0,
-        size: data.meta_data?.find(m => m.key === 'area')?.value || 0,
-        images: images,
-        source: 'woocommerce' 
-      };
-      
-      console.log(`[DEBUG] Datos de WooCommerce procesados correctamente`);
-      return result;
-    }
+    };
+    
+    return await fetchConReintentos(fetchData, {
+      maxRetries: 7,
+      initialTimeout: 2000,
+      maxTimeout: 30000,
+      factor: 1.5,
+      isProduction
+    });
+    
   } catch (error) {
-    console.error("[DEBUG] Error en getPropertyById:", error);
-    console.error("[DEBUG] Stack trace:", error.stack);
+    console.error("[DEBUG] Error final en getPropertyById:", error);
     throw error;
   }
+}
+
+// Función auxiliar para procesar datos de MongoDB
+function procesarDatosMongoDB(data) {
+  let images = [];
+  
+  if (data.images) {
+    if (Array.isArray(data.images)) {
+      images = data.images.map(img => {
+        if (typeof img === 'string') {
+          return img.startsWith('http') ? img : `${API_URL}${img.startsWith('/') ? '' : '/'}${img}`;
+        } else if (typeof img === 'object' && img.src) {
+          const src = img.src.startsWith('http') ? img.src : `${API_URL}${img.src.startsWith('/') ? '' : '/'}${img.src}`;
+          return { ...img, src };
+        }
+        return img;
+      }).filter(img => img);
+    } else if (typeof data.images === 'string') {
+      const img = data.images;
+      images = [img.startsWith('http') ? img : `${API_URL}${img.startsWith('/') ? '' : '/'}${img}`];
+    }
+  }
+  
+  if (images.length === 0) {
+    images = ['/img/default-property-image.jpg'];
+  }
+  
+  return {
+    ...data,
+    _id: data._id,
+    title: data.title || data.name || 'Propiedad sin título',
+    description: data.description || '',
+    price: data.price || '0',
+    location: data.location || 'Madrid',
+    bedrooms: data.bedrooms || data.rooms || 0,
+    bathrooms: data.bathrooms || data.wc || 0,
+    size: data.area || data.m2 || 0,
+    images: images,
+    source: 'mongodb'
+  };
+}
+
+// Función auxiliar para procesar datos de WooCommerce
+function procesarDatosWooCommerce(data) {
+  let images = [];
+  
+  if (data.images && Array.isArray(data.images) && data.images.length > 0) {
+    images = data.images.map(img => img.src || img).filter(img => img);
+  } else if (data.image && data.image.src) {
+    images = [data.image.src];
+  }
+  
+  if (images.length === 0) {
+    images = ['/img/default-property-image.jpg'];
+  }
+  
+  return {
+    ...data,
+    id: data.id,
+    title: data.name || 'Propiedad sin título',
+    description: data.description || '',
+    price: data.price || '0',
+    location: data.address || 'Madrid',
+    bedrooms: data.meta_data?.find(m => m.key === 'bedrooms')?.value || 0,
+    bathrooms: data.meta_data?.find(m => m.key === 'bathrooms')?.value || 0,
+    size: data.meta_data?.find(m => m.key === 'area')?.value || 0,
+    images: images,
+    source: 'woocommerce'
+  };
 }
 
 // Función para enviar el formulario de contacto
@@ -896,60 +848,71 @@ export const sendPropertyEmail = async (data) => {
     if (data.type === 'offer') {
       const endpoint = `${API_URL}/api/property-offer/create`;
       
-      // Mapear los campos correctamente para la oferta
+      // Validar datos requeridos para la oferta
+      if (!data.offerAmount || !data.email || !data.name || !data.phone || !data.propertyId || !data.propertyTitle) {
+        throw new Error('Faltan datos de la oferta');
+      }
+      
+      // Mapear los campos según PropertyOfferSchema
       const offerData = {
-        offerPrice: data.offerAmount,
-        offerPercentage: data.offerLabel,
+        property: data.propertyId,
+        propertyAddress: data.propertyTitle,
+        offerPrice: parseFloat(data.offerAmount),
+        offerPercentage: data.offerLabel || 'Personalizada',
         email: data.email,
         name: data.name,
-        phone: data.phone,
-        property: data.propertyId,
-        propertyAddress: data.propertyTitle
+        phone: data.phone
       };
     
+      console.log('Enviando datos de oferta:', offerData);
+      
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(offerData),
+        body: JSON.stringify(offerData)
       });
       
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('Error en respuesta:', errorData);
         throw new Error(errorData.message || 'Error en la respuesta del servidor');
       }
       
       return await response.json();
+      
     } else if (data.type === 'visit') {
       const endpoint = `${API_URL}/api/property-visit/create`;
       
-      // Mapear los campos correctamente para la visita
+      // Validar datos requeridos para la visita
+      if (!data.visitDate || !data.visitTime || !data.email || !data.name || !data.phone || !data.propertyId || !data.propertyTitle) {
+        throw new Error('Faltan datos de la visita');
+      }
+      
+      // Mapear los campos según PropertyVisitSchema
       const visitData = {
-        date: data.visitDate,
-        time: data.visitTime,
+        property: data.propertyId,
+        propertyAddress: data.propertyTitle,
+        date: new Date(data.visitDate),
+        time: new Date(data.visitTime),
         email: data.email,
         name: data.name,
         phone: data.phone,
-        property: data.propertyId,
-        propertyAddress: data.propertyTitle,
-        message: data.message
+        message: data.message || ''
       };
 
+      console.log('Enviando datos de visita:', visitData);
+      
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(visitData),
+        body: JSON.stringify(visitData)
       });
       
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('Error en respuesta:', errorData);
         throw new Error(errorData.message || 'Error en la respuesta del servidor');
       }
       
@@ -961,7 +924,7 @@ export const sendPropertyEmail = async (data) => {
     console.error('Error al enviar email:', error);
     return {
       success: false,
-      message: error.message || 'Error al procesar la solicitud',
+      message: error.message
     };
   }
 };
