@@ -89,6 +89,34 @@ export default function PropertyImage({
     };
   }, [safeSrc]);
   
+  // Componente de carga elegante
+  const LoadingIndicator = () => (
+    <div className="absolute inset-0 flex items-center justify-center bg-gray-100/80 backdrop-blur-sm">
+      <div className="flex flex-col items-center">
+        <svg className="w-12 h-12" viewBox="0 0 24 24">
+          <path
+            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+            fill="none"
+            stroke="#FFD700"
+            strokeWidth="2"
+            strokeDasharray="60"
+            strokeDashoffset="60"
+            strokeLinecap="round"
+          >
+            <animate
+              attributeName="stroke-dashoffset"
+              dur="1.5s"
+              from="60"
+              to="-60"
+              repeatCount="indefinite"
+            />
+          </path>
+        </svg>
+        <span className="mt-2 text-sm font-medium text-gray-700">Cargando imagen...</span>
+      </div>
+    </div>
+  );
+  
   // Imagen por defecto si hay error o no hay src
   if (error || !safeSrc) {
     return (
@@ -143,10 +171,11 @@ export default function PropertyImage({
           itemType="https://schema.org/ImageObject"
           itemID={`#${imageId}`}
         >
+          {!loaded && <LoadingIndicator />}
           <img 
             src={proxyUrl}
             alt={alt || "Propiedad inmobiliaria"}
-            className={`w-full h-full object-cover ${className}`}
+            className={`w-full h-full object-cover ${className} ${!loaded ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}
             onError={() => setError(true)}
             onLoad={() => setLoaded(true)}
             loading={priority ? "eager" : "lazy"}
@@ -185,10 +214,11 @@ export default function PropertyImage({
           itemType="https://schema.org/ImageObject"
           itemID={`#${imageId}`}
         >
+          {!loaded && <LoadingIndicator />}
           <img 
             src={safeSrc}
             alt={alt || "Propiedad inmobiliaria"}
-            className={`w-full h-full object-cover ${className}`}
+            className={`w-full h-full object-cover ${className} ${!loaded ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}
             onError={() => setError(true)}
             onLoad={() => setLoaded(true)}
             loading={priority ? "eager" : "lazy"}
@@ -228,13 +258,15 @@ export default function PropertyImage({
         itemType="https://schema.org/ImageObject"
         itemID={`#${imageId}`}
       >
+        {!loaded && <LoadingIndicator />}
         <Image
           src={safeSrc}
           alt={alt || "Propiedad inmobiliaria"}
           width={500}
           height={300}
-          className={`object-cover ${className}`}
+          className={`object-cover ${className} ${!loaded ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}
           onError={() => setError(true)}
+          onLoad={() => setLoaded(true)}
           priority={priority}
           sizes={sizes}
           quality={85}

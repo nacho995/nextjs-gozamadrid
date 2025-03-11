@@ -2,6 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes infinityLeft {
+  0% {
+    transform: translate(0) rotate(0deg);
+  }
+  25% {
+    transform: translate(50%) rotate(90deg);
+  }
+  50% {
+    transform: translate(100%) rotate(180deg);
+  }
+  75% {
+    transform: translate(50%) rotate(270deg);
+  }
+  100% {
+    transform: translate(0) rotate(360deg);
+  }
+}
+
+@keyframes infinityRight {
+  0% {
+    transform: translate(0) rotate(0deg);
+  }
+  25% {
+    transform: translate(-50%) rotate(-90deg);
+  }
+  50% {
+    transform: translate(-100%) rotate(-180deg);
+  }
+  75% {
+    transform: translate(-50%) rotate(-270deg);
+  }
+  100% {
+    transform: translate(0) rotate(-360deg);
+  }
+}
+
 :root {
   --font-chakra: 'Chakra Petch', sans-serif;
 }
