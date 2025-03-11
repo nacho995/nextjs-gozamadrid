@@ -16,7 +16,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Importar rutas
-import propertyNotificationRoutes from './routes/propertyNotificationRoutes.js';
+import propertyVisitRoutes from './routes/propertyVisitRoutes.js';
 import prefixRouter from "./routes/routerPrefix.js";
 import blogRouter from "./routes/blogRouter.js";
 import userRouter from "./routes/userContentRouter.js";
@@ -101,8 +101,10 @@ app.use("/prefix", prefixRouter);
 app.use("/blog", blogRouter);
 app.use("/user", userRouter);
 app.use('/property', propertyRoutes);
-app.use('/api/property-notification', propertyNotificationRoutes);
-app.use('/api/property-offer', propertyOfferRoutes); 
+
+// Rutas específicas para ofertas y visitas de propiedades
+app.use('/api/property-visit', propertyVisitRoutes);
+app.use('/api/property-offer', propertyOfferRoutes);
 
 // Configurar headers para recursos estáticos
 app.use('/uploads', (req, res, next) => {
