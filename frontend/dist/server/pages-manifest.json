@@ -2,13 +2,10 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/property/[id]": "pages/property/[id].js",
   "/": "pages/index.js",
   "/api/wordpress-proxy": "pages/api/wordpress-proxy.js",
   "/vender/comprar": "pages/vender/comprar.js",
+  "/property/[id]": "pages/property/[id].js",
   "/blog": "pages/blog.js",
-  "/servicios": "pages/servicios.js",
-  "/api/proxy-image": "pages/api/proxy-image.js",
-  "/blog/[id]": "pages/blog/[id].js",
-  "/contacto": "pages/contacto.js"
+  "/blog/[id]": "pages/blog/[id].js"
 }
