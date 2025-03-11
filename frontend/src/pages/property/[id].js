@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Layout from '@/components/layout';
 import DefaultPropertyContent from '@/components/propiedades/PropertyContent';
+import LoadingScreen from '@/components/LoadingScreen';
 
 // Función para obtener una propiedad por ID con reintentos
 const fetchProperty = async (id, source, isServer = false, retries = 5) => {
@@ -193,6 +194,7 @@ export default function PropertyDetail({
   
   const propertyId = preloadedId || routerId;
   const source = routerSource || initialSource || (propertyId && /[a-zA-Z]/.test(propertyId) && propertyId.length > 10 ? 'mongodb' : 'woocommerce');
+  const isProduction = process.env.NODE_ENV === 'production';
 
   useEffect(() => {
     // Si ya tenemos la propiedad precargada y no hay error, no cargar de nuevo
@@ -230,12 +232,17 @@ export default function PropertyDetail({
         console.error("Error al cargar la propiedad:", err);
         setError(err.message || 'Error al cargar la propiedad');
       } finally {
-        setLoading(false);
+        // En producción, mantenemos el loading un poco más para asegurar que todo se cargue
+        if (isProduction) {
+          setTimeout(() => setLoading(false), 1000);
+        } else {
+          setLoading(false);
+        }
       }
     };
     
     loadProperty();
-  }, [router.isReady, propertyId, source, preloadedProperty, preloadedError]);
+  }, [router.isReady, propertyId, source, preloadedProperty, preloadedError, isProduction]);
 
   // Función para generar la descripción meta
   const generateMetaDescription = (property) => {
@@ -243,19 +250,8 @@ export default function PropertyDetail({
     return `${property.type || 'Propiedad'} en ${property.location || 'Madrid'}. ${property.bedrooms || 0} habitaciones, ${property.bathrooms || 0} baños. ${property.description?.substring(0, 100) || ''}`
   };
 
-  if (loading) {
-    return (
-      <>
-        <Head>
-          <title>Cargando Propiedad | Goza Madrid Inmobiliaria</title>
-          <meta name="robots" content="noindex, nofollow" />
-        </Head>
-        <div className="container mx-auto py-12 flex flex-col justify-center items-center min-h-[60vh]">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-amber-400 mb-4"></div>
-          <p className="text-lg text-gray-600">Cargando información de la propiedad...</p>
-        </div>
-        </>
-    );
+  if (loading && isProduction) {
+    return <LoadingScreen />;
   }
 
   if (error) {
@@ -283,7 +279,7 @@ export default function PropertyDetail({
             </button>
           </div>
         </div>
-        </>
+      </>
     );
   }
 
@@ -380,6 +376,6 @@ export default function PropertyDetail({
       </Head>
 
       <DefaultPropertyContent property={property} />
-      </>
+    </>
   );
 }
