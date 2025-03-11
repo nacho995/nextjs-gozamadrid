@@ -910,11 +910,13 @@ export default function DefaultPropertyContent({ property }) {
                             propertyTitle: property.title || property.name || 'Propiedad sin título',
                             propertyId: property.id || property._id || '',
                             propertyUrl: propertyUrl,
-                            visitDate: selectedDate ? selectedDate.toLocaleDateString('es-ES') : '',
-                            visitTime: selectedTime ? selectedTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '',
+                            visitDate: selectedDate,
+                            visitTime: selectedTime,
                             price: formattedPrice,
                             message: `Solicitud de visita para la propiedad ${property.title || property.name || 'Propiedad sin título'} el día ${selectedDate ? selectedDate.toLocaleDateString('es-ES') : ''} a las ${selectedTime ? selectedTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : ''}`
                           };
+                          
+                          console.log('Enviando datos de visita:', visitData);
                           
                           // Enviar los datos
                           const response = await sendPropertyEmail(visitData);

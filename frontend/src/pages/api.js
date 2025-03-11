@@ -884,17 +884,35 @@ export const sendPropertyEmail = async (data) => {
     } else if (data.type === 'visit') {
       const endpoint = `${API_URL}/api/property-visit/create`;
       
+      // Validar que las fechas sean objetos Date válidos
+      if (!(data.visitDate instanceof Date) || !(data.visitTime instanceof Date)) {
+        throw new Error('Las fechas proporcionadas no son válidas');
+      }
+      
       // Validar datos requeridos para la visita
-      if (!data.visitDate || !data.visitTime || !data.email || !data.name || !data.phone || !data.propertyId || !data.propertyTitle) {
+      if (!data.email || !data.name || !data.phone || !data.propertyId || !data.propertyTitle) {
         throw new Error('Faltan datos de la visita');
       }
+      
+      // Crear objetos Date para fecha y hora
+      const visitDate = new Date(data.visitDate);
+      const visitTime = new Date(data.visitTime);
+      
+      // Combinar fecha y hora en un solo objeto Date
+      const combinedDateTime = new Date(
+        visitDate.getFullYear(),
+        visitDate.getMonth(),
+        visitDate.getDate(),
+        visitTime.getHours(),
+        visitTime.getMinutes()
+      );
       
       // Mapear los campos según PropertyVisitSchema
       const visitData = {
         property: data.propertyId,
         propertyAddress: data.propertyTitle,
-        date: new Date(data.visitDate),
-        time: new Date(data.visitTime),
+        date: combinedDateTime,
+        time: combinedDateTime,
         email: data.email,
         name: data.name,
         phone: data.phone,
