@@ -3,6 +3,7 @@ import React from 'react';
 import Head from 'next/head';
 import ControlMenu from './header';
 import Footer3 from './footer';
+import CookieConsent from './CookieConsent';
 
 // Schema.org para la estructura del sitio
 const getWebsiteSchema = () => ({
@@ -77,6 +78,8 @@ const Layout = ({ children }) => (
       <footer className="relative z-40">
         <Footer3 />
       </footer>
+
+      <CookieConsent />
     </div>
   </>
 );
