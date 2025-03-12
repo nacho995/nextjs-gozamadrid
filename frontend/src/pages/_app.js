@@ -9,6 +9,7 @@ import { Toaster } from 'react-hot-toast';
 import LoadingScreen from '../components/LoadingScreen';
 import { useRouter } from 'next/router';
 import { UserProvider } from '../context/UserContext';
+import { CookieProvider } from '../context/CookieContext';
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
@@ -49,42 +50,44 @@ function MyApp({ Component, pageProps }) {
   }, [router.pathname]);
 
   return (
-    <UserProvider>
-      <Head>
-        <title>Goza Madrid | Inmobiliaria de Lujo en Madrid</title>
-        <meta name="description" content="Expertos en servicios inmobiliarios de lujo en Madrid. Compra, venta y alquiler de propiedades exclusivas. Asesoramiento personalizado para inversores nacionales e internacionales." />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href={`${assetPrefix}/logo.png`} />
+    <CookieProvider>
+      <UserProvider>
+        <Head>
+          <title>Goza Madrid | Inmobiliaria de Lujo en Madrid</title>
+          <meta name="description" content="Expertos en servicios inmobiliarios de lujo en Madrid. Compra, venta y alquiler de propiedades exclusivas. Asesoramiento personalizado para inversores nacionales e internacionales." />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="icon" href={`${assetPrefix}/logo.png`} />
+          
+          {/* Metadatos básicos */}
+          <meta charSet="UTF-8" />
+          <meta name="author" content="Goza Madrid" />
+          <meta name="robots" content="index, follow" />
+          
+          {/* Open Graph / Facebook */}
+          <meta property="og:type" content="website" />
+          <meta property="og:url" content="https://gozamadrid.com/" />
+          <meta property="og:title" content="Goza Madrid | Inmobiliaria de Lujo en Madrid" />
+          <meta property="og:description" content="Expertos en servicios inmobiliarios de lujo en Madrid. Compra, venta y alquiler de propiedades exclusivas. Asesoramiento personalizado para inversores nacionales e internacionales." />
+          <meta property="og:image" content="https://gozamadrid.com/og-image.jpg" />
+          
+          {/* Twitter */}
+          <meta property="twitter:card" content="summary_large_image" />
+          <meta property="twitter:url" content="https://gozamadrid.com/" />
+          <meta property="twitter:title" content="Goza Madrid | Inmobiliaria de Lujo en Madrid" />
+          <meta property="twitter:description" content="Expertos en servicios inmobiliarios de lujo en Madrid. Compra, venta y alquiler de propiedades exclusivas. Asesoramiento personalizado para inversores nacionales e internacionales." />
+          <meta property="twitter:image" content="https://gozamadrid.com/twitter-image.jpg" />
+        </Head>
         
-        {/* Metadatos básicos */}
-        <meta charSet="UTF-8" />
-        <meta name="author" content="Goza Madrid" />
-        <meta name="robots" content="index, follow" />
+        {loading && <LoadingScreen />}
         
-        {/* Open Graph / Facebook */}
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://gozamadrid.com/" />
-        <meta property="og:title" content="Goza Madrid | Inmobiliaria de Lujo en Madrid" />
-        <meta property="og:description" content="Expertos en servicios inmobiliarios de lujo en Madrid. Compra, venta y alquiler de propiedades exclusivas. Asesoramiento personalizado para inversores nacionales e internacionales." />
-        <meta property="og:image" content="https://gozamadrid.com/og-image.jpg" />
-        
-        {/* Twitter */}
-        <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:url" content="https://gozamadrid.com/" />
-        <meta property="twitter:title" content="Goza Madrid | Inmobiliaria de Lujo en Madrid" />
-        <meta property="twitter:description" content="Expertos en servicios inmobiliarios de lujo en Madrid. Compra, venta y alquiler de propiedades exclusivas. Asesoramiento personalizado para inversores nacionales e internacionales." />
-        <meta property="twitter:image" content="https://gozamadrid.com/twitter-image.jpg" />
-      </Head>
-      
-      {loading && <LoadingScreen />}
-      
-      <NavbarProvider>
-        <Layout hideControlMenu={hideControlMenu}>
-          <Component {...pageProps} />
-        </Layout>
-        <Toaster />
-      </NavbarProvider>
-    </UserProvider>
+        <NavbarProvider>
+          <Layout hideControlMenu={hideControlMenu}>
+            <Component {...pageProps} />
+          </Layout>
+          <Toaster />
+        </NavbarProvider>
+      </UserProvider>
+    </CookieProvider>
   );
 }
 

@@ -4,6 +4,6 @@
   "/_document": "pages/_document.js",
   "/": "pages/index.js",
   "/api/wordpress-proxy": "pages/api/wordpress-proxy.js",
-  "/vender/comprar": "pages/vender/comprar.js",
-  "/vender": "pages/vender.js"
+  "/vender": "pages/vender.js",
+  "/vender/comprar": "pages/vender/comprar.js"
 }
