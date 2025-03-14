@@ -27,7 +27,7 @@ const getSliderSchema = () => ({
   "itemListElement": sliderData.map((slide, index) => ({
     "@type": "ImageObject",
     "position": index + 1,
-    "contentUrl": `https://www.gozamadrid.com${slide.src}`,
+    "contentUrl": `https://www.realestategozamadrid.com${slide.src}`,
     "name": slide.title.replace('\\n', ' '),
     "description": slide.description,
     "caption": slide.alt

@@ -11,7 +11,7 @@ export default function ServiciosEspaña() {
         "@type": "RealEstateAgent",
         "name": "Goza Madrid - Servicios Inmobiliarios para Residentes en España",
         "description": "Servicios especializados para propietarios residentes en España: alquileres turísticos y guía de compra de propiedades con asesoramiento integral.",
-        "url": "https://www.gozamadrid.com/servicios/residentes-espana",
+        "url": "https://www.realestategozamadrid.com/servicios/residentes-espana",
         "knowsAbout": ["Alquiler turístico en España", "Compra de propiedades en Madrid", "Asesoramiento inmobiliario"],
         "makesOffer": [
             {
@@ -56,10 +56,10 @@ export default function ServiciosEspaña() {
                 <title>Servicios Inmobiliarios para Residentes en España | Goza Madrid</title>
                 <meta name="description" content="Servicios especializados para propietarios en España: gestión de alquileres turísticos y asesoramiento completo para compra de propiedades en Madrid." />
                 <meta name="keywords" content="alquiler turístico madrid, gestión apartamentos turísticos, compra viviendas madrid, asesoramiento inmobiliario españa, inversión inmobiliaria" />
-                <link rel="canonical" href="https://www.gozamadrid.com/servicios/residentes-espana" />
+                <link rel="canonical" href="https://www.realestategozamadrid.com/servicios/residentes-espana" />
                 <meta property="og:title" content="Servicios Inmobiliarios para Residentes en España | Goza Madrid" />
                 <meta property="og:description" content="Maximiza la rentabilidad de tu propiedad con alquileres vacacionales y recibe asesoramiento experto en compra de viviendas en Madrid." />
-                <meta property="og:url" content="https://www.gozamadrid.com/servicios/residentes-espana" />
+                <meta property="og:url" content="https://www.realestategozamadrid.com/servicios/residentes-espana" />
                 <meta property="og:type" content="website" />
                 <script
                     type="application/ld+json"

@@ -10,10 +10,10 @@ const getWebsiteSchema = () => ({
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "Goza Madrid",
-  "url": "https://www.gozamadrid.com",
+  "url": "https://www.realestategozamadrid.com",
   "potentialAction": {
     "@type": "SearchAction",
-    "target": "https://www.gozamadrid.com/buscar?q={search_term_string}",
+    "target": "https://www.realestategozamadrid.com/buscar?q={search_term_string}",
     "query-input": "required name=search_term_string"
   }
 });
@@ -23,8 +23,8 @@ const getOrganizationSchema = () => ({
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": "Goza Madrid",
-  "url": "https://www.gozamadrid.com",
-  "logo": "https://www.gozamadrid.com/logo.png",
+  "url": "https://www.realestategozamadrid.com",
+  "logo": "https://www.realestategozamadrid.com/logo.png",
   "contactPoint": {
     "@type": "ContactPoint",
     "telephone": "+34-XXX-XXX-XXX",

@@ -13,7 +13,7 @@ export default function ExpCountries() {
         "@type": "RealEstateAgency",
         "name": "eXp Realty Internacional",
         "description": "eXp Realty con presencia en España (Madrid, Andalucía, Cataluña, Valencia) y otros mercados internacionales como México, Portugal, Miami y Dubai.",
-        "url": "https://www.gozamadrid.com/exp-international",
+        "url": "https://www.realestategozamadrid.com/exp-international",
         "areaServed": [
             { "@type": "Country", "name": "España" },
             { "@type": "Place", "name": "Madrid, España" },
@@ -116,10 +116,11 @@ export default function ExpCountries() {
 
     const commonButtonStyles = `
         group/link relative inline-flex items-center gap-2 overflow-hidden 
-        rounded-full bg-white/20 px-8 py-3 
+        rounded-full bg-white/20 px-4 sm:px-6 md:px-8 py-2 sm:py-3 
         transition-all duration-300 
         hover:bg-white/30 
         backdrop-blur-sm
+        w-full max-w-[180px] justify-center
     `;
 
     return (
@@ -128,12 +129,12 @@ export default function ExpCountries() {
                 <title>Propiedades Internacionales eXp Realty | España, México, Portugal, Miami, Dubai</title>
                 <meta name="description" content="Descubre nuestras propiedades inmobiliarias internacionales en España (Madrid, Andalucía, Cataluña, Valencia), México, Portugal, Miami y Dubai. Inversión global con eXp Realty." />
                 <meta name="keywords" content="propiedades internacionales, eXp Realty global, inmobiliaria españa internacional, propiedades méxico, propiedades portugal, propiedades miami, propiedades dubai" />
-                <link rel="canonical" href="https://www.gozamadrid.com/exp-international" />
+                <link rel="canonical" href="https://www.realestategozamadrid.com/exp-international" />
                 <meta property="og:title" content="Propiedades Internacionales eXp Realty | Inversión Global" />
                 <meta property="og:description" content="Explore nuestro portafolio internacional de propiedades en España, México, Portugal, Miami y Dubai. Servicios inmobiliarios globales con eXp Realty." />
-                <meta property="og:url" content="https://www.gozamadrid.com/exp-international" />
+                <meta property="og:url" content="https://www.realestategozamadrid.com/exp-international" />
                 <meta property="og:type" content="website" />
-                <meta property="og:image" content="https://www.gozamadrid.com/exp-global.jpg" />
+                <meta property="og:image" content="https://www.realestategozamadrid.com/exp-global.jpg" />
                 <script
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -192,11 +193,11 @@ export default function ExpCountries() {
                                     itemProp="image"
                                 />
                                 <div className={commonOverlayStyles}>
-                                    <div className="absolute inset-0 flex flex-col items-center justify-center p-4 space-y-4">
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center p-2 sm:p-4 space-y-2 sm:space-y-4">
                                         <h3 className={commonTitleStyles} itemProp="name">
                                             {country.name}
                                         </h3>
-                                        <p className="text-white text-sm font-bold text-center" itemProp="description">
+                                        <p className="text-white text-xs sm:text-sm font-bold text-center line-clamp-3 sm:line-clamp-none" itemProp="description">
                                             {country.description}
                                         </p>
                                         <a 
@@ -207,7 +208,7 @@ export default function ExpCountries() {
                                             aria-label={`Ver propiedades en ${country.name}`}
                                             itemProp="url"
                                         >
-                                            <span className="relative text-lg font-semibold text-white">
+                                            <span className="relative text-sm sm:text-base md:text-lg font-semibold text-white whitespace-nowrap">
                                                 Ver propiedades
                                             </span>
                                             <span className="absolute bottom-0 left-0 h-1 w-full transform 

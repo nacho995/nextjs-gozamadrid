@@ -343,7 +343,7 @@ export default function PropertyPage() {
             "name": title,
             "description": `${title} ubicada en ${location}`,
             "image": imageUrl,
-            "url": `https://www.gozamadrid.com/property/${id}`,
+            "url": `https://www.realestategozamadrid.com/property/${id}`,
             "category": property.typeProperty || "Propiedad inmobiliaria",
             "offers": priceValue ? {
               "@type": "Offer",
@@ -519,14 +519,14 @@ export default function PropertyPage() {
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={pageDescription} />
         <meta property="og:url" content={currentUrl} />
-        <meta property="og:image" content="https://www.gozamadrid.com/og-image-properties.jpg" />
+        <meta property="og:image" content="https://www.realestategozamadrid.com/og-image-properties.jpg" />
         <meta property="og:site_name" content="Goza Madrid" />
         
         {/* Twitter Card tags */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={pageTitle} />
         <meta name="twitter:description" content={pageDescription} />
-        <meta name="twitter:image" content="https://www.gozamadrid.com/twitter-image-properties.jpg" />
+        <meta name="twitter:image" content="https://www.realestategozamadrid.com/twitter-image-properties.jpg" />
         
         {/* Schema.org structured data */}
         {propertyListSchema && (

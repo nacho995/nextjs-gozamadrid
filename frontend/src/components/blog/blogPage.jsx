@@ -138,13 +138,13 @@ export default function BlogPage() {
       "@type": "Blog",
       "name": "Blog de Goza Madrid",
       "description": "Artículos y noticias sobre el sector inmobiliario, inversión y estilo de vida en Madrid",
-      "url": typeof window !== 'undefined' ? window.location.origin + '/blog' : 'https://www.gozamadrid.com/blog',
+      "url": typeof window !== 'undefined' ? window.location.origin + '/blog' : 'https://www.realestategozamadrid.com/blog',
       "publisher": {
         "@type": "Organization",
         "name": "Goza Madrid",
         "logo": {
           "@type": "ImageObject",
-          "url": typeof window !== 'undefined' ? window.location.origin + '/logo.png' : 'https://www.gozamadrid.com/logo.png'
+          "url": typeof window !== 'undefined' ? window.location.origin + '/logo.png' : 'https://www.realestategozamadrid.com/logo.png'
         }
       },
       "blogPosts": blogs.map(blog => ({
@@ -159,7 +159,7 @@ export default function BlogPage() {
         "image": blog.image?.src || "/img/default-image.jpg",
         "url": typeof window !== 'undefined' 
           ? `${window.location.origin}/blog/${blog.source === 'wordpress' ? blog.slug + '?source=wordpress' : blog._id}`
-          : `https://www.gozamadrid.com/blog/${blog.source === 'wordpress' ? blog.slug + '?source=wordpress' : blog._id}`
+          : `https://www.realestategozamadrid.com/blog/${blog.source === 'wordpress' ? blog.slug + '?source=wordpress' : blog._id}`
       }))
     };
 
@@ -386,10 +386,10 @@ export default function BlogPage() {
                 <title>Blog de Goza Madrid | Artículos inmobiliarios y noticias del sector</title>
                 <meta name="description" content="Descubre artículos sobre inversión inmobiliaria, compraventa, alquiler, decoración y tendencias del mercado en Madrid. Blog especializado en el sector inmobiliario." />
                 <meta name="keywords" content="blog inmobiliario, artículos inmobiliarios madrid, noticias sector inmobiliario, inversión inmobiliaria, compraventa, alquiler" />
-                <link rel="canonical" href="https://www.gozamadrid.com/blog" />
+                <link rel="canonical" href="https://www.realestategozamadrid.com/blog" />
                 <meta property="og:title" content="Blog de Goza Madrid | Artículos y noticias inmobiliarias" />
                 <meta property="og:description" content="Encuentra información valiosa sobre el mercado inmobiliario, consejos para comprar o vender tu propiedad, y las últimas tendencias del sector." />
-                <meta property="og:url" content="https://www.gozamadrid.com/blog" />
+                <meta property="og:url" content="https://www.realestategozamadrid.com/blog" />
                 <meta property="og:type" content="website" />
                 <script
                     type="application/ld+json"

@@ -109,7 +109,7 @@ export default function AvisoLegal() {
 
                             <section>
                                 <h2 className="text-2xl font-semibold mb-4">2. Objeto y Ámbito de Aplicación</h2>
-                                <p>Este sitio web es propiedad de Goza Madrid. El presente aviso legal regula el uso del servicio del portal de Internet www.gozamadrid.com. La navegación por el sitio web atribuye la condición de usuario e implica la aceptación plena y sin reservas de todas las disposiciones incluidas en este aviso legal.</p>
+                                <p>Este sitio web es propiedad de Goza Madrid. El presente aviso legal regula el uso del servicio del portal de Internet www.realestategozamadrid.com. La navegación por el sitio web atribuye la condición de usuario e implica la aceptación plena y sin reservas de todas las disposiciones incluidas en este aviso legal.</p>
                             </section>
 
                             <section>
@@ -133,7 +133,7 @@ export default function AvisoLegal() {
 
                             <section>
                                 <h2 className="text-2xl font-semibold mb-4">6. Enlaces</h2>
-                                <p>En el caso de que en www.gozamadrid.com se incluyesen enlaces o hipervínculos hacia otros sitios de Internet, Goza Madrid no ejercerá ningún tipo de control sobre dichos sitios y contenidos. En ningún caso asumirá responsabilidad alguna por los contenidos de algún enlace perteneciente a un sitio web ajeno.</p>
+                                <p>En el caso de que en www.realestategozamadrid.com se incluyesen enlaces o hipervínculos hacia otros sitios de Internet, Goza Madrid no ejercerá ningún tipo de control sobre dichos sitios y contenidos. En ningún caso asumirá responsabilidad alguna por los contenidos de algún enlace perteneciente a un sitio web ajeno.</p>
                             </section>
 
                             <section>

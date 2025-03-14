@@ -21,7 +21,7 @@ export default function Reforms() {
         "name": "Reformas Sin Obras",
         "description": "Transformamos espacios sin las molestias de las obras tradicionales. Soluciones rápidas, limpias y profesionales para tu hogar.",
         "slogan": "Reformas rápidas y sin licencias",
-        "url": "https://www.gozamadrid.com/reformas",
+        "url": "https://www.realestategozamadrid.com/reformas",
         "knowsAbout": ["Reformas sin obras", "Renovación de paredes", "Suelos innovadores", "Reformas de baños", "Reformas en exteriores"],
         "makesOffer": [
             {
@@ -173,10 +173,10 @@ export default function Reforms() {
                 <title>Reformas Sin Obras en Madrid | Soluciones Rápidas y Sin Licencias</title>
                 <meta name="description" content="Especialistas en reformas sin obras en Madrid. Transformamos espacios sin las molestias tradicionales. Paredes, suelos, baños y exteriores sin necesidad de licencias." />
                 <meta name="keywords" content="reformas sin obras, renovación paredes, suelos sin obras, reformas baños rápidas, reformas interiores, reformas exteriores madrid" />
-                <link rel="canonical" href="https://www.gozamadrid.com/reformas" />
+                <link rel="canonical" href="https://www.realestategozamadrid.com/reformas" />
                 <meta property="og:title" content="Reformas Sin Obras en Madrid | Rápidas y Sin Licencias" />
                 <meta property="og:description" content="Transformamos tu hogar sin las molestias de las obras tradicionales. Paredes, suelos, baños y exteriores con soluciones rápidas y profesionales." />
-                <meta property="og:url" content="https://www.gozamadrid.com/reformas" />
+                <meta property="og:url" content="https://www.realestategozamadrid.com/reformas" />
                 <meta property="og:type" content="website" />
                 <script
                     type="application/ld+json"

@@ -107,6 +107,13 @@ const getProxiedImageUrl = (originalUrl) => {
   return `/api/proxy-image?url=${encodeURIComponent(originalUrl)}`;
 };
 
+// Función para limpiar texto para SEO (elimina HTML y limita longitud)
+const cleanTextForSEO = (htmlText, maxLength = 160) => {
+  if (!htmlText) return '';
+  const plainText = htmlText.replace(/<[^>]*>/g, '');
+  return plainText.length > maxLength ? plainText.substring(0, maxLength) + '...' : plainText;
+};
+
 export default function DefaultPropertyContent({ property }) {
   console.log("Renderizando PropertyContent con propiedad:", property ? `ID: ${property.id || property._id}` : 'null');
   
@@ -461,67 +468,99 @@ export default function DefaultPropertyContent({ property }) {
   
   const location = property.location || 'Madrid, España';
   const propertyType = property.type || 'Propiedad';
+  
+  // Preparar datos para SEO
+  const seoTitle = `${title} | Propiedad en ${location}`;
+  const seoDescription = cleanTextForSEO(description, 160) || `${propertyType} en ${location}. ${propertyData.bedrooms > 0 ? propertyData.bedrooms + ' habitaciones, ' : ''}${propertyData.bathrooms > 0 ? propertyData.bathrooms + ' baños, ' : ''}${propertyData.livingArea > 0 ? propertyData.livingArea + ' m². ' : ''}`;
+  const seoKeywords = `${propertyType}, ${location}, inmobiliaria, comprar, alquilar, ${propertyData.bedrooms > 0 ? propertyData.bedrooms + ' habitaciones, ' : ''}${propertyData.livingArea > 0 ? propertyData.livingArea + ' m², ' : ''}`;
+  const seoImage = propertyImages && propertyImages.length > 0 ? propertyImages[0].src : '/img/default-property-image.jpg';
+  
+  // Datos estructurados para Schema.org
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "RealEstateListing",
+    "name": title,
+    "description": cleanTextForSEO(description, 500),
+    "url": propertyUrl,
+    "image": propertyImages.map(img => img.src),
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": location.split(',')[0] || "Madrid",
+      "addressRegion": "Madrid",
+      "addressCountry": "ES"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": typeof priceValue === 'number' ? priceValue : (typeof priceValue === 'string' ? priceValue.replace(/[^\d]/g, '') : ''),
+      "priceCurrency": "EUR",
+      "availability": "https://schema.org/InStock"
+    },
+    "numberOfRooms": propertyData?.bedrooms || undefined,
+    "numberOfBathroomsTotal": propertyData?.bathrooms || undefined,
+    "floorSize": {
+      "@type": "QuantitativeValue",
+      "value": propertyData?.livingArea || undefined,
+      "unitCode": "MTK"
+    },
+    "datePosted": property.date || new Date().toISOString(),
+    "mainEntityOfPage": propertyUrl
+  };
 
   return (
     <>
-      {/* Add Head with SEO meta tags */}
+      {/* Enhanced SEO meta tags */}
       <Head>
-        <title>{title} | Propiedad en {location}</title>
-        <meta name="description" content={`${propertyType} en ${location}. ${propertyData.bedrooms > 0 ? propertyData.bedrooms + ' habitaciones, ' : ''}${propertyData.bathrooms > 0 ? propertyData.bathrooms + ' baños, ' : ''}${propertyData.livingArea > 0 ? propertyData.livingArea + ' m². ' : ''}${cleanedContent ? cleanedContent.replace(/<[^>]*>/g, '').substring(0, 120) : ''}...`} />
+        <title>{seoTitle}</title>
+        <meta name="description" content={seoDescription} />
+        <meta name="keywords" content={seoKeywords} />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href={propertyUrl} />
         
         {/* OpenGraph tags for social sharing */}
         <meta property="og:title" content={`${title} | ${formattedPrice}`} />
-        <meta property="og:description" content={`${propertyType} en ${location}. ${cleanedContent ? cleanedContent.replace(/<[^>]*>/g, '').substring(0, 150) : ''}...`} />
-        <meta property="og:image" content={propertyImages && propertyImages.length > 0 ? propertyImages[0].src : '/img/default-property-image.jpg'} />
+        <meta property="og:description" content={seoDescription} />
+        <meta property="og:image" content={seoImage} />
+        <meta property="og:image:alt" content={`Imagen de ${title}`} />
         <meta property="og:url" content={propertyUrl} />
         <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Goza Madrid" />
+        <meta property="og:locale" content="es_ES" />
         
         {/* Twitter Card data */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`${title} | ${formattedPrice}`} />
-        <meta name="twitter:description" content={`${propertyType} en ${location}. ${cleanedContent ? cleanedContent.replace(/<[^>]*>/g, '').substring(0, 120) : ''}...`} />
-        <meta name="twitter:image" content={propertyImages && propertyImages.length > 0 ? propertyImages[0].src : '/img/default-property-image.jpg'} />
+        <meta name="twitter:description" content={seoDescription} />
+        <meta name="twitter:image" content={seoImage} />
+        <meta name="twitter:image:alt" content={`Imagen de ${title}`} />
+        <meta name="twitter:site" content="@gozamadrid" />
+        
+        {/* Additional SEO meta tags */}
+        <meta name="geo.region" content="ES-MD" />
+        <meta name="geo.placename" content={location.split(',')[0] || "Madrid"} />
+        <meta name="author" content="Goza Madrid" />
+        <meta name="publisher" content="Goza Madrid" />
         
         {/* Schema.org JSON-LD structured data */}
         <script 
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "RealEstateListing",
-            "name": title,
-            "description": cleanedContent.replace(/<[^>]*>/g, '').substring(0, 500) + '...',
-            "url": propertyUrl,
-            "image": propertyImages.length > 0 ? propertyImages[0].src : null,
-            "address": {
-              "@type": "PostalAddress",
-              "addressLocality": location || "Madrid",
-              "addressRegion": "Madrid",
-              "addressCountry": "ES"
-            },
-            "offers": {
-              "@type": "Offer",
-              "price": typeof formattedPrice === 'string' ? formattedPrice.replace(/[^\d]/g, '') : formattedPrice,
-              "priceCurrency": "EUR"
-            },
-            "numberOfRooms": propertyData?.bedrooms !== 0 ? propertyData.bedrooms : undefined,
-            "numberOfBathroomsTotal": propertyData?.bathrooms !== 0 ? propertyData.bathrooms : undefined,
-            "floorSize": {
-              "@type": "QuantitativeValue",
-              "value": propertyData?.livingArea !== 0 ? propertyData.livingArea : undefined,
-              "unitCode": "MTK"  // Square meters according to UN/CEFACT
-            }
-          }) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
       </Head>
     
       <div className="container mx-auto px-4 py-8">
         <article className="relative" itemScope itemType="https://schema.org/RealEstateListing">
-          {/* SEO metadata */}
+          {/* Enhanced SEO metadata */}
           <meta itemProp="name" content={title} />
-          <meta itemProp="description" content={cleanedContent?.replace(/<[^>]*>/g, '').substring(0, 500)} />
+          <meta itemProp="description" content={cleanTextForSEO(description, 500)} />
           <meta itemProp="url" content={propertyUrl} />
+          <meta itemProp="datePosted" content={property.date || new Date().toISOString()} />
+          <meta itemProp="propertyType" content={propertyType} />
+          <meta itemProp="numberOfRooms" content={propertyData?.bedrooms || 0} />
+          <meta itemProp="numberOfBathroomsTotal" content={propertyData?.bathrooms || 0} />
+          <meta itemProp="floorSize" content={propertyData?.livingArea || 0} />
+          <meta itemProp="floorSizeUnit" content="MTK" />
+          <meta itemProp="price" content={typeof priceValue === 'number' ? priceValue : (typeof priceValue === 'string' ? priceValue.replace(/[^\d]/g, '') : '')} />
+          <meta itemProp="priceCurrency" content="EUR" />
 
           {/* Cabecera de lujo con efecto de cristal y oro */}
           <div className="mb-12 bg-gradient-to-r from-black/80 via-black/70 to-black/80 backdrop-blur-xl p-10 rounded-[2rem] border border-amarillo/20 shadow-2xl relative overflow-hidden">
@@ -530,19 +569,25 @@ export default function DefaultPropertyContent({ property }) {
             
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between relative z-10">
               <div className="lg:mr-8">
-                <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight leading-tight">{title}</h1>
+                <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight leading-tight" itemProp="name">{title}</h1>
                 <div className=" items-center mt-4 bg-black/30 backdrop-blur-md px-4 py-3 rounded-xl inline-block">
                   <div className="bg-amarillo p-2 rounded-lg mr-3">
                     <FaMapMarkerAlt className="text-black text-xl" />
                   </div>
-                  <p className="text-xl text-white font-light">{location}</p>
+                  <p className="text-xl text-white font-light" itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
+                    <span itemProp="addressLocality">{location}</span>
+                  </p>
                 </div>
               </div>
               
               <div className="mt-8 lg:mt-0">
                 <div className="bg-amarillo py-4 px-8 rounded-2xl inline-flex items-center shadow-xl transform hover:scale-105 transition-all duration-500 group">
                   <FaEuroSign className="text-3xl text-black mr-3" />
-                  <p className="text-3xl font-bold text-black tracking-wide" itemProp="offers">{formattedPrice}</p>
+                  <p className="text-3xl font-bold text-black tracking-wide" itemProp="offers" itemScope itemType="https://schema.org/Offer">
+                    <span itemProp="price">{formattedPrice}</span>
+                    <meta itemProp="priceCurrency" content="EUR" />
+                    <meta itemProp="availability" content="https://schema.org/InStock" />
+                  </p>
                 </div>
               </div>
             </div>
@@ -566,7 +611,7 @@ export default function DefaultPropertyContent({ property }) {
                 <motion.img
                   key={current}
                   src={propertyImages[current].src}
-                  alt={propertyImages[current].alt}
+                  alt={propertyImages[current].alt || `${title} - Imagen ${current + 1}`}
                   className="w-full h-full object-cover transition-transform duration-3000 group-hover:scale-110"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -582,13 +627,15 @@ export default function DefaultPropertyContent({ property }) {
                     }));
                   }}
                   loading="eager"
+                  itemProp="image"
                 />
               ) : (
                 <img 
                   src="/img/default-property-image.jpg" 
-                  alt="Imagen por defecto"
+                  alt={`${title} - Imagen por defecto`}
                   className="w-full h-full object-cover"
                   onLoad={() => setImageLoading(false)}
+                  itemProp="image"
                 />
               )}
               
@@ -630,10 +677,11 @@ export default function DefaultPropertyContent({ property }) {
                         ? "ring-4 ring-amarillo shadow-2xl scale-110 z-10"
                         : "ring-1 ring-white/10 hover:ring-amarillo hover:shadow-xl hover:scale-105"
                     }`}
+                    aria-label={`Ver imagen ${index + 1} de ${propertyImages.length}`}
                   >
                     <img
                       src={image.src}
-                      alt={image.alt}
+                      alt={image.alt || `${title} - Imagen ${index + 1}`}
                       className="h-full w-full object-cover transition-transform duration-3000 hover:scale-125"
                       onError={handleImageError}
                     />
@@ -751,6 +799,8 @@ export default function DefaultPropertyContent({ property }) {
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                   className="rounded-2xl"
+                  title={`Mapa de ubicación de ${title} en ${location}`}
+                  aria-label={`Ubicación de ${title} en ${location}`}
                 ></iframe>
               </div>
             </div>
@@ -761,6 +811,7 @@ export default function DefaultPropertyContent({ property }) {
             <button
               onClick={() => setShowCalendar(true)}
               className="group relative inline-flex items-center gap-3 overflow-hidden rounded-2xl bg-black/80 px-8 py-6 transition-all duration-500 hover:bg-black backdrop-blur-xl border border-amarillo/20 shadow-2xl hover:shadow-amarillo/20"
+              aria-label="Agendar visita privada"
             >
               <div className="bg-amarillo p-3 rounded-xl">
                 <FaCalendarAlt className="text-2xl text-black" />
@@ -773,6 +824,7 @@ export default function DefaultPropertyContent({ property }) {
             <button
               onClick={() => setShowOfferPanel(true)}
               className="group relative inline-flex items-center gap-3 overflow-hidden rounded-2xl bg-black/80 px-8 py-6 transition-all duration-500 hover:bg-black backdrop-blur-xl border border-amarillo/20 shadow-2xl hover:shadow-amarillo/20"
+              aria-label="Realizar oferta por esta propiedad"
             >
               <div className="bg-amarillo p-3 rounded-xl">
                 <FaHandshake className="text-2xl text-black" />
@@ -790,7 +842,7 @@ export default function DefaultPropertyContent({ property }) {
             
             <h3 className="text-3xl font-semibold text-white mb-8 tracking-wide relative z-10">¿Desea más información sobre esta propiedad exclusiva?</h3>
             <Link href="/contacto">
-              <button className="group relative inline-flex items-center gap-3 overflow-hidden rounded-2xl bg-amarillo px-8 py-6 transition-all duration-500 hover:bg-amarillo/90 shadow-2xl hover:scale-105">
+              <button className="group relative inline-flex items-center gap-3 overflow-hidden rounded-2xl bg-amarillo px-8 py-6 transition-all duration-500 hover:bg-amarillo/90 shadow-2xl hover:scale-105" aria-label="Contactar para más información">
                 <FaEnvelope className="text-2xl text-black" />
                 <span className="text-xl font-semibold text-black tracking-wide">
                   Contacto Personalizado
@@ -974,7 +1026,7 @@ export default function DefaultPropertyContent({ property }) {
                   onClick={() => setShowOfferPanel(false)}
                   className="text-gray-400 hover:text-white transition-colors duration-300 p-2 rounded-full hover:bg-white/10"
                 >
-                  <FaTimes className="text-xl" />
+                  <FaTimes className="text-xl text-amarillo" />
                 </button>
               </div>
               
