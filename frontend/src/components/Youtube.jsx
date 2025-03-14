@@ -18,7 +18,7 @@ const getYouTubeSchema = (videoId, title) => ({
     "name": "Goza Madrid",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://www.gozamadrid.com/logo.png"
+      "url": "https://www.realestategozamadrid.com/logo.png"
     }
   },
   "potentialAction": {

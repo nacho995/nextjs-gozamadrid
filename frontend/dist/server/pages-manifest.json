@@ -4,6 +4,11 @@
   "/_document": "pages/_document.js",
   "/": "pages/index.js",
   "/api/wordpress-proxy": "pages/api/wordpress-proxy.js",
-  "/vender": "pages/vender.js",
-  "/vender/comprar": "pages/vender/comprar.js"
+  "/vender/comprar": "pages/vender/comprar.js",
+  "/property/[id]": "pages/property/[id].js",
+  "/api/proxy-image": "pages/api/proxy-image.js",
+  "/exp-realty": "pages/exp-realty.js",
+  "/blog": "pages/blog.js",
+  "/blog/[id]": "pages/blog/[id].js",
+  "/reformas": "pages/reformas.js"
 }

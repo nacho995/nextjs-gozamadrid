@@ -97,10 +97,10 @@ export default function AlquilerTuristico() {
                 <title>Alquiler Turístico en España | Gestión Integral de Alquileres Vacacionales</title>
                 <meta name="description" content="Servicio profesional de gestión de alquiler turístico en España. Maximiza la rentabilidad de tu propiedad con nuestra gestión integral, marketing digital y atención personalizada." />
                 <meta name="keywords" content="alquiler turístico, alquileres vacacionales España, gestión Airbnb, apartamentos turísticos, rentabilidad alquiler vacacional" />
-                <link rel="canonical" href="https://www.gozamadrid.com/servicios/alquiler-turistico" />
+                <link rel="canonical" href="https://www.realestategozamadrid.com/servicios/alquiler-turistico" />
                 <meta property="og:title" content="Alquiler Turístico en España - Gestión Integral de Propiedades" />
                 <meta property="og:description" content="Maximiza la rentabilidad de tu propiedad con nuestra gestión integral de alquileres vacacionales en España. Servicio completo para propietarios." />
-                <meta property="og:url" content="https://www.gozamadrid.com/servicios/alquiler-turistico" />
+                <meta property="og:url" content="https://www.realestategozamadrid.com/servicios/alquiler-turistico" />
                 <meta property="og:type" content="website" />
                 <script
                     type="application/ld+json"
