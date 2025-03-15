@@ -186,7 +186,7 @@ export default function Reforms() {
             
             <main className="relative z-0">
                 <section aria-label="Introducción a reformas sin obras" className="hero-section">
-                    <FadeIn>
+                    <>
                         <div className="container mx-auto px-4 py-12">
                             <div className="text-center mb-16">
                                 <motion.h1
@@ -208,10 +208,10 @@ export default function Reforms() {
                                 </motion.p>
                             </div>
                         </div>
-                    </FadeIn>
+                    </>
                 </section>
 
-                <FadeInView>
+                <>
                     <div className="container mx-auto px-4">
                         {/* Servicios Iniciales */}
                         <section aria-label="Nuestros servicios de reformas" className="services-section">
@@ -425,10 +425,10 @@ export default function Reforms() {
                             </div>
                         </section>
                     </div>
-                </FadeInView>
+                </>
 
                 <section aria-label="Contacto para presupuesto" className="cta-section">
-                    <FadeInView>
+                    <>
                         <div className="container mx-auto px-4 py-12">
                             <div className="text-center">
                                 <motion.div
@@ -453,7 +453,7 @@ export default function Reforms() {
                                 </p>
                             </div>
                         </div>
-                    </FadeInView>
+                    </>
                 </section>
             </main>
         </>

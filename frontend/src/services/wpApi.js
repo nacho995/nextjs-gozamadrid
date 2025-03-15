@@ -44,8 +44,8 @@ export const getBlogPostsFromServer = async (page = 1, perPage = 9) => {
     // Construir la URL base según el entorno
     let baseUrl = '';
     if (isServer) {
-      // En el servidor, usamos directamente la API de WordPress para evitar problemas con URLs relativas
-      baseUrl = 'https://realestategozamadrid.com/wp-json/wp/v2';
+      // En el servidor, usamos directamente la API de WordPress
+      baseUrl = process.env.NEXT_PUBLIC_WP_API_URL || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wp/v2';
     } else {
       // En el cliente, usamos nuestro proxy
       baseUrl = '/api/wordpress-proxy?endpoint=wp&path=';
@@ -56,7 +56,9 @@ export const getBlogPostsFromServer = async (page = 1, perPage = 9) => {
       ? `${baseUrl}/posts?page=${page}&per_page=${perPage}&_embed` 
       : `${baseUrl}posts&page=${page}&per_page=${perPage}&_embed=true`;
     
-    console.log(`WP API: URL de petición (${isServer ? 'servidor' : 'cliente'}): ${url}`);
+    // Añadir un timeout para evitar bloqueos
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 segundos timeout
     
     const response = await fetch(
       url,
@@ -65,9 +67,12 @@ export const getBlogPostsFromServer = async (page = 1, perPage = 9) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        cache: 'no-store' // Evitar caché en Next.js
+        cache: 'no-store', // Evitar caché en Next.js
+        signal: controller.signal
       }
     );
+    
+    clearTimeout(timeoutId);
     
     if (!response.ok) {
       console.error(`Error en la respuesta de WordPress: ${response.status} ${response.statusText}`);
@@ -77,9 +82,8 @@ export const getBlogPostsFromServer = async (page = 1, perPage = 9) => {
     const postsData = await response.json();
     const totalPages = parseInt(response.headers.get('X-WP-TotalPages') || '1');
     
-    console.log(`Obtenidos ${postsData.length} posts de WordPress con éxito`);
-    
     // Procesar los posts para garantizar que no hay objetos directos en ningún campo
+    // Optimizar el procesamiento para que sea más rápido
     const processedPosts = postsData.map(post => {
       // Crear una copia sin referencias a objetos de WordPress
       return {
@@ -102,6 +106,10 @@ export const getBlogPostsFromServer = async (page = 1, perPage = 9) => {
     return { posts: processedPosts, totalPages };
   } catch (error) {
     console.error('Error en getBlogPostsFromServer:', error);
+    // Si es un error de timeout, proporcionar un mensaje más claro
+    if (error.name === 'AbortError') {
+      console.error('La solicitud a WordPress se canceló por timeout');
+    }
     return { posts: [], totalPages: 0 };
   }
 };
@@ -114,16 +122,14 @@ export const getBlogPostsFromServer = async (page = 1, perPage = 9) => {
  */
 export async function getBlogPostBySlug(slug, retries = 5) {
   try {
-    console.log(`WP API: Buscando blog con slug "${slug}"`);
-    
     // Determinar si estamos en el servidor o en el cliente
     const isServer = typeof window === 'undefined';
     
     // Construir la URL base según el entorno
     let baseUrl = '';
     if (isServer) {
-      // En el servidor, usamos directamente la API de WordPress para evitar problemas con URLs relativas
-      baseUrl = 'https://realestategozamadrid.com/wp-json/wp/v2';
+      // En el servidor, usamos directamente la API de WordPress
+      baseUrl = process.env.NEXT_PUBLIC_WP_API_URL || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wp/v2';
     } else {
       // En el cliente, usamos nuestro proxy
       baseUrl = '/api/wordpress-proxy?endpoint=wp&path=';
@@ -133,8 +139,6 @@ export async function getBlogPostBySlug(slug, retries = 5) {
     const url = isServer 
       ? `${baseUrl}/posts?slug=${encodeURIComponent(slug)}&_embed` 
       : `${baseUrl}posts&slug=${encodeURIComponent(slug)}&_embed=true`;
-    
-    console.log(`WP API: URL de petición (${isServer ? 'servidor' : 'cliente'}): ${url}`);
     
     // Añadir timeout para evitar que la petición se quede colgada
     const controller = new AbortController();
@@ -155,7 +159,6 @@ export async function getBlogPostBySlug(slug, retries = 5) {
     
     // Si obtenemos un error 503, intentar de nuevo después de un retraso
     if (response.status === 503 && retries > 0) {
-      console.log(`Error 503 al obtener blog con slug ${slug}. Reintentando en 5 segundos... (${retries} intentos restantes)`);
       await new Promise(resolve => setTimeout(resolve, 5000)); // Esperar 5 segundos
       return getBlogPostBySlug(slug, retries - 1);
     }
@@ -166,12 +169,10 @@ export async function getBlogPostBySlug(slug, retries = 5) {
     }
     
     const posts = await response.json();
-    console.log(`WP API: Respuesta recibida, posts encontrados: ${posts.length}`);
     
     // Si encontramos el post, procesar sus campos
     if (posts && posts.length > 0) {
       const post = posts[0];
-      console.log(`WP API: Post encontrado: ID=${post.id}, título="${post.title?.rendered}"`);
       
       // Procesar todos los campos que podrían ser objetos
       post.title = safeRenderValue(post.title);
@@ -180,7 +181,6 @@ export async function getBlogPostBySlug(slug, retries = 5) {
       
       return post;
     } else {
-      console.log(`WP API: No se encontró blog de WordPress con slug: ${slug}`);
       return null;
     }
   } catch (error) {
@@ -188,75 +188,12 @@ export async function getBlogPostBySlug(slug, retries = 5) {
     
     // Si es un error de timeout o de red y aún tenemos reintentos, intentar de nuevo
     if ((error.name === 'AbortError' || error.name === 'TypeError') && retries > 0) {
-      console.log(`Error de red al obtener blog con slug ${slug}. Reintentando en 5 segundos... (${retries} intentos restantes)`);
       await new Promise(resolve => setTimeout(resolve, 5000)); // Esperar 5 segundos
       return getBlogPostBySlug(slug, retries - 1);
     }
     
     throw error;
   }
-}
-
-// En la función que transforma los posts de WordPress
-export function transformWordPressPost(wpPost, cleanSlug) {
-  // Código existente...
-  
-  // Reemplazar la función getImageUrl para asegurar que todas las imágenes usen el proxy
-  const getImageUrl = (post) => {
-    let imageUrl = null;
-    
-    // Intentar obtener la imagen destacada
-    if (post._embedded && post._embedded['wp:featuredmedia'] && post._embedded['wp:featuredmedia'].length > 0) {
-      const media = post._embedded['wp:featuredmedia'][0];
-      
-      // Intentar diferentes tamaños de imagen
-      if (media.media_details && media.media_details.sizes) {
-        // Preferir tamaños en este orden
-        const sizes = ['large', 'medium_large', 'medium', 'thumbnail', 'full'];
-        
-        for (const size of sizes) {
-          if (media.media_details.sizes[size]) {
-            imageUrl = media.media_details.sizes[size].source_url;
-            break;
-          }
-        }
-      }
-      
-      // Si no se encontró ningún tamaño específico, usar la URL estándar
-      if (!imageUrl && media.source_url) {
-        imageUrl = media.source_url;
-      }
-    }
-    
-    // Buscar en uagb_featured_image_src como alternativa
-    if (!imageUrl && post.uagb_featured_image_src) {
-      for (const size in post.uagb_featured_image_src) {
-        if (post.uagb_featured_image_src[size] && Array.isArray(post.uagb_featured_image_src[size])) {
-          imageUrl = post.uagb_featured_image_src[size][0];
-          break;
-        }
-      }
-    }
-    
-    // Buscar en el contenido como último recurso
-    if (!imageUrl && post.content && post.content.rendered) {
-      const imgMatch = post.content.rendered.match(/<img[^>]+src="([^">]+)"/);
-      if (imgMatch && imgMatch[1]) {
-        imageUrl = imgMatch[1];
-      }
-    }
-    
-    // Siempre utilizar el proxy para URLs externas
-    return imageUrl ? proxyImage(imageUrl) : '/img/default-logo.png';
-  };
-
-  // Resto del código de transformación...
-  
-  return {
-    // Resto de las propiedades...
-    imageUrl: getImageUrl(wpPost),
-    // ...
-  };
 }
 
 // Función getImageUrl mejorada para no depender del proxy
