@@ -42,7 +42,9 @@ const nextConfig = {
       'images.weserv.nl',
       'via.placeholder.com',
       'goza-madrid-qbw9.onrender.com',
-      'gozamadrid.com'
+      'gozamadrid.com',
+      'wordpress-1430059-5339263.cloudwaysapps.com'
+      
     ],
     remotePatterns: [
       {

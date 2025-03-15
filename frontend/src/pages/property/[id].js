@@ -19,7 +19,7 @@ const fetchProperty = async (id, source, isServer = false, retries = 5) => {
     // Si es una propiedad de WooCommerce
     if (isServer) {
       // En el servidor necesitamos URL absoluta
-      url = `https://realestategozamadrid.com/wp-json/wc/v3/products/${id}?consumer_key=ck_75c5940bfae6a9dd63f1489da71e43b576999633&consumer_secret=cs_f194d11b41ca92cdd356145705fede711cd233e5`;
+      url = `${process.env.NEXT_PUBLIC_WC_API_URL || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3'}/products/${id}?consumer_key=${process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY || 'ck_d69e61427264a7beea70ca9ee543b45dd00cae85'}&consumer_secret=${process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET || 'cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e'}`;
     } else {
       // En el cliente podemos usar URL relativa
       url = `/api/wordpress-proxy?path=products/${id}`;
@@ -89,7 +89,8 @@ export async function getStaticPaths() {
     // Luego, intentar obtener propiedades de WooCommerce
     let woocommerceIds = [];
     try {
-      const wooResponse = await fetch('https://realestategozamadrid.com/wp-json/wc/v3/products?consumer_key=ck_75c5940bfae6a9dd63f1489da71e43b576999633&consumer_secret=cs_f194d11b41ca92cdd356145705fede711cd233e5');
+      const wooCommerceUrl = `${process.env.NEXT_PUBLIC_WC_API_URL || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3'}/products?consumer_key=${process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY || 'ck_d69e61427264a7beea70ca9ee543b45dd00cae85'}&consumer_secret=${process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET || 'cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e'}`;
+      const wooResponse = await fetch(wooCommerceUrl);
       if (wooResponse.ok) {
         const wooProducts = await wooResponse.json();
         woocommerceIds = wooProducts.map(prod => prod.id.toString());

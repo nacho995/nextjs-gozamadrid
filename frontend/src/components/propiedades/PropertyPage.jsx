@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from 'next/router';
@@ -17,10 +17,19 @@ const textShadowLightStyle = { textShadow: '1px 1px 2px rgba(0, 0, 0, 0.5)' };
 const Pagination = ({ totalPages, currentPage, onPageChange }) => {
   const router = useRouter();
   
-  // Función para obtener todos los números de página
-  const getPageNumbers = () => {
+  // Función para renderizar números de página limitados
+  const renderPageNumbers = () => {
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    // Ajustar si estamos cerca del final
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
     const pages = [];
-    for (let i = 1; i <= totalPages; i++) {
+    for (let i = startPage; i <= endPage; i++) {
       pages.push(i);
     }
     return pages;
@@ -62,8 +71,8 @@ const Pagination = ({ totalPages, currentPage, onPageChange }) => {
               </button>
             </li>
 
-            {/* Todos los números de página */}
-            {getPageNumbers().map((pageNumber) => (
+            {/* Números de página limitados */}
+            {renderPageNumbers().map((pageNumber) => (
               <li key={pageNumber}>
                 <button
                   onClick={() => handlePageChange(pageNumber)}
@@ -212,6 +221,7 @@ const extractLocations = (properties) => {
 export default function PropertyPage() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [partialLoading, setPartialLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -406,18 +416,40 @@ export default function PropertyPage() {
       })
     : [];
 
-  // Función simplificada para el manejo del cambio de página
-  const handlePageChange = (pageNumber) => {
+  // Función para el manejo del cambio de página
+  const handlePageChange = useCallback((pageNumber) => {
     if (pageNumber === currentPage) return;
     
-    setCurrentPage(pageNumber); // Actualizar inmediatamente el currentPage
-    // No necesitas hacer fetchProperties aquí, el useEffect se encargará de eso
-  };
+    setCurrentPage(pageNumber);
+    setPartialLoading(true);
+    
+    // Simular carga parcial
+    setTimeout(() => {
+      setPartialLoading(false);
+    }, 300);
+  }, [currentPage]);
 
-  // Eliminar useCallback para getCurrentProperties
-  const getCurrentProperties = () => {
-    return filteredProperties;
-  };
+  // Función para obtener las propiedades actuales según la página
+  const getCurrentProperties = useCallback(() => {
+    const indexOfLastProperty = currentPage * propertiesPerPage;
+    const indexOfFirstProperty = indexOfLastProperty - propertiesPerPage;
+    return filteredProperties.slice(indexOfFirstProperty, indexOfLastProperty);
+  }, [currentPage, filteredProperties, propertiesPerPage]);
+
+  // Cuando el usuario busca, resetear a la primera página
+  useEffect(() => {
+    if (searchTerm !== "" && currentPage !== 1) {
+      setCurrentPage(1);
+      
+      // Actualizar la URL para reflejar el cambio de página
+      if (router.isReady) {
+        router.push({
+          pathname: router.pathname,
+          query: { ...router.query, page: 1 }
+        }, undefined, { shallow: true });
+      }
+    }
+  }, [searchTerm, currentPage, router]);
 
   // Renderizar estado de carga
   if (loading) {
@@ -717,11 +749,8 @@ export default function PropertyPage() {
                           // Si contiene letras y tiene más de 10 caracteres, es de MongoDB
                           const isMongoProperty = /[a-zA-Z]/.test(cleanId) && cleanId.length > 10;
                           
-                          console.log(`Navegando a propiedad ${isMongoProperty ? 'MongoDB' : 'WooCommerce'}:`, cleanId);
-                          
                           // Crear URL con el origen correcto
                           const url = `/property/${cleanId}?source=${isMongoProperty ? 'mongodb' : 'woocommerce'}`;
-                          console.log('URL de navegación:', url);
                           
                           // Navegar programáticamente
                           window.location.href = url;

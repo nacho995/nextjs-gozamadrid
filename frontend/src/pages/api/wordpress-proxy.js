@@ -93,7 +93,7 @@ export default async function handler(req, res) {
   const WC_CONSUMER_SECRET = process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET || 'cs_f194d11b41ca92cdd356145705fede711cd233e5';
   
   // Determinar qué API usar (WooCommerce o WordPress)
-  let baseUrl = 'https://realestategozamadrid.com/wp-json/';
+  let baseUrl = '';
   let url = '';
   
   // En producción, siempre intentamos obtener el máximo de elementos por página
@@ -103,8 +103,8 @@ export default async function handler(req, res) {
   
   if (endpoint === 'wp') {
     // API de WordPress (posts, etc.)
-    baseUrl += 'wp/v2/';
-    url = `${baseUrl}${path || 'posts'}`;
+    baseUrl = process.env.NEXT_PUBLIC_WP_API_URL || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wp/v2';
+    url = `${baseUrl}/${path || 'posts'}`;
     
     // Añadir parámetros de consulta
     const queryString = Object.entries(queryParams)
@@ -116,8 +116,8 @@ export default async function handler(req, res) {
     }
   } else {
     // API de WooCommerce (productos)
-    baseUrl += 'wc/v3/';
-    url = `${baseUrl}${path || 'products'}`;
+    baseUrl = process.env.NEXT_PUBLIC_WC_API_URL || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3';
+    url = `${baseUrl}/${path || 'products'}`;
     
     // Añadir las claves de API
     url += `?consumer_key=${WC_CONSUMER_KEY}&consumer_secret=${WC_CONSUMER_SECRET}`;

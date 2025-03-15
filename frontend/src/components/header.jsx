@@ -319,7 +319,18 @@ export default function ControlMenu() {
                 <Link href="/reformas" className={`${isExpRealty ? 'text-white' : 'text-white'} hover:text-gray-300 whitespace-nowrap`}>
                   Reformas
                 </Link>
-                <Link href="/blog" className={`${isExpRealty ? 'text-white' : 'text-white'} hover:text-gray-300`}>
+                <Link 
+                  href="/blog" 
+                  className={`${isExpRealty ? 'text-white' : 'text-white'} hover:text-gray-300`}
+                  onClick={(e) => {
+                    // Asegurarse de que el enlace funcione correctamente
+                    e.stopPropagation();
+                    // Si el menú está visible en móvil, cerrarlo
+                    if (menuVisible && window.innerWidth < 1024) {
+                      handleMenuToggle();
+                    }
+                  }}
+                >
                   Blog
                 </Link>
               </div>
@@ -515,7 +526,18 @@ export default function ControlMenu() {
 
               <Link href="/exp-realty" className="text-white hover:text-gray-700">eXp Realty</Link>
               <Link href="/reformas" className="text-white hover:text-gray-700">Reformas</Link>
-              <Link href="/blog" className="text-white hover:text-gray-700">Blog</Link>
+              <Link 
+                href="/blog" 
+                className="text-white hover:text-gray-700"
+                onClick={(e) => {
+                  // Asegurarse de que el enlace funcione correctamente
+                  e.stopPropagation();
+                  // Cerrar el menú móvil después de hacer clic
+                  handleMenuToggle();
+                }}
+              >
+                Blog
+              </Link>
               
               {/* Servicios móvil */}
               <div className="relative whitespace-nowrap flex flex-col">

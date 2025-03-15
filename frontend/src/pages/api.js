@@ -22,8 +22,6 @@ export const handleApiError = (error, functionName) => {
 
 export async function getCountryPrefix() {
   try {
-    console.log("Intentando obtener prefijos de país desde la API local");
-    
     // Usar AbortController para evitar bloqueos
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 segundos timeout
@@ -47,7 +45,6 @@ export async function getCountryPrefix() {
     }
     
     // Si algo falla, devolver prefijos por defecto
-    console.log("Usando prefijos de país por defecto");
     return getDefaultCountryPrefixes();
     
   } catch (error) {
@@ -60,29 +57,23 @@ export async function getCountryPrefix() {
 // Esta es la forma correcta, un junior podría hacerlo así:
 export async function getBlogPosts() {
   // Array donde guardaremos todos los blogs
-  let allBlogs = [];
+  const allBlogs = [];
   
-  // 1. Intentar obtener blogs de WordPress usando nuestro proxy
+  // 1. Intentar obtener blogs de WordPress
   try {
-    console.log("Obteniendo blogs de WordPress...");
+    // Usar nuestro proxy de Next.js
+    const response = await fetch(`/api/wordpress-proxy?endpoint=wp&path=posts&per_page=10&_embed=true`);
     
-    // Usar el proxy con el parámetro endpoint=wp para indicar que queremos la API de WordPress
-    const wpResponse = await fetch(
-      "/api/wordpress-proxy?endpoint=wp&path=posts&_embed=true"
-    );
+    if (!response.ok) {
+      console.error(`Error al obtener blogs de WordPress: ${response.status} ${response.statusText}`);
+      throw new Error(`Error al obtener blogs: ${response.status}`);
+    }
     
-    console.log("Respuesta de WordPress:", {
-      status: wpResponse.status,
-      statusText: wpResponse.statusText
-    });
+    const data = await response.json();
     
-    if (wpResponse.ok) {
-      const wpBlogs = await wpResponse.json();
-      
-      console.log(`Obtenidos ${wpBlogs.length} blogs de WordPress`);
-      
-      // Añadir los blogs de WordPress al array, con la fuente marcada
-      wpBlogs.forEach(blog => {
+    if (Array.isArray(data) && data.length > 0) {
+      // Procesar cada blog
+      data.forEach(blog => {
         // Procesar la imagen destacada
         let featuredImage = null;
         
@@ -133,8 +124,8 @@ export async function getBlogPosts() {
         });
       });
     } else {
-      const errorData = await wpResponse.json();
-      console.error(`Error al obtener blogs de WordPress: ${wpResponse.status}`, errorData);
+      const errorData = await response.json();
+      console.error(`Error al obtener blogs de WordPress: ${response.status}`, errorData);
     }
   } catch (error) {
     console.error("Error con WordPress:", error.message);
@@ -142,8 +133,6 @@ export async function getBlogPosts() {
   
   // 2. Intentar obtener blogs de MongoDB usando la API directa
   try {
-    console.log("Obteniendo blogs de MongoDB...");
-    
     // Usar la ruta correcta con API_URL
     const mongoResponse = await fetch(`${API_URL}/blog`, {
       method: 'GET',
@@ -152,17 +141,10 @@ export async function getBlogPosts() {
       }
     });
     
-    console.log("Respuesta de MongoDB:", {
-      status: mongoResponse.status,
-      statusText: mongoResponse.statusText
-    });
-    
     if (mongoResponse.ok) {
       const contentType = mongoResponse.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
         const mongoBlogs = await mongoResponse.json();
-        
-        console.log(`Obtenidos ${mongoBlogs.length} blogs de MongoDB`);
         
         // Añadir los blogs de MongoDB al array, con la fuente marcada
         mongoBlogs.forEach(blog => {
@@ -249,7 +231,6 @@ export async function getBlogPosts() {
     console.error("Error con MongoDB:", error.message);
   }
   
-  console.log(`Total de blogs obtenidos: ${allBlogs.length}`);
   return allBlogs;
 }
 
@@ -479,15 +460,8 @@ export async function getPropertyPosts() {
   
   // 1. Intentar obtener propiedades de WooCommerce a través del proxy
   try {
-    console.log("Obteniendo propiedades de WooCommerce...");
-    
-    // Usar nuestro proxy de Next.js
-    const firstPageResponse = await fetch(`/api/wordpress-proxy?per_page=100`);
-    
-    console.log("Respuesta de WooCommerce:", {
-      status: firstPageResponse.status,
-      statusText: firstPageResponse.statusText
-    });
+    // Usar nuestro proxy de Next.js con el parámetro endpoint correcto
+    const firstPageResponse = await fetch(`/api/wordpress-proxy?path=products&per_page=100`);
     
     if (!firstPageResponse.ok) {
       console.error(`Error al obtener propiedades de WooCommerce: ${firstPageResponse.status} ${firstPageResponse.statusText}`);
@@ -496,7 +470,6 @@ export async function getPropertyPosts() {
     
     // Obtener el número total de páginas
     const totalPages = parseInt(firstPageResponse.headers.get('X-WP-TotalPages') || '1');
-    console.log(`Total de páginas de propiedades: ${totalPages}`);
     
     // Obtener los datos de la primera página
     const firstPageData = await firstPageResponse.json();
@@ -514,7 +487,7 @@ export async function getPropertyPosts() {
       const pagePromises = [];
       for (let page = 2; page <= totalPages; page++) {
         pagePromises.push(
-          fetch(`/api/wordpress-proxy?page=${page}&per_page=100`)
+          fetch(`/api/wordpress-proxy?path=products&page=${page}&per_page=100`)
             .then(res => {
               if (!res.ok) throw new Error(`Error en página ${page}: ${res.status}`);
               return res.json();
@@ -537,29 +510,19 @@ export async function getPropertyPosts() {
         wpData = [...wpData, ...pageData];
       });
     }
-    
-    console.log(`Total de propiedades de WooCommerce obtenidas: ${wpData.length}`);
   } catch (wpError) {
     console.error("Error al obtener propiedades de WooCommerce:", wpError);
   }
   
   // 2. Intentar obtener propiedades de MongoDB
   try {
-    console.log("Obteniendo propiedades de MongoDB...");
-    
     // Usar la ruta correcta con API_URL
     const mongoResponse = await fetch(`${API_URL}/property`);
-    
-    console.log("Respuesta de MongoDB:", {
-      status: mongoResponse.status,
-      statusText: mongoResponse.statusText
-    });
     
     if (mongoResponse.ok) {
       const contentType = mongoResponse.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
         const properties = await mongoResponse.json();
-        console.log("Propiedades de MongoDB obtenidas:", properties);
         
         // Procesar las propiedades para asegurar que tengan el formato correcto
         mongoData = properties.map(property => {
@@ -604,8 +567,6 @@ export async function getPropertyPosts() {
             source: 'mongodb'
           };
         });
-        
-        console.log(`Total de propiedades de MongoDB obtenidas: ${mongoData.length}`);
       } else {
         console.error("La respuesta no es JSON válido:", await mongoResponse.text());
       }
@@ -624,23 +585,19 @@ export async function getPropertyPosts() {
   // Combinar los resultados de ambas fuentes
   const combinedData = [...mongoData, ...wpData];
   
-  console.log(`Total de propiedades combinadas: ${combinedData.length}`);
   return combinedData;
 }
 
 export async function getPropertyById(id) {
   try {
-    console.log(`[DEBUG] Iniciando getPropertyById para ID: ${id}`);
-    
     const isProduction = process.env.NODE_ENV === 'production';
     const isMongoId = /^[0-9a-fA-F]{24}$/.test(id);
     
     const fetchData = async () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => {
-        console.log('[DEBUG] Timeout alcanzado, abortando petición');
         controller.abort();
-      }, isProduction ? 30000 : 10000);
+      }, isProduction ? 15000 : 8000);
       
       try {
         let response;
@@ -658,11 +615,8 @@ export async function getPropertyById(id) {
             }
           });
         } else {
-          const baseUrl = typeof window === 'undefined' 
-            ? `${API_URL}/api/wordpress-proxy` 
-            : '/api/wordpress-proxy';
-          
-          const url = `${baseUrl}?path=products/${id}`;
+          // Para propiedades de WooCommerce
+          const url = `/api/wordpress-proxy?path=products/${id}`;
           
           response = await fetch(url, {
             signal: controller.signal,
@@ -690,15 +644,15 @@ export async function getPropertyById(id) {
     };
     
     return await fetchConReintentos(fetchData, {
-      maxRetries: 7,
-      initialTimeout: 2000,
-      maxTimeout: 30000,
+      maxRetries: 3,
+      initialTimeout: 1000,
+      maxTimeout: 10000,
       factor: 1.5,
       isProduction
     });
     
   } catch (error) {
-    console.error("[DEBUG] Error final en getPropertyById:", error);
+    console.error("Error final en getPropertyById:", error);
     throw error;
   }
 }

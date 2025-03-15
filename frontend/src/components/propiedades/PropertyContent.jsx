@@ -502,7 +502,7 @@ export default function DefaultPropertyContent({ property }) {
       "value": propertyData?.livingArea || undefined,
       "unitCode": "MTK"
     },
-    "datePosted": property.date || new Date().toISOString(),
+    "datePosted": property.date || property.createdAt || property.updatedAt || "2023-01-01T00:00:00.000Z",
     "mainEntityOfPage": propertyUrl
   };
 
@@ -553,7 +553,7 @@ export default function DefaultPropertyContent({ property }) {
           <meta itemProp="name" content={title} />
           <meta itemProp="description" content={cleanTextForSEO(description, 500)} />
           <meta itemProp="url" content={propertyUrl} />
-          <meta itemProp="datePosted" content={property.date || new Date().toISOString()} />
+          <meta itemProp="datePosted" content={property.date || property.createdAt || property.updatedAt || "2023-01-01T00:00:00.000Z"} />
           <meta itemProp="propertyType" content={propertyType} />
           <meta itemProp="numberOfRooms" content={propertyData?.bedrooms || 0} />
           <meta itemProp="numberOfBathroomsTotal" content={propertyData?.bathrooms || 0} />

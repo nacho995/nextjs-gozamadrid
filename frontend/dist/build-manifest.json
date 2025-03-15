@@ -44,25 +44,6 @@
       "static/chunks/main.js",
       "static/chunks/pages/blog/[id].js"
     ],
-    "/exp-realty": [
-      "static/chunks/webpack.js",
-      "static/chunks/commons.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/exp-realty.js"
-    ],
-    "/property/[id]": [
-      "static/chunks/webpack.js",
-      "static/chunks/commons.js",
-      "static/chunks/main.js",
-      "static/chunks/vendors-node_modules_date-fns_esm_locale_es_index_js-node_modules_react-datepicker_dist_react-b6a742.js",
-      "static/chunks/pages/property/[id].js"
-    ],
-    "/reformas": [
-      "static/chunks/webpack.js",
-      "static/chunks/commons.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/reformas.js"
-    ],
     "/vender/comprar": [
       "static/chunks/webpack.js",
       "static/chunks/commons.js",
