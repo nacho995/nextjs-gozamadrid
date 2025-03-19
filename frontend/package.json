@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && cp out/index.html out/index.orig.html && cp out/404.html out/404.orig.html",
     "start": "next start -p ${PORT:-8081}",
     "lint": "next lint",
     "deploy:aws": "npm run build && eb deploy",

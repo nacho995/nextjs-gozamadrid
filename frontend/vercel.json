@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "buildCommand": "npm install && npm run build",
+  "outputDirectory": "out",
+  "regions": ["fra1"],
+  "rewrites": [
+    { "source": "/favicon.ico", "destination": "/favicon-32x32.png" }
+  ],
+  "cleanUrls": true
+} 
