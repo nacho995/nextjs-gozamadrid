@@ -5,71 +5,89 @@
 const fs = require('fs');
 const path = require('path');
 
-// Configuración
-const config = {
-  outputDir: path.resolve(__dirname, '../out'),
-  scriptTag: '<script id="script-loader" src="/script-loader.js"></script>',
-  insertAfter: '<head>'
-};
-
-// Función principal
-async function insertScriptLoader() {
-  console.log('Iniciando proceso post-build simplificado...');
-  
+// Simple script loader injection for HTML files
+(async function() {
   try {
-    // Verificar la existencia del directorio de salida
-    if (!fs.existsSync(config.outputDir)) {
-      console.warn(`Advertencia: El directorio ${config.outputDir} no existe. Intentando crear...`);
-      fs.mkdirSync(config.outputDir, { recursive: true });
+    console.log('Iniciando proceso post-build simplificado...');
+    
+    // Configuration
+    const outputDir = path.resolve(__dirname, '../out');
+    const scriptTag = '<script id="script-loader" src="/script-loader.js"></script>';
+    const headTag = '<head>';
+    
+    // Verificar que el script-loader.js existe en public
+    const scriptLoaderPath = path.resolve(__dirname, '../public/script-loader.js');
+    
+    if (!fs.existsSync(scriptLoaderPath)) {
+      console.warn('⚠️ Advertencia: script-loader.js no encontrado en /public.');
+      console.log('Continuando con el despliegue sin añadir el script-loader...');
+      return;
     }
     
-    // Leer todos los archivos HTML en el directorio de salida
-    const files = fs.readdirSync(config.outputDir);
-    const htmlFiles = files.filter(file => file.endsWith('.html'));
+    // Verificar si el directorio de salida existe
+    if (!fs.existsSync(outputDir)) {
+      console.warn(`⚠️ Advertencia: El directorio de salida ${outputDir} no existe.`);
+      console.log('Continuando con el despliegue sin procesar archivos HTML...');
+      return;
+    }
     
-    console.log(`Encontrados ${htmlFiles.length} archivos HTML`);
-    
-    let modifiedCount = 0;
-    
-    // Procesar cada archivo HTML
-    for (const htmlFile of htmlFiles) {
-      const filePath = path.join(config.outputDir, htmlFile);
+    try {
+      // Verificar que podemos leer el directorio
+      const files = fs.readdirSync(outputDir);
+      const htmlFiles = files.filter(file => file.endsWith('.html'));
       
-      try {
-        let content = fs.readFileSync(filePath, 'utf8');
-        
-        // Verificar si el script ya está incluido
-        if (content.includes('id="script-loader"')) {
-          console.log(`Script ya incluido en ${htmlFile}, saltando...`);
-          continue;
-        }
-        
-        // Insertar el script después de la etiqueta <head>
-        if (content.includes(config.insertAfter)) {
-          content = content.replace(
-            config.insertAfter,
-            `${config.insertAfter}\n  ${config.scriptTag}`
-          );
-          fs.writeFileSync(filePath, content);
-          modifiedCount++;
-          console.log(`Script insertado en ${htmlFile}`);
-        } else {
-          console.warn(`No se encontró la etiqueta ${config.insertAfter} en ${htmlFile}`);
-        }
-      } catch (fileError) {
-        console.error(`Error al procesar el archivo ${htmlFile}:`, fileError.message);
+      if (htmlFiles.length === 0) {
+        console.warn('⚠️ No se encontraron archivos HTML en el directorio de salida.');
+        console.log('Continuando con el despliegue sin modificaciones...');
+        return;
       }
+      
+      console.log(`📄 Encontrados ${htmlFiles.length} archivos HTML para procesar.`);
+      
+      let processedCount = 0;
+      let successCount = 0;
+      
+      // Process each HTML file
+      for (const htmlFile of htmlFiles) {
+        processedCount++;
+        
+        try {
+          const filePath = path.join(outputDir, htmlFile);
+          const content = fs.readFileSync(filePath, 'utf8');
+          
+          // Skip if script is already included
+          if (content.includes('id="script-loader"')) {
+            console.log(`✓ Script ya incluido en ${htmlFile}, saltando...`);
+            continue;
+          }
+          
+          // Only insert if head tag exists
+          if (content.includes(headTag)) {
+            const updatedContent = content.replace(
+              headTag,
+              `${headTag}\n  ${scriptTag}`
+            );
+            
+            fs.writeFileSync(filePath, updatedContent);
+            successCount++;
+            console.log(`✅ Script insertado correctamente en ${htmlFile}`);
+          } else {
+            console.warn(`⚠️ No se encontró la etiqueta <head> en ${htmlFile}`);
+          }
+        } catch (fileError) {
+          console.error(`❌ Error al procesar ${htmlFile}: ${fileError.message}`);
+          // Continue with next file
+        }
+      }
+      
+      console.log(`🎉 Proceso completado: ${successCount} de ${processedCount} archivos modificados correctamente.`);
+    } catch (dirError) {
+      console.error(`❌ Error al leer el directorio: ${dirError.message}`);
+      console.log('Continuando con el despliegue sin modificaciones...');
     }
-    
-    console.log(`Proceso completado. Modificados ${modifiedCount} de ${htmlFiles.length} archivos.`);
-    return true;
   } catch (error) {
-    console.error('Error durante el proceso:', error.message);
-    // No salimos con código de error para no interrumpir el despliegue en Vercel
+    // Catch-all for any unexpected errors
+    console.error(`❌ Error inesperado: ${error.message}`);
     console.log('Continuando con el despliegue a pesar del error...');
-    return false;
   }
-}
-
-// Ejecutar el script
-insertScriptLoader(); 
+})(); 
