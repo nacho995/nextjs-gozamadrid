@@ -12,6 +12,10 @@ public/video.mp4
 frontend-next.zip
 mi-proyecto-original.zip
 
+# Importante: NO ignorar la carpeta frontend
+!frontend/
+!frontend/**/*
+
 # Ignorar archivos temporales
 .DS_Store
 *.log
