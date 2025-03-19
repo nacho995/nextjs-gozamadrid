@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
-  "devCommand": "npm run dev",
+  "buildCommand": "cd frontend && npm run build",
+  "devCommand": "cd frontend && npm run dev",
   "outputDirectory": "frontend/out",
   "framework": "nextjs",
   "github": {
