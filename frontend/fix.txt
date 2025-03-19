@@ -1,1 +1,0 @@
-return `commonjs ${localRes.replace(/.*?next[/\]dist/, "next/dist").replace(/\/g, "/")}`; // Fixed for cross-platform compatibility
