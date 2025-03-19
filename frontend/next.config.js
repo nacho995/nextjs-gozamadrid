@@ -5,9 +5,10 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  trailingSlash: true,
+  trailingSlash: false,
   basePath: '',
-  distDir: 'dist'
+  distDir: 'dist',
+  // La opción experimental no es necesaria ya que estamos usando solo Pages Router
 }
 
 module.exports = nextConfig;

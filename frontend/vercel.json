@@ -1,7 +1,13 @@
 {
   "version": 2,
   "buildCommand": "npm install && npm run build",
-  "outputDirectory": "frontend/dist",
+  "outputDirectory": "dist",
   "regions": ["fra1"],
-  "cleanUrls": true
+  "cleanUrls": true,
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "^/$", "dest": "/index.html" },
+    { "src": "/(.*)\\.html", "dest": "/$1" },
+    { "src": "/(.*)", "dest": "/$1.html" }
+  ]
 } 

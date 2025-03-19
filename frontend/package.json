@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && touch dist/index.html && cp dist/vender-comprar.html dist/index.html",
     "start": "next start -p ${PORT:-8081}",
     "lint": "next lint",
     "deploy:aws": "npm run build && eb deploy",
