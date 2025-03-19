@@ -1,7 +1,7 @@
 {
   "version": 2,
   "buildCommand": "npm install && npm run build",
-  "outputDirectory": "out",
+  "outputDirectory": "frontend/dist",
   "regions": ["fra1"],
   "cleanUrls": true
 } 

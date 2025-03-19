@@ -4,8 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && npm run copy-files",
-    "copy-files": "rm -rf out && mkdir -p out && cp -r dist/. out/",
+    "build": "next build",
     "start": "next start -p ${PORT:-8081}",
     "lint": "next lint",
     "deploy:aws": "npm run build && eb deploy",
