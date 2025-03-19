@@ -1,10 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  output: 'export',
   images: {
     unoptimized: true,
   },
-  trailingSlash: false,
+  trailingSlash: true,
   basePath: '',
   assetPrefix: '',
   // Configuraciones adicionales

@@ -2,16 +2,15 @@
   "version": 2,
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
-  "outputDirectory": ".next",
+  "outputDirectory": "out",
   "framework": "nextjs",
   "github": {
     "silent": true
   },
   "cleanUrls": true,
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    }
+  "trailingSlash": true,
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 } 
