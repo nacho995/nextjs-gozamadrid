@@ -4,7 +4,12 @@
     "/*"
   ],
   "exclude": [
-    "/_next/static/*"
+    "/_next/*",
+    "/api/*",
+    "/_vercel/*",
+    "/_error",
+    "/_app",
+    "/_document"
   ],
   "routes": [
     {

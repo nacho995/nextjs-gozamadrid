@@ -1,12 +1,5 @@
 {
-  "version": 2,
-  "buildCommand": "npm run build",
-  "devCommand": "npm run dev",
-  "outputDirectory": "out",
   "framework": "nextjs",
-  "github": {
-    "silent": true
-  },
-  "cleanUrls": true,
-  "trailingSlash": false
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "frontend/out"
 } 
