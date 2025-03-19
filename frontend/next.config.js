@@ -9,11 +9,7 @@ const nextConfig = {
   trailingSlash: false,
   basePath: '',
   assetPrefix: '',
-  // Configurar páginas específicas sin usar exportPathMap
-  experimental: {
-    // Permitir la exportación estática del directorio pages y app
-    appDir: true,
-  },
+  // Configuraciones adicionales
   async rewrites() {
     return [
       {
