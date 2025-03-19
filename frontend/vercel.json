@@ -1,10 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "npm install && npm run build || true && echo '<!DOCTYPE html><html><head><meta http-equiv=\"refresh\" content=\"0; url=/vender-comprar.html\"><title>Goza Madrid</title></head><body>Redirigiendo...</body></html>' > out/index.html",
+  "buildCommand": "npm install && npm run build",
   "outputDirectory": "out",
   "regions": ["fra1"],
-  "rewrites": [
-    { "source": "/favicon.ico", "destination": "/favicon-32x32.png" }
-  ],
   "cleanUrls": true
 } 
