@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "npm install && npm run build",
+  "buildCommand": "npm install && npm run build && echo '<!DOCTYPE html><html><head><meta http-equiv=\"refresh\" content=\"0; url=/vender-comprar.html\"><title>Goza Madrid</title></head><body>Redirigiendo...</body></html>' > out/index.html",
   "outputDirectory": "out",
   "regions": ["fra1"],
   "rewrites": [
