@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "include": [
+    "/*"
+  ],
+  "exclude": [
+    "/_next/static/*"
+  ],
+  "routes": [
+    {
+      "pattern": "/api/properties",
+      "function": "api/properties"
+    },
+    {
+      "pattern": "/api/blog",
+      "function": "api/blog"
+    },
+    {
+      "pattern": "/api/test",
+      "function": "api/test"
+    },
+    {
+      "pattern": "/api/proxy",
+      "function": "api/proxy"
+    },
+    {
+      "pattern": "/api/woocommerce-proxy",
+      "function": "api/proxy?service=woocommerce"
+    },
+    {
+      "pattern": "/api/wordpress-proxy",
+      "function": "api/proxy?service=wordpress"
+    },
+    {
+      "pattern": "/config.js",
+      "static": {
+        "path": "config.js",
+        "headers": {
+          "Cache-Control": "public, max-age=600, stale-while-revalidate=86400"
+        }
+      }
+    }
+  ],
+  "functions": {
+    "/api/wordpress-proxy/:path*": {
+      "function": "api/proxy?service=wordpress"
+    },
+    "/api/woocommerce-proxy/:path*": {
+      "function": "api/proxy?service=woocommerce"
+    },
+    "/api/wp/:path*": {
+      "function": "api/proxy?service=wordpress"
+    },
+    "/api/wc/:path*": {
+      "function": "api/proxy?service=woocommerce"
+    },
+    "/api": {
+      "function": "api/index"
+    },
+    "/healthcheck": {
+      "function": "healthcheck"
+    },
+    "/blog/:id*": {
+      "function": "blog/[id]"
+    },
+    "/property/:id*": {
+      "function": "property/[id]"
+    },
+    "/_next/data/:build/:page.json": {
+      "function": "api/json-data"
+    },
+    "/_next/data/:build/:folder/:page.json": {
+      "function": "api/json-data"
+    },
+    "/*.json": {
+      "function": "api/json-data"
+    },
+    "/vender.json": {
+      "function": "api/json-data"
+    },
+    "/servicios.json": {
+      "function": "api/json-data"
+    },
+    "/reformas.json": {
+      "function": "api/json-data"
+    },
+    "/contacto.json": {
+      "function": "api/json-data"
+    },
+    "/blog.json": {
+      "function": "api/json-data"
+    },
+    "/exp-realty.json": {
+      "function": "api/json-data"
+    },
+    "/comprar.json": {
+      "function": "api/json-data"
+    }
+  }
+} 

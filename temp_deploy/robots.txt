@@ -1,0 +1,16 @@
+# Permitir a todos los robots rastrear el sitio
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://gozamadrid.com/sitemap.xml
+
+# Recursos estáticos
+Allow: /img/
+Allow: /video/
+Allow: /logo.png
+Allow: /favicon.ico
+Allow: /_next/static/
+
+# Evitar rastreo de API
+Disallow: /api/ 

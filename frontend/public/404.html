@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Página no encontrada | Goza Madrid</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.4)), url("/gozamadridwp2.jpg");
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: white;
+      text-align: center;
+    }
+    .container {
+      max-width: 600px;
+      padding: 2rem;
+      background-color: rgba(0, 0, 0, 0.7);
+      border-radius: 1rem;
+      backdrop-filter: blur(8px);
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: #f3d503;
+    }
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+    .btn {
+      display: inline-block;
+      background-color: #f3d503;
+      color: black;
+      padding: 0.8rem 1.5rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.2s ease;
+    }
+    .btn:hover {
+      background-color: #e0c300;
+      transform: translateY(-2px);
+    }
+    .redirect-text {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+  </style>
+  <!-- Script para intentar redireccionar para rutas de propiedades -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const path = window.location.pathname;
+      
+      // Verificar si la URL parece ser una ruta de propiedad
+      if (path.startsWith('/property/')) {
+        const parts = path.split('/');
+        if (parts.length >= 3) {
+          const id = parts[2];
+          
+          // Verificar si parece un ID de MongoDB (24 caracteres hexadecimales)
+          const isMongoId = /^[0-9a-f]{24}$/i.test(id);
+          
+          // Intentar navegar manualmente a la página
+          if (isMongoId) {
+            console.log('Detectada URL de MongoDB, intentando redireccionar...');
+            window.location.href = `/property/[id].html?id=${id}&source=mongodb`;
+          } else {
+            console.log('Detectada URL de WooCommerce, intentando redireccionar...');
+            window.location.href = `/property/[id].html?id=${id}&source=woocommerce`;
+          }
+          
+          document.getElementById('redirect-message').textContent = 'Redireccionando a la página de propiedad...';
+        }
+      }
+    });
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>Página no encontrada</h1>
+    <p>Lo sentimos, la página que estás buscando no existe o ha sido trasladada.</p>
+    <a href="/" class="btn">Volver a Inicio</a>
+    <p id="redirect-message" class="redirect-text"></p>
+  </div>
+</body>
+</html> 

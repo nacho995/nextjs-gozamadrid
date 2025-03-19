@@ -22,52 +22,69 @@ import blogRouter from "./routes/blogRouter.js";
 import userRouter from "./routes/userContentRouter.js";
 import propertyRoutes from './routes/propertyRoutes.js';
 import propertyOfferRoutes from './routes/propertyOfferRoutes.js';
+import { sendContactEmail } from './controller/contactController.js';
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8081;
 
-// Definir los orígenes permitidos
-const allowedOrigins = [
-  'https://goza-madrid-qbw9.onrender.com', 
-  'https://goza-madrid.onrender.com',
-  'https://blogsypropiedades.onrender.com', 
-  'http://localhost:3000',
-  'http://localhost:5173',
-  'http://localhost:3000',
-  'https://realestategozamadrid.com'  // Añadir el dominio de WordPress
-];
+// Configurar CORS con opciones avanzadas
+const allowedOrigins = process.env.CORS_ORIGIN 
+  ? process.env.CORS_ORIGIN.split(',') 
+  : [
+      'https://realestategozamadrid.com',
+      'http://realestategozamadrid.com',
+      'https://www.realestategozamadrid.com',
+      'http://www.realestategozamadrid.com',
+      'https://blog.realestategozamadrid.com',
+      'http://blog.realestategozamadrid.com',
+      'https://gozamadrid-env.eba-dwhnvgbt.eu-west-3.elasticbeanstalk.com',
+      'http://gozamadrid-env.eba-dwhnvgbt.eu-west-3.elasticbeanstalk.com',
+      'https://gozamadrid.pages.dev',
+      'https://*.gozamadrid.pages.dev',
+      'https://gozamadrid-frontend.pages.dev',
+      'http://localhost:3000'
+    ];
 
-// Modificar la configuración CORS para ser más permisiva con recursos estáticos
-app.use(cors({
-  credentials: true,
-  origin: function(origin, callback) {
-    // Permitir solicitudes sin origin (como recursos estáticos) o si está en la lista
-    if (!origin || allowedOrigins.some(allowed => origin.includes(allowed))) {
-      callback(null, true);
-    } else {
-      console.log('Origen bloqueado por CORS:', origin);
-      callback(null, true); // Temporalmente permitir todos los orígenes para debugging
-    }
-  },
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  optionsSuccessStatus: 204,
-  preflightContinue: false,
-  exposedHeaders: ['Content-Length', 'Content-Type'] // Permitir estos headers
-}));
-
-// Middleware para depurar solicitudes CORS
+// Middleware para normalizar rutas (eliminar barras finales)
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
-  console.log('Origin:', req.headers.origin);
-  console.log('Referer:', req.headers.referer);
-  next();
+  if (req.path.length > 1 && req.path.endsWith('/')) {
+    // Mantener la ruta original para que las rutas con barra final también funcionen
+    next();
+  } else {
+    next();
+  }
 });
 
-// Middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+// Configuración de CORS
+app.use(cors({
+  origin: function(origin, callback) {
+    // Permitir solicitudes sin origen (como aplicaciones móviles o curl)
+    if (!origin) return callback(null, true);
+    
+    // Verificar si el origen está en la lista de permitidos
+    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes('*')) {
+      callback(null, true);
+    } else {
+      console.warn(`Origen bloqueado por CORS: ${origin}`);
+      callback(null, true); // Permitir todos los orígenes en producción por ahora
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With']
+}));
+
+// Middleware para parsear JSON
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Middleware para logging
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
 
 // Middleware para debugging
 app.use((req, res, next) => {
@@ -105,6 +122,42 @@ app.use('/property', propertyRoutes);
 // Rutas específicas para ofertas y visitas de propiedades
 app.use('/api/property-visit', propertyVisitRoutes);
 app.use('/api/property-offer', propertyOfferRoutes);
+
+// Ruta para el formulario de contacto
+app.post('/api/contact', sendContactEmail);
+
+// Middleware para manejar rutas con barra final o sin ella
+app.use((req, res, next) => {
+  // Verificar si la ruta termina con una barra y no es la raíz
+  if (req.path.length > 1 && req.path.endsWith('/')) {
+    // Redirigir a la misma ruta sin la barra final
+    const newPath = req.path.slice(0, -1);
+    console.log(`Redirigiendo de ${req.path} a ${newPath}`);
+    req.url = newPath + req.url.slice(req.path.length);
+  }
+  next();
+});
+
+// Middleware para manejar rutas específicas que causan problemas
+app.use((req, res, next) => {
+  // Verificar si la URL contiene property-visit o property-offer
+  if (req.url.includes('/api/property-visit') || req.url.includes('/api/property-offer')) {
+    console.log('URL original:', req.url);
+    
+    // Normalizar la ruta para property-visit
+    if (req.url.includes('/api/property-visit')) {
+      req.url = req.url.replace(/\/api\/property-visit\/create\/?.*/, '/api/property-visit/create');
+    }
+    
+    // Normalizar la ruta para property-offer
+    if (req.url.includes('/api/property-offer')) {
+      req.url = req.url.replace(/\/api\/property-offer\/create\/?.*/, '/api/property-offer/create');
+    }
+    
+    console.log('URL normalizada:', req.url);
+  }
+  next();
+});
 
 // Configurar headers para recursos estáticos
 app.use('/uploads', (req, res, next) => {

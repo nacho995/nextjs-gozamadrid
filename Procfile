@@ -1,0 +1,1 @@
+web: mkdir -p /tmp/logs && node servidor/server.js > /tmp/logs/nodejs.log 2> /tmp/logs/errors.log 

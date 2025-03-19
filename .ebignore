@@ -1,0 +1,83 @@
+# Archivos de desarrollo
+.git
+.github
+.vscode
+.idea
+*.md
+*.yml
+*.yaml
+!.ebextensions/*.yml
+!.ebextensions/*.yaml
+
+# Carpetas de Node.js
+node_modules/
+**/node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Carpetas específicas para excluir
+frontend/node_modules/
+frontend/.next/
+frontend/dist/node_modules/
+frontend/public/img/
+frontend/public/video/
+frontend/src/
+cloudflare-deploy/
+backend-deploy/
+out/
+functions/
+
+# Excluir todo en el frontend excepto lo necesario para producción
+frontend/*
+!frontend/dist/
+frontend/dist/_next/cache/
+
+# Archivos de servidor
+servidor/node_modules/
+servidor/aws/
+servidor/awscliv2.zip
+servidor/src/
+
+# Archivos temporales
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.swp
+*.swo
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Archivos grandes y zip
+*.zip
+.elasticbeanstalk/app_versions/*
+
+# Archivos de prueba
+__tests__/
+*.test.js
+*.spec.js
+coverage/
+
+# Archivos de caché
+.cache/
+.npm/
+.eslintcache
+.wrangler/
+.cloudflare/
+
+# Archivos de dependencias que se pueden reconstruir
+package-lock.json
+yarn.lock
+**/package-lock.json
+**/yarn.lock
+
+# Scripts no necesarios para la ejecución
+*.sh
+!prepara-deploy-aws.sh 

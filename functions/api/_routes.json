@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "include": [
+    "/_next/data/*",
+    "/api/*",
+    "/test/*",
+    "/*"
+  ],
+  "exclude": [],
+  "routes": [
+    {
+      "pattern": "/_next/data/[^/]+/(.+).json",
+      "script": "api/json-data.js"
+    },
+    {
+      "pattern": "/api/property-id",
+      "script": "api/property-id.js"
+    },
+    {
+      "pattern": "/api/api-test",
+      "script": "api/api-test.js"
+    },
+    {
+      "pattern": "/api/api-test/*",
+      "script": "api/api-test.js"
+    },
+    {
+      "pattern": "/api/test-api",
+      "script": "api/api-test.js"
+    },
+    {
+      "pattern": "/api/property-direct/:id",
+      "script": "api/property-direct.js"
+    },
+    {
+      "pattern": "/api/property-direct/:id/",
+      "script": "api/property-direct.js"
+    },
+    {
+      "pattern": "/api/property-direct/:id\\?.*",
+      "script": "api/property-direct.js"
+    },
+    {
+      "pattern": "/api/proxy",
+      "script": "api/proxy.js"
+    },
+    {
+      "pattern": "/api/woocommerce-proxy",
+      "script": "api/woocommerce-proxy.js"
+    },
+    {
+      "pattern": "/api/properties",
+      "script": "api/properties.js"
+    },
+    {
+      "pattern": "/api/diagnostico",
+      "script": "api/diagnostico.js"
+    },
+    {
+      "pattern": "/api/diagnostic",
+      "script": "api/diagnostico.js"
+    },
+    {
+      "pattern": "/api/health-check",
+      "script": "api/health-check.js"
+    },
+    {
+      "pattern": "/api/health",
+      "script": "api/health-check.js"
+    },
+    {
+      "pattern": "/api/test",
+      "script": "api/test.js"
+    },
+    {
+      "pattern": "/api/property-fallback",
+      "script": "api/property-fallback.js"
+    },
+    {
+      "pattern": "/api/property/:id",
+      "script": "api/property-direct.js"
+    },
+    {
+      "pattern": "/api/property/:id/",
+      "script": "api/property-direct.js"
+    },
+    {
+      "pattern": "/api/property/:id\\?.*",
+      "script": "api/property-direct.js"
+    },
+    {
+      "pattern": "/property/:id",
+      "script": "api/redirect-mongodb.js"
+    },
+    {
+      "pattern": "/property/:id/",
+      "script": "api/redirect-mongodb.js"
+    },
+    {
+      "pattern": "/property/*",
+      "destination": "/index.html"
+    },
+    {
+      "pattern": "/test/",
+      "destination": "/test/index.html"
+    },
+    {
+      "pattern": "/",
+      "destination": "/index.html"
+    },
+    {
+      "pattern": "/(vender|comprar).*",
+      "destination": "/"
+    },
+    {
+      "pattern": "/api/frontend-debug",
+      "script": "api/frontend-debug.js"
+    }
+  ]
+} 

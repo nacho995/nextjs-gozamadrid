@@ -1,8 +1,22 @@
-# Manejar rutas dinámicas de blog
+# IMPORTANTE: NO HACER REDIRECCIONES AUTOMÁTICAS A REALESTATEGOZAMADRID.COM
+
+# Redirecciones para Cloudflare Pages
+
+# Redireccionar todas las solicitudes HTTP a HTTPS
+http://:hostname/* https://:hostname/:splat 301!
+
+# Rutas dinámicas específicas para propiedades
+/property/:id /property/[id].html 200
+
+# Rutas dinámicas específicas para blog
+/blog/:id /blog/[id].html 200
+
+# Redirecciones específicas
+/vender/comprar    /vender-comprar.html    200
+
+# Manejar rutas dinámicas
+/property/*    /property/[id].html    200
 /blog/*    /blog/[id].html    200
 
-# Manejar rutas dinámicas de propiedades
-/property/*    /property/[id].html    200
-
-# Fallback para otras rutas
+# Manejar el resto de rutas para SPA
 /*    /index.html    200

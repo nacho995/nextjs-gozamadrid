@@ -1,54 +1,213 @@
 {
   "polyfillFiles": [
-    "static/chunks/polyfills.js"
+    "static/chunks/polyfills-42372ed130431b0a.js"
   ],
-  "devFiles": [
-    "static/chunks/react-refresh.js"
-  ],
+  "devFiles": [],
   "ampDevFiles": [],
   "lowPriorityFiles": [
-    "static/development/_buildManifest.js",
-    "static/development/_ssgManifest.js"
+    "static/FLyUGSN5h6HIQ7Uk7q5ST/_buildManifest.js",
+    "static/FLyUGSN5h6HIQ7Uk7q5ST/_ssgManifest.js"
   ],
-  "rootMainFiles": [],
+  "rootMainFiles": [
+    "static/chunks/webpack-8203e6017865b08f.js",
+    "static/chunks/d9ce20bb-0eb9118bedaed583.js",
+    "static/chunks/430-4b1169b4555878a7.js",
+    "static/chunks/main-app-305469d31a57a00a.js"
+  ],
+  "rootMainFilesTree": {},
   "pages": {
     "/": [
-      "static/chunks/webpack.js",
-      "static/chunks/commons.js",
-      "static/chunks/main.js",
-      "static/chunks/vendors-node_modules_relume_io_relume-ui_dist_index_js-node_modules_react-icons_rx_index_mjs.js",
-      "static/chunks/pages/index.js"
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/framework-095cd8dcf9e85509.js",
+      "static/chunks/da66ead4-f319947c0d870541.js",
+      "static/chunks/ea62714e-bf5340ac112bc99a.js",
+      "static/chunks/4fbbbcd7-acbaf77dfb92a44c.js",
+      "static/chunks/de2442e2-c5b74102ee7edfbb.js",
+      "static/chunks/80894832-b52a96e508dc81b9.js",
+      "static/chunks/f44a9a30-686fcae71e37c64e.js",
+      "static/chunks/4536fbec-73228a540db3e04e.js",
+      "static/chunks/be93c486-7211b55402d0dcdc.js",
+      "static/chunks/c219b1be-8443c33b710be7c1.js",
+      "static/chunks/9062-2f2d8e842eb672e6.js",
+      "static/chunks/2534-04c5aa5b9a9d9720.js",
+      "static/chunks/91-4820a7165a6cf131.js",
+      "static/chunks/225-bfbdfdaa1972d6e7.js",
+      "static/chunks/9290-61601ea4a0073c69.js",
+      "static/chunks/6966-9bf412ec76473db7.js",
+      "static/chunks/pages/index-d47928d61dc5fc8b.js"
     ],
     "/_app": [
-      "static/chunks/webpack.js",
-      "static/chunks/commons.js",
-      "static/chunks/main.js",
-      "static/chunks/vendors-node_modules_next_dist_build_webpack_loaders_css-loader_src_runtime_api_js-node_modul-3dd856.js",
-      "static/chunks/pages/_app.js"
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/framework-095cd8dcf9e85509.js",
+      "static/css/0f363dd31655b705.css",
+      "static/chunks/pages/_app-e2466bd75bd96e68.js"
     ],
     "/_error": [
-      "static/chunks/webpack.js",
-      "static/chunks/commons.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/_error.js"
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/pages/_error-b029c8516aa06944.js"
+    ],
+    "/aviso-legal": [
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/9062-2f2d8e842eb672e6.js",
+      "static/chunks/pages/aviso-legal-dff5de0c92438d3b.js"
     ],
     "/blog": [
-      "static/chunks/webpack.js",
-      "static/chunks/commons.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/blog.js"
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/9062-2f2d8e842eb672e6.js",
+      "static/chunks/2534-04c5aa5b9a9d9720.js",
+      "static/chunks/225-bfbdfdaa1972d6e7.js",
+      "static/chunks/pages/blog-d50f0ba2cd0e9c8c.js"
     ],
     "/blog/[id]": [
-      "static/chunks/webpack.js",
-      "static/chunks/commons.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/blog/[id].js"
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/2534-04c5aa5b9a9d9720.js",
+      "static/chunks/225-bfbdfdaa1972d6e7.js",
+      "static/chunks/6966-9bf412ec76473db7.js",
+      "static/chunks/pages/blog/[id]-e453f27b9f0727cd.js"
+    ],
+    "/contacto": [
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/9062-2f2d8e842eb672e6.js",
+      "static/chunks/9290-61601ea4a0073c69.js",
+      "static/chunks/pages/contacto-304033e3b10f76f7.js"
+    ],
+    "/diagnostico": [
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/2534-04c5aa5b9a9d9720.js",
+      "static/chunks/225-bfbdfdaa1972d6e7.js",
+      "static/chunks/pages/diagnostico-b9cbbdc7cd7034db.js"
+    ],
+    "/diagnostico-simple": [
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/pages/diagnostico-simple-95f68eb42f538980.js"
+    ],
+    "/exp-realty": [
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/9062-2f2d8e842eb672e6.js",
+      "static/chunks/9290-61601ea4a0073c69.js",
+      "static/chunks/pages/exp-realty-9b866ad90b0634a7.js"
+    ],
+    "/listar-propiedades": [
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/pages/listar-propiedades-a0578bf73efe33bb.js"
+    ],
+    "/politica-cookies": [
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/pages/politica-cookies-9c5f41d7b6d61b27.js"
+    ],
+    "/privacidad": [
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/9062-2f2d8e842eb672e6.js",
+      "static/chunks/pages/privacidad-f854db3a74e9dfc5.js"
+    ],
+    "/property/[id]": [
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/framework-095cd8dcf9e85509.js",
+      "static/chunks/bab1410a-dc3cd85a5010ffa7.js",
+      "static/chunks/9062-2f2d8e842eb672e6.js",
+      "static/chunks/2534-04c5aa5b9a9d9720.js",
+      "static/css/0c57ef59804701e0.css",
+      "static/chunks/8251-889754733feec578.js",
+      "static/chunks/225-bfbdfdaa1972d6e7.js",
+      "static/chunks/pages/property/[id]-8881d95dc322ba77.js"
+    ],
+    "/propiedad-test": [
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/pages/propiedad-test-21d09e01992f931d.js"
+    ],
+    "/reformas": [
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/9062-2f2d8e842eb672e6.js",
+      "static/chunks/pages/reformas-679a8886317979bc.js"
+    ],
+    "/servicios": [
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/9062-2f2d8e842eb672e6.js",
+      "static/chunks/pages/servicios-4d6ddde75aa3a52a.js"
+    ],
+    "/servicios/alquiler": [
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/9062-2f2d8e842eb672e6.js",
+      "static/chunks/3218-ba9f14f182f6161d.js",
+      "static/chunks/pages/servicios/alquiler-142d69617e54f8a9.js"
+    ],
+    "/servicios/residentes-espana": [
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/9062-2f2d8e842eb672e6.js",
+      "static/chunks/pages/servicios/residentes-espana-dc1b84bf1bccdc4b.js"
+    ],
+    "/servicios/residentes-espana/alquiler": [
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/9062-2f2d8e842eb672e6.js",
+      "static/chunks/3218-ba9f14f182f6161d.js",
+      "static/chunks/pages/servicios/residentes-espana/alquiler-19f7fb13ddbe7091.js"
+    ],
+    "/servicios/residentes-espana/guia-compra": [
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/9062-2f2d8e842eb672e6.js",
+      "static/chunks/153-a050c7d4fb1bad27.js",
+      "static/chunks/pages/servicios/residentes-espana/guia-compra-ec852ef9eb72f321.js"
+    ],
+    "/servicios/residentes-extranjero": [
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/9062-2f2d8e842eb672e6.js",
+      "static/chunks/pages/servicios/residentes-extranjero-433e8c85cac296b7.js"
+    ],
+    "/servicios/residentes-extranjero/guia-compra": [
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/9062-2f2d8e842eb672e6.js",
+      "static/chunks/153-a050c7d4fb1bad27.js",
+      "static/chunks/pages/servicios/residentes-extranjero/guia-compra-37646332a02a6b9d.js"
+    ],
+    "/servicios/residentes-extranjero/impuesto-renta": [
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/9062-2f2d8e842eb672e6.js",
+      "static/chunks/pages/servicios/residentes-extranjero/impuesto-renta-baf7b424f322ede0.js"
+    ],
+    "/terminos": [
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/9062-2f2d8e842eb672e6.js",
+      "static/chunks/pages/terminos-bbac468090cacb3b.js"
+    ],
+    "/vender": [
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/9062-2f2d8e842eb672e6.js",
+      "static/chunks/9290-61601ea4a0073c69.js",
+      "static/chunks/pages/vender-13fe6884d54bb0fa.js"
     ],
     "/vender/comprar": [
-      "static/chunks/webpack.js",
-      "static/chunks/commons.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/vender/comprar.js"
+      "static/chunks/webpack-8203e6017865b08f.js",
+      "static/chunks/main-28761bbc2a9e0dc8.js",
+      "static/chunks/9062-2f2d8e842eb672e6.js",
+      "static/chunks/2534-04c5aa5b9a9d9720.js",
+      "static/chunks/225-bfbdfdaa1972d6e7.js",
+      "static/chunks/pages/vender/comprar-02b15aff48b006cd.js"
     ]
   },
   "ampFirstPages": []
