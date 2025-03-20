@@ -11,9 +11,8 @@ const nextConfig = {
       },
     ],
   },
-  trailingSlash: false,
+  trailingSlash: true,
   basePath: '',
-  // Eliminamos el exportPathMap para permitir que Next.js maneje automáticamente las rutas
 }
 
 module.exports = nextConfig;

@@ -1,1 +1,11 @@
-{"version":2,"buildCommand":"npm install && npm run build","regions":["fra1"],"cleanUrls":true,"github":{"silent":true}}
+{
+  "framework": "nextjs",
+  "buildCommand": "npm install && npm run build",
+  "installCommand": "npm install",
+  "outputDirectory": ".next",
+  "regions": ["fra1"],
+  "cleanUrls": true,
+  "github": {
+    "silent": true
+  }
+}
