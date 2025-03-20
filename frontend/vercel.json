@@ -6,5 +6,9 @@
   "cleanUrls": true,
   "rewrites": [
     { "source": "/", "destination": "/index.html" }
-  ]
+  ],
+  "github": {
+    "silent": true
+  },
+  "ignoreCommand": "find . -name '.next' -type d -prune -o -name '.vercel' -type d -prune -o -path './node_modules' -prune -o -print"
 } 
