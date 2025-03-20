@@ -1,35 +1,18 @@
 // src/pages/index.js
 import React from 'react';
 import Head from 'next/head';
+import HomeComponent from '../components/home';
 
-export default function HomePage() {
+export default function Home() {
   return (
     <>
       <Head>
-        <title>Goza Madrid - Página de Inicio</title>
-        <meta name="description" content="Bienvenido a Goza Madrid - Tu portal inmobiliario en Madrid" />
+        <title>Goza Madrid - Inmobiliaria de Lujo en Madrid</title>
+        <meta name="description" content="Expertos en servicios inmobiliarios de lujo en Madrid. Compra, venta y alquiler de propiedades exclusivas." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="min-h-screen flex flex-col items-center justify-center bg-white text-gray-800 p-4">
-        <h1 className="text-4xl font-bold mb-4">Bienvenido a Goza Madrid</h1>
-        <p className="text-xl mb-8">Tu portal inmobiliario de confianza en Madrid</p>
-        <div className="space-y-4">
-          <a 
-            href="/listar-propiedades" 
-            className="bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-md inline-block transition-colors"
-            style={{ backgroundColor: '#C7A336', display: 'block', textAlign: 'center' }}
-          >
-            Ver Propiedades
-          </a>
-          <a 
-            href="/contacto" 
-            className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-md inline-block transition-colors"
-            style={{ display: 'block', textAlign: 'center' }}
-          >
-            Contacto
-          </a>
-        </div>
-      </div>
+      <HomeComponent />
     </>
   );
 }

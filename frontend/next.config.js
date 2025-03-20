@@ -23,17 +23,14 @@ const nextConfig = {
     VERCEL_URL: process.env.VERCEL_URL || '',
     VERCEL_ENV: process.env.VERCEL_ENV || 'development',
   },
-  // Necesario para permitir la exportación estática
+  // Output como static para generar archivos HTML estáticos
   output: 'export',
-  // Configuración para manejo de archivos estáticos
-  sassOptions: {
-    includePaths: ['./src/styles'],
-  },
-  // Configuración para asegurar compatibilidad con Vercel
-  swcMinify: true,
-  compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
-  },
+  // Mejorar la experiencia de desarrollo
+  distDir: process.env.BUILD_DIR || 'out',
+  // Asegurarnos de que las páginas estáticas no tengan problemas
+  optimizeFonts: false,
+  // Desactivar optimizaciones que puedan causar problemas
+  swcMinify: false,
   // Desactivar el linting durante la compilación
   eslint: {
     ignoreDuringBuilds: true,
