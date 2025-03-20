@@ -11,9 +11,6 @@
   "github": {
     "silent": true
   },
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
-  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -45,11 +42,6 @@
   ],
   "redirects": [
     { "source": "/404", "destination": "/", "permanent": false },
-    { "source": "/404.html", "destination": "/", "permanent": false },
-    { "source": "/:path((?!api|_next|static|css|img|favicon.ico).+)", "destination": "/", "permanent": false }
-  ],
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/" }
+    { "source": "/404.html", "destination": "/", "permanent": false }
   ]
 }

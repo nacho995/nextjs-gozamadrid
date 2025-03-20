@@ -7,13 +7,19 @@ export default function CatchAll() {
   const router = useRouter();
   
   useEffect(() => {
-    // Solo redirigir cuando estamos en el navegador y cuando la ruta no es la raíz
-    if (typeof window !== 'undefined' && router.asPath !== '/') {
+    // Solo redirigir cuando:
+    // 1. Estamos en el navegador
+    // 2. Cuando la ruta no es la raíz
+    // 3. Cuando la URL no tiene ya un parámetro de redirección (para evitar bucles)
+    if (typeof window !== 'undefined' && 
+        router.asPath !== '/' && 
+        !router.asPath.includes('?redirected=true')) {
       console.log('[Capturada ruta no existente]:', router.asPath);
-      // Redirección forzada al index.js en la carpeta pages
-      window.location.href = '/';
+      
+      // Usamos router.replace en lugar de window.location para mejor manejo de estado
+      router.replace('/?redirected=true');
     }
-  }, [router]);
+  }, [router.asPath, router]);
 
   // Mostrar una pantalla de carga mientras redirige
   return (
@@ -41,7 +47,7 @@ export default function CatchAll() {
   );
 }
 
-// Desactivamos la generación estática para asegurarnos de que siempre redirija
+// Desactivamos la generación estática para asegurarnos que siempre redirija
 export async function getStaticPaths() {
   return {
     paths: [],
@@ -63,7 +69,5 @@ export async function getStaticProps(context) {
   // Para cualquier otra ruta, permitimos que el componente maneje la redirección en el cliente
   return {
     props: {},
-    // Forzamos revalidación frecuente para evitar que se quede cacheada
-    revalidate: 1
   };
 }

@@ -23,23 +23,10 @@ const nextConfig = {
     VERCEL_URL: process.env.VERCEL_URL || '',
     VERCEL_ENV: process.env.VERCEL_ENV || 'development',
   },
-  // Asegurarse de que no hay redirects 404 durante la producción
+  // Configuración simplificada para evitar bucles de redirección
   async rewrites() {
     return [
-      // Redirección principal - cualquier ruta no encontrada va al index
-      {
-        source: '/:path*',
-        destination: '/',
-        // Solo aplicar esta regla si la ruta no existe
-        has: [
-          {
-            type: 'header',
-            key: 'x-matched-path',
-            value: '(?!/_next|/api|/static|/favicon.ico|/css|/public|/img).*',
-          },
-        ],
-      },
-      // Redirigir explícitamente 404 a la página principal
+      // Redirigir 404 explícitos a la página principal
       {
         source: '/404',
         destination: '/',
@@ -50,10 +37,9 @@ const nextConfig = {
       }
     ];
   },
-  // Añadir redirects para manejar páginas no encontradas
+  // Reducimos los redirects para evitar conflictos
   async redirects() {
     return [
-      // Redirecciones principales para errores 404
       {
         source: '/404',
         destination: '/',
@@ -61,12 +47,6 @@ const nextConfig = {
       },
       {
         source: '/404.html',
-        destination: '/',
-        permanent: false,
-      },
-      // Redirección para cualquier ruta que no existe
-      {
-        source: '/:path((?!_next|api|static|favicon.ico|css|public|img|property).*)',
         destination: '/',
         permanent: false,
       }

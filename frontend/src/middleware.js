@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
-import { getServerCookies, COOKIE_KEYS } from '@/utils/serverCookies';
 
 // Middleware para interceptar todas las solicitudes antes de que se procesen
 export function middleware(request) {
   const url = request.nextUrl.clone();
   const { pathname } = url;
+
+  // Importante: no procesar más si estamos en la raíz para evitar bucles
+  if (pathname === '/') {
+    return NextResponse.next();
+  }
 
   console.log('Middleware interceptando ruta:', pathname);
 
@@ -39,10 +43,10 @@ export function middleware(request) {
   return NextResponse.next();
 }
 
-// Configurar en qué rutas debe ejecutarse el middleware
+// Configurar en qué rutas debe ejecutarse el middleware - excluir explícitamente la raíz
 export const config = {
   matcher: [
-    // Excluir rutas estáticas conocidas
-    '/((?!_next/static|_next/image|favicon.ico|robots.txt).*)',
+    // Excluir la ruta raíz y rutas estáticas conocidas
+    '/((?!$|_next/static|_next/image|favicon.ico|robots.txt).*)',
   ],
 }; 
