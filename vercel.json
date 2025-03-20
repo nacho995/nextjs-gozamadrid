@@ -5,6 +5,8 @@
   "cleanUrls": true,
   "github": {
     "silent": true
-  }
-  /* Eliminamos la redirección para que Next.js utilice la página index por defecto */
+  },
+  "redirects": [
+    { "source": "/", "destination": "/index.html", "permanent": true }
+  ]
 }
