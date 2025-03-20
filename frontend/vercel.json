@@ -1,20 +1,41 @@
 {
   "framework": "nextjs",
-  "buildCommand": "cd frontend && npm install && npm run build",
-  "installCommand": "cd frontend && npm install",
-  "outputDirectory": "frontend/.next",
+  "buildCommand": "npm install && npm run build",
+  "installCommand": "npm install",
+  "outputDirectory": ".next",
   "regions": ["fra1"],
   "cleanUrls": true,
   "github": {
     "silent": true
   },
   "trailingSlash": false,
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/css/(.*)", "dest": "/_next/static/css/$1" },
-    { "src": "/_next/static/(.*)", "dest": "/_next/static/$1", "headers": { "cache-control": "public,max-age=31536000,immutable" } },
-    { "src": "/static/(.*)", "dest": "/static/$1", "headers": { "cache-control": "public,max-age=31536000,immutable" } },
-    { "src": "/(.*)\\.(.+)", "dest": "/$1.$2" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/$1" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" }
+      ]
+    },
+    {
+      "source": "/_next/static/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/static/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    }
+  ],
+  "redirects": [
+    { "source": "/404", "destination": "/", "permanent": false },
+    { "source": "/404.html", "destination": "/", "permanent": false }
   ]
 }
