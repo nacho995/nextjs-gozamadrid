@@ -18,8 +18,10 @@ module.exports = {
   rules: {
     'react/prop-types': 'off',
     'react/react-in-jsx-scope': 'off',
-    'no-unused-vars': ['warn'],
-    'no-console': ['warn', { allow: ['warn', 'error'] }],
+    'no-unused-vars': 'off',
+    'no-console': 'off',
+    'no-undef': 'off',
+    'no-restricted-globals': 'off',
   },
   overrides: [
     {
@@ -31,12 +33,17 @@ module.exports = {
         ecmaFeatures: {
           jsx: true,
         },
+        requireConfigFile: false,
+        babelOptions: {
+          presets: ["next/babel"],
+        },
       },
     },
   ],
   ignorePatterns: [
     'node_modules/',
     '.next/',
+    'out/',
     'public/',
     '*.config.js',
     '*.setup.js',

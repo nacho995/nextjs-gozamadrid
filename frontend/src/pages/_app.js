@@ -13,6 +13,12 @@ import { CookieProvider } from '../context/CookieContext';
 
 // Detectar qué ruta del proxy está disponible
 if (typeof window !== 'undefined') {
+  // Resolver problema de 404 al cargar directamente una ruta
+  // Si estamos en la página 404.html, redirigir a la página principal
+  if (window.location.pathname === '/404' || window.location.pathname === '/404.html') {
+    window.location.href = '/';
+  }
+
   // Función para verificar si una ruta está disponible
   const checkEndpointAvailability = async (url) => {
     try {
@@ -74,12 +80,17 @@ function MyApp({ Component, pageProps }) {
     Router.events.on('routeChangeComplete', handleComplete);
     Router.events.on('routeChangeError', handleComplete);
 
+    // Verificar si estamos en la página 404 y redirigir si es necesario
+    if (typeof window !== 'undefined' && (window.location.pathname === '/404' || window.location.pathname === '/404.html')) {
+      router.replace('/');
+    }
+
     return () => {
       Router.events.off('routeChangeStart', handleStart);
       Router.events.off('routeChangeComplete', handleComplete);
       Router.events.off('routeChangeError', handleComplete);
     };
-  }, []);
+  }, [router]);
 
   // Efecto para ocultar el menú de control en ciertas rutas
   useEffect(() => {

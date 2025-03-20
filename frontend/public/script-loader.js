@@ -8,6 +8,13 @@
     debug: true,
     scripts: [
       {
+        id: 'index-fix',
+        src: '/fixes/index-fix.js',
+        priority: 'high', // 'high' se carga lo antes posible
+        async: false,
+        defer: false
+      },
+      {
         id: 'css-fix',
         src: '/fixes/css-fix.js',
         priority: 'high', // 'high' se carga lo antes posible

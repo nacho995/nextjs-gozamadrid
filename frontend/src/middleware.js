@@ -1,15 +1,10 @@
-import { NextResponse } from 'next/server';
-
-// Middleware muy básico que solo realiza una acción mínima
-export function middleware(request) {
-  // Simplemente continuamos con la solicitud normal
-  return NextResponse.next();
+// Este archivo debe existir pero no necesita hacer nada por ahora
+export function middleware() {
+  // Middleware vacío
+  return;
 }
 
-// Configuración para ejecutar el middleware solo en rutas específicas
+// No se ejecutará en ninguna ruta
 export const config = {
-  matcher: [
-    // Excluimos casi todo para minimizar la interferencia
-    '/(api|property)/:path*',
-  ],
+  matcher: [],
 }; 
