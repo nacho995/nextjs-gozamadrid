@@ -1,10 +1,10 @@
 {
   "version": 2,
   "buildCommand": "cd frontend && npm install && npm run build",
-  "outputDirectory": "out",
   "regions": ["fra1"],
   "cleanUrls": true,
   "github": {
     "silent": true
   }
-} 
+  /* Eliminamos la redirección para que Next.js utilice la página index por defecto */
+}

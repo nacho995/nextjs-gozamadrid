@@ -8,9 +8,16 @@
     debug: true,
     scripts: [
       {
+        id: 'css-fix',
+        src: '/fixes/css-fix.js',
+        priority: 'high', // 'high' se carga lo antes posible
+        async: false,
+        defer: false
+      },
+      {
         id: 'early-error-interceptor',
         src: '/fixes/early-error-interceptor.js',
-        priority: 'high', // 'high' se carga lo antes posible
+        priority: 'high',
         async: false,
         defer: false
       },

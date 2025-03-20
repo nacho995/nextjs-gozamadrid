@@ -1,9 +1,1 @@
-{
-  "version": 2,
-  "buildCommand": "npm install && npm run build",
-  "regions": ["fra1"],
-  "cleanUrls": true,
-  "github": {
-    "silent": true
-  }
-} 
+{"version":2,"buildCommand":"npm install && npm run build","regions":["fra1"],"cleanUrls":true,"github":{"silent":true}}
