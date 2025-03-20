@@ -11,7 +11,6 @@
     "eb:init": "eb init",
     "eb:create": "eb create",
     "eb:deploy": "eb deploy",
-    "export": "NEXT_EXPORT=true next build && node scripts/copy-to-cloudflare.js",
     "generate-sitemap": "next-sitemap",
     "analyze": "ANALYZE=true next build",
     "deploy:cloudflare": "wrangler pages deploy out --project-name=gozamadrid-frontend-new --commit-dirty=true"

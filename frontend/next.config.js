@@ -18,78 +18,25 @@ const nextConfig = {
   experimental: {
     scrollRestoration: true,
   },
-  // Añadir una configuración específica para Vercel
+  // Configuración específica para Vercel
   env: {
     VERCEL_URL: process.env.VERCEL_URL || '',
     VERCEL_ENV: process.env.VERCEL_ENV || 'development',
   },
-  // Configuración simplificada para evitar bucles de redirección
-  async rewrites() {
-    return [
-      // Redirigir 404 explícitos a la página principal
-      {
-        source: '/404',
-        destination: '/',
-      },
-      {
-        source: '/404.html',
-        destination: '/',
-      }
-    ];
+  // Configuración para manejo de archivos estáticos
+  sassOptions: {
+    includePaths: ['./src/styles'],
   },
-  // Reducimos los redirects para evitar conflictos
-  async redirects() {
-    return [
-      {
-        source: '/404',
-        destination: '/',
-        permanent: false,
-      },
-      {
-        source: '/404.html',
-        destination: '/',
-        permanent: false,
-      }
-    ];
+  // Configuración para asegurar compatibilidad con Vercel
+  swcMinify: true,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
   },
-  // Añadir headers para mejorar la seguridad y el rendimiento
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
-          },
-        ],
-      },
-      {
-        source: '/css/(.*)',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'text/css',
-          },
-        ],
-      },
-    ];
-  },
-  // Desactivar el linting durante la compilación que está causando problemas
+  // Desactivar el linting durante la compilación
   eslint: {
-    // Advertencia en lugar de error en producción
     ignoreDuringBuilds: true,
   },
   typescript: {
-    // Ignorar errores de TypeScript durante la compilación
     ignoreBuildErrors: true,
   },
   // Asegurarnos de que index.js se genere como página principal
