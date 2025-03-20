@@ -1,40 +1,12 @@
 /**
  * Script Loader v1.0
- * Carga los scripts de corrección en el orden adecuado y con la prioridad correcta
+ * Carga básica de scripts esenciales
  */
 (function() {
-  // Configuración
+  // Configuración simplificada
   const config = {
     debug: true,
     scripts: [
-      {
-        id: 'index-fix',
-        src: '/fixes/index-fix.js',
-        priority: 'high', // 'high' se carga lo antes posible
-        async: false,
-        defer: false
-      },
-      {
-        id: 'css-fix',
-        src: '/fixes/css-fix.js',
-        priority: 'high', // 'high' se carga lo antes posible
-        async: false,
-        defer: false
-      },
-      {
-        id: 'early-error-interceptor',
-        src: '/fixes/early-error-interceptor.js',
-        priority: 'high',
-        async: false,
-        defer: false
-      },
-      {
-        id: '404-handler',
-        src: '/fixes/404-handler.js',
-        priority: 'normal',
-        async: true,
-        defer: false
-      },
       {
         id: 'mongodb-handler',
         src: '/mongodb-handler.js',
