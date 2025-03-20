@@ -1,36 +1,48 @@
 import { NextResponse } from 'next/server';
 import { getServerCookies, COOKIE_KEYS } from '@/utils/serverCookies';
 
+// Middleware para interceptar todas las solicitudes antes de que se procesen
 export function middleware(request) {
-  const { pathname } = request.nextUrl;
-  const cookies = getServerCookies(request);
-  
-  // Clonar la respuesta para poder modificarla
-  const response = NextResponse.next();
+  const url = request.nextUrl.clone();
+  const { pathname } = url;
 
-  // Obtener preferencias de cookies
-  const theme = cookies.get(COOKIE_KEYS.THEME);
-  const language = cookies.get(COOKIE_KEYS.LANGUAGE);
-  const viewMode = cookies.get(COOKIE_KEYS.VIEW_MODE);
+  console.log('Middleware interceptando ruta:', pathname);
 
-  // Agregar headers con las preferencias si existen
-  if (theme) response.headers.set('X-Theme', theme);
-  if (language) response.headers.set('X-Language', language);
-  if (viewMode) response.headers.set('X-View-Mode', viewMode);
+  // Lista de rutas válidas conocidas
+  const validRoutes = [
+    '/',
+    '/api',
+    '/_next',
+    '/static',
+    '/css',
+    '/img',
+    '/favicon.ico',
+    '/public',
+    '/property'
+  ];
 
-  return response;
+  // Verificar si la ruta es válida o debería redirigirse
+  const shouldRedirect = !validRoutes.some(route => 
+    pathname === route || pathname.startsWith(`${route}/`)
+  );
+
+  // Redireccionar a la página principal si la ruta no es válida
+  if (shouldRedirect) {
+    console.log('Redirigiendo ruta no válida:', pathname);
+    
+    // Redirección a la página principal
+    url.pathname = '/';
+    return NextResponse.redirect(url);
+  }
+
+  // Continuar con la solicitud normal para rutas válidas
+  return NextResponse.next();
 }
 
-// Configurar en qué rutas se ejecutará el middleware
+// Configurar en qué rutas debe ejecutarse el middleware
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    // Excluir rutas estáticas conocidas
+    '/((?!_next/static|_next/image|favicon.ico|robots.txt).*)',
   ],
 }; 

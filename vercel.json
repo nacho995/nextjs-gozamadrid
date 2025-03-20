@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "framework": "nextjs",
+  "public": true,
+  "framework": false,
   "buildCommand": "cd frontend && npm install && npm run build",
   "installCommand": "cd frontend && npm install",
-  "outputDirectory": "frontend/.next",
+  "outputDirectory": "./frontend/.next",
   "regions": ["fra1"],
   "cleanUrls": true,
   "trailingSlash": false,
@@ -11,7 +12,7 @@
     "silent": true
   },
   "rewrites": [
-    { "source": "/(.*)", "destination": "/$1" }
+    { "source": "/(.*)", "destination": "/" }
   ],
   "headers": [
     {
@@ -33,10 +34,22 @@
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
       ]
+    },
+    {
+      "source": "/css/(.*\\.css)",
+      "headers": [
+        { "key": "Content-Type", "value": "text/css" },
+        { "key": "Cache-Control", "value": "public, max-age=31536000" }
+      ]
     }
   ],
   "redirects": [
     { "source": "/404", "destination": "/", "permanent": false },
-    { "source": "/404.html", "destination": "/", "permanent": false }
+    { "source": "/404.html", "destination": "/", "permanent": false },
+    { "source": "/:path((?!api|_next|static|css|img|favicon.ico).+)", "destination": "/", "permanent": false }
+  ],
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/" }
   ]
 }
