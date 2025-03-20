@@ -4,13 +4,20 @@
   "framework": "nextjs",
   "buildCommand": "cd frontend && npm install && npm run build",
   "installCommand": "cd frontend && npm install",
-  "outputDirectory": "frontend/.next",
+  "outputDirectory": "frontend/out",
   "regions": ["fra1"],
   "cleanUrls": true,
   "trailingSlash": false,
   "github": {
     "silent": true
   },
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ],
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
   "headers": [
     {
       "source": "/(.*)",

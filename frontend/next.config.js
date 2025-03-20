@@ -23,6 +23,8 @@ const nextConfig = {
     VERCEL_URL: process.env.VERCEL_URL || '',
     VERCEL_ENV: process.env.VERCEL_ENV || 'development',
   },
+  // Necesario para permitir la exportación estática
+  output: 'export',
   // Configuración para manejo de archivos estáticos
   sassOptions: {
     includePaths: ['./src/styles'],
