@@ -1,20 +1,23 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: 'export',
+  // Cambiamos de 'export' a standalone para Vercel
+  // output: 'export',
   images: {
     unoptimized: true,
+    domains: ['localhost', 'vercel.app']
   },
   trailingSlash: false,
   basePath: '',
-  distDir: 'dist',
-  // La opción experimental no es necesaria ya que estamos usando solo Pages Router
-  exportPathMap: async function() {
+  // Removemos distDir para que Vercel use su configuración predeterminada
+  // distDir: 'dist',
+  // La exportPathMap puede causar problemas si las páginas están en src/pages
+  /* exportPathMap: async function() {
     return {
       '/': { page: '/' },
       '/404': { page: '/404' }
     };
-  }
+  } */
 }
 
 module.exports = nextConfig;

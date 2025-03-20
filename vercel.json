@@ -1,11 +1,10 @@
 {
   "version": 2,
-  "buildCommand": "npm install && npm run build",
+  "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "out",
   "regions": ["fra1"],
-  "rewrites": [
-    { "source": "/", "destination": "/vender-comprar.html" },
-    { "source": "/:path*", "destination": "/:path*.html" }
-  ],
-  "cleanUrls": true
+  "cleanUrls": true,
+  "github": {
+    "silent": true
+  }
 } 

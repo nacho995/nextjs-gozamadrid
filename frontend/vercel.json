@@ -1,12 +1,8 @@
 {
   "version": 2,
   "buildCommand": "npm install && npm run build",
-  "outputDirectory": "dist",
   "regions": ["fra1"],
   "cleanUrls": true,
-  "rewrites": [
-    { "source": "/", "destination": "/index.html" }
-  ],
   "github": {
     "silent": true
   }
