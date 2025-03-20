@@ -1,0 +1,14 @@
+# Ignorar directorios de compilación
+.next
+.turbo
+.swc
+
+# Ignorar node_modules ya que Vercel los instalará
+node_modules
+
+# Archivos de configuración local
+.env*.local
+
+# Logs y archivos temporales
+*.log
+.DS_Store 
