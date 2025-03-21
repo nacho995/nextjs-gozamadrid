@@ -39,11 +39,12 @@ const allowedOrigins = process.env.CORS_ORIGIN
       'http://www.realestategozamadrid.com',
       'https://blog.realestategozamadrid.com',
       'http://blog.realestategozamadrid.com',
-      'https://gozamadrid-env.eba-dwhnvgbt.eu-west-3.elasticbeanstalk.com',
-      'http://gozamadrid-env.eba-dwhnvgbt.eu-west-3.elasticbeanstalk.com',
+      'https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com',
+      'http://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com',
       'https://gozamadrid.pages.dev',
       'https://*.gozamadrid.pages.dev',
       'https://gozamadrid-frontend.pages.dev',
+      'https://gozamadrid-frontend-hzb50dzj9-nacho995s-projects.vercel.app',
       'http://localhost:3000'
     ];
 
