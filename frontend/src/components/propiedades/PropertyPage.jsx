@@ -1002,16 +1002,14 @@ export default function PropertyPage() {
         source: property.source
       });
 
-      router.push(`/property/${navigationId}`, undefined, { 
-        shallow: false,
-        scroll: true
-      });
+      // Usar window.location.href para asegurar navegación completa
+      window.location.href = `/property/${navigationId}`;
     } catch (error) {
       console.error('[PropertyPage] Error al navegar:', error);
-      // Intentar una navegación alternativa
+      // Fallback de navegación
       window.location.href = `/property/${property.id || property._id}`;
     }
-  }, [router]);
+  }, []);
 
   // Renderizar estado de carga
   if (loading) {
@@ -1223,61 +1221,58 @@ export default function PropertyPage() {
                             <span className="font-semibold">{formattedPrice}</span>
                           </span>
                         </div>
-                        
-                        {/* Etiqueta de ubicación */}
-                        <div className="absolute bottom-4 left-4 right-4 bg-black/60 text-white px-4 py-2 rounded-lg backdrop-blur-md border border-white/20 shadow-lg flex items-center gap-2 max-w-[90%]">
-                          <FaMapMarkerAlt className="text-amarillo flex-shrink-0" />
-                          <span className="line-clamp-1 text-sm font-light" style={textShadowLightStyle}>{property.location}</span>
-                        </div>
                       </div>
 
                       {/* Contenido */}
                       <div className="p-6">
-                        <h3 className="text-xl font-semibold text-white mb-3 line-clamp-2" style={textShadowStyle}>
+                        {/* Título con ubicación */}
+                        <h3 className="text-xl font-semibold text-white mb-2 line-clamp-2" style={textShadowStyle}>
                           {property.title}
+                          {property.location && (
+                            <span className="block text-sm font-light text-amarillo mt-1">
+                              <FaMapMarkerAlt className="inline-block mr-1 text-xs" /> 
+                              {property.location.split(',')[0]}
+                            </span>
+                          )}
                         </h3>
+                        
+                        {/* Características principales con iconos debajo del título */}
+                        <div className="flex items-center gap-4 mb-4 mt-3 text-white">
+                          {bedrooms > 0 && (
+                            <div className="flex items-center gap-1">
+                              <FaBed className="text-amarillo" />
+                              <span className="text-sm">{bedrooms} hab</span>
+                            </div>
+                          )}
+                          {bathrooms > 0 && (
+                            <div className="flex items-center gap-1">
+                              <FaBath className="text-amarillo" />
+                              <span className="text-sm">{bathrooms} baños</span>
+                            </div>
+                          )}
+                          {area > 0 && (
+                            <div className="flex items-center gap-1">
+                              <FaRulerCombined className="text-amarillo" />
+                              <span className="text-sm">{area} m²</span>
+                            </div>
+                          )}
+                        </div>
                         
                         {/* Descripción breve */}
                         <p className="text-gray-300 mb-4 line-clamp-2 text-sm" style={textShadowLightStyle}>
                           {property.description.replace(/<[^>]*>?/gm, '')}
                         </p>
 
-                        {/* Características principales */}
-                        <div className="grid grid-cols-4 gap-3 mb-4 bg-black/30 rounded-lg p-3 border border-white/10">
-                          {bedrooms > 0 && (
-                            <div className="flex flex-col items-center">
-                              <FaBed className="text-amarillo mb-1" />
-                              <span className="text-white text-sm font-medium">{bedrooms}</span>
-                              <span className="text-gray-400 text-xs">Hab.</span>
-                            </div>
-                          )}
-                          {bathrooms > 0 && (
-                            <div className="flex flex-col items-center">
-                              <FaBath className="text-amarillo mb-1" />
-                              <span className="text-white text-sm font-medium">{bathrooms}</span>
-                              <span className="text-gray-400 text-xs">Baños</span>
-                            </div>
-                          )}
-                          {area > 0 && (
-                            <div className="flex flex-col items-center">
-                              <FaRulerCombined className="text-amarillo mb-1" />
-                              <span className="text-white text-sm font-medium">{area}</span>
-                              <span className="text-gray-400 text-xs">m²</span>
-                            </div>
-                          )}
+                        {/* Características adicionales (iconos) */}
+                        <div className="flex flex-wrap gap-2 justify-start">
                           {floor !== null && (
-                            <div className="flex flex-col items-center">
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amarillo mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <div className="bg-amarillo/10 border border-amarillo/20 rounded-full px-3 py-1 text-xs text-white flex items-center gap-1">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-amarillo" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                               </svg>
-                              <span className="text-white text-sm font-medium">{floor}</span>
-                              <span className="text-gray-400 text-xs">Planta</span>
+                              Planta {floor}
                             </div>
                           )}
-                        </div>
-
-                        {/* Características adicionales (iconos) */}
-                        <div className="flex flex-wrap gap-2 justify-center">
                           {hasPool && (
                             <div className="bg-amarillo/10 border border-amarillo/20 rounded-full px-3 py-1 text-xs text-white flex items-center gap-1">
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-amarillo" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1313,13 +1308,21 @@ export default function PropertyPage() {
                         </div>
                       </div>
 
-                      {/* Botón elegante "Ver detalles" */}
+                      {/* Botón elegante "Ver detalles" con Link para mejor navegación */}
                       <div className="px-6 pb-6">
-                        <button 
-                          className="w-full py-3 bg-gradient-to-r from-amarillo/80 to-amber-600/80 text-black font-medium rounded-lg transition-all duration-300 hover:from-amarillo hover:to-amber-600 backdrop-blur-sm shadow-lg border border-amber-500/30 group-hover:scale-105"
+                        <Link 
+                          href={`/property/${property._id || property.id}`}
+                          className="block w-full"
+                          onClick={(e) => {
+                            e.stopPropagation(); // Evitar doble navegación
+                            handlePropertyClick(property);
+                          }}
+                          legacyBehavior={false}
                         >
-                          Ver detalles
-                        </button>
+                          <div className="w-full py-3 bg-gradient-to-r from-amarillo/80 to-amber-600/80 text-black font-medium rounded-lg transition-all duration-300 hover:from-amarillo hover:to-amber-600 backdrop-blur-sm shadow-lg border border-amber-500/30 group-hover:scale-105 text-center cursor-pointer">
+                            Ver detalles
+                          </div>
+                        </Link>
                       </div>
                     </div>
                   </motion.div>
