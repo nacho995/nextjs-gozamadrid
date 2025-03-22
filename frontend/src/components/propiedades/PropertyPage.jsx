@@ -426,10 +426,14 @@ export default function PropertyPage() {
         setLoading(true);
         console.log(`[PropertyPage] Iniciando fetchProperties para página: ${currentPage} (intento ${retryCount + 1}/${maxRetries + 1})`);
         
-        let response;
+        let mongoDbProperties = [];
+        let wooCommerceProperties = [];
+        let total = 0;
+        
+        // Paso 1: Obtener propiedades de MongoDB
         try {
           // Intentar primero con nuestro proxy
-          response = await axios.get('/api/proxy', {
+          const mongoResponse = await axios.get('/api/proxy', {
             params: {
               source: 'mongodb',
               path: '/properties',
@@ -437,50 +441,129 @@ export default function PropertyPage() {
               limit: ITEMS_PER_PAGE
             }
           });
-        } catch (initialError) {
-          console.log('[PropertyPage] Error con proxy, intentando API directa:', initialError.message);
           
-          // Segundo intento: API directa
+          if (validateResponse(mongoResponse.data)) {
+            if (mongoResponse.data && mongoResponse.data.properties) {
+              mongoDbProperties = mongoResponse.data.properties;
+              total += mongoResponse.data.total || mongoResponse.data.properties.length;
+              console.log('[PropertyPage] Propiedades MongoDB obtenidas:', mongoDbProperties.length);
+            } else if (Array.isArray(mongoResponse.data)) {
+              mongoDbProperties = mongoResponse.data;
+              total += mongoResponse.data.length;
+              console.log('[PropertyPage] Propiedades MongoDB obtenidas (array):', mongoDbProperties.length);
+            }
+          }
+        } catch (mongoError) {
+          console.log('[PropertyPage] Error al obtener propiedades de MongoDB:', mongoError.message);
+          // Intentar con API directa para MongoDB
           try {
-            response = await axiosInstance.get('/api/properties', {
+            const mongoDirectResponse = await axiosInstance.get('/api/properties', {
+              params: {
+                source: 'mongodb',
+                page: currentPage,
+                limit: ITEMS_PER_PAGE
+              }
+            });
+            
+            if (validateResponse(mongoDirectResponse.data)) {
+              if (mongoDirectResponse.data && mongoDirectResponse.data.properties) {
+                mongoDbProperties = mongoDirectResponse.data.properties;
+                total += mongoDirectResponse.data.total || mongoDirectResponse.data.properties.length;
+                console.log('[PropertyPage] Propiedades MongoDB obtenidas desde API directa:', mongoDbProperties.length);
+              } else if (Array.isArray(mongoDirectResponse.data)) {
+                mongoDbProperties = mongoDirectResponse.data;
+                total += mongoDirectResponse.data.length;
+                console.log('[PropertyPage] Propiedades MongoDB obtenidas desde API directa (array):', mongoDbProperties.length);
+              }
+            }
+          } catch (mongoDirectError) {
+            console.log('[PropertyPage] Error al obtener propiedades de MongoDB directamente:', mongoDirectError.message);
+          }
+        }
+        
+        // Paso 2: Obtener propiedades de WooCommerce
+        try {
+          // Primer intento: usando proxy para WooCommerce
+          const wooResponse = await axios.get('/api/proxy', {
+            params: {
+              source: 'woocommerce',
+              path: '/products',
+              page: currentPage,
+              limit: ITEMS_PER_PAGE,
+              category: 17  // Categoría de propiedades en WooCommerce
+            }
+          });
+          
+          if (validateResponse(wooResponse.data)) {
+            if (Array.isArray(wooResponse.data)) {
+              wooCommerceProperties = wooResponse.data;
+              total += wooResponse.data.length;
+              console.log('[PropertyPage] Propiedades WooCommerce obtenidas:', wooCommerceProperties.length);
+            }
+          }
+        } catch (wooError) {
+          console.log('[PropertyPage] Error al obtener propiedades de WooCommerce vía proxy:', wooError.message);
+          
+          // Segundo intento: API directa para WooCommerce
+          try {
+            const wooDirectResponse = await axiosInstance.get('/api/properties/sources/woocommerce', {
               params: {
                 page: currentPage,
                 limit: ITEMS_PER_PAGE
               }
             });
-          } catch (apiError) {
-            if (retryCount < maxRetries) {
-              console.log(`[PropertyPage] Reintentando (${retryCount + 1}/${maxRetries})...`);
-              return fetchProperties(retryCount + 1);
+            
+            if (validateResponse(wooDirectResponse.data)) {
+              if (Array.isArray(wooDirectResponse.data)) {
+                wooCommerceProperties = wooDirectResponse.data;
+                total += wooDirectResponse.data.length;
+                console.log('[PropertyPage] Propiedades WooCommerce obtenidas desde API directa:', wooCommerceProperties.length);
+              }
             }
-            throw apiError;
+          } catch (wooDirectError) {
+            console.log('[PropertyPage] Error al obtener propiedades de WooCommerce directamente:', wooDirectError.message);
           }
         }
-
-        const data = response.data;
-        if (!validateResponse(data)) {
-          throw new Error('Estructura de datos inválida en la respuesta');
+        
+        // Si no tenemos propiedades después de intentar ambas fuentes, lanzar error
+        if (mongoDbProperties.length === 0 && wooCommerceProperties.length === 0) {
+          if (retryCount < maxRetries) {
+            console.log(`[PropertyPage] Reintentando (${retryCount + 1}/${maxRetries})...`);
+            return fetchProperties(retryCount + 1);
+          }
+          throw new Error('No se pudieron obtener propiedades de ninguna fuente');
         }
 
-        // Procesar las propiedades
+        // Combinar y procesar todas las propiedades
         let processedProperties = [];
-        let total = 0;
 
-        if (data && data.properties) {
-          processedProperties = data.properties;
-          total = data.total || data.properties.length;
-        } else if (Array.isArray(data)) {
-          processedProperties = data;
-          total = data.length;
-        }
-
-        // Estandarizar el formato de las propiedades
-        processedProperties = processedProperties.map(property => {
-          const isWooCommerce = !property._id;
-          
+        // Procesar propiedades de MongoDB
+        const processedMongoProperties = mongoDbProperties.map(property => ({
+          id: property._id,
+          source: 'mongodb',
+          title: property.title || 'Sin título',
+          description: property.description || '',
+          price: property.price || 0,
+          location: getCorrectLocation(property),
+          images: (property.images || []).map(img => ({
+            url: getProxiedImageUrl(img),
+            alt: property.title || 'Imagen de propiedad'
+          })),
+          features: {
+            bedrooms: property.bedrooms || 0,
+            bathrooms: property.bathrooms || 0,
+            area: property.area || 0,
+            floor: property.floor || null
+          },
+          metadata: property.metadata || {},
+          rawData: property
+        }));
+        
+        // Procesar propiedades de WooCommerce
+        const processedWooProperties = wooCommerceProperties.map(property => {
           // Extraer metadatos de WooCommerce
           let metadata = {};
-          if (isWooCommerce && property.meta_data) {
+          if (property.meta_data) {
             property.meta_data.forEach(meta => {
               // Eliminar los metadatos con prefijo "_"
               if (!meta.key.startsWith('_')) {
@@ -488,39 +571,36 @@ export default function PropertyPage() {
               }
             });
           }
-
-          // Construir objeto estandarizado
+          
           return {
-            id: property._id || property.id,
-            source: isWooCommerce ? 'woocommerce' : 'mongodb',
-            title: property.name || property.title,
+            id: property.id,
+            source: 'woocommerce',
+            title: property.name || 'Sin título',
             description: property.description || property.short_description || '',
             price: property.price || metadata.price || 0,
             location: getCorrectLocation(property),
-            images: isWooCommerce ? 
-              (property.images || []).map(img => ({
-                url: getProxiedImageUrl(img.src || img.source_url),
-                alt: img.alt || property.name
-              })) :
-              (property.images || []).map(img => ({
-                url: getProxiedImageUrl(img),
-                alt: property.title
-              })),
+            images: (property.images || []).map(img => ({
+              url: getProxiedImageUrl(img.src || img.source_url),
+              alt: img.alt || property.name || 'Imagen de propiedad'
+            })),
             features: {
-              bedrooms: metadata.bedrooms || property.bedrooms || 0,
-              bathrooms: metadata.baños || metadata.bathrooms || property.bathrooms || 0,
-              area: metadata.living_area || property.area || 0,
-              floor: metadata.Planta || property.floor || null
+              bedrooms: metadata.bedrooms || 0,
+              bathrooms: metadata.baños || metadata.bathrooms || 0,
+              area: metadata.living_area || 0,
+              floor: metadata.Planta || null
             },
             metadata: metadata,
-            rawData: property // Mantener datos originales por si se necesitan
+            rawData: property
           };
         });
-
+        
+        // Combinar ambas fuentes
+        processedProperties = [...processedWooProperties, ...processedMongoProperties];
+        
         console.log('[PropertyPage] Propiedades procesadas:', {
           total: processedProperties.length,
-          woocommerce: processedProperties.filter(p => p.source === 'woocommerce').length,
-          mongodb: processedProperties.filter(p => p.source === 'mongodb').length
+          woocommerce: processedWooProperties.length,
+          mongodb: processedMongoProperties.length
         });
 
         setProperties(processedProperties);
