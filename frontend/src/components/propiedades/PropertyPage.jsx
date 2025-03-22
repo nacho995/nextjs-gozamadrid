@@ -1226,45 +1226,46 @@ export default function PropertyPage() {
                       {/* Contenido */}
                       <div className="p-6">
                         {/* Título con ubicación */}
-                        <h3 className="text-xl font-semibold text-white mb-2 line-clamp-2" style={textShadowStyle}>
-                          {property.title}
+                        <h3 className="text-xl font-semibold text-white mb-3 line-clamp-2" style={textShadowStyle}>
+                          {property.title === 'Sin título' ? 
+                            (property.location ? `${property.location.split(',')[0]}, España` : 'Madrid, España') : 
+                            property.title
+                          }
                           {property.location && (
-                            <span className="block text-sm font-light text-amarillo mt-1">
+                            <span className="block text-sm font-light text-amarillo mt-2">
                               <FaMapMarkerAlt className="inline-block mr-1 text-xs" /> 
                               {property.location.split(',')[0]}
                             </span>
                           )}
                         </h3>
                         
-                        {/* Características principales con iconos debajo del título */}
-                        <div className="flex items-center gap-4 mb-4 mt-3 text-white">
+                        {/* Características principales con iconos destacados */}
+                        <div className="flex justify-between items-center py-4 px-2 mb-2 bg-black/30 rounded-lg border border-white/10">
                           {bedrooms > 0 && (
-                            <div className="flex items-center gap-1">
-                              <FaBed className="text-amarillo" />
-                              <span className="text-sm">{bedrooms} hab</span>
+                            <div className="flex flex-col items-center gap-1">
+                              <FaBed className="text-amarillo text-lg" />
+                              <span className="text-white font-medium">{bedrooms}</span>
+                              <span className="text-gray-400 text-xs">hab</span>
                             </div>
                           )}
                           {bathrooms > 0 && (
-                            <div className="flex items-center gap-1">
-                              <FaBath className="text-amarillo" />
-                              <span className="text-sm">{bathrooms} baños</span>
+                            <div className="flex flex-col items-center gap-1">
+                              <FaBath className="text-amarillo text-lg" />
+                              <span className="text-white font-medium">{bathrooms}</span>
+                              <span className="text-gray-400 text-xs">baños</span>
                             </div>
                           )}
                           {area > 0 && (
-                            <div className="flex items-center gap-1">
-                              <FaRulerCombined className="text-amarillo" />
-                              <span className="text-sm">{area} m²</span>
+                            <div className="flex flex-col items-center gap-1">
+                              <FaRulerCombined className="text-amarillo text-lg" />
+                              <span className="text-white font-medium">{area}</span>
+                              <span className="text-gray-400 text-xs">m²</span>
                             </div>
                           )}
                         </div>
-                        
-                        {/* Descripción breve */}
-                        <p className="text-gray-300 mb-4 line-clamp-2 text-sm" style={textShadowLightStyle}>
-                          {property.description.replace(/<[^>]*>?/gm, '')}
-                        </p>
 
                         {/* Características adicionales (iconos) */}
-                        <div className="flex flex-wrap gap-2 justify-start">
+                        <div className="flex flex-wrap gap-2 justify-start mt-4">
                           {floor !== null && (
                             <div className="bg-amarillo/10 border border-amarillo/20 rounded-full px-3 py-1 text-xs text-white flex items-center gap-1">
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-amarillo" fill="none" viewBox="0 0 24 24" stroke="currentColor">
