@@ -18,74 +18,40 @@
       "use": "@vercel/next"
     }
   ],
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/proxy/wordpress/:path*",
-      "destination": "https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wp/v2/:path*"
+      "src": "/api/proxy/wordpress/(.*)",
+      "dest": "https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wp/v2/$1"
     },
     {
-      "source": "/api/proxy/woocommerce/:path*",
-      "destination": "https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3/:path*?consumer_key=${WOO_COMMERCE_KEY}&consumer_secret=${WOO_COMMERCE_SECRET}"
+      "src": "/api/proxy/woocommerce/(.*)",
+      "dest": "https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3/$1?consumer_key=${WOO_COMMERCE_KEY}&consumer_secret=${WOO_COMMERCE_SECRET}"
     },
     {
-      "source": "/api/properties",
-      "destination": "https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api/properties"
+      "src": "/api/properties",
+      "dest": "https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api/properties"
     },
     {
-      "source": "/api/properties/sources/woocommerce",
-      "destination": "https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api/properties/sources/woocommerce"
+      "src": "/api/properties/sources/woocommerce",
+      "dest": "https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api/properties/sources/woocommerce"
     },
     {
-      "source": "/api/properties/sources/mongodb",
-      "destination": "https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api/properties/sources/mongodb"
+      "src": "/api/properties/sources/mongodb",
+      "dest": "https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api/properties/sources/mongodb"
     },
     {
-      "source": "/api/properties/:id",
-      "destination": "https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api/properties/:id"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "X-Requested-With, Content-Type, Accept, Authorization, Cache-Control, Pragma, x-skip-head-check"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "no-store, must-revalidate"
-        }
-      ]
+      "src": "/api/properties/(.*)",
+      "dest": "https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api/properties/$1"
     },
     {
-      "source": "/api/properties/:path*",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET, OPTIONS, HEAD"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "X-Requested-With, Content-Type, Accept, Cache-Control, Pragma, x-skip-head-check"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "no-store, must-revalidate"
-        }
-      ]
+      "src": "/(.*)",
+      "dest": "/frontend/$1",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH",
+        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Authorization, Cache-Control, Pragma, x-skip-head-check",
+        "Cache-Control": "no-store, must-revalidate"
+      }
     }
   ],
   "regions": ["fra1"]
