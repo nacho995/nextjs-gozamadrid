@@ -1239,29 +1239,29 @@ export default function PropertyPage() {
                           )}
                         </h3>
                         
-                        {/* Características principales con iconos destacados */}
-                        <div className="flex justify-between items-center py-4 px-2 mb-2 bg-black/30 rounded-lg border border-white/10">
-                          {bedrooms > 0 && (
-                            <div className="flex flex-col items-center gap-1">
-                              <FaBed className="text-amarillo text-lg" />
-                              <span className="text-white font-medium">{bedrooms}</span>
-                              <span className="text-gray-400 text-xs">hab</span>
-                            </div>
-                          )}
-                          {bathrooms > 0 && (
-                            <div className="flex flex-col items-center gap-1">
-                              <FaBath className="text-amarillo text-lg" />
-                              <span className="text-white font-medium">{bathrooms}</span>
-                              <span className="text-gray-400 text-xs">baños</span>
-                            </div>
-                          )}
-                          {area > 0 && (
-                            <div className="flex flex-col items-center gap-1">
-                              <FaRulerCombined className="text-amarillo text-lg" />
-                              <span className="text-white font-medium">{area}</span>
-                              <span className="text-gray-400 text-xs">m²</span>
-                            </div>
-                          )}
+                        {/* Características principales con iconos destacados - DISEÑO MEJORADO */}
+                        <div className="flex justify-between items-stretch py-4 px-2 mb-2 bg-gradient-to-br from-black/60 to-gray-900/40 rounded-lg border border-white/10 shadow-inner">
+                          <div className="flex flex-col items-center gap-1 flex-1 px-2">
+                            <FaBed className="text-amarillo text-2xl mb-1" />
+                            <span className="text-white font-medium text-lg">{bedrooms || property.features?.bedrooms || 0}</span>
+                            <span className="text-gray-400 text-xs">habitaciones</span>
+                          </div>
+                          
+                          <div className="w-px h-auto bg-gray-700/50 mx-1"></div>
+                          
+                          <div className="flex flex-col items-center gap-1 flex-1 px-2">
+                            <FaBath className="text-amarillo text-2xl mb-1" />
+                            <span className="text-white font-medium text-lg">{bathrooms || property.features?.bathrooms || 0}</span>
+                            <span className="text-gray-400 text-xs">baños</span>
+                          </div>
+                          
+                          <div className="w-px h-auto bg-gray-700/50 mx-1"></div>
+                          
+                          <div className="flex flex-col items-center gap-1 flex-1 px-2">
+                            <FaRulerCombined className="text-amarillo text-2xl mb-1" />
+                            <span className="text-white font-medium text-lg">{area || property.features?.area || 0}</span>
+                            <span className="text-gray-400 text-xs">m²</span>
+                          </div>
                         </div>
 
                         {/* Características adicionales (iconos) */}
