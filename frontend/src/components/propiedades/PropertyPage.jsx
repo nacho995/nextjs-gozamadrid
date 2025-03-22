@@ -285,9 +285,36 @@ const safeJsonParse = (data) => {
 
 // Función para validar la estructura de la respuesta
 const validateResponse = (data) => {
-  if (!data) return false;
-  if (Array.isArray(data)) return true;
-  if (data.properties && Array.isArray(data.properties)) return true;
+  if (!data) {
+    console.log('[PropertyPage] validateResponse: datos nulos o indefinidos');
+    return false;
+  }
+  
+  if (Array.isArray(data)) {
+    console.log(`[PropertyPage] validateResponse: datos son un array con ${data.length} elementos`);
+    return true;
+  }
+  
+  if (data.properties && Array.isArray(data.properties)) {
+    console.log(`[PropertyPage] validateResponse: datos contienen array properties con ${data.properties.length} elementos`);
+    return true;
+  }
+  
+  // Intentar extraer datos si la respuesta es un objeto con estructura no estándar
+  if (typeof data === 'object') {
+    const objectKeys = Object.keys(data);
+    console.log(`[PropertyPage] validateResponse: datos son un objeto con claves: ${objectKeys.join(', ')}`);
+    
+    // Buscar alguna clave que pueda contener un array de propiedades
+    for (const key of objectKeys) {
+      if (Array.isArray(data[key])) {
+        console.log(`[PropertyPage] validateResponse: se encontró array en clave ${key} con ${data[key].length} elementos`);
+        return true;
+      }
+    }
+  }
+  
+  console.log(`[PropertyPage] validateResponse: estructura de datos no reconocida: ${typeof data}`);
   return false;
 };
 
@@ -348,6 +375,85 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// Función auxiliar para realizar peticiones a WooCommerce de forma robusta
+const fetchWooCommerce = async (attempts = 0) => {
+  const maxAttempts = 3;
+  const timeout = 30000; // 30 segundos de timeout
+  
+  try {
+    console.log(`[PropertyPage] Intento #${attempts + 1} de obtener productos WooCommerce`);
+    
+    // Primera estrategia: API proxy interna
+    try {
+      const proxyResponse = await axios.get('/api/proxy', {
+        params: {
+          source: 'woocommerce',
+          path: '/products',
+          limit: 100 // Intentar obtener más productos
+        },
+        timeout: timeout
+      });
+      
+      if (Array.isArray(proxyResponse.data) && proxyResponse.data.length > 0) {
+        console.log(`[PropertyPage] Éxito con proxy interno: ${proxyResponse.data.length} productos`);
+        return proxyResponse.data;
+      }
+    } catch (proxyError) {
+      console.log('[PropertyPage] Error en proxy interno:', proxyError.message);
+    }
+    
+    // Segunda estrategia: Endpoint específico para propiedades WooCommerce
+    try {
+      const specificResponse = await axios.get('/api/properties/sources/woocommerce', {
+        timeout: timeout
+      });
+      
+      if (Array.isArray(specificResponse.data) && specificResponse.data.length > 0) {
+        console.log(`[PropertyPage] Éxito con endpoint específico: ${specificResponse.data.length} productos`);
+        return specificResponse.data;
+      }
+    } catch (specificError) {
+      console.log('[PropertyPage] Error en endpoint específico:', specificError.message);
+    }
+    
+    // Tercera estrategia: API directa de WooCommerce
+    try {
+      const directResponse = await axios.get(
+        'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3/products', {
+          params: {
+            consumer_key: 'ck_d69e61427264a7beea70ca9ee543b45dd00cae85',
+            consumer_secret: 'cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e',
+            per_page: 100 // Obtener más productos
+          },
+          timeout: timeout
+        }
+      );
+      
+      if (Array.isArray(directResponse.data) && directResponse.data.length > 0) {
+        console.log(`[PropertyPage] Éxito con API directa: ${directResponse.data.length} productos`);
+        return directResponse.data;
+      }
+    } catch (directError) {
+      console.log('[PropertyPage] Error en API directa:', directError.message);
+    }
+    
+    // Si llegamos aquí, todos los intentos fallaron
+    if (attempts < maxAttempts - 1) {
+      console.log(`[PropertyPage] Reintentando obtener productos WooCommerce...`);
+      // Esperar un tiempo antes del siguiente intento (backoff exponencial)
+      await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, attempts)));
+      return fetchWooCommerce(attempts + 1);
+    }
+    
+    console.log('[PropertyPage] Todos los intentos de obtener productos WooCommerce fallaron');
+    return [];
+    
+  } catch (error) {
+    console.error('[PropertyPage] Error general en fetchWooCommerce:', error.message);
+    return [];
+  }
+};
 
 export default function PropertyPage() {
   const router = useRouter();
@@ -481,48 +587,19 @@ export default function PropertyPage() {
           }
         }
         
-        // Paso 2: Obtener propiedades de WooCommerce
+        // Paso 2: Obtener propiedades de WooCommerce usando la función robusta
         try {
-          // Primer intento: usando proxy para WooCommerce
-          const wooResponse = await axios.get('/api/proxy', {
-            params: {
-              source: 'woocommerce',
-              path: '/products',
-              page: currentPage,
-              limit: ITEMS_PER_PAGE,
-              category: 17  // Categoría de propiedades en WooCommerce
-            }
-          });
+          console.log('[PropertyPage] Iniciando obtención de propiedades WooCommerce con método robusto');
+          wooCommerceProperties = await fetchWooCommerce();
           
-          if (validateResponse(wooResponse.data)) {
-            if (Array.isArray(wooResponse.data)) {
-              wooCommerceProperties = wooResponse.data;
-              total += wooResponse.data.length;
-              console.log('[PropertyPage] Propiedades WooCommerce obtenidas:', wooCommerceProperties.length);
-            }
+          if (wooCommerceProperties && wooCommerceProperties.length > 0) {
+            total += wooCommerceProperties.length;
+            console.log('[PropertyPage] Propiedades WooCommerce obtenidas con método robusto:', wooCommerceProperties.length);
+          } else {
+            console.log('[PropertyPage] No se obtuvieron propiedades de WooCommerce después de múltiples intentos');
           }
         } catch (wooError) {
-          console.log('[PropertyPage] Error al obtener propiedades de WooCommerce vía proxy:', wooError.message);
-          
-          // Segundo intento: API directa para WooCommerce
-          try {
-            const wooDirectResponse = await axiosInstance.get('/api/properties/sources/woocommerce', {
-              params: {
-                page: currentPage,
-                limit: ITEMS_PER_PAGE
-              }
-            });
-            
-            if (validateResponse(wooDirectResponse.data)) {
-              if (Array.isArray(wooDirectResponse.data)) {
-                wooCommerceProperties = wooDirectResponse.data;
-                total += wooDirectResponse.data.length;
-                console.log('[PropertyPage] Propiedades WooCommerce obtenidas desde API directa:', wooCommerceProperties.length);
-              }
-            }
-          } catch (wooDirectError) {
-            console.log('[PropertyPage] Error al obtener propiedades de WooCommerce directamente:', wooDirectError.message);
-          }
+          console.error('[PropertyPage] Error al obtener propiedades de WooCommerce:', wooError);
         }
         
         // Si no tenemos propiedades después de intentar ambas fuentes, lanzar error
@@ -559,42 +636,101 @@ export default function PropertyPage() {
           rawData: property
         }));
         
-        // Procesar propiedades de WooCommerce
-        const processedWooProperties = wooCommerceProperties.map(property => {
-          // Extraer metadatos de WooCommerce
-          let metadata = {};
-          if (property.meta_data) {
-            property.meta_data.forEach(meta => {
-              // Eliminar los metadatos con prefijo "_"
-              if (!meta.key.startsWith('_')) {
-                metadata[meta.key] = meta.value;
-              }
+        // Procesar propiedades de WooCommerce con manejo de errores
+        const processedWooProperties = [];
+        for (const property of wooCommerceProperties) {
+          try {
+            // Extraer metadatos de WooCommerce
+            let metadata = {};
+            if (property.meta_data && Array.isArray(property.meta_data)) {
+              property.meta_data.forEach(meta => {
+                // Eliminar los metadatos con prefijo "_"
+                if (!meta.key.startsWith('_')) {
+                  metadata[meta.key] = meta.value;
+                }
+              });
+            }
+            
+            // Procesar y validar las imágenes
+            let images = [];
+            if (property.images && Array.isArray(property.images) && property.images.length > 0) {
+              images = property.images.map(img => {
+                const imgSrc = img.src || img.source_url || (typeof img === 'string' ? img : null);
+                return {
+                  url: getProxiedImageUrl(imgSrc),
+                  alt: img.alt || property.name || 'Imagen de propiedad'
+                };
+              }).filter(img => img.url && img.url !== '/img/default-property-image.jpg');
+            }
+            
+            // Si no hay imágenes válidas, usar imagen por defecto
+            if (images.length === 0) {
+              images = [{
+                url: '/img/default-property-image.jpg',
+                alt: property.name || 'Imagen por defecto'
+              }];
+            }
+            
+            // Validar y procesar el precio
+            let price = property.price || metadata.price || 0;
+            if (typeof price === 'string') {
+              price = parseFloat(price.replace(/[^\d.-]/g, '')) || 0;
+            }
+            
+            // Validar características
+            const bedrooms = parseInt(metadata.bedrooms) || 0;
+            const bathrooms = parseInt(metadata.baños || metadata.bathrooms) || 0;
+            const area = parseInt(metadata.living_area) || 0;
+            
+            processedWooProperties.push({
+              id: property.id,
+              source: 'woocommerce',
+              title: property.name || 'Sin título',
+              description: property.description || property.short_description || '',
+              price: price,
+              location: getCorrectLocation(property),
+              images: images,
+              features: {
+                bedrooms: bedrooms,
+                bathrooms: bathrooms,
+                area: area,
+                floor: metadata.Planta || null
+              },
+              metadata: metadata,
+              rawData: property
             });
+          } catch (processingError) {
+            console.error(`[PropertyPage] Error procesando propiedad WooCommerce ID ${property.id}:`, processingError);
+            // Intentar añadir una versión simplificada de la propiedad
+            try {
+              processedWooProperties.push({
+                id: property.id,
+                source: 'woocommerce',
+                title: property.name || 'Propiedad',
+                description: property.description || property.short_description || '',
+                price: property.price || 0,
+                location: property.name || "Madrid",
+                images: [{
+                  url: '/img/default-property-image.jpg',
+                  alt: 'Imagen por defecto'
+                }],
+                features: {
+                  bedrooms: 0,
+                  bathrooms: 0,
+                  area: 0,
+                  floor: null
+                },
+                metadata: {},
+                rawData: { id: property.id, name: property.name }
+              });
+              console.log(`[PropertyPage] Propiedad WooCommerce ID ${property.id} añadida en formato simplificado`);
+            } catch (fallbackError) {
+              console.error(`[PropertyPage] No se pudo añadir versión simplificada:`, fallbackError);
+            }
           }
-          
-          return {
-            id: property.id,
-            source: 'woocommerce',
-            title: property.name || 'Sin título',
-            description: property.description || property.short_description || '',
-            price: property.price || metadata.price || 0,
-            location: getCorrectLocation(property),
-            images: (property.images || []).map(img => ({
-              url: getProxiedImageUrl(img.src || img.source_url),
-              alt: img.alt || property.name || 'Imagen de propiedad'
-            })),
-            features: {
-              bedrooms: metadata.bedrooms || 0,
-              bathrooms: metadata.baños || metadata.bathrooms || 0,
-              area: metadata.living_area || 0,
-              floor: metadata.Planta || null
-            },
-            metadata: metadata,
-            rawData: property
-          };
-        });
+        }
         
-        // Combinar ambas fuentes
+        // Asegurar que las propiedades de WooCommerce se muestren primero
         processedProperties = [...processedWooProperties, ...processedMongoProperties];
         
         console.log('[PropertyPage] Propiedades procesadas:', {
@@ -602,6 +738,33 @@ export default function PropertyPage() {
           woocommerce: processedWooProperties.length,
           mongodb: processedMongoProperties.length
         });
+
+        console.log('[PropertyPage] Desglose de propiedades procesadas:', 
+          processedProperties.reduce((acc, prop) => {
+            acc[prop.source] = (acc[prop.source] || 0) + 1;
+            return acc;
+          }, {})
+        );
+
+        // Log detallado de cada propiedad de WooCommerce
+        if (processedWooProperties.length > 0) {
+          console.log('[PropertyPage] Primera propiedad WooCommerce procesada:', 
+            JSON.stringify({
+              id: processedWooProperties[0].id,
+              title: processedWooProperties[0].title,
+              source: processedWooProperties[0].source,
+              images: processedWooProperties[0].images.length,
+              price: processedWooProperties[0].price
+            })
+          );
+        } else {
+          console.log('[PropertyPage] No se procesaron propiedades de WooCommerce');
+        }
+
+        // Asegurar que hay propiedades de WooCommerce
+        if (wooCommerceProperties.length > 0 && processedWooProperties.length === 0) {
+          console.error('[PropertyPage] ERROR: Se obtuvieron propiedades WooCommerce pero no se procesaron correctamente');
+        }
 
         setProperties(processedProperties);
         setTotalPages(Math.ceil(total / ITEMS_PER_PAGE) || 1);
@@ -825,23 +988,29 @@ export default function PropertyPage() {
     };
   };
 
-  // Optimizar la navegación
+  // Modificar la función handlePropertyClick para ser más robusta
   const handlePropertyClick = useCallback((property) => {
-    const navigationId = property._id || property.id;
-    if (!navigationId) {
-      console.error('ID de propiedad no válido:', property);
-      return;
+    try {
+      const navigationId = property._id || property.id;
+      if (!navigationId) {
+        console.error('ID de propiedad no válido:', property);
+        return;
+      }
+
+      console.log('[NAVEGACIÓN] Navegando a propiedad:', {
+        id: navigationId,
+        source: property.source
+      });
+
+      router.push(`/property/${navigationId}`, undefined, { 
+        shallow: false,
+        scroll: true
+      });
+    } catch (error) {
+      console.error('[PropertyPage] Error al navegar:', error);
+      // Intentar una navegación alternativa
+      window.location.href = `/property/${property.id || property._id}`;
     }
-
-    console.log('[NAVEGACIÓN] Navegando a propiedad:', {
-      id: navigationId,
-      source: property.source
-    });
-
-    router.push(`/property/${navigationId}`, undefined, { 
-      shallow: false,
-      scroll: true
-    });
   }, [router]);
 
   // Renderizar estado de carga
