@@ -1,20 +1,13 @@
 {
-  "name": "gozamadrid-aws",
+  "name": "gozamadrid-frontend",
   "version": "1.0.0",
   "description": "Goza Madrid - Aplicación web para propiedades inmobiliarias",
-  "main": "servidor/server.js",
-  "type": "module",
+  "private": true,
   "scripts": {
-    "start": "node servidor/server.js",
-    "build": "cd frontend && npm run build",
-    "install": "cd frontend && npm install",
-    "deploy": "eb deploy",
-    "eb:init": "eb init",
-    "eb:create": "eb create",
-    "eb:status": "eb status",
-    "eb:health": "eb health",
-    "eb:logs": "eb logs",
-    "eb:open": "eb open"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "engines": {
     "node": ">=18.0.0",
@@ -22,16 +15,17 @@
   },
   "author": "Goza Madrid",
   "license": "ISC",
-  "private": true,
   "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.0.3",
-    "express": "^4.18.2",
-    "mongoose": "^7.0.3",
-    "cloudinary": "^1.35.0",
-    "multer": "^1.4.5-lts.1",
-    "multer-storage-cloudinary": "^4.0.0",
-    "nodemailer": "^6.9.1",
-    "itty-router": "5.0.18"
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/material": "^5.14.7",
+    "axios": "^1.5.0",
+    "next": "^15.2.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.10.1",
+    "react-loading-skeleton": "^3.3.1",
+    "react-responsive-carousel": "^3.2.23",
+    "sass": "^1.66.1"
   }
 }

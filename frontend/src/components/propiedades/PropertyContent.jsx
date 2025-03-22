@@ -38,21 +38,62 @@ const extractPropertyData = (property) => {
       
       // Buscar en meta_data los valores específicos
       if (property.meta_data && Array.isArray(property.meta_data)) {
+        console.log("Metadatos disponibles:", property.meta_data.map(m => `${m.key}: ${m.value}`).join(', '));
+        
         property.meta_data.forEach(meta => {
-          if (meta.key === 'living_area' && meta.value) {
+          // Área/superficie
+          if (['living_area', 'superficie', 'area', 'metros', 'm2'].includes(meta.key) && meta.value) {
             livingArea = parseInt(meta.value, 10) || 0;
+            console.log(`Encontrado área: ${meta.key} = ${meta.value} (convertido a ${livingArea})`);
           }
-          if (meta.key === 'bedrooms' && meta.value) {
+          
+          // Dormitorios/habitaciones
+          if (['bedrooms', 'dormitorios', 'habitaciones'].includes(meta.key) && meta.value) {
             bedrooms = parseInt(meta.value, 10) || 0;
+            console.log(`Encontradas habitaciones: ${meta.key} = ${meta.value} (convertido a ${bedrooms})`);
           }
-          if (meta.key === 'baños' && meta.value && meta.value !== "-1") {
+          
+          // Baños
+          if (['baños', 'bathrooms', 'banos'].includes(meta.key) && meta.value && meta.value !== "-1") {
             bathrooms = parseInt(meta.value, 10) || 0;
+            console.log(`Encontrados baños: ${meta.key} = ${meta.value} (convertido a ${bathrooms})`);
           }
-          if (meta.key === 'Planta' && meta.value) {
+          
+          // Planta
+          if (['Planta', 'planta', 'floor'].includes(meta.key) && meta.value) {
             floor = parseInt(meta.value, 10) || 0;
+            console.log(`Encontrada planta: ${meta.key} = ${meta.value} (convertido a ${floor})`);
           }
         });
       }
+      
+      // Si tenemos metadata pero no en meta_data (estructura alternativa)
+      if (livingArea === 0 && property.metadata) {
+        const metadata = property.metadata;
+        
+        // Verificar área/superficie en metadata
+        if (metadata.living_area) livingArea = parseInt(metadata.living_area, 10) || 0;
+        else if (metadata.superficie) livingArea = parseInt(metadata.superficie, 10) || 0;
+        else if (metadata.area) livingArea = parseInt(metadata.area, 10) || 0;
+        else if (metadata.metros) livingArea = parseInt(metadata.metros, 10) || 0;
+        else if (metadata.m2) livingArea = parseInt(metadata.m2, 10) || 0;
+        
+        // Verificar baños en metadata
+        if (metadata.baños) bathrooms = parseInt(metadata.baños, 10) || 0;
+        else if (metadata.bathrooms) bathrooms = parseInt(metadata.bathrooms, 10) || 0;
+        else if (metadata.banos) bathrooms = parseInt(metadata.banos, 10) || 0;
+      }
+      
+      // Si todavía no tenemos datos, buscar en features
+      if (livingArea === 0 && property.features && property.features.area) {
+        livingArea = parseInt(property.features.area, 10) || 0;
+      }
+      
+      if (bathrooms === 0 && property.features && property.features.bathrooms) {
+        bathrooms = parseInt(property.features.bathrooms, 10) || 0;
+      }
+      
+      console.log(`Datos finales extraídos: Área=${livingArea}, Baños=${bathrooms}, Habitaciones=${bedrooms}, Planta=${floor}`);
       
       return {
         livingArea,
@@ -64,11 +105,25 @@ const extractPropertyData = (property) => {
     // Para propiedades de MongoDB
     else if (property.source === 'mongodb') {
       console.log("Extrayendo datos de propiedad MongoDB");
+      
+      // Extraer área de varias propiedades posibles
+      let livingArea = 0;
+      if (property.m2) livingArea = parseInt(property.m2, 10) || 0;
+      else if (property.area) livingArea = parseInt(property.area, 10) || 0;
+      else if (property.livingArea) livingArea = parseInt(property.livingArea, 10) || 0;
+      else if (property.size) livingArea = parseInt(property.size, 10) || 0;
+      else if (property.features && property.features.area) livingArea = parseInt(property.features.area, 10) || 0;
+      
+      // Extraer baños
+      let bathrooms = 0;
+      if (property.bathrooms) bathrooms = parseInt(property.bathrooms, 10) || 0;
+      else if (property.features && property.features.bathrooms) bathrooms = parseInt(property.features.bathrooms, 10) || 0;
+      
       return {
-        livingArea: property.m2 || property.area || property.livingArea || property.size || 0,
-        bedrooms: property.bedrooms || 0,
-        bathrooms: property.bathrooms || 0,
-        floor: property.piso || property.floor || 0
+        livingArea,
+        bedrooms: property.bedrooms || (property.features && property.features.bedrooms) || 0,
+        bathrooms,
+        floor: property.piso || property.floor || (property.features && property.features.floor) || 0
       };
     } 
     // Fallback general

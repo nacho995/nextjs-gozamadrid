@@ -1,8 +1,0 @@
-# Redirecciones para Cloudflare Pages
-# Asegurar que las rutas dinámicas funcionen correctamente
-
-# Redireccionar rutas de propiedades no encontradas al índice correspondiente
-/property/* /property/[id].html 200
-
-# Redireccionar cualquier otra ruta no encontrada a la página 404
-/* /404.html 404 

@@ -116,9 +116,9 @@ const upload = multer({ storage: storage });
 // Rutas
 app.use('/api', notificationRouter);
 app.use("/prefix", prefixRouter);
-app.use("/blog", blogRouter);
+app.use("/api/blogs", blogRouter);
 app.use("/user", userRouter);
-app.use('/property', propertyRoutes);
+app.use('/api/properties', propertyRoutes);
 
 // Rutas específicas para ofertas y visitas de propiedades
 app.use('/api/property-visit', propertyVisitRoutes);

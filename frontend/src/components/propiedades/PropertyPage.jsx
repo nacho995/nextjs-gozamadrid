@@ -178,9 +178,12 @@ const getProxiedImageUrl = (url) => {
 
 // Modificar la función para obtener la ubicación correcta
 const getCorrectLocation = (property) => {
+  // Extraer la ubicación de la propiedad sin agregar "Madrid" automáticamente
+  // Si no hay una ubicación, simplemente devolvemos una cadena vacía
+  
   // Si es una propiedad de MongoDB
   if (property._id) {
-    return property.location || property.address || "Ubicación no disponible";
+    return property.location || property.address || "";
   }
   
   // Si es una propiedad de WordPress con campo address directo
@@ -195,25 +198,40 @@ const getCorrectLocation = (property) => {
       meta.key === "address" || meta.key === "Ubicación" || meta.key === "ubicacion"
     );
     if (addressMeta && addressMeta.value) {
-      return typeof addressMeta.value === 'object' 
-        ? addressMeta.value.address || addressMeta.value.name || "Ubicación no disponible"
+      const addressValue = typeof addressMeta.value === 'object' 
+        ? addressMeta.value.address || addressMeta.value.name
         : addressMeta.value;
+      
+      return addressValue;
     }
   }
   
-  // Si no se encontró en meta_data, usar short_description
-  if (property.short_description) {
-    return property.short_description;
+  // Extraer dirección del nombre de la propiedad
+  if (property.name) {
+    // Verificar si el nombre contiene una dirección
+    if (property.name.includes("Calle") || property.name.includes("Avenida") || 
+        property.name.includes("Plaza") || 
+        /^(Calle|C\/|Avda\.|Av\.|Pza\.|Plaza)\s+[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+\d*/.test(property.name)) {
+      return property.name;
+    }
   }
   
-  // Extraer del nombre si contiene una dirección
-  if (property.name && 
-      (property.name.includes("Calle") || property.name.includes("Avenida") || 
-       property.name.includes("Plaza"))) {
-    return property.name;
+  // Si no se encontró en meta_data, usar description o short_description
+  // y extraer posibles menciones de ubicación
+  const fullDescription = property.description || property.short_description || "";
+  if (fullDescription) {
+    // Buscar menciones de ubicación en la descripción
+    if (fullDescription.includes("Ubicación") || fullDescription.includes("ubicación")) {
+      // Intentar extraer la primera línea después de "Ubicación"
+      const matches = fullDescription.match(/Ubicación.*?[\r\n](.*?)[\r\n]/i);
+      if (matches && matches[1]) {
+        return matches[1].trim();
+      }
+    }
   }
   
-  return "Ubicación no disponible";
+  // Si nada más funciona, devolver una cadena vacía
+  return "";
 };
 
 // Función para extraer tipos de propiedades (nueva, para SEO)
@@ -640,7 +658,7 @@ export default function PropertyPage() {
         const processedWooProperties = [];
         for (const property of wooCommerceProperties) {
           try {
-            // Extraer metadatos de WooCommerce
+            // Obtener metadatos de WooCommerce
             let metadata = {};
             if (property.meta_data && Array.isArray(property.meta_data)) {
               property.meta_data.forEach(meta => {
@@ -677,11 +695,177 @@ export default function PropertyPage() {
               price = parseFloat(price.replace(/[^\d.-]/g, '')) || 0;
             }
             
-            // Validar características
-            const bedrooms = parseInt(metadata.bedrooms) || 0;
-            const bathrooms = parseInt(metadata.baños || metadata.bathrooms) || 0;
-            const area = parseInt(metadata.living_area) || 0;
+            // Obtener características principales
+            const propertyMetadata = property.metadata || {};
             
+            // Extraer datos de características con manejo mejorado
+            // MEJORA: Recopilar datos tanto del objeto features como de metadata
+            
+            // Habitaciones (bedrooms)
+            let bedrooms = 0;
+            // Primero intentar con property.features
+            if (property.features && typeof property.features.bedrooms === 'number') {
+              bedrooms = property.features.bedrooms;
+            } 
+            // Luego con property directo
+            else if (typeof property.bedrooms === 'number') {
+              bedrooms = property.bedrooms;
+            }
+            // Finalmente buscar en metadata con múltiples claves posibles
+            else {
+              const bedroomKeys = ['bedrooms', 'habitaciones', 'dormitorios', 'rooms', 'dormitorio', 'bedroom'];
+              for (const key of bedroomKeys) {
+                if (propertyMetadata[key] !== undefined) {
+                  const val = parseInt(propertyMetadata[key]);
+                  if (!isNaN(val) && val >= 0) {
+                    bedrooms = val;
+                    break;
+                  }
+                }
+              }
+            }
+            
+            // Baños (bathrooms)
+            let bathrooms = 0;
+            // Primero intentar con property.features
+            if (property.features && typeof property.features.bathrooms === 'number') {
+              bathrooms = property.features.bathrooms;
+            } 
+            // Luego con property directo
+            else if (typeof property.bathrooms === 'number') {
+              bathrooms = property.bathrooms;
+            }
+            // Finalmente buscar en metadata con múltiples claves posibles
+            else {
+              const bathroomKeys = ['bathrooms', 'baños', 'banos', 'bath', 'bathroom', 'aseos', 'toilet'];
+              for (const key of bathroomKeys) {
+                if (propertyMetadata[key] !== undefined) {
+                  const val = parseInt(propertyMetadata[key]);
+                  if (!isNaN(val) && val >= 0) {
+                    bathrooms = val;
+                    break;
+                  }
+                }
+              }
+            }
+            
+            // Área (superficie en m²)
+            let area = 0;
+            // Primero intentar con property.features
+            if (property.features && typeof property.features.area === 'number') {
+              area = property.features.area;
+            } 
+            // Luego con property directo
+            else if (typeof property.area === 'number') {
+              area = property.area;
+            }
+            // Finalmente buscar en metadata con múltiples claves posibles
+            else {
+              const areaKeys = ['living_area', 'area', 'superficie', 'metros', 'm2', 'square_meters', 'metros_cuadrados'];
+              for (const key of areaKeys) {
+                if (propertyMetadata[key] !== undefined) {
+                  // Intentar extraer el valor numérico
+                  let val;
+                  if (typeof propertyMetadata[key] === 'string') {
+                    // Eliminar cualquier texto no numérico (como "m²" o "metros") y convertir a número
+                    val = parseInt(propertyMetadata[key].replace(/[^\d.-]/g, ''));
+                  } else {
+                    val = parseInt(propertyMetadata[key]);
+                  }
+                  if (!isNaN(val) && val > 0) {
+                    area = val;
+                    break;
+                  }
+                }
+              }
+            }
+            
+            // MEJORA: Si los datos siguen siendo 0, intentar buscar en la descripción
+            const description = property.description || property.short_description || '';
+            
+            if (bedrooms === 0) {
+              const bedroomRegex = /(\d+)\s*(?:habitaci[oó]n|habitaciones|dormitorio|dormitorios|hab|dorm)/i;
+              const match = description.match(bedroomRegex);
+              if (match && match[1]) {
+                bedrooms = parseInt(match[1]);
+              }
+            }
+            
+            if (bathrooms === 0) {
+              const bathroomRegex = /(\d+)\s*(?:baño|baños|aseo|aseos|ba[ñn]o)/i;
+              const match = description.match(bathroomRegex);
+              if (match && match[1]) {
+                bathrooms = parseInt(match[1]);
+              }
+            }
+            
+            if (area === 0) {
+              // Buscar también en la descripción con patrones más flexibles
+              // Incluir casos como "167m" (sin el ²) que aparecen en la API
+              const areaRegex = /(\d+)\s*(?:m²|metros cuadrados|m2|metros|m(?!\w))/i;
+              const match = description.match(areaRegex);
+              if (match && match[1]) {
+                area = parseInt(match[1]);
+              }
+              
+              // Buscar específicamente en elementos <li> de la descripción HTML
+              if (area === 0 && description.includes('<li>')) {
+                const liRegex = /<li[^>]*>([^<]*\d+\s*m[²2]?[^<]*)<\/li>/gi;
+                let liMatch;
+                while ((liMatch = liRegex.exec(description)) !== null) {
+                  const liContent = liMatch[1];
+                  const numberMatch = liContent.match(/(\d+)\s*m[²2]?/i);
+                  if (numberMatch && numberMatch[1]) {
+                    area = parseInt(numberMatch[1]);
+                    if (area > 0) break;
+                  }
+                }
+              }
+            }
+            
+            // Validar que los valores sean realistas
+            if (area < 10 || area > 5000) {
+              // Verificar si hay algún número que podría ser área en la descripción
+              // Los apartamentos en Madrid típicamente tienen al menos 25-30m²
+              // Si es menos de 10m² o más de 5000m², probablemente sea un error
+              
+              // Intentar extracción adicional en el título/nombre
+              if (property.name) {
+                const titleMatch = property.name.match(/(\d+)\s*(?:m²|m2|metros|m\b)/i);
+                if (titleMatch && titleMatch[1]) {
+                  const extractedArea = parseInt(titleMatch[1]);
+                  if (extractedArea >= 10 && extractedArea <= 5000) {
+                    area = extractedArea;
+                  }
+                }
+              }
+              
+              // Si aún no tenemos un valor realista, usar valores predeterminados
+              if (area < 10 || area > 5000) {
+                // Establecer un valor predeterminado según el número de habitaciones
+                if (bedrooms <= 1) {
+                  area = 50; // Estudio o 1 habitación
+                } else if (bedrooms === 2) {
+                  area = 70; // 2 habitaciones
+                } else if (bedrooms === 3) {
+                  area = 90; // 3 habitaciones
+                } else if (bedrooms >= 4) {
+                  area = 120; // 4+ habitaciones
+                } else {
+                  area = 80; // Valor promedio si no sabemos habitaciones
+                }
+              }
+            }
+            
+            // Validar habitaciones y baños para valores realistas
+            if (bedrooms < 0 || bedrooms > 20) {
+              bedrooms = 1; // Valor predeterminado más realista
+            }
+            
+            if (bathrooms < 0 || bathrooms > 15) {
+              bathrooms = 1; // Valor predeterminado más realista
+            }
+
             processedWooProperties.push({
               id: property.id,
               source: 'woocommerce',
@@ -694,7 +878,7 @@ export default function PropertyPage() {
                 bedrooms: bedrooms,
                 bathrooms: bathrooms,
                 area: area,
-                floor: metadata.Planta || null
+                floor: propertyMetadata.Planta || propertyMetadata.planta || propertyMetadata.floor || null
               },
               metadata: metadata,
               rawData: property
@@ -1175,17 +1359,183 @@ export default function PropertyPage() {
                   : property.price;
                   
                 // Obtener características principales
-                const bedrooms = property.bedrooms || property.features?.bedrooms || 0;
-                const bathrooms = property.bathrooms || property.features?.bathrooms || 0;
-                const area = property.area || property.features?.area || 0;
+                const propertyMetadata = property.metadata || {};
+                
+                // Extraer datos de características con manejo mejorado
+                // MEJORA: Recopilar datos tanto del objeto features como de metadata
+                
+                // Habitaciones (bedrooms)
+                let bedrooms = 0;
+                // Primero intentar con property.features
+                if (property.features && typeof property.features.bedrooms === 'number') {
+                  bedrooms = property.features.bedrooms;
+                } 
+                // Luego con property directo
+                else if (typeof property.bedrooms === 'number') {
+                  bedrooms = property.bedrooms;
+                }
+                // Finalmente buscar en metadata con múltiples claves posibles
+                else {
+                  const bedroomKeys = ['bedrooms', 'habitaciones', 'dormitorios', 'rooms', 'dormitorio', 'bedroom'];
+                  for (const key of bedroomKeys) {
+                    if (propertyMetadata[key] !== undefined) {
+                      const val = parseInt(propertyMetadata[key]);
+                      if (!isNaN(val) && val >= 0) {
+                        bedrooms = val;
+                        break;
+                      }
+                    }
+                  }
+                }
+                
+                // Baños (bathrooms)
+                let bathrooms = 0;
+                // Primero intentar con property.features
+                if (property.features && typeof property.features.bathrooms === 'number') {
+                  bathrooms = property.features.bathrooms;
+                } 
+                // Luego con property directo
+                else if (typeof property.bathrooms === 'number') {
+                  bathrooms = property.bathrooms;
+                }
+                // Finalmente buscar en metadata con múltiples claves posibles
+                else {
+                  const bathroomKeys = ['bathrooms', 'baños', 'banos', 'bath', 'bathroom', 'aseos', 'toilet'];
+                  for (const key of bathroomKeys) {
+                    if (propertyMetadata[key] !== undefined) {
+                      const val = parseInt(propertyMetadata[key]);
+                      if (!isNaN(val) && val >= 0) {
+                        bathrooms = val;
+                        break;
+                      }
+                    }
+                  }
+                }
+                
+                // Área (superficie en m²)
+                let area = 0;
+                // Primero intentar con property.features
+                if (property.features && typeof property.features.area === 'number') {
+                  area = property.features.area;
+                } 
+                // Luego con property directo
+                else if (typeof property.area === 'number') {
+                  area = property.area;
+                }
+                // Finalmente buscar en metadata con múltiples claves posibles
+                else {
+                  const areaKeys = ['living_area', 'area', 'superficie', 'metros', 'm2', 'square_meters', 'metros_cuadrados'];
+                  for (const key of areaKeys) {
+                    if (propertyMetadata[key] !== undefined) {
+                      // Intentar extraer el valor numérico
+                      let val;
+                      if (typeof propertyMetadata[key] === 'string') {
+                        // Eliminar cualquier texto no numérico (como "m²" o "metros") y convertir a número
+                        val = parseInt(propertyMetadata[key].replace(/[^\d.-]/g, ''));
+                      } else {
+                        val = parseInt(propertyMetadata[key]);
+                      }
+                      if (!isNaN(val) && val > 0) {
+                        area = val;
+                        break;
+                      }
+                    }
+                  }
+                }
+                
+                // MEJORA: Si los datos siguen siendo 0, intentar buscar en la descripción
+                const description = property.description || property.short_description || '';
+                
+                if (bedrooms === 0) {
+                  const bedroomRegex = /(\d+)\s*(?:habitaci[oó]n|habitaciones|dormitorio|dormitorios|hab|dorm)/i;
+                  const match = description.match(bedroomRegex);
+                  if (match && match[1]) {
+                    bedrooms = parseInt(match[1]);
+                  }
+                }
+                
+                if (bathrooms === 0) {
+                  const bathroomRegex = /(\d+)\s*(?:baño|baños|aseo|aseos|ba[ñn]o)/i;
+                  const match = description.match(bathroomRegex);
+                  if (match && match[1]) {
+                    bathrooms = parseInt(match[1]);
+                  }
+                }
+                
+                if (area === 0) {
+                  // Buscar también en la descripción con patrones más flexibles
+                  // Incluir casos como "167m" (sin el ²) que aparecen en la API
+                  const areaRegex = /(\d+)\s*(?:m²|metros cuadrados|m2|metros|m(?!\w))/i;
+                  const match = description.match(areaRegex);
+                  if (match && match[1]) {
+                    area = parseInt(match[1]);
+                  }
+                  
+                  // Buscar específicamente en elementos <li> de la descripción HTML
+                  if (area === 0 && description.includes('<li>')) {
+                    const liRegex = /<li[^>]*>([^<]*\d+\s*m[²2]?[^<]*)<\/li>/gi;
+                    let liMatch;
+                    while ((liMatch = liRegex.exec(description)) !== null) {
+                      const liContent = liMatch[1];
+                      const numberMatch = liContent.match(/(\d+)\s*m[²2]?/i);
+                      if (numberMatch && numberMatch[1]) {
+                        area = parseInt(numberMatch[1]);
+                        if (area > 0) break;
+                      }
+                    }
+                  }
+                }
+                
+                // Validar que los valores sean realistas
+                if (area < 10 || area > 5000) {
+                  // Verificar si hay algún número que podría ser área en la descripción
+                  // Los apartamentos en Madrid típicamente tienen al menos 25-30m²
+                  // Si es menos de 10m² o más de 5000m², probablemente sea un error
+                  
+                  // Intentar extracción adicional en el título/nombre
+                  if (property.name) {
+                    const titleMatch = property.name.match(/(\d+)\s*(?:m²|m2|metros|m\b)/i);
+                    if (titleMatch && titleMatch[1]) {
+                      const extractedArea = parseInt(titleMatch[1]);
+                      if (extractedArea >= 10 && extractedArea <= 5000) {
+                        area = extractedArea;
+                      }
+                    }
+                  }
+                  
+                  // Si aún no tenemos un valor realista, usar valores predeterminados
+                  if (area < 10 || area > 5000) {
+                    // Establecer un valor predeterminado según el número de habitaciones
+                    if (bedrooms <= 1) {
+                      area = 50; // Estudio o 1 habitación
+                    } else if (bedrooms === 2) {
+                      area = 70; // 2 habitaciones
+                    } else if (bedrooms === 3) {
+                      area = 90; // 3 habitaciones
+                    } else if (bedrooms >= 4) {
+                      area = 120; // 4+ habitaciones
+                    } else {
+                      area = 80; // Valor promedio si no sabemos habitaciones
+                    }
+                  }
+                }
+                
+                // Validar habitaciones y baños para valores realistas
+                if (bedrooms < 0 || bedrooms > 20) {
+                  bedrooms = 1; // Valor predeterminado más realista
+                }
+                
+                if (bathrooms < 0 || bathrooms > 15) {
+                  bathrooms = 1; // Valor predeterminado más realista
+                }
+
                 const floor = property.floor || property.features?.floor || null;
                 
                 // Obtener características adicionales (metadatos)
-                const metadata = property.metadata || {};
-                const hasPool = metadata.piscina || metadata.pool || false;
-                const hasGarage = metadata.garaje || metadata.garage || false;
-                const hasTerrace = metadata.terraza || metadata.terrace || false;
-                const hasGarden = metadata.jardin || metadata.garden || false;
+                const hasPool = propertyMetadata.piscina || propertyMetadata.pool || false;
+                const hasGarage = propertyMetadata.garaje || propertyMetadata.garage || false;
+                const hasTerrace = propertyMetadata.terraza || propertyMetadata.terrace || false;
+                const hasGarden = propertyMetadata.jardin || propertyMetadata.garden || false;
                 
                 return (
                   <motion.div
@@ -1228,13 +1578,13 @@ export default function PropertyPage() {
                         {/* Título con ubicación */}
                         <h3 className="text-xl font-semibold text-white mb-3 line-clamp-2" style={textShadowStyle}>
                           {property.title === 'Sin título' ? 
-                            (property.location ? `${property.location.split(',')[0]}, España` : 'Madrid, España') : 
+                            (property.location ? `${property.location.split(',')[0]}` : 'Propiedad') : 
                             property.title
                           }
-                          {property.location && (
+                          {property.location && property.location.trim() !== "" && (
                             <span className="block text-sm font-light text-amarillo mt-2">
                               <FaMapMarkerAlt className="inline-block mr-1 text-xs" /> 
-                              {property.location.split(',')[0]}
+                              {property.location}
                             </span>
                           )}
                         </h3>
@@ -1243,7 +1593,7 @@ export default function PropertyPage() {
                         <div className="flex justify-between items-stretch py-4 px-2 mb-2 bg-gradient-to-br from-black/60 to-gray-900/40 rounded-lg border border-white/10 shadow-inner">
                           <div className="flex flex-col items-center gap-1 flex-1 px-2">
                             <FaBed className="text-amarillo text-2xl mb-1" />
-                            <span className="text-white font-medium text-lg">{bedrooms || property.features?.bedrooms || 0}</span>
+                            <span className="text-white font-medium text-lg">{bedrooms}</span>
                             <span className="text-gray-400 text-xs">habitaciones</span>
                           </div>
                           
@@ -1251,7 +1601,7 @@ export default function PropertyPage() {
                           
                           <div className="flex flex-col items-center gap-1 flex-1 px-2">
                             <FaBath className="text-amarillo text-2xl mb-1" />
-                            <span className="text-white font-medium text-lg">{bathrooms || property.features?.bathrooms || 0}</span>
+                            <span className="text-white font-medium text-lg">{bathrooms}</span>
                             <span className="text-gray-400 text-xs">baños</span>
                           </div>
                           
@@ -1259,7 +1609,7 @@ export default function PropertyPage() {
                           
                           <div className="flex flex-col items-center gap-1 flex-1 px-2">
                             <FaRulerCombined className="text-amarillo text-2xl mb-1" />
-                            <span className="text-white font-medium text-lg">{area || property.features?.area || 0}</span>
+                            <span className="text-white font-medium text-lg">{area}</span>
                             <span className="text-gray-400 text-xs">m²</span>
                           </div>
                         </div>
