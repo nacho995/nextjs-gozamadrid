@@ -1,13 +1,92 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend && npm install && npm run build",
-  "outputDirectory": "frontend/out",
-  "framework": "nextjs",
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/_next/(.*)", "dest": "/_next/$1" },
-    { "src": "/api/(.*)", "dest": "/api/$1" },
-    { "src": "/(.*)", "dest": "/$1.html" },
-    { "src": "(.*)", "dest": "/index.html" }
-  ]
-}
+  "buildCommand": "cd frontend && npm install next@14.0.0 && npm run build",
+  "installCommand": "cd frontend && npm install next@14.0.0 --save",
+  "outputDirectory": "frontend/.next",
+  "env": {
+    "NEXT_PUBLIC_WP_API_URL": "https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wp/v2",
+    "NEXT_PUBLIC_WC_API_URL": "https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3",
+    "NEXT_PUBLIC_API_URL": "https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com",
+    "NEXT_PUBLIC_API_TIMEOUT": "60000",
+    "NEXT_PUBLIC_MAX_RETRIES": "5",
+    "WOO_COMMERCE_KEY": "${WOO_COMMERCE_KEY}",
+    "WOO_COMMERCE_SECRET": "${WOO_COMMERCE_SECRET}"
+  },
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/proxy/wordpress/:path*",
+      "destination": "https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wp/v2/:path*"
+    },
+    {
+      "source": "/api/proxy/woocommerce/:path*",
+      "destination": "https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3/:path*?consumer_key=${WOO_COMMERCE_KEY}&consumer_secret=${WOO_COMMERCE_SECRET}"
+    },
+    {
+      "source": "/api/properties",
+      "destination": "https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api/properties"
+    },
+    {
+      "source": "/api/properties/sources/woocommerce",
+      "destination": "https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api/properties/sources/woocommerce"
+    },
+    {
+      "source": "/api/properties/sources/mongodb",
+      "destination": "https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api/properties/sources/mongodb"
+    },
+    {
+      "source": "/api/properties/:id",
+      "destination": "https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api/properties/:id"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "X-Requested-With, Content-Type, Accept, Authorization, Cache-Control, Pragma, x-skip-head-check"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/api/properties/:path*",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, OPTIONS, HEAD"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "X-Requested-With, Content-Type, Accept, Cache-Control, Pragma, x-skip-head-check"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store, must-revalidate"
+        }
+      ]
+    }
+  ],
+  "regions": ["fra1"]
+} 
