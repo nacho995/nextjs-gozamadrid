@@ -1164,100 +1164,168 @@ export default function PropertyPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredProperties.map((property) => {
                 // Asegurarse de que tenemos una imagen válida
-                const mainImage = property.images[0]?.url || '/img/default-property-image.jpg';
-                const imageAlt = property.images[0]?.alt || property.title;
+                const mainImage = property.images && property.images.length > 0 
+                  ? property.images[0]?.url || '/img/default-property-image.jpg'
+                  : '/img/default-property-image.jpg';
+                const imageAlt = property.images && property.images.length > 0 
+                  ? property.images[0]?.alt || property.title
+                  : property.title;
                 
                 // Formatear el precio
                 const formattedPrice = typeof property.price === 'number' 
                   ? property.price.toLocaleString('es-ES')
                   : property.price;
                   
-                  return (
-                    <motion.div
+                // Obtener características principales
+                const bedrooms = property.bedrooms || property.features?.bedrooms || 0;
+                const bathrooms = property.bathrooms || property.features?.bathrooms || 0;
+                const area = property.area || property.features?.area || 0;
+                const floor = property.floor || property.features?.floor || null;
+                
+                // Obtener características adicionales (metadatos)
+                const metadata = property.metadata || {};
+                const hasPool = metadata.piscina || metadata.pool || false;
+                const hasGarage = metadata.garaje || metadata.garage || false;
+                const hasTerrace = metadata.terraza || metadata.terrace || false;
+                const hasGarden = metadata.jardin || metadata.garden || false;
+                
+                return (
+                  <motion.div
                     key={property.id}
-                      initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
-                    className="group relative bg-black/30 backdrop-blur-sm rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]"
+                    className="group relative overflow-hidden rounded-xl transition-all duration-500"
                     onClick={() => handlePropertyClick(property)}
                     role="button"
                     tabIndex={0}
                     aria-label={`Ver detalles de ${property.title}`}
                   >
-                    {/* Imagen principal */}
-                    <div className="relative h-64 overflow-hidden">
-                            <PropertyImage 
-                        src={mainImage}
-                        alt={imageAlt}
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className="object-cover group-hover:scale-110 transition-transform duration-500"
-                        quality={85}
-                        priority={false}
-                      />
-                      {/* Etiqueta de precio */}
-                      <div className="absolute top-4 right-4 bg-black/80 text-amarillo px-4 py-2 rounded-lg backdrop-blur-sm">
-                        <span className="flex items-center gap-1">
-                          <FaEuroSign className="text-sm" />
-                          <span className="font-semibold">{formattedPrice}</span>
-                        </span>
-                          </div>
-                          </div>
-
-                    {/* Contenido */}
-                        <div className="p-6">
-                      <h3 className="text-xl font-semibold text-white mb-2 line-clamp-2" style={textShadowStyle}>
-                        {property.title}
-                            </h3>
-                      
-                      {/* Ubicación */}
-                      <p className="text-gray-300 mb-4 flex items-center gap-2" style={textShadowLightStyle}>
-                        <FaMapMarkerAlt className="text-amarillo" />
-                        <span className="line-clamp-1">{property.location}</span>
-                      </p>
-
-                      {/* Características */}
-                      <div className="grid grid-cols-3 gap-4 text-center">
-                        {property.features.bedrooms > 0 && (
-                          <div className="flex flex-col items-center">
-                            <FaBed className="text-amarillo mb-1" />
-                            <span className="text-white text-sm">{property.features.bedrooms}</span>
-                            </div>
-                        )}
-                        {property.features.bathrooms > 0 && (
-                          <div className="flex flex-col items-center">
-                            <FaBath className="text-amarillo mb-1" />
-                            <span className="text-white text-sm">{property.features.bathrooms}</span>
-                            </div>
-                        )}
-                        {property.features.area > 0 && (
-                          <div className="flex flex-col items-center">
-                            <FaRulerCombined className="text-amarillo mb-1" />
-                            <span className="text-white text-sm">{property.features.area}m²</span>
-                            </div>
-                        )}
-                          </div>
-
-                      {/* Planta (si está disponible) */}
-                      {property.features.floor && (
-                        <p className="mt-4 text-sm text-gray-300 text-center">
-                          Planta: {property.features.floor}
-                        </p>
-                      )}
-                            </div>
-
-                    {/* Overlay al hacer hover */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="absolute bottom-6 left-6 right-6">
-                        <p className="text-white text-sm line-clamp-3" style={textShadowStyle}>
-                          {property.description}
-                        </p>
-                          </div>
+                    {/* Tarjeta principal con efecto de vidrio */}
+                    <div className="bg-black/40 backdrop-blur-md rounded-xl overflow-hidden shadow-2xl hover:shadow-[0_20px_50px_rgba(255,215,0,0.2)] transition-all duration-500 hover:scale-[1.02] border border-white/10">
+                      {/* Imagen principal con overlay degradado */}
+                      <div className="relative h-72 overflow-hidden">
+                        <PropertyImage 
+                          src={mainImage}
+                          alt={imageAlt}
+                          fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          className="object-cover group-hover:scale-110 transition-transform duration-700"
+                          quality={85}
+                          priority={false}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-70"></div>
+                        
+                        {/* Etiqueta de precio elegante */}
+                        <div className="absolute top-4 right-4 bg-black/60 text-amarillo px-4 py-2 rounded-lg backdrop-blur-md border border-amarillo/30 shadow-lg">
+                          <span className="flex items-center gap-1">
+                            <FaEuroSign className="text-sm" />
+                            <span className="font-semibold">{formattedPrice}</span>
+                          </span>
                         </div>
-                    </motion.div>
-                  );
-                })}
-                </div>
+                        
+                        {/* Etiqueta de ubicación */}
+                        <div className="absolute bottom-4 left-4 right-4 bg-black/60 text-white px-4 py-2 rounded-lg backdrop-blur-md border border-white/20 shadow-lg flex items-center gap-2 max-w-[90%]">
+                          <FaMapMarkerAlt className="text-amarillo flex-shrink-0" />
+                          <span className="line-clamp-1 text-sm font-light" style={textShadowLightStyle}>{property.location}</span>
+                        </div>
+                      </div>
+
+                      {/* Contenido */}
+                      <div className="p-6">
+                        <h3 className="text-xl font-semibold text-white mb-3 line-clamp-2" style={textShadowStyle}>
+                          {property.title}
+                        </h3>
+                        
+                        {/* Descripción breve */}
+                        <p className="text-gray-300 mb-4 line-clamp-2 text-sm" style={textShadowLightStyle}>
+                          {property.description.replace(/<[^>]*>?/gm, '')}
+                        </p>
+
+                        {/* Características principales */}
+                        <div className="grid grid-cols-4 gap-3 mb-4 bg-black/30 rounded-lg p-3 border border-white/10">
+                          {bedrooms > 0 && (
+                            <div className="flex flex-col items-center">
+                              <FaBed className="text-amarillo mb-1" />
+                              <span className="text-white text-sm font-medium">{bedrooms}</span>
+                              <span className="text-gray-400 text-xs">Hab.</span>
+                            </div>
+                          )}
+                          {bathrooms > 0 && (
+                            <div className="flex flex-col items-center">
+                              <FaBath className="text-amarillo mb-1" />
+                              <span className="text-white text-sm font-medium">{bathrooms}</span>
+                              <span className="text-gray-400 text-xs">Baños</span>
+                            </div>
+                          )}
+                          {area > 0 && (
+                            <div className="flex flex-col items-center">
+                              <FaRulerCombined className="text-amarillo mb-1" />
+                              <span className="text-white text-sm font-medium">{area}</span>
+                              <span className="text-gray-400 text-xs">m²</span>
+                            </div>
+                          )}
+                          {floor !== null && (
+                            <div className="flex flex-col items-center">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amarillo mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                              </svg>
+                              <span className="text-white text-sm font-medium">{floor}</span>
+                              <span className="text-gray-400 text-xs">Planta</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Características adicionales (iconos) */}
+                        <div className="flex flex-wrap gap-2 justify-center">
+                          {hasPool && (
+                            <div className="bg-amarillo/10 border border-amarillo/20 rounded-full px-3 py-1 text-xs text-white flex items-center gap-1">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-amarillo" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
+                              </svg>
+                              Piscina
+                            </div>
+                          )}
+                          {hasGarage && (
+                            <div className="bg-amarillo/10 border border-amarillo/20 rounded-full px-3 py-1 text-xs text-white flex items-center gap-1">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-amarillo" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                              </svg>
+                              Garaje
+                            </div>
+                          )}
+                          {hasTerrace && (
+                            <div className="bg-amarillo/10 border border-amarillo/20 rounded-full px-3 py-1 text-xs text-white flex items-center gap-1">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-amarillo" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                              </svg>
+                              Terraza
+                            </div>
+                          )}
+                          {hasGarden && (
+                            <div className="bg-amarillo/10 border border-amarillo/20 rounded-full px-3 py-1 text-xs text-white flex items-center gap-1">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-amarillo" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                              </svg>
+                              Jardín
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Botón elegante "Ver detalles" */}
+                      <div className="px-6 pb-6">
+                        <button 
+                          className="w-full py-3 bg-gradient-to-r from-amarillo/80 to-amber-600/80 text-black font-medium rounded-lg transition-all duration-300 hover:from-amarillo hover:to-amber-600 backdrop-blur-sm shadow-lg border border-amber-500/30 group-hover:scale-105"
+                        >
+                          Ver detalles
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
 
             {/* Paginación */}
             {totalPages > 1 && (
