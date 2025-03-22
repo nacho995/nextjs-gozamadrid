@@ -11,6 +11,59 @@ import { useRouter } from 'next/router';
 import { UserProvider } from '../context/UserContext';
 import { CookieProvider } from '../context/CookieContext';
 import config from '@/config/config';
+import Script from 'next/script';
+
+// Script para interceptar las peticiones HEAD
+const DISABLE_HEAD_SCRIPT = `
+  // Desactivar HEAD requests
+  (function() {
+    // Interceptar fetch
+    const originalFetch = window.fetch;
+    window.fetch = function(url, options = {}) {
+      // Si es una petición HEAD, convertir a GET o cancelar
+      if (options && options.method && options.method.toUpperCase() === 'HEAD') {
+        console.log('[App] Interceptando HEAD request:', url);
+        options.method = 'GET';
+      }
+      return originalFetch(url, options);
+    };
+
+    // Interceptar XMLHttpRequest
+    const originalXHROpen = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function(method, url, ...rest) {
+      // Si es una petición HEAD, convertir a GET o cancelar
+      if (method && method.toUpperCase() === 'HEAD') {
+        console.log('[App] Interceptando HEAD XHR:', url);
+        method = 'GET';
+      }
+      return originalXHROpen.call(this, method, url, ...rest);
+    };
+    
+    // Parchar el prefetching de Next.js
+    if (window.__NEXT_DATA__ && window.__NEXT_DATA__.props) {
+      try {
+        // Forzar rutas dinámicas para evitar prefetching
+        window.__NEXT_DATA__.props.pageProps.__N_SSG = false;
+        window.__NEXT_DATA__.props.pageProps.__N_SSP = false;
+        
+        // Parchar router de Next.js cuando esté disponible
+        setTimeout(() => {
+          if (window.next && window.next.router) {
+            const originalPrefetch = window.next.router.prefetch;
+            window.next.router.prefetch = function() {
+              console.log('[App] Prefetch desactivado');
+              return Promise.resolve();
+            };
+          }
+        }, 0);
+      } catch (e) {
+        console.warn('[App] No se pudo modificar Next.js data');
+      }
+    }
+    
+    console.log('[App] Interceptación de HEAD requests activada');
+  })();
+`;
 
 // Detectar qué ruta del proxy está disponible
 if (typeof window !== 'undefined') {
@@ -20,12 +73,12 @@ if (typeof window !== 'undefined') {
     window.location.href = '/';
   }
 
-  // Función para verificar la disponibilidad de endpoints
+  // Función modificada para verificar la disponibilidad de endpoints usando GET en lugar de HEAD
   async function checkEndpointAvailability(url) {
     try {
       console.log(`[_app.js] Verificando disponibilidad de: ${url}`);
       const response = await fetch(url, {
-        method: 'HEAD',
+        method: 'GET', // Cambiado de HEAD a GET
         headers: {
           'Accept': 'application/json'
         },
@@ -229,6 +282,9 @@ function MyApp({ Component, pageProps }) {
           <meta property="twitter:description" content="Expertos en servicios inmobiliarios de lujo en Madrid. Compra, venta y alquiler de propiedades exclusivas. Asesoramiento personalizado para inversores nacionales e internacionales." />
           <meta property="twitter:image" content="https://gozamadrid.com/twitter-image.jpg" />
         </Head>
+        
+        {/* Script para interceptar peticiones HEAD */}
+        <Script id="disable-head-requests" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: DISABLE_HEAD_SCRIPT }} />
         
         {loading && <LoadingScreen />}
         
