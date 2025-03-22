@@ -5,7 +5,7 @@ import Link from "next/link";
 import Head from "next/head";
 import { useRouter } from 'next/router';
 import { getBlogPostBySlug } from '@/services/wpApi';
-import { getBlogPosts, getBlogById } from '@/pages/api';
+import { getBlogPosts, getBlogById } from '@/services/api';
 import BlogImage from './BlogImage';
 
 // Importar iconos individualmente en lugar de usar barrel imports

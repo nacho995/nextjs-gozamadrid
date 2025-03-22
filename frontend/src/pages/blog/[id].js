@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
-import { getBlogById } from '@/pages/api'; // API local
+import { getBlogById } from '@/services/api'; // API local
 import { getBlogPostBySlug } from '@/services/wpApi'; // API WordPress
 import { useRouter } from 'next/router';
 import LoadingScreen from '@/components/LoadingScreen';

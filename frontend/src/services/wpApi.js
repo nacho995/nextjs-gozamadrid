@@ -2,8 +2,12 @@
  * Servicio para gestionar las peticiones a la API de WordPress a través del proxy
  */
 
+import config from '@/config/config';
+
 // URL base para el proxy de WordPress
-const WP_PROXY_URL = '/api/proxy?service=wordpress';
+const WP_PROXY_URL = `${config.API_URL}/proxy?service=wordpress`;
+
+const WORDPRESS_API_URL = process.env.WORDPRESS_API_URL;
 
 // Añadir esta función de utilidad en la parte superior del archivo
 const proxyImage = (url) => {
@@ -36,68 +40,19 @@ const safeRenderValue = (value) => {
  * @param {number} perPage - Cantidad de posts por página
  * @returns {Promise} - Promesa con los posts
  */
-export const getBlogPostsFromServer = async (page = 1, perPage = 9) => {
+export async function getBlogPostsFromServer(page = 1, perPage = 3) {
   try {
-    // Construir URL para usar el proxy
-    const url = `${WP_PROXY_URL}&resource=posts&page=${page}&per_page=${perPage}`;
-    
-    // Añadir un timeout para evitar bloqueos
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 segundos timeout
-    
-    const response = await fetch(
-      url,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        cache: 'no-store', // Evitar caché en Next.js
-        signal: controller.signal
-      }
-    );
-    
-    clearTimeout(timeoutId);
-    
+    const response = await fetch(`${WP_PROXY_URL}&resource=posts&page=${page}&per_page=${perPage}`);
     if (!response.ok) {
-      console.error(`Error en la respuesta de WordPress: ${response.status} ${response.statusText}`);
-      throw new Error('Error al obtener los posts');
+      throw new Error(`Error en la respuesta de WordPress: ${response.status}`);
     }
-    
-    const postsData = await response.json();
-    const totalPages = parseInt(response.headers.get('X-WP-TotalPages') || '1');
-    
-    // Procesar los posts para garantizar que no hay objetos directos en ningún campo
-    // Optimizar el procesamiento para que sea más rápido
-    const processedPosts = postsData.map(post => {
-      // Crear una copia sin referencias a objetos de WordPress
-      return {
-        ...post,
-        title: safeRenderValue(post.title),
-        content: safeRenderValue(post.content),
-        excerpt: safeRenderValue(post.excerpt),
-        // Usar nuestra nueva función getImageUrl para extraer correctamente la imagen
-        image: {
-          src: getImageUrl(post),
-          alt: safeRenderValue(post.title)
-        },
-        source: 'wordpress',
-        _id: `wp-${post.id}`,
-        id: post.id
-      };
-    });
-    
-    // Mantener la estructura anterior
-    return { posts: processedPosts, totalPages };
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error('Error en getBlogPostsFromServer:', error);
-    // Si es un error de timeout, proporcionar un mensaje más claro
-    if (error.name === 'AbortError') {
-      console.error('La solicitud a WordPress se canceló por timeout');
-    }
-    return { posts: [], totalPages: 0 };
+    throw new Error('Error al obtener los posts');
   }
-};
+}
 
 /**
  * Obtiene un post específico por su slug con reintentos
@@ -206,4 +161,57 @@ export function getImageUrl(wpPost) {
   
   // Devolver la URL directamente sin proxy
   return imageUrl;
+}
+
+export async function getPosts(page = 1, perPage = 10) {
+  try {
+    const response = await fetch(
+      `${WORDPRESS_API_URL}/wp/v2/posts?page=${page}&per_page=${perPage}&_embed`
+    );
+    if (!response.ok) throw new Error('Error fetching posts');
+    return await response.json();
+  } catch (error) {
+    console.error('Error in getPosts:', error);
+    return [];
+  }
+}
+
+export async function getPost(slug) {
+  try {
+    const response = await fetch(
+      `${WORDPRESS_API_URL}/wp/v2/posts?slug=${slug}&_embed`
+    );
+    if (!response.ok) throw new Error('Error fetching post');
+    const posts = await response.json();
+    return posts[0];
+  } catch (error) {
+    console.error('Error in getPost:', error);
+    return null;
+  }
+}
+
+export async function getCategories() {
+  try {
+    const response = await fetch(
+      `${WORDPRESS_API_URL}/wp/v2/categories`
+    );
+    if (!response.ok) throw new Error('Error fetching categories');
+    return await response.json();
+  } catch (error) {
+    console.error('Error in getCategories:', error);
+    return [];
+  }
+}
+
+export async function getPostsByCategory(categoryId, page = 1, perPage = 10) {
+  try {
+    const response = await fetch(
+      `${WORDPRESS_API_URL}/wp/v2/posts?categories=${categoryId}&page=${page}&per_page=${perPage}&_embed`
+    );
+    if (!response.ok) throw new Error('Error fetching posts by category');
+    return await response.json();
+  } catch (error) {
+    console.error('Error in getPostsByCategory:', error);
+    return [];
+  }
 } 

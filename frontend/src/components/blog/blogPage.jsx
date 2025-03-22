@@ -1,6 +1,6 @@
 "use client";
 
-import { getBlogById, getBlogPosts } from "@/pages/api";
+import { getBlogPosts, getBlogById } from '@/services/api';
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import AnimatedOnScroll from "../AnimatedScroll";

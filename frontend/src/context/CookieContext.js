@@ -1,37 +1,44 @@
-import { createContext, useContext, useCallback } from 'react';
-import { setCookie, getCookie, removeCookie, COOKIE_KEYS } from '@/utils/cookies';
+import { createContext, useContext } from 'react';
+import { setCookie as setUniversalCookie, getCookie as getUniversalCookie, removeCookie as removeUniversalCookie } from '@/utils/cookies';
 
-const CookieContext = createContext();
+const COOKIE_KEYS = {
+  COOKIE_CONSENT: 'cookie_consent',
+  USER_PREFERENCES: 'user_preferences',
+  SESSION: 'session',
+  THEME: 'theme'
+};
+
+const CookieContext = createContext({
+  setCookie: () => {},
+  getCookie: () => {},
+  removeCookie: () => {},
+  COOKIE_KEYS: {}
+});
 
 export function CookieProvider({ children }) {
-  const setGlobalCookie = useCallback((key, value, options = {}) => {
-    setCookie(key, value, options);
-  }, []);
+  const setCookie = (name, value, options = {}) => {
+    setUniversalCookie(name, value, options);
+  };
 
-  const getGlobalCookie = useCallback((key) => {
-    return getCookie(key);
-  }, []);
+  const getCookie = (name) => {
+    return getUniversalCookie(name);
+  };
 
-  const removeGlobalCookie = useCallback((key) => {
-    removeCookie(key);
-  }, []);
+  const removeCookie = (name) => {
+    removeUniversalCookie(name);
+  };
 
   return (
-    <CookieContext.Provider value={{
-      setCookie: setGlobalCookie,
-      getCookie: getGlobalCookie,
-      removeCookie: removeGlobalCookie,
-      COOKIE_KEYS
-    }}>
+    <CookieContext.Provider value={{ setCookie, getCookie, removeCookie, COOKIE_KEYS }}>
       {children}
     </CookieContext.Provider>
   );
 }
 
-export const useCookies = () => {
+export function useCookies() {
   const context = useContext(CookieContext);
   if (!context) {
     throw new Error('useCookies debe ser usado dentro de un CookieProvider');
   }
   return context;
-}; 
+} 

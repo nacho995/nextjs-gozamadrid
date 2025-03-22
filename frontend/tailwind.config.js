@@ -11,7 +11,7 @@ module.exports = {
         sans: ["Chakra Petch", "sans-serif"],
       },
       colors: {
-        gold: "#D5AB6F",
+        gold: "#C7A336",
         bluecolor: "#000752",
         amarillo: "#C7A336",
         background: "var(--background)",

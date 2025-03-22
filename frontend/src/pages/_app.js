@@ -10,6 +10,7 @@ import LoadingScreen from '../components/LoadingScreen';
 import { useRouter } from 'next/router';
 import { UserProvider } from '../context/UserContext';
 import { CookieProvider } from '../context/CookieContext';
+import config from '@/config/config';
 
 // Detectar qué ruta del proxy está disponible
 if (typeof window !== 'undefined') {
@@ -19,48 +20,149 @@ if (typeof window !== 'undefined') {
     window.location.href = '/';
   }
 
-  // Función para verificar si una ruta está disponible
-  const checkEndpointAvailability = async (url) => {
+  // Función para verificar la disponibilidad de endpoints
+  async function checkEndpointAvailability(url) {
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
-      
+      console.log(`[_app.js] Verificando disponibilidad de: ${url}`);
       const response = await fetch(url, {
         method: 'HEAD',
-        signal: controller.signal,
-        cache: 'no-store'
-      }).finally(() => clearTimeout(timeoutId));
+        headers: {
+          'Accept': 'application/json'
+        },
+        // Timeout más corto para la verificación
+        signal: AbortSignal.timeout(5000)
+      });
       
-      return response.ok;
+      const available = response.ok;
+      console.log(`[_app.js] Endpoint ${url} disponible:`, available);
+      return available;
     } catch (error) {
-      console.error(`Error comprobando endpoint ${url}:`, error);
+      console.warn(`[_app.js] Error verificando endpoint ${url}:`, error);
       return false;
     }
-  };
+  }
   
   // Al cargar, verificar ambas rutas
+  const BASE_URL = typeof window !== 'undefined' ? window.location.origin : 'https://www.realestategozamadrid.com';
+
   Promise.all([
-    checkEndpointAvailability('/api/proxy?service=woocommerce&resource=products'),
-    checkEndpointAvailability('/api/woocommerce-proxy?endpoint=products')
-  ]).then(([proxyAvailable, woocommerceProxyAvailable]) => {
-    console.log(`Disponibilidad de endpoints - Proxy general: ${proxyAvailable}, WooCommerce proxy: ${woocommerceProxyAvailable}`);
+    checkEndpointAvailability(`${BASE_URL}/api/proxy/woocommerce/products`),
+    checkEndpointAvailability(`${BASE_URL}/api/proxy/wordpress/posts`),
+    checkEndpointAvailability(`${BASE_URL}/api/properties/sources/woocommerce`),
+    checkEndpointAvailability(`${BASE_URL}/api/properties/sources/mongodb`)
+  ]).then(([wooCommerceProxyAvailable, wordPressProxyAvailable, wooCommerceApiAvailable, mongodbApiAvailable]) => {
+    console.log('[_app.js] Estado de endpoints:', {
+      'proxy/woocommerce': wooCommerceProxyAvailable,
+      'proxy/wordpress': wordPressProxyAvailable,
+      'properties/woocommerce': wooCommerceApiAvailable,
+      'properties/mongodb': mongodbApiAvailable
+    });
     
-    // Guardar la configuración según el resultado
-    window.__USE_WOOCOMMERCE_PROXY_ROUTE = woocommerceProxyAvailable && !proxyAvailable;
+    // Determinar qué ruta usar basado en la disponibilidad
+    const useProxyRoute = !wooCommerceApiAvailable && !mongodbApiAvailable;
+    const useWooCommerceProxy = wooCommerceProxyAvailable && !wooCommerceApiAvailable;
     
-    console.log(`Usando ruta: ${window.__USE_WOOCOMMERCE_PROXY_ROUTE ? 'WooCommerce proxy específico' : 'Proxy general'}`);
+    window.__USE_PROXY_ROUTE = useProxyRoute;
+    window.__USE_WOOCOMMERCE_PROXY = useWooCommerceProxy;
+    
+    console.log('[_app.js] Configuración de rutas:', {
+      useProxyRoute,
+      useWooCommerceProxy
+    });
+    
+    if (useProxyRoute) {
+      console.log('[_app.js] Usando proxy general debido a que los endpoints directos no están disponibles');
+    } else if (useWooCommerceProxy) {
+      console.log('[_app.js] Usando proxy específico de WooCommerce');
+    } else {
+      console.log('[_app.js] Usando endpoints directos de la API');
+    }
   }).catch(error => {
-    console.error('Error detectando endpoints disponibles:', error);
-    // Por defecto, usar el proxy general
-    window.__USE_WOOCOMMERCE_PROXY_ROUTE = false;
+    console.error('[_app.js] Error detectando endpoints disponibles:', error);
+    // Por defecto, usar endpoints directos
+    window.__USE_PROXY_ROUTE = false;
+    window.__USE_WOOCOMMERCE_PROXY = false;
   });
+}
+
+// Función para cargar la configuración global
+async function loadConfig() {
+  try {
+    console.log('[_app.js] Cargando configuración desde:', '/api/config/properties');
+    
+    const response = await fetch('/api/config/properties', {
+      headers: {
+        'Accept': 'application/json',
+        'Cache-Control': 'no-cache'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const { success, config: apiConfig, message } = await response.json();
+    
+    if (!success) {
+      throw new Error(message || 'Error al cargar la configuración');
+    }
+    
+    window.appConfig = {
+      ...apiConfig,
+      frontendUrl: '',  // Usar rutas relativas en el cliente
+      apiUrl: '/api/properties',
+      debug: process.env.NODE_ENV === 'development'
+    };
+    
+    console.log('[_app.js] Configuración cargada exitosamente:', window.appConfig);
+    return true;
+  } catch (error) {
+    console.error('[_app.js] Error cargando la configuración:', error);
+    
+    // Configuración por defecto en caso de error
+    window.appConfig = {
+      frontendUrl: '',  // Usar rutas relativas en el cliente
+      apiUrl: '/api/properties',
+      debug: process.env.NODE_ENV === 'development',
+      timeout: 15000,
+      retries: 3,
+      backoff: true,
+      endpoints: {
+        woocommerce: {
+          url: '/api/properties/sources/woocommerce',
+          available: true,
+          params: {}
+        },
+        mongodb: {
+          url: '/api/properties/sources/mongodb',
+          available: true,
+          params: {}
+        }
+      }
+    };
+    
+    console.log('[_app.js] Usando configuración por defecto:', window.appConfig);
+    return false;
+  }
 }
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [hideControlMenu, setHideControlMenu] = useState(false);
+  const [configLoaded, setConfigLoaded] = useState(false);
   const assetPrefix = process.env.NEXT_PUBLIC_ASSET_PREFIX || '';
+
+  // Efecto para cargar la configuración
+  useEffect(() => {
+    async function initConfig() {
+      if (typeof window !== 'undefined' && !configLoaded) {
+        const success = await loadConfig();
+        setConfigLoaded(success);
+      }
+    }
+    initConfig();
+  }, [configLoaded]);
 
   // Efecto para manejar la carga
   useEffect(() => {
@@ -126,7 +228,6 @@ function MyApp({ Component, pageProps }) {
           <meta property="twitter:title" content="Goza Madrid | Inmobiliaria de Lujo en Madrid" />
           <meta property="twitter:description" content="Expertos en servicios inmobiliarios de lujo en Madrid. Compra, venta y alquiler de propiedades exclusivas. Asesoramiento personalizado para inversores nacionales e internacionales." />
           <meta property="twitter:image" content="https://gozamadrid.com/twitter-image.jpg" />
-          <script src="/config.js" />
         </Head>
         
         {loading && <LoadingScreen />}

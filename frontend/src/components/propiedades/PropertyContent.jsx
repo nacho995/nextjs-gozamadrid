@@ -9,7 +9,7 @@ import { motion } from "framer-motion";
 import { addDays, setHours, setMinutes } from "date-fns";
 import es from "date-fns/locale/es";
 import { toast } from "react-hot-toast";
-import { sendPropertyEmail } from "@/pages/api";
+import { sendPropertyEmail } from '@/services/api';
 import Head from "next/head";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://goza-madrid.onrender.com';

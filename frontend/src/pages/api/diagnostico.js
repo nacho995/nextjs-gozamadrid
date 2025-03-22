@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // Permitir solo solicitudes GET
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Método no permitido' });
   }
@@ -11,37 +10,81 @@ export default async function handler(req, res) {
   }
 
   const logs = [];
-  const addLog = (message) => {
-    logs.push({ time: new Date().toISOString(), message });
+  const addLog = (message, type = 'info') => {
+    logs.push({ 
+      time: new Date().toISOString(), 
+      message,
+      type 
+    });
+  };
+
+  // Función para verificar DNS
+  const checkDNS = async (hostname) => {
+    try {
+      const dnsStartTime = performance.now();
+      const response = await fetch(`https://${hostname}`);
+      const dnsEndTime = performance.now();
+      addLog(`DNS resolución exitosa para ${hostname} (${Math.round(dnsEndTime - dnsStartTime)}ms)`);
+      return true;
+    } catch (error) {
+      addLog(`Error DNS para ${hostname}: ${error.message}`, 'error');
+      return false;
+    }
+  };
+
+  // Función para medir tiempo de respuesta
+  const measureResponseTime = async (url) => {
+    const startTime = performance.now();
+    try {
+      const response = await fetch(url, { method: 'HEAD' });
+      const endTime = performance.now();
+      return Math.round(endTime - startTime);
+    } catch (error) {
+      return -1;
+    }
   };
 
   try {
+    // Verificar variables de entorno
+    addLog('Verificando variables de entorno...');
+    const envVars = {
+      NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+      NODE_ENV: process.env.NODE_ENV,
+      VERCEL_ENV: process.env.VERCEL_ENV,
+      VERCEL_URL: process.env.VERCEL_URL
+    };
+    addLog(`Variables de entorno: ${JSON.stringify(envVars)}`);
+
+    // Verificar DNS de los servicios
+    addLog('Iniciando verificación de DNS...');
+    await checkDNS('realestategozamadrid.com');
+    await checkDNS('api.realestategozamadrid.com');
+    
     addLog(`Iniciando diagnóstico para ID: ${id}`);
 
-    // Verificar si es un ID de MongoDB (formato ObjectId)
     const isMongoId = /^[0-9a-fA-F]{24}$/.test(id);
     addLog(`¿Es ID de MongoDB? ${isMongoId}`);
 
-    // Determinar la URL base según el entorno
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://goza-madrid.onrender.com';
+    const MONGODB_API_URL = 'https://api.realestategozamadrid.com';
+    addLog(`API URL configurada: ${MONGODB_API_URL}`);
+
+    // Medir latencia
+    const apiLatency = await measureResponseTime(MONGODB_API_URL);
+    addLog(`Latencia al API: ${apiLatency}ms`);
     
-    // Crear un controlador de aborto para establecer un timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
-      addLog(`TIMEOUT alcanzado para la propiedad con ID: ${id}`);
+      addLog(`TIMEOUT alcanzado para la propiedad con ID: ${id}`, 'error');
       controller.abort();
-    }, 15000); // 15 segundos timeout
-
-    addLog(`Intentando cargar propiedad con ID: ${id}`);
+    }, 15000);
 
     let response;
+    const requestStartTime = performance.now();
 
     if (isMongoId) {
-      // Es un ID de MongoDB, obtener de nuestra API
       addLog(`Obteniendo propiedad de MongoDB con ID ${id}`);
-
       try {
-        const url = `${API_URL}/property/${id}`;
+        const url = `${MONGODB_API_URL}/api/properties/${id}`;
         addLog(`URL de petición MongoDB: ${url}`);
 
         response = await fetch(url, {
@@ -49,14 +92,30 @@ export default async function handler(req, res) {
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
             'Pragma': 'no-cache',
-            'Expires': '0'
+            'Expires': '0',
+            'Origin': process.env.NEXT_PUBLIC_SITE_URL || 'https://realestategozamadrid.com'
           }
         });
 
-        addLog(`Respuesta MongoDB recibida: ${response.status} ${response.statusText}`);
+        const requestEndTime = performance.now();
+        addLog(`Tiempo total de respuesta MongoDB: ${Math.round(requestEndTime - requestStartTime)}ms`);
+        
+        // Analizar headers de respuesta
+        const headers = {};
+        for (const [key, value] of response.headers.entries()) {
+          headers[key] = value;
+        }
+        addLog(`Headers de respuesta MongoDB: ${JSON.stringify(headers)}`);
+        
+        if (!response.ok) {
+          addLog(`Error en respuesta MongoDB: ${response.status} ${response.statusText}`, 'error');
+          const errorBody = await response.text();
+          addLog(`Cuerpo del error MongoDB: ${errorBody}`, 'error');
+        }
       } catch (fetchError) {
         clearTimeout(timeoutId);
-        addLog(`Error en fetch MongoDB: ${fetchError.message}`);
+        addLog(`Error en fetch MongoDB: ${fetchError.message}`, 'error');
+        addLog(`Stack trace: ${fetchError.stack}`, 'error');
 
         if (fetchError.name === 'AbortError') {
           return res.status(504).json({
@@ -64,16 +123,24 @@ export default async function handler(req, res) {
             logs
           });
         }
-
         throw fetchError;
       }
     } else {
-      // Es un ID de WooCommerce, usar nuestro proxy
       addLog(`Obteniendo propiedad de WooCommerce con ID ${id}`);
-
       try {
-        const url = `${API_URL}/api/wordpress-proxy?path=products/${id}`;
+        const url = `${MONGODB_API_URL}/api/proxy?service=wordpress&endpoint=products/${id}`;
         addLog(`URL de petición WooCommerce: ${url}`);
+
+        // Verificar CORS
+        addLog('Verificando configuración CORS...');
+        const corsCheck = await fetch(url, { method: 'OPTIONS' });
+        const corsHeaders = {};
+        for (const [key, value] of corsCheck.headers.entries()) {
+          if (key.toLowerCase().includes('cors') || key.toLowerCase().includes('access-control')) {
+            corsHeaders[key] = value;
+          }
+        }
+        addLog(`Headers CORS: ${JSON.stringify(corsHeaders)}`);
 
         response = await fetch(url, {
           signal: controller.signal,
@@ -84,53 +151,76 @@ export default async function handler(req, res) {
           }
         });
 
-        addLog(`Respuesta WooCommerce recibida: ${response.status} ${response.statusText}`);
+        const requestEndTime = performance.now();
+        addLog(`Tiempo total de respuesta WooCommerce: ${Math.round(requestEndTime - requestStartTime)}ms`);
+
+        // Analizar headers de respuesta
+        const headers = {};
+        for (const [key, value] of response.headers.entries()) {
+          headers[key] = value;
+        }
+        addLog(`Headers de respuesta WooCommerce: ${JSON.stringify(headers)}`);
+
+        // Verificar certificado SSL
+        const sslInfo = response.headers.get('ssl-info');
+        addLog(`Información SSL: ${sslInfo || 'No disponible'}`);
+
+        if (!response.ok) {
+          addLog(`Error en respuesta WooCommerce: ${response.status} ${response.statusText}`, 'error');
+          const errorBody = await response.text();
+          addLog(`Cuerpo del error WooCommerce: ${errorBody}`, 'error');
+        }
       } catch (fetchError) {
         clearTimeout(timeoutId);
-        addLog(`Error en fetch WooCommerce: ${fetchError.message}`);
+        addLog(`Error en fetch WooCommerce: ${fetchError.message}`, 'error');
+        addLog(`Stack trace: ${fetchError.stack}`, 'error');
 
         if (fetchError.name === 'AbortError') {
           return res.status(504).json({
             error: "Tiempo de espera agotado al obtener la propiedad",
-            logs
+            logs,
+            timestamp: new Date().toISOString()
           });
         }
-
         throw fetchError;
       }
     }
 
-    // Limpiar el timeout
     clearTimeout(timeoutId);
 
-    // Verificar si la respuesta es exitosa
     if (!response.ok) {
-      addLog(`Error en respuesta: ${response.status} ${response.statusText}`);
       return res.status(response.status).json({
-        error: `Error al obtener propiedad: ${response.status} ${response.statusText}`,
-        logs
+        error: `Error al obtener la propiedad: ${response.statusText}`,
+        status: response.status,
+        logs,
+        timestamp: new Date().toISOString()
       });
     }
 
-    // Obtener los datos de la respuesta
-    addLog(`Intentando obtener JSON de la respuesta`);
     const data = await response.json();
-    addLog(`JSON obtenido correctamente`);
-
-    // Devolver los datos y los logs
+    
     return res.status(200).json({
       success: true,
       data,
-      logs
+      logs,
+      timestamp: new Date().toISOString(),
+      diagnosticInfo: {
+        apiUrl: MONGODB_API_URL,
+        environment: process.env.NODE_ENV,
+        vercelEnv: process.env.VERCEL_ENV,
+        requestDuration: Math.round(performance.now() - requestStartTime)
+      }
     });
 
-  } catch (err) {
-    addLog(`Error en diagnóstico: ${err.message}`);
-    console.error("Error en diagnóstico:", err);
-
+  } catch (error) {
+    addLog(`Error general: ${error.message}`, 'error');
+    addLog(`Stack trace: ${error.stack}`, 'error');
+    
     return res.status(500).json({
-      error: err.message || "Error desconocido",
-      logs
+      error: 'Error interno del servidor',
+      message: error.message,
+      logs,
+      timestamp: new Date().toISOString()
     });
   }
-} 
+}

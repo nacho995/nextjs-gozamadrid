@@ -21,7 +21,7 @@ import Link from "next/link";
 import Head from 'next/head';
 import AnimatedOnScroll from "./AnimatedScroll";
 import { getBlogPostsFromServer } from "@/services/wpApi";
-import { getBlogPosts } from "@/pages/api";
+import { getBlogPosts } from '@/services/api';
 import DirectImage from './DirectImage';
 import LoadingScreen from './LoadingScreen';
 import BlogImage from './blog/BlogImage';

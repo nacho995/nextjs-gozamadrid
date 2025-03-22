@@ -2,7 +2,9 @@ import Cookies from 'js-cookie';
 
 // Definir las claves de las cookies que usaremos
 export const COOKIE_KEYS = {
+  ACCEPTED: 'cookiesAccepted',
   THEME: 'theme',
+  SESSION: 'session',
   LANGUAGE: 'language',
   FILTER_PREFERENCES: 'filter_preferences',
   VIEW_MODE: 'view_mode',
@@ -12,33 +14,50 @@ export const COOKIE_KEYS = {
 };
 
 // Función para establecer una cookie
-export const setCookie = (key, value, options = {}) => {
-  Cookies.set(key, JSON.stringify(value), {
-    expires: 7, // Por defecto, las cookies expiran en 7 días
-    path: '/',
-    ...options
-  });
-};
+export function setCookie(name, value, days = 7) {
+  try {
+    const options = {
+      expires: days,
+      path: '/',
+    };
+    
+    if (typeof value === 'object') {
+      Cookies.set(name, JSON.stringify(value), options);
+    } else {
+      Cookies.set(name, value, options);
+    }
+  } catch (error) {
+    console.error('Error setting cookie:', error);
+  }
+}
 
 // Función para obtener una cookie
-export const getCookie = (key) => {
-  const cookie = Cookies.get(key);
-  if (cookie) {
+export function getCookie(name) {
+  try {
+    const value = Cookies.get(name);
+    if (!value) return null;
+    
     try {
-      return JSON.parse(cookie);
+      return JSON.parse(value);
     } catch {
-      return cookie;
+      return value;
     }
+  } catch (error) {
+    console.error('Error getting cookie:', error);
+    return null;
   }
-  return null;
-};
+}
 
 // Función para eliminar una cookie
-export const removeCookie = (key) => {
-  Cookies.remove(key, { path: '/' });
-};
+export function removeCookie(name) {
+  try {
+    Cookies.remove(name, { path: '/' });
+  } catch (error) {
+    console.error('Error removing cookie:', error);
+  }
+}
 
 // Función para comprobar si una cookie existe
-export const hasCookie = (key) => {
-  return !!Cookies.get(key);
-}; 
+export function hasCookie(name) {
+  return !!Cookies.get(name);
+} 

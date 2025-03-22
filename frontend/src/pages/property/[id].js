@@ -4,7 +4,7 @@ import Head from 'next/head';
 import Layout from '@/components/layout';
 import DefaultPropertyContent from '@/components/propiedades/PropertyContent';
 import LoadingScreen from '@/components/LoadingScreen';
-import { API_URL } from '@/pages/api';
+import config from '@/config/config';
 
 // Función auxiliar simplificada para detectar el tipo de propiedad por ID
 const detectSourceFromId = (id) => {
@@ -47,236 +47,78 @@ const fetchProperty = async (id, source, isServer = false, retries = 3) => {
     return { property: null, error: 'ID de propiedad no proporcionado' };
   }
 
+  // Construir la URL base según el entorno
+  const baseUrl = isServer 
+    ? (process.env.NEXT_PUBLIC_API_URL || 'https://www.realestategozamadrid.com')
+    : '';
+
+  // Construir la URL según la fuente
   let url;
-  
-  // Construir la URL correcta según la fuente - MODIFICADO para acceso directo a APIs externas
   if (source === 'mongodb') {
-    // Para MongoDB, usamos la ruta directa a la API
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com';
-    url = `${baseUrl}/property/${id}`;
-    console.log(`[fetchProperty] URL para MongoDB: ${url}`);
+    url = `${baseUrl}/api/properties/sources/mongodb/${id}`;
   } else {
-    // Para WooCommerce, usamos la ruta directa a la API
-    const WC_API_URL = process.env.NEXT_PUBLIC_WC_API_URL || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3';
-    const WC_KEY = process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY || 'ck_d69e61427264a7beea70ca9ee543b45dd00cae85';
-    const WC_SECRET = process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET || 'cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e';
-    url = `${WC_API_URL}/products/${id}?consumer_key=${WC_KEY}&consumer_secret=${WC_SECRET}`;
-    console.log(`[fetchProperty] URL para WooCommerce: ${url.replace(/consumer_key=.*?&/, 'consumer_key=HIDDEN&')}`);
+    url = `${baseUrl}/api/properties/sources/woocommerce/${id}`;
   }
-  
-  try {
-    console.log(`[fetchProperty] Intentando obtener propiedad desde: ${url.includes('consumer_key') ? url.replace(/consumer_key=.*?&/, 'consumer_key=HIDDEN&') : url}`);
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 segundos timeout
-    
-    const fetchOptions = {
-      signal: controller.signal,
-      headers: {
-        'Accept': 'application/json',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
-        'User-Agent': 'GozaMadrid-Frontend/1.0'
-      },
-      // Usar mode: 'cors' para solicitudes directas a APIs externas
-      mode: 'cors'
-    };
-    
-    const response = await fetch(url, fetchOptions).finally(() => clearTimeout(timeoutId));
-    
-    if (response.status === 503 && retries > 0) {
-      console.log(`[fetchProperty] Servicio no disponible (503), reintentando en 3 segundos...`);
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      return fetchProperty(id, source, isServer, retries - 1);
-    }
-    
-    if (!response.ok) {
-      console.error(`[fetchProperty] Error al obtener la propiedad: ${response.status} ${response.statusText}`);
-      
-      // Intentar leer el cuerpo del error para diagnóstico
-      try {
-        const errorText = await response.text();
-        console.error(`[fetchProperty] Detalle del error: ${errorText.slice(0, 200)}...`);
-      } catch (e) {
-        console.error(`[fetchProperty] No se pudo leer el detalle del error:`, e);
+
+  console.log(`[fetchProperty] Intentando obtener propiedad de ${url}`);
+
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
       }
-      
-      throw new Error(`Error al obtener la propiedad: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    
-    if (!data) {
-      throw new Error('La respuesta es null o undefined');
-    }
-    
-    console.log(`[fetchProperty] Propiedad obtenida:`, 
-      JSON.stringify({
-        id: data._id || data.id,
-        title: data.title || data.name,
-        source: data.source || source
-      })
-    );
-    
-    // Agregar el origen de la propiedad si no está presente
-    if (!data.source) {
-      data.source = source;
-    }
-    
-    // Post-procesar el resultado según el tipo de fuente
-    let processedData = data;
-    
-    if (source === 'mongodb') {
-      // Asegurarse de que las URLs de imágenes son absolutas
-      if (data.images && Array.isArray(data.images)) {
-        processedData.images = data.images.map(img => {
-          if (typeof img === 'string' && !img.startsWith('http')) {
-            return `${process.env.NEXT_PUBLIC_API_URL}${img.startsWith('/') ? '' : '/'}${img}`;
-          }
-          return img;
-        });
+
+      const data = await response.json();
+      return { property: data, error: null };
+    } catch (error) {
+      console.error(`[fetchProperty] Intento ${attempt + 1} fallido:`, error);
+      if (attempt === retries - 1) {
+        return { property: null, error: error.message };
       }
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
-    
-    return { property: processedData, error: null };
-  } catch (error) {
-    console.error('Error al obtener propiedad:', error);
-    
-    if ((error.name === 'AbortError' || error.name === 'TypeError') && retries > 0) {
-      console.log(`[fetchProperty] Error de timeout o red, reintentando en 3 segundos...`);
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      return fetchProperty(id, source, isServer, retries - 1);
-    }
-    
-    return { property: null, error: error.message };
   }
 };
 
 // Añadir getStaticPaths para manejar rutas dinámicas
 export async function getStaticPaths() {
-  // Para SSG, necesitamos pre-renderizar todas las rutas posibles
-  console.log('Generando rutas estáticas para propiedades...');
-  
-  const paths = [];
+  console.log('[getStaticPaths] Generando rutas estáticas para propiedades...');
   
   try {
-    // Obtener propiedades de WooCommerce (hasta 3 páginas)
-    for (let page = 1; page <= 3; page++) {
-      try {
-        // Para WooCommerce, usamos la ruta directa a la API
-        const WC_API_URL = process.env.NEXT_PUBLIC_WC_API_URL || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3';
-        const WC_KEY = process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY || 'ck_d69e61427264a7beea70ca9ee543b45dd00cae85';
-        const WC_SECRET = process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET || 'cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e';
-        const proxyUrl = `${WC_API_URL}/products?consumer_key=${WC_KEY}&consumer_secret=${WC_SECRET}&per_page=100&page=${page}`;
-        
-        console.log(`[getStaticPaths] Obteniendo propiedades de WooCommerce, página ${page}`);
-        
-        const response = await fetch(proxyUrl);
-        
-        if (response.ok) {
-          const products = await response.json();
-          
-          if (Array.isArray(products) && products.length > 0) {
-            console.log(`[getStaticPaths] Se encontraron ${products.length} propiedades de WooCommerce en página ${page}`);
-            products.forEach(product => {
-              paths.push({
-                params: { id: product.id.toString() }
-              });
-            });
-          }
-          
-          if (products.length < 100) {
-            break;
-          }
-        } else {
-          console.error(`[getStaticPaths] Error al obtener productos de WooCommerce: ${response.status} ${response.statusText}`);
-          break;
-        }
-      } catch (pageError) {
-        console.error(`[getStaticPaths] Error durante la obtención de productos de WooCommerce:`, pageError);
-        break;
-      }
-    }
+    console.log('[getStaticPaths] Intentando obtener propiedades de MongoDB...');
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://www.realestategozamadrid.com';
+    const mongodbUrl = `${baseUrl}/api/properties/sources/mongodb`;
     
-    // Intentar obtener propiedades de MongoDB usando la URL directa
-    try {
-      console.log('[getStaticPaths] Intentando obtener propiedades de MongoDB para rutas estáticas...');
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com';
-      
-      // Corregir la URL para asegurar que sea válida y no tenga "/api/properties/" al inicio
-      const mongoUrl = `${API_URL}/property`;
-      console.log(`[getStaticPaths] URL de MongoDB: ${mongoUrl}`);
-      
-      // Utilizar un timeout para la petición a MongoDB
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
-      
-      const mongoResponse = await fetch(mongoUrl, {
-        signal: controller.signal,
-        headers: {
-          'Accept': 'application/json',
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'User-Agent': 'GozaMadrid-Frontend/1.0'
-        }
-      }).finally(() => clearTimeout(timeoutId));
-      
-      if (mongoResponse.ok) {
-        const mongoProperties = await mongoResponse.json();
-        
-        if (Array.isArray(mongoProperties) && mongoProperties.length > 0) {
-          console.log(`[getStaticPaths] Encontradas ${mongoProperties.length} propiedades de MongoDB para rutas estáticas`);
-          
-          mongoProperties.forEach(property => {
-            if (property._id) {
-              paths.push({
-                params: { id: property._id.toString() }
-              });
-              console.log(`[getStaticPaths] Añadida ruta para propiedad MongoDB con ID: ${property._id}`);
-            }
-          });
-        } else {
-          console.error('[getStaticPaths] No se encontraron propiedades de MongoDB o el formato no es válido');
-        }
-      } else {
-        console.error(`[getStaticPaths] Error al obtener propiedades de MongoDB: ${mongoResponse.status} ${mongoResponse.statusText}`);
-        try {
-          const errorText = await mongoResponse.text();
-          console.error('[getStaticPaths] Detalle del error:', errorText.substring(0, 200));
-        } catch (e) {
-          console.error('[getStaticPaths] No se pudo leer el detalle del error');
-        }
-      }
-    } catch (mongoError) {
-      console.error('[getStaticPaths] Error al obtener propiedades de MongoDB para rutas estáticas:', mongoError);
-    }
+    console.log('[getStaticPaths] URL de MongoDB:', mongodbUrl);
     
+    const response = await fetch(mongodbUrl);
+    const properties = await response.json();
+    
+    // Generar paths para cada propiedad
+    const paths = properties.map((property) => ({
+      params: { id: property._id.toString() }
+    }));
+
+    return {
+      paths,
+      fallback: true // Permitir generación bajo demanda
+    };
   } catch (error) {
-    console.error('[getStaticPaths] Error general al generar rutas estáticas:', error);
-  }
-  
-  // Si no pudimos obtener propiedades, incluir algunos IDs comunes
-  if (paths.length === 0) {
-    console.log('[getStaticPaths] No se obtuvieron propiedades, usando IDs comunes predefinidos');
+    console.log('[getStaticPaths] Error al generar rutas:', error);
     
-    // IDs comunes de WooCommerce
-    const commonWooCommerceIds = ['3945', '3895', '3772', '3313', '3291', '3268', '3157', '2844', '2829', '2763'];
-    commonWooCommerceIds.forEach(id => {
-      paths.push({ params: { id } });
-    });
-    
-    // IDs de ejemplo para MongoDB (si los tienes)
-    const commonMongoDBIds = ['65a6c0b9d89e1e3b84f1ed8c', '659da5dd7ad6c0b8c42f5e03'];
-    commonMongoDBIds.forEach(id => {
-      paths.push({ params: { id } });
-    });
+    // En caso de error, devolver paths vacío pero permitir fallback
+    return {
+      paths: [],
+      fallback: true
+    };
   }
-  
-  console.log(`[getStaticPaths] Generadas ${paths.length} rutas estáticas para propiedades`);
-  
-  return {
-    paths,
-    fallback: 'blocking' // 'blocking' en vez de true para mejorar SEO
-  };
 }
 
 // Añadir getStaticProps para pre-renderizar la página
@@ -285,38 +127,62 @@ export async function getStaticProps({ params }) {
   
   // Determinar si es una propiedad de MongoDB o WooCommerce
   const source = detectSourceFromId(id);
+  console.log(`[getStaticProps] ID: ${id}, Fuente detectada: ${source}`);
   
   try {
     const { property, error } = await fetchProperty(id, source, true);
     
-    if (property) {
+    if (error) {
+      console.error(`[getStaticProps] Error al obtener propiedad:`, error);
       return {
         props: {
           preloadedId: id,
-          error: null,
-          preloadedProperty: property,
+          error: error,
+          preloadedProperty: null,
           source
-        }
+        },
+        revalidate: 60 // Revalidar cada minuto si hay error
       };
     }
     
-    return {
-      props: {
-        preloadedId: id,
-        error: null,
-        preloadedProperty: null,
-        source
-      }
-    };
+    if (!property) {
+      console.log(`[getStaticProps] No se encontró la propiedad con ID ${id}`);
+      return {
+        props: {
+          preloadedId: id,
+          error: "Propiedad no encontrada",
+          preloadedProperty: null,
+          source
+        },
+        revalidate: 60
+      };
+    }
+
+    console.log(`[getStaticProps] Propiedad obtenida correctamente:`, {
+      id: property._id || property.id,
+      source: property.source,
+      title: property.title || property.name
+    });
     
-  } catch (error) {
     return {
       props: {
         preloadedId: id,
         error: null,
+        preloadedProperty: property,
+        source
+      },
+      revalidate: 300 // Revalidar cada 5 minutos si todo está bien
+    };
+  } catch (error) {
+    console.error(`[getStaticProps] Error inesperado:`, error);
+    return {
+      props: {
+        preloadedId: id,
+        error: error.message,
         preloadedProperty: null,
         source
-      }
+      },
+      revalidate: 60
     };
   }
 }
@@ -342,6 +208,10 @@ export default function PropertyDetail({
   useEffect(() => {
     // Si ya tenemos la propiedad precargada y no hay error, no cargar de nuevo
     if (preloadedProperty && !preloadedError) {
+      console.log('[PropertyDetail] Usando propiedad precargada:', {
+        id: preloadedProperty._id || preloadedProperty.id,
+        source: preloadedProperty.source
+      });
       setProperty(preloadedProperty);
       setLoading(false);
       return;
@@ -357,18 +227,28 @@ export default function PropertyDetail({
       setError(null);
       
       try {
+        console.log(`[PropertyDetail] Cargando propiedad ID: ${propertyId}, Fuente: ${source}`);
         const { property: propertyData, error: fetchError } = await fetchProperty(propertyId, source, false);
         
         if (fetchError) {
+          console.error('[PropertyDetail] Error al cargar:', fetchError);
           throw new Error(fetchError);
         }
         
         if (!propertyData) {
+          console.error('[PropertyDetail] No se recibieron datos de la propiedad');
           throw new Error('No se pudo obtener la información de la propiedad');
         }
         
+        console.log('[PropertyDetail] Propiedad cargada:', {
+          id: propertyData._id || propertyData.id,
+          source: propertyData.source,
+          title: propertyData.title || propertyData.name
+        });
+        
         setProperty(propertyData);
       } catch (err) {
+        console.error('[PropertyDetail] Error en loadProperty:', err);
         setError(err.message || 'Error al cargar la propiedad');
       } finally {
         if (isProduction) {
