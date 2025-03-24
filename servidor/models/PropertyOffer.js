@@ -29,6 +29,10 @@ const PropertyOfferSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  message: {
+    type: String,
+    default: ''
+  },
   status: {
     type: String,
     enum: ['pending', 'accepted', 'rejected', 'negotiating'],

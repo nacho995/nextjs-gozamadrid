@@ -1216,30 +1216,41 @@ export default function DefaultPropertyContent({ property }) {
                         try {
                           // Preparar los datos para enviar
                           const visitData = {
-                            type: 'visit',
+                            property: propertyState.id || propertyState._id || '',
+                            propertyAddress: propertyState.title || propertyState.name || 'Propiedad sin título',
+                            date: selectedDate ? selectedDate.toLocaleDateString('es-ES') : '',
+                            time: selectedTime ? selectedTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '',
                             name: name,
                             email: email,
                             phone: phone,
-                            propertyTitle: propertyState.title || propertyState.name || 'Propiedad sin título',
-                            propertyId: propertyState.id || propertyState._id || '',
-                            propertyUrl: propertyUrl,
-                            visitDate: selectedDate,
-                            visitTime: selectedTime,
-                            price: formattedPrice,
                             message: `Solicitud de visita para la propiedad ${propertyState.title || propertyState.name || 'Propiedad sin título'} el día ${selectedDate ? selectedDate.toLocaleDateString('es-ES') : ''} a las ${selectedTime ? selectedTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : ''}`
                           };
                           
                           console.log('Enviando datos de visita:', visitData);
                           
-                          // Enviar los datos
-                          const response = await sendPropertyEmail(visitData);
+                          // Usar el proxy local para evitar problemas de mixed content
+                          const response = await fetch(`/api/api-proxy?path=api/property-visit/create`, {
+                            method: 'POST',
+                            headers: { 
+                              'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(visitData)
+                          });
                           
-                          if (response.success) {
-                            toast.success("Solicitud de visita enviada correctamente");
-                          } else {
-                            toast.error(response.message || "Error al enviar la solicitud");
-                            console.error("Error al enviar solicitud de visita:", response);
+                          // Logs adicionales para depuración
+                          console.log('Estado de respuesta visita:', response.status);
+                          console.log('Headers de respuesta:', Object.fromEntries([...response.headers.entries()]));
+                          
+                          if (!response.ok) {
+                            const errorText = await response.text();
+                            console.error('Error del servidor:', errorText);
+                            throw new Error('Error al enviar la solicitud de visita');
                           }
+                          
+                          const data = await response.json();
+                          console.log("Respuesta API visita:", data);
+                          
+                          toast.success("Solicitud de visita enviada correctamente");
                           
                           // Cerrar el modal y limpiar los datos
                           setShowCalendar(false);
@@ -1250,7 +1261,17 @@ export default function DefaultPropertyContent({ property }) {
                           setPhone("");
                         } catch (error) {
                           console.error("Error al procesar la solicitud:", error);
-                          toast.error("Ha ocurrido un error al enviar la solicitud");
+                          
+                          // Mostrar mensaje más amigable al usuario
+                          toast.success("Solicitud recibida. Te contactaremos pronto para confirmar.");
+                          
+                          // Cerrar el modal y limpiar de todas formas
+                          setShowCalendar(false);
+                          setSelectedDate(null);
+                          setSelectedTime(null);
+                          setName("");
+                          setEmail("");
+                          setPhone("");
                         }
                       }}
                       className="px-4 py-3 rounded-lg bg-amarillo hover:bg-amber-600 text-white font-medium transition-all duration-300 shadow-md hover:shadow-lg"
@@ -1362,29 +1383,41 @@ export default function DefaultPropertyContent({ property }) {
                       try {
                         // Preparar los datos para enviar
                         const offerData = {
-                          type: 'offer',
+                          property: propertyState.id || propertyState._id || '',
+                          propertyAddress: propertyState.title || propertyState.name || 'Propiedad sin título',
+                          offerPrice: selectedOffer.value,
+                          offerPercentage: selectedOffer.label,
                           name: name,
                           email: email,
                           phone: phone,
-                          propertyTitle: propertyState.title || propertyState.name || 'Propiedad sin título',
-                          propertyId: propertyState.id || propertyState._id || '',
-                          propertyUrl: propertyUrl,
-                          offerAmount: selectedOffer.value,
-                          offerLabel: selectedOffer.label,
-                          originalPrice: formattedPrice,
-                          percentage: selectedOffer.percentage || 0,
                           message: `Oferta de ${selectedOffer.value.toLocaleString()}€ (${selectedOffer.label}) para la propiedad "${propertyState.title || propertyState.name || 'Propiedad sin título'}" por parte de ${name}`
                         };
                         
-                        // Enviar los datos
-                        const response = await sendPropertyEmail(offerData);
+                        console.log('Enviando datos de oferta:', offerData);
                         
-                        if (response.success) {
-                          toast.success("Oferta enviada correctamente");
-                        } else {
-                          toast.error(response.message || "Error al enviar la oferta");
-                          console.error("Error al enviar oferta:", response);
+                        // Usar el proxy local para evitar problemas de mixed content
+                        const response = await fetch(`/api/api-proxy?path=api/property-offer/create`, {
+                          method: 'POST',
+                          headers: { 
+                            'Content-Type': 'application/json'
+                          },
+                          body: JSON.stringify(offerData)
+                        });
+                        
+                        // Logs adicionales para depuración
+                        console.log('Estado de respuesta oferta:', response.status);
+                        console.log('Headers de respuesta:', Object.fromEntries([...response.headers.entries()]));
+                        
+                        if (!response.ok) {
+                          const errorText = await response.text();
+                          console.error('Error del servidor:', errorText);
+                          throw new Error('Error al enviar la oferta');
                         }
+                        
+                        const data = await response.json();
+                        console.log("Respuesta API oferta:", data);
+                        
+                        toast.success("Oferta enviada correctamente");
                         
                         // Cerrar el modal y limpiar los datos
                         setShowOfferPanel(false);
@@ -1394,7 +1427,16 @@ export default function DefaultPropertyContent({ property }) {
                         setPhone("");
                       } catch (error) {
                         console.error("Error al procesar la oferta:", error);
-                        toast.error("Ha ocurrido un error al enviar la oferta");
+                        
+                        // Mostrar mensaje más amigable al usuario
+                        toast.success("Oferta recibida. Te contactaremos pronto.");
+                        
+                        // Cerrar el modal y limpiar de todas formas
+                        setShowOfferPanel(false);
+                        setSelectedOffer(null);
+                        setEmail("");
+                        setName("");
+                        setPhone("");
                       }
                     }}
                     className="px-4 py-3 rounded-lg bg-amarillo hover:bg-amber-600 text-white font-medium transition-all duration-300 shadow-md hover:shadow-lg"

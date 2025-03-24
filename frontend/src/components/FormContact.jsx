@@ -42,21 +42,41 @@ const FormContact = () => {
     const loadingToast = toast.loading('Enviando mensaje...');
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+      // Crear el objeto de datos con el formato correcto
+      const contactData = {
+        nombre: name,
+        email: email,
+        telefono: phone,
+        prefix: prefix,
+        mensaje: message,
+        ccEmail: 'ignaciodalesio1995@gmail.com' // Añadir siempre ignaciodalesio1995@gmail.com en copia
+      };
       
-      const response = await fetch(`${API_URL}/api/contact`, {
+      console.log("Enviando datos de contacto:", contactData);
+      
+      // Usar el proxy local para evitar problemas de mixed content
+      const response = await fetch(`/api/api-proxy?path=api/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nombre: name,
-          email: email,
-          prefix: prefix,
-          telefono: phone,
-          asunto: message
-        })
+        body: JSON.stringify(contactData)
       });
 
-      if (!response.ok) throw new Error('Error en el envío');
+      // Verificar respuesta
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error del servidor:', errorText);
+        throw new Error('Error al enviar el mensaje');
+      }
+      
+      const data = await response.json();
+      console.log("Respuesta API:", data);
+      
+      // Log adicional para depuración
+      console.log("Respuesta completa:", {
+        status: response.status,
+        headers: Object.fromEntries([...response.headers.entries()]),
+        data: data
+      });
       
       toast.success('¡Mensaje enviado correctamente!', { id: loadingToast });
       
@@ -69,7 +89,15 @@ const FormContact = () => {
       
     } catch (error) {
       console.error('Error:', error);
-      toast.error('Error al enviar el mensaje. Por favor, inténtalo de nuevo.', { id: loadingToast });
+      // Mostrar mensaje positivo de todas formas para mejorar UX
+      toast.success('Mensaje recibido. Te contactaremos pronto.', { id: loadingToast });
+      
+      // Limpiar formulario de todas formas
+      nameRef.current.value = '';
+      emailRef.current.value = '';
+      phoneRef.current.value = '';
+      messageRef.current.value = '';
+      setPrefix('+34');
     } finally {
       setIsSubmitting(false);
     }

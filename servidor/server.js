@@ -1,5 +1,11 @@
 // Importaciones
 import dotenv from 'dotenv';
+// Cargar variables de entorno primero
+dotenv.config();
+
+// Cargar configuración de correo (debe estar después de dotenv.config y antes de otros imports)
+import './config/emailSetup.js';
+
 import cors from 'cors';
 import express from 'express';
 import mongoose from 'mongoose';
@@ -22,9 +28,8 @@ import blogRouter from "./routes/blogRouter.js";
 import userRouter from "./routes/userContentRouter.js";
 import propertyRoutes from './routes/propertyRoutes.js';
 import propertyOfferRoutes from './routes/propertyOfferRoutes.js';
+import healthRoutes from './routes/healthRoutes.js';
 import { sendContactEmail } from './controller/contactController.js';
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 8081;
@@ -124,8 +129,13 @@ app.use("/user", userRouter);
 app.use('/api/property-visit', propertyVisitRoutes);
 app.use('/api/property-offer', propertyOfferRoutes);
 
-// Ruta para el formulario de contacto
+// Rutas para health check y monitoreo
+app.use('/api/health', healthRoutes);
+
+// Ruta especial para el formulario de contacto
 app.post('/api/contact', sendContactEmail);
+// Añadir la misma ruta con barra final para manejar ambos casos
+app.post('/api/contact/', sendContactEmail);
 
 // Middleware para manejar rutas con barra final o sin ella
 app.use((req, res, next) => {
