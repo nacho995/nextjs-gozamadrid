@@ -32,7 +32,7 @@ const nextConfig = {
     NEXT_PUBLIC_WOO_COMMERCE_KEY: process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY || 'ck_d69e61427264a7beea70ca9ee543b45dd00cae85',
     NEXT_PUBLIC_WOO_COMMERCE_SECRET: process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET || 'cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e',
     NEXT_PUBLIC_WC_API_URL: process.env.NEXT_PUBLIC_WC_API_URL || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3',
-    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://gozamadrid.com'),
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://realestategozamadrid.com'),
     MONGODB_URL: process.env.MONGODB_URL || 'https://api.realestategozamadrid.com',
     API_BASE_URL: process.env.API_BASE_URL || 'https://api.realestategozamadrid.com'
   },
@@ -52,6 +52,8 @@ const nextConfig = {
   async rewrites() {
     const apiUrl = process.env.API_BASE_URL || 'https://api.realestategozamadrid.com';
     const wcUrl = process.env.NEXT_PUBLIC_WC_API_URL || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3';
+    const wcKey = process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY || 'ck_d69e61427264a7beea70ca9ee543b45dd00cae85';
+    const wcSecret = process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET || 'cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e';
 
     return [
       // Rutas específicas para las fuentes
@@ -59,15 +61,23 @@ const nextConfig = {
         source: '/api/properties/sources/:source',
         destination: `${apiUrl}/api/properties/sources/:source`
       },
+      {
+        source: '/api/properties/sources/:source/:id',
+        destination: `${apiUrl}/api/properties/sources/:source/:id`
+      },
       // Ruta específica para WooCommerce
       {
         source: '/api/woocommerce/:path*',
-        destination: `${wcUrl}/:path*`
+        destination: `${wcUrl}/:path*?consumer_key=${wcKey}&consumer_secret=${wcSecret}`
       },
       // API Routes para propiedades
       {
         source: '/api/properties',
         destination: `${apiUrl}/api/properties`
+      },
+      {
+        source: '/api/properties/:id',
+        destination: `${apiUrl}/api/properties/:id`
       },
       {
         source: '/api/properties/:path*',
@@ -76,10 +86,20 @@ const nextConfig = {
       // Proxy routes
       {
         source: '/api/proxy/woocommerce/:path*',
-        destination: `${wcUrl}/:path*`
+        destination: `${wcUrl}/:path*?consumer_key=${wcKey}&consumer_secret=${wcSecret}`
       },
       {
         source: '/api/proxy/mongodb/:path*',
+        destination: `${apiUrl}/api/:path*`
+      },
+      // Proxy directo para imágenes (evitar problemas CORS)
+      {
+        source: '/api/proxy-image',
+        destination: `${apiUrl}/api/proxy-image`
+      },
+      // Fallbacks para manejo de errores
+      {
+        source: '/api/:path*',
         destination: `${apiUrl}/api/:path*`
       }
     ];
@@ -100,7 +120,7 @@ const nextConfig = {
           },
           {
             key: 'Access-Control-Allow-Headers',
-            value: 'Accept, Content-Type, Origin, Cache-Control, X-Requested-With, x-no-preflight-check'
+            value: 'Accept, Content-Type, Origin, Cache-Control, X-Requested-With, x-no-preflight-check, x-property-auth, x-requested-property'
           }
         ]
       },
@@ -117,7 +137,7 @@ const nextConfig = {
           },
           {
             key: 'Access-Control-Allow-Headers',
-            value: 'Accept, Content-Type, Origin, Cache-Control, X-Requested-With, x-no-preflight-check'
+            value: 'Accept, Content-Type, Origin, Cache-Control, X-Requested-With, x-no-preflight-check, x-property-auth, x-requested-property'
           }
         ]
       }

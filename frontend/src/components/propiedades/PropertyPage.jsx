@@ -1,11 +1,9 @@
 "use client";
 import React, { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from 'next/router';
 import { motion } from "framer-motion";
-import { FaBed, FaBath, FaRulerCombined, FaMapMarkerAlt, FaEuroSign } from "react-icons/fa";
-import api from '@/services/api';
+import { FaBed, FaBath, FaRulerCombined, FaMapMarkerAlt, FaEuroSign, FaSearchMinus, FaTimes } from "react-icons/fa";
 import PropertyImage from './PropertyImage';
 import LoadingFallback from './LoadingFallback';
 import Head from 'next/head';
@@ -154,25 +152,32 @@ const getProxiedImageUrl = (url) => {
   
   // Si es una ruta relativa, construir la URL completa
   if (!url.startsWith('http') && !url.startsWith('/')) {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.realestategozamadrid.com';
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com';
     url = `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
     console.log("PropertyPage - URL relativa convertida a absoluta:", url);
   }
   
   // Para URLs externas, usar un servicio de proxy para evitar errores CORS y QUIC_PROTOCOL_ERROR
   if (url.startsWith('http')) {
-    // No usar proxy para URLs de Cloudinary
+    // No usar proxy para URLs de Cloudinary, ya que son seguras y optimizadas
     if (url.includes('cloudinary.com')) {
+      console.log("PropertyPage - URL de Cloudinary, devolviendo tal cual:", url);
       return url;
     }
-    // Usar images.weserv.nl como proxy confiable con configuración básica
-    const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(url)}&n=-1&default=https://via.placeholder.com/800x600?text=Sin+Imagen`;
-    console.log("PropertyPage - URL convertida a proxy:", proxyUrl);
-    return proxyUrl;
+    
+    // Para otras URLs, usar un servicio de proxy de imágenes
+    try {
+      const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(url)}&default=https://www.realestategozamadrid.com/img/default-property-image.jpg`;
+      console.log("PropertyPage - URL con proxy:", proxyUrl);
+      return proxyUrl;
+    } catch (e) {
+      console.error("PropertyPage - Error al generar URL con proxy:", e);
+      return url; // Devolver la URL original si hay un error
+    }
   }
   
-  // Si es una ruta local, devolverla tal cual
-  console.log("PropertyPage - URL local, devolviendo tal cual:", url);
+  // Si no es una URL completa, usar la imagen por defecto
+  console.log("PropertyPage - URL no es URL completa, devolviendo original:", url);
   return url;
 };
 
@@ -285,7 +290,7 @@ const extractLocations = (properties) => {
 const ITEMS_PER_PAGE = config.ITEMS_PER_PAGE || 12;
 const DEFAULT_PAGE = 1;
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gozamadrid.com';
-const API_URL = process.env.MONGODB_URL || 'https://api.realestategozamadrid.com';
+const API_URL = process.env.MONGODB_URL || 'https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com';
 
 // Función para validar y parsear respuestas JSON
 const safeJsonParse = (data) => {
@@ -346,48 +351,34 @@ const axiosInstance = axios.create({
   }
 });
 
-// Simplificar interceptor de peticiones
+// Añadir logs para depuración
 axiosInstance.interceptors.request.use(
   config => {
-    // Siempre usar método GET
-    config.method = 'get';
-    
-    // Eliminar headers problemáticos
-    ['Origin', 'Cache-Control', 'Pragma', 'Host'].forEach(
-      header => delete config.headers[header]
-    );
-    
+    console.log(`[API Request] ${config.method.toUpperCase()} ${config.baseURL}${config.url}`, config.params || {});
     return config;
   },
-  error => Promise.reject(error)
+  error => {
+    console.error('[API Request Error]', error);
+    return Promise.reject(error);
+  }
 );
 
-// Simplificar interceptor de respuestas
 axiosInstance.interceptors.response.use(
-  response => response,
-  async error => {
-    console.error('[PropertyPage] Error en la petición:', error.message);
+  response => {
+    console.log(`[API Response] Status: ${response.status} for ${response.config.url}`, 
+      response.data ? (Array.isArray(response.data) ? `Array[${response.data.length}]` : typeof response.data) : 'No data');
+    return response;
+  },
+  error => {
+    console.error(`[API Response Error] ${error.config?.url || 'unknown URL'}:`, error.message);
     
-    // Si es un error de red, intentar con nuestro proxy interno
-    if (error.code === 'ERR_NETWORK' || error.message.includes('CORS')) {
-      try {
-        const params = error.config?.params || {};
-        const proxyUrl = '/api/proxy';
-        
-        console.log('[PropertyPage] Reintentando con proxy interno:', proxyUrl);
-        
-        const response = await axios.get(proxyUrl, { 
-          params: {
-            source: 'mongodb',
-            path: '/properties',
-            ...params
-          }
-        });
-        
-        return response;
-      } catch (retryError) {
-        console.error('[PropertyPage] Error en reintento:', retryError.message);
-      }
+    // Log más detallado para analizar la respuesta de error
+    if (error.response) {
+      console.error(`[API Error Details] Status: ${error.response.status}`, error.response.data);
+    }
+    
+    if (error.request && !error.response) {
+      console.error('[API Network Error] No se recibió respuesta del servidor');
     }
     
     return Promise.reject(error);
@@ -438,10 +429,8 @@ const fetchWooCommerce = async (attempts = 0) => {
     // Tercera estrategia: API directa de WooCommerce
     try {
       const directResponse = await axios.get(
-        'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3/products', {
+        '/api/proxy/woocommerce/products', {
           params: {
-            consumer_key: 'ck_d69e61427264a7beea70ca9ee543b45dd00cae85',
-            consumer_secret: 'cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e',
             per_page: 100 // Obtener más productos
           },
           timeout: timeout
@@ -449,11 +438,20 @@ const fetchWooCommerce = async (attempts = 0) => {
       );
       
       if (Array.isArray(directResponse.data) && directResponse.data.length > 0) {
-        console.log(`[PropertyPage] Éxito con API directa: ${directResponse.data.length} productos`);
-        return directResponse.data;
+        console.log(`[PropertyPage] Éxito obteniendo ${directResponse.data.length} propiedades directamente de WooCommerce API`);
+        
+        // Añadir un indicador de fuente para facilitar la identificación
+        const processedProperties = directResponse.data.map(property => ({
+          ...property,
+          source: 'woocommerce'
+        }));
+        
+        return processedProperties;
+      } else {
+        console.log('[PropertyPage] Respuesta vacía o inválida de la API directa de WooCommerce');
       }
     } catch (directError) {
-      console.log('[PropertyPage] Error en API directa:', directError.message);
+      console.error('[PropertyPage] Error con la API directa de WooCommerce:', directError.message);
     }
     
     // Si llegamos aquí, todos los intentos fallaron
@@ -481,12 +479,41 @@ export default function PropertyPage() {
   const [currentPage, setCurrentPage] = useState(DEFAULT_PAGE);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
+  const [propertyTypes, setPropertyTypes] = useState([]);
+  const [locations, setLocations] = useState([]);
+  const [selectedType, setSelectedType] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState('');
   const [configLoaded, setConfigLoaded] = useState(false);
   const renderCountRef = useRef(0);
-  const isFirstRender = useRef(true);
-  const { query } = router;
+  const abortControllerRef = useRef(null);
   
-  // Efecto para esperar a que la configuración se cargue
+  // DEBUG: Imprimir información de la API y configuración
+  useEffect(() => {
+    console.log('API URL configurada:', API_URL);
+    console.log('BASE URL configurada:', BASE_URL);
+    console.log('Configuración window.appConfig:', window.appConfig);
+    
+    // Verificar si hay un proxy o CORS configurado - usar proxy interno para evitar errores CORS
+    try {
+      // Uso de nuestro proxy interno en lugar de fetch directo
+      axios.head('/api/proxy', {
+        params: {
+          source: 'mongodb',
+          path: '/properties'
+        },
+        timeout: 5000
+      })
+      .then(response => {
+        console.log('Verificación de conectividad con API exitosa', response.status);
+      })
+      .catch(error => {
+        console.log('Verificación de conectividad con API a través del proxy falló, es normal en algunos navegadores', error.message);
+      });
+    } catch (err) {
+      console.log('Error al intentar verificar conectividad con API', err.message);
+    }
+  }, []);
+
   useEffect(() => {
     let timeoutId;
     let attempts = 0;
@@ -534,479 +561,252 @@ export default function PropertyPage() {
   }, [router.isReady, router.query.page]);
 
   // Efecto para cargar propiedades
+  const fetchPropertiesFromAPI = async () => {
+    try {
+      console.log(`[PropertyPage] Obteniendo propiedades de MongoDB usando: ${API_URL}/api/properties`);
+      
+      const response = await axios.get(`${API_URL}/api/properties`, {
+        params: {
+          page: currentPage,
+          limit: ITEMS_PER_PAGE
+        },
+        timeout: 30000 // Aumentar el timeout a 30 segundos
+      });
+      
+      if (validateResponse(response.data)) {
+        const properties = response.data.properties || [];
+        // Añadir indicador de fuente
+        return properties.map(property => ({
+          ...property,
+          source: 'mongodb'
+        }));
+      }
+      return [];
+    } catch (error) {
+      console.error('[PropertyPage] Error al obtener propiedades de MongoDB:', error);
+      throw error; // Propagar el error para manejarlo en fetchAllProperties
+    }
+  };
+
+  const fetchWooCommerceProperties = async () => {
+    try {
+      console.log(`[PropertyPage] Obteniendo propiedades de WooCommerce`);
+      
+      // Intentar primero con el proxy interno
+      try {
+        const proxyResponse = await axios.get('/api/proxy', {
+          params: {
+            source: 'woocommerce',
+            path: '/products',
+            per_page: 100  // Solicitar hasta 100 productos para asegurar obtener todos
+          },
+          timeout: 20000
+        });
+        
+        if (validateResponse(proxyResponse.data) && Array.isArray(proxyResponse.data) && proxyResponse.data.length > 0) {
+          console.log(`[PropertyPage] Éxito obteniendo ${proxyResponse.data.length} propiedades de WooCommerce a través del proxy general`);
+          
+          // Añadir un indicador de fuente
+          const processedProperties = proxyResponse.data.map(property => ({
+            ...property,
+            source: 'woocommerce'
+          }));
+          
+          return processedProperties;
+        } else {
+          console.log('[PropertyPage] Respuesta vacía o inválida del proxy general de WooCommerce, intentando proxy específico');
+        }
+      } catch (proxyError) {
+        console.error('[PropertyPage] Error con el proxy general de WooCommerce:', proxyError.message);
+      }
+      
+      // Intentar con el proxy específico para WooCommerce
+      try {
+        const specificProxyResponse = await axios.get('/api/properties/sources/woocommerce', {
+          params: {
+            page: 1,
+            limit: 100  // Aumentar el límite para obtener todas las propiedades
+          },
+          timeout: 20000
+        });
+        
+        if (validateResponse(specificProxyResponse.data) && Array.isArray(specificProxyResponse.data) && specificProxyResponse.data.length > 0) {
+          console.log(`[PropertyPage] Éxito obteniendo ${specificProxyResponse.data.length} propiedades de WooCommerce a través del proxy específico`);
+          
+          // Asegurarse de que tengan indicador de fuente
+          const processedProperties = specificProxyResponse.data.map(property => ({
+            ...property,
+            source: 'woocommerce'
+          }));
+          
+          return processedProperties;
+        } else {
+          console.log('[PropertyPage] Respuesta vacía o inválida del proxy específico de WooCommerce, intentando conexión directa');
+        }
+      } catch (specificProxyError) {
+        console.error('[PropertyPage] Error con el proxy específico de WooCommerce:', specificProxyError.message);
+      }
+      
+      // Si ambos proxies fallan, intentar directamente con la API de WooCommerce
+      console.log('[PropertyPage] Intentando conexión directa a WooCommerce API');
+      try {
+        const directResponse = await axios.get(
+          '/api/proxy/woocommerce/products', {
+            params: {
+              per_page: 100 // Obtener más productos
+            },
+            timeout: 30000
+          }
+        );
+        
+        if (Array.isArray(directResponse.data) && directResponse.data.length > 0) {
+          console.log(`[PropertyPage] Éxito obteniendo ${directResponse.data.length} propiedades directamente de WooCommerce API`);
+          
+          // Añadir un indicador de fuente para facilitar la identificación
+          const processedProperties = directResponse.data.map(property => ({
+            ...property,
+            source: 'woocommerce'
+          }));
+          
+          return processedProperties;
+        } else {
+          console.log('[PropertyPage] Respuesta vacía o inválida de la API directa de WooCommerce');
+        }
+      } catch (directError) {
+        console.error('[PropertyPage] Error con la API directa de WooCommerce:', directError.message);
+      }
+      
+      // Último intento: conexión directa a la URL completa
+      try {
+        console.log('[PropertyPage] Intento final: conexión directa a la URL completa de la API de WooCommerce');
+        const finalResponse = await axios.get(
+          'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3/products?consumer_key=ck_d69e61427264a7beea70ca9ee543b45dd00cae85&consumer_secret=cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e', {
+            timeout: 30000
+          }
+        );
+        
+        if (Array.isArray(finalResponse.data) && finalResponse.data.length > 0) {
+          console.log(`[PropertyPage] Éxito en intento final: ${finalResponse.data.length} propiedades obtenidas`);
+          
+          const processedProperties = finalResponse.data.map(property => ({
+            ...property,
+            source: 'woocommerce'
+          }));
+          
+          return processedProperties;
+        }
+      } catch (finalError) {
+        console.error('[PropertyPage] Error en intento final de WooCommerce:', finalError.message);
+      }
+      
+      // Si todos los intentos fallan, devolver un array vacío
+      console.error('[PropertyPage] Todos los intentos de obtener propiedades de WooCommerce fallaron');
+      return [];
+    } catch (error) {
+      console.error('[PropertyPage] Error general al obtener propiedades de WooCommerce:', error);
+      throw error; // Propagar el error para manejarlo en fetchAllProperties
+    }
+  };
+
   useEffect(() => {
     if (!router.isReady || !configLoaded) {
       console.log('[PropertyPage] Esperando router y configuración...');
       return;
     }
 
-    let abortController = null;
-    let timeoutId = null;
-
-    const fetchProperties = async (retryCount = 0) => {
-      const maxRetries = 3;
+    const fetchAllProperties = async () => {
+      setLoading(true);
+      setError(null); // Resetear error al inicio
+      
+      let apiProperties = [];
+      let wooCommerceProperties = [];
+      let mongoDbError = null;
+      let wooCommerceError = null;
       
       try {
-        setLoading(true);
-        console.log(`[PropertyPage] Iniciando fetchProperties para página: ${currentPage} (intento ${retryCount + 1}/${maxRetries + 1})`);
+        console.log('[PropertyPage] Iniciando carga de propiedades de MongoDB...');
+        apiProperties = await fetchPropertiesFromAPI();
+        console.log(`[PropertyPage] Propiedades de MongoDB cargadas: ${apiProperties.length}`);
+      } catch (mongoError) {
+        console.error('[PropertyPage] Error al cargar propiedades de MongoDB:', mongoError);
+        mongoDbError = mongoError.message || 'Error al obtener propiedades de MongoDB';
+      }
+      
+      try {
+        console.log('[PropertyPage] Iniciando carga de propiedades de WooCommerce...');
+        wooCommerceProperties = await fetchWooCommerceProperties();
+        console.log(`[PropertyPage] Propiedades de WooCommerce cargadas: ${wooCommerceProperties.length}`);
+      } catch (wooError) {
+        console.error('[PropertyPage] Error al cargar propiedades de WooCommerce:', wooError);
+        wooCommerceError = wooError.message || 'Error al obtener propiedades de WooCommerce';
+      }
+      
+      // Combinar todas las propiedades disponibles
+      const allProperties = [...apiProperties, ...wooCommerceProperties];
+      
+      if (allProperties.length > 0) {
+        console.log(`[PropertyPage] Total de propiedades combinadas: ${allProperties.length}`);
+        setProperties(allProperties);
+        setTotalPages(Math.ceil(allProperties.length / ITEMS_PER_PAGE) || 1);
         
-        let mongoDbProperties = [];
-        let wooCommerceProperties = [];
-        let total = 0;
-        
-        // Paso 1: Obtener propiedades de MongoDB
-        try {
-          // Intentar primero con nuestro proxy
-          const mongoResponse = await axios.get('/api/proxy', {
-            params: {
-              source: 'mongodb',
-              path: '/properties',
-              page: currentPage,
-              limit: ITEMS_PER_PAGE
-            }
-          });
-          
-          if (validateResponse(mongoResponse.data)) {
-            if (mongoResponse.data && mongoResponse.data.properties) {
-              mongoDbProperties = mongoResponse.data.properties;
-              total += mongoResponse.data.total || mongoResponse.data.properties.length;
-              console.log('[PropertyPage] Propiedades MongoDB obtenidas:', mongoDbProperties.length);
-            } else if (Array.isArray(mongoResponse.data)) {
-              mongoDbProperties = mongoResponse.data;
-              total += mongoResponse.data.length;
-              console.log('[PropertyPage] Propiedades MongoDB obtenidas (array):', mongoDbProperties.length);
-            }
-          }
-        } catch (mongoError) {
-          console.log('[PropertyPage] Error al obtener propiedades de MongoDB:', mongoError.message);
-          // Intentar con API directa para MongoDB
-          try {
-            const mongoDirectResponse = await axiosInstance.get('/api/properties', {
-              params: {
-                source: 'mongodb',
-                page: currentPage,
-                limit: ITEMS_PER_PAGE
-              }
-            });
-            
-            if (validateResponse(mongoDirectResponse.data)) {
-              if (mongoDirectResponse.data && mongoDirectResponse.data.properties) {
-                mongoDbProperties = mongoDirectResponse.data.properties;
-                total += mongoDirectResponse.data.total || mongoDirectResponse.data.properties.length;
-                console.log('[PropertyPage] Propiedades MongoDB obtenidas desde API directa:', mongoDbProperties.length);
-              } else if (Array.isArray(mongoDirectResponse.data)) {
-                mongoDbProperties = mongoDirectResponse.data;
-                total += mongoDirectResponse.data.length;
-                console.log('[PropertyPage] Propiedades MongoDB obtenidas desde API directa (array):', mongoDbProperties.length);
-              }
-            }
-          } catch (mongoDirectError) {
-            console.log('[PropertyPage] Error al obtener propiedades de MongoDB directamente:', mongoDirectError.message);
-          }
-        }
-        
-        // Paso 2: Obtener propiedades de WooCommerce usando la función robusta
-        try {
-          console.log('[PropertyPage] Iniciando obtención de propiedades WooCommerce con método robusto');
-          wooCommerceProperties = await fetchWooCommerce();
-          
-          if (wooCommerceProperties && wooCommerceProperties.length > 0) {
-            total += wooCommerceProperties.length;
-            console.log('[PropertyPage] Propiedades WooCommerce obtenidas con método robusto:', wooCommerceProperties.length);
-          } else {
-            console.log('[PropertyPage] No se obtuvieron propiedades de WooCommerce después de múltiples intentos');
-          }
-        } catch (wooError) {
-          console.error('[PropertyPage] Error al obtener propiedades de WooCommerce:', wooError);
-        }
-        
-        // Si no tenemos propiedades después de intentar ambas fuentes, lanzar error
-        if (mongoDbProperties.length === 0 && wooCommerceProperties.length === 0) {
-          if (retryCount < maxRetries) {
-            console.log(`[PropertyPage] Reintentando (${retryCount + 1}/${maxRetries})...`);
-            return fetchProperties(retryCount + 1);
-          }
-          throw new Error('No se pudieron obtener propiedades de ninguna fuente');
-        }
-
-        // Combinar y procesar todas las propiedades
-        let processedProperties = [];
-
-        // Procesar propiedades de MongoDB
-        const processedMongoProperties = mongoDbProperties.map(property => ({
-          id: property._id,
-          source: 'mongodb',
-          title: property.title || 'Sin título',
-          description: property.description || '',
-          price: property.price || 0,
-          location: getCorrectLocation(property),
-          images: (property.images || []).map(img => ({
-            url: getProxiedImageUrl(img),
-            alt: property.title || 'Imagen de propiedad'
-          })),
-          features: {
-            bedrooms: property.bedrooms || 0,
-            bathrooms: property.bathrooms || 0,
-            area: property.area || 0,
-            floor: property.floor || null
-          },
-          metadata: property.metadata || {},
-          rawData: property
-        }));
-        
-        // Procesar propiedades de WooCommerce con manejo de errores
-        const processedWooProperties = [];
-        for (const property of wooCommerceProperties) {
-          try {
-            // Obtener metadatos de WooCommerce
-            let metadata = {};
-            if (property.meta_data && Array.isArray(property.meta_data)) {
-              property.meta_data.forEach(meta => {
-                // Eliminar los metadatos con prefijo "_"
-                if (!meta.key.startsWith('_')) {
-                  metadata[meta.key] = meta.value;
-                }
-              });
-            }
-            
-            // Procesar y validar las imágenes
-            let images = [];
-            if (property.images && Array.isArray(property.images) && property.images.length > 0) {
-              images = property.images.map(img => {
-                const imgSrc = img.src || img.source_url || (typeof img === 'string' ? img : null);
-                return {
-                  url: getProxiedImageUrl(imgSrc),
-                  alt: img.alt || property.name || 'Imagen de propiedad'
-                };
-              }).filter(img => img.url && img.url !== '/img/default-property-image.jpg');
-            }
-            
-            // Si no hay imágenes válidas, usar imagen por defecto
-            if (images.length === 0) {
-              images = [{
-                url: '/img/default-property-image.jpg',
-                alt: property.name || 'Imagen por defecto'
-              }];
-            }
-            
-            // Validar y procesar el precio
-            let price = property.price || metadata.price || 0;
-            if (typeof price === 'string') {
-              price = parseFloat(price.replace(/[^\d.-]/g, '')) || 0;
-            }
-            
-            // Obtener características principales
-            const propertyMetadata = property.metadata || {};
-            
-            // Extraer datos de características con manejo mejorado
-            // MEJORA: Recopilar datos tanto del objeto features como de metadata
-            
-            // Habitaciones (bedrooms)
-            let bedrooms = 0;
-            // Primero intentar con property.features
-            if (property.features && typeof property.features.bedrooms === 'number') {
-              bedrooms = property.features.bedrooms;
-            } 
-            // Luego con property directo
-            else if (typeof property.bedrooms === 'number') {
-              bedrooms = property.bedrooms;
-            }
-            // Finalmente buscar en metadata con múltiples claves posibles
-            else {
-              const bedroomKeys = ['bedrooms', 'habitaciones', 'dormitorios', 'rooms', 'dormitorio', 'bedroom'];
-              for (const key of bedroomKeys) {
-                if (propertyMetadata[key] !== undefined) {
-                  const val = parseInt(propertyMetadata[key]);
-                  if (!isNaN(val) && val >= 0) {
-                    bedrooms = val;
-                    break;
-                  }
-                }
-              }
-            }
-            
-            // Baños (bathrooms)
-            let bathrooms = 0;
-            // Primero intentar con property.features
-            if (property.features && typeof property.features.bathrooms === 'number') {
-              bathrooms = property.features.bathrooms;
-            } 
-            // Luego con property directo
-            else if (typeof property.bathrooms === 'number') {
-              bathrooms = property.bathrooms;
-            }
-            // Finalmente buscar en metadata con múltiples claves posibles
-            else {
-              const bathroomKeys = ['bathrooms', 'baños', 'banos', 'bath', 'bathroom', 'aseos', 'toilet'];
-              for (const key of bathroomKeys) {
-                if (propertyMetadata[key] !== undefined) {
-                  const val = parseInt(propertyMetadata[key]);
-                  if (!isNaN(val) && val >= 0) {
-                    bathrooms = val;
-                    break;
-                  }
-                }
-              }
-            }
-            
-            // Área (superficie en m²)
-            let area = 0;
-            // Primero intentar con property.features
-            if (property.features && typeof property.features.area === 'number') {
-              area = property.features.area;
-            } 
-            // Luego con property directo
-            else if (typeof property.area === 'number') {
-              area = property.area;
-            }
-            // Finalmente buscar en metadata con múltiples claves posibles
-            else {
-              const areaKeys = ['living_area', 'area', 'superficie', 'metros', 'm2', 'square_meters', 'metros_cuadrados'];
-              for (const key of areaKeys) {
-                if (propertyMetadata[key] !== undefined) {
-                  // Intentar extraer el valor numérico
-                  let val;
-                  if (typeof propertyMetadata[key] === 'string') {
-                    // Eliminar cualquier texto no numérico (como "m²" o "metros") y convertir a número
-                    val = parseInt(propertyMetadata[key].replace(/[^\d.-]/g, ''));
-                  } else {
-                    val = parseInt(propertyMetadata[key]);
-                  }
-                  if (!isNaN(val) && val > 0) {
-                    area = val;
-                    break;
-                  }
-                }
-              }
-            }
-            
-            // MEJORA: Si los datos siguen siendo 0, intentar buscar en la descripción
-            const description = property.description || property.short_description || '';
-            
-            if (bedrooms === 0) {
-              const bedroomRegex = /(\d+)\s*(?:habitaci[oó]n|habitaciones|dormitorio|dormitorios|hab|dorm)/i;
-              const match = description.match(bedroomRegex);
-              if (match && match[1]) {
-                bedrooms = parseInt(match[1]);
-              }
-            }
-            
-            if (bathrooms === 0) {
-              const bathroomRegex = /(\d+)\s*(?:baño|baños|aseo|aseos|ba[ñn]o)/i;
-              const match = description.match(bathroomRegex);
-              if (match && match[1]) {
-                bathrooms = parseInt(match[1]);
-              }
-            }
-            
-            if (area === 0) {
-              // Buscar también en la descripción con patrones más flexibles
-              // Incluir casos como "167m" (sin el ²) que aparecen en la API
-              const areaRegex = /(\d+)\s*(?:m²|metros cuadrados|m2|metros|m(?!\w))/i;
-              const match = description.match(areaRegex);
-              if (match && match[1]) {
-                area = parseInt(match[1]);
-              }
-              
-              // Buscar específicamente en elementos <li> de la descripción HTML
-              if (area === 0 && description.includes('<li>')) {
-                const liRegex = /<li[^>]*>([^<]*\d+\s*m[²2]?[^<]*)<\/li>/gi;
-                let liMatch;
-                while ((liMatch = liRegex.exec(description)) !== null) {
-                  const liContent = liMatch[1];
-                  const numberMatch = liContent.match(/(\d+)\s*m[²2]?/i);
-                  if (numberMatch && numberMatch[1]) {
-                    area = parseInt(numberMatch[1]);
-                    if (area > 0) break;
-                  }
-                }
-              }
-            }
-            
-            // Validar que los valores sean realistas
-            if (area < 10 || area > 5000) {
-              // Verificar si hay algún número que podría ser área en la descripción
-              // Los apartamentos en Madrid típicamente tienen al menos 25-30m²
-              // Si es menos de 10m² o más de 5000m², probablemente sea un error
-              
-              // Intentar extracción adicional en el título/nombre
-              if (property.name) {
-                const titleMatch = property.name.match(/(\d+)\s*(?:m²|m2|metros|m\b)/i);
-                if (titleMatch && titleMatch[1]) {
-                  const extractedArea = parseInt(titleMatch[1]);
-                  if (extractedArea >= 10 && extractedArea <= 5000) {
-                    area = extractedArea;
-                  }
-                }
-              }
-              
-              // Si aún no tenemos un valor realista, usar valores predeterminados
-              if (area < 10 || area > 5000) {
-                // Establecer un valor predeterminado según el número de habitaciones
-                if (bedrooms <= 1) {
-                  area = 50; // Estudio o 1 habitación
-                } else if (bedrooms === 2) {
-                  area = 70; // 2 habitaciones
-                } else if (bedrooms === 3) {
-                  area = 90; // 3 habitaciones
-                } else if (bedrooms >= 4) {
-                  area = 120; // 4+ habitaciones
-                } else {
-                  area = 80; // Valor promedio si no sabemos habitaciones
-                }
-              }
-            }
-            
-            // Validar habitaciones y baños para valores realistas
-            if (bedrooms < 0 || bedrooms > 20) {
-              bedrooms = 1; // Valor predeterminado más realista
-            }
-            
-            if (bathrooms < 0 || bathrooms > 15) {
-              bathrooms = 1; // Valor predeterminado más realista
-            }
-
-            processedWooProperties.push({
-              id: property.id,
-              source: 'woocommerce',
-              title: property.name || 'Sin título',
-              description: property.description || property.short_description || '',
-              price: price,
-              location: getCorrectLocation(property),
-              images: images,
-              features: {
-                bedrooms: bedrooms,
-                bathrooms: bathrooms,
-                area: area,
-                floor: propertyMetadata.Planta || propertyMetadata.planta || propertyMetadata.floor || null
-              },
-              metadata: metadata,
-              rawData: property
-            });
-          } catch (processingError) {
-            console.error(`[PropertyPage] Error procesando propiedad WooCommerce ID ${property.id}:`, processingError);
-            // Intentar añadir una versión simplificada de la propiedad
-            try {
-              processedWooProperties.push({
-                id: property.id,
-                source: 'woocommerce',
-                title: property.name || 'Propiedad',
-                description: property.description || property.short_description || '',
-                price: property.price || 0,
-                location: property.name || "Madrid",
-                images: [{
-                  url: '/img/default-property-image.jpg',
-                  alt: 'Imagen por defecto'
-                }],
-                features: {
-                  bedrooms: 0,
-                  bathrooms: 0,
-                  area: 0,
-                  floor: null
-                },
-                metadata: {},
-                rawData: { id: property.id, name: property.name }
-              });
-              console.log(`[PropertyPage] Propiedad WooCommerce ID ${property.id} añadida en formato simplificado`);
-            } catch (fallbackError) {
-              console.error(`[PropertyPage] No se pudo añadir versión simplificada:`, fallbackError);
-            }
-          }
-        }
-        
-        // Asegurar que las propiedades de WooCommerce se muestren primero
-        processedProperties = [...processedWooProperties, ...processedMongoProperties];
-        
-        console.log('[PropertyPage] Propiedades procesadas:', {
-          total: processedProperties.length,
-          woocommerce: processedWooProperties.length,
-          mongodb: processedMongoProperties.length
-        });
-
-        console.log('[PropertyPage] Desglose de propiedades procesadas:', 
-          processedProperties.reduce((acc, prop) => {
-            acc[prop.source] = (acc[prop.source] || 0) + 1;
-            return acc;
-          }, {})
-        );
-
-        // Log detallado de cada propiedad de WooCommerce
-        if (processedWooProperties.length > 0) {
-          console.log('[PropertyPage] Primera propiedad WooCommerce procesada:', 
-            JSON.stringify({
-              id: processedWooProperties[0].id,
-              title: processedWooProperties[0].title,
-              source: processedWooProperties[0].source,
-              images: processedWooProperties[0].images.length,
-              price: processedWooProperties[0].price
-            })
-          );
-        } else {
-          console.log('[PropertyPage] No se procesaron propiedades de WooCommerce');
-        }
-
-        // Asegurar que hay propiedades de WooCommerce
-        if (wooCommerceProperties.length > 0 && processedWooProperties.length === 0) {
-          console.error('[PropertyPage] ERROR: Se obtuvieron propiedades WooCommerce pero no se procesaron correctamente');
-        }
-
-        setProperties(processedProperties);
-        setTotalPages(Math.ceil(total / ITEMS_PER_PAGE) || 1);
+        // Si tenemos propiedades, no mostramos error aunque una de las fuentes haya fallado
         setError(null);
-
-      } catch (error) {
-        console.error('[PropertyPage] Error al obtener propiedades:', error);
+      } else {
+        // Si no hay propiedades de ninguna fuente, mostrar mensaje de error combinado
+        console.error('[PropertyPage] No se pudieron cargar propiedades de ninguna fuente');
+        const errorMessages = [];
+        if (mongoDbError) errorMessages.push(`MongoDB: ${mongoDbError}`);
+        if (wooCommerceError) errorMessages.push(`WooCommerce: ${wooCommerceError}`);
         
-        if (axios.isCancel(error)) {
-          console.log('[PropertyPage] La petición fue cancelada');
-        } else if (error.code === 'ECONNABORTED') {
-          console.log('[PropertyPage] Timeout de la petición');
-        } else if (error.response) {
-          console.log('[PropertyPage] Error de respuesta:', error.response.status);
-        } else if (error.request) {
-          console.log('[PropertyPage] Error de red');
-        }
-        
-        if (retryCount < maxRetries) {
-          console.log(`[PropertyPage] Reintentando (${retryCount + 1}/${maxRetries})...`);
-          await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
-          return fetchProperties(retryCount + 1);
-        }
-        
-        setError('Error al obtener propiedades. Por favor, intente más tarde.');
-      } finally {
-        if (timeoutId) {
-          clearTimeout(timeoutId);
-        }
-        setTimeout(() => setLoading(false), 100);
+        setError(errorMessages.length > 0 
+          ? `No se pudieron cargar propiedades. ${errorMessages.join('. ')}` 
+          : 'No se pudieron cargar propiedades de ninguna fuente.');
       }
+      
+      setLoading(false);
     };
 
-    fetchProperties();
-
-    return () => {
-      if (abortController) {
-        abortController.abort();
-      }
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
+    fetchAllProperties();
   }, [router.isReady, currentPage, configLoaded]);
 
   // Memoizar las propiedades filtradas
   const filteredProperties = useMemo(() => {
-    if (!searchTerm) return properties;
-
+    if (!properties || properties.length === 0) {
+      console.log('[PropertyPage] No hay propiedades para filtrar');
+      return [];
+    }
+    
+    console.log(`[PropertyPage] Filtrando ${properties.length} propiedades con término: "${searchTerm}", tipo: "${selectedType}", ubicación: "${selectedLocation}"`);
+    
     return properties.filter(property => {
-      const searchLower = searchTerm.toLowerCase();
-      const location = property.location || property.address || '';
-      const title = property.title || property.name || '';
+      // Filtrar por término de búsqueda
+      if (searchTerm) {
+        const searchLower = searchTerm.toLowerCase();
+        const location = (property.location || property.address || '').toLowerCase();
+        const title = (property.title || property.name || '').toLowerCase();
+        const description = (property.description || '').toLowerCase();
+        
+        if (!location.includes(searchLower) && 
+            !title.includes(searchLower) && 
+            !description.includes(searchLower)) {
+          return false;
+        }
+      }
       
-      return location.toLowerCase().includes(searchLower) ||
-             title.toLowerCase().includes(searchLower);
+      // Filtrar por tipo
+      if (selectedType && property.propertyType !== selectedType) {
+        return false;
+      }
+      
+      // Filtrar por ubicación
+      if (selectedLocation && 
+          (!property.location || !property.location.includes(selectedLocation))) {
+        return false;
+      }
+      
+      return true;
     });
-  }, [properties, searchTerm]);
+  }, [properties, searchTerm, selectedType, selectedLocation]);
 
   // Callback para cambio de página
   const handlePageChange = useCallback((page) => {
@@ -1175,7 +975,23 @@ export default function PropertyPage() {
   // Modificar la función handlePropertyClick para ser más robusta
   const handlePropertyClick = useCallback((property) => {
     try {
-      const navigationId = property._id || property.id;
+      if (!property) {
+        console.error('Propiedad inválida:', property);
+        return;
+      }
+
+      // Obtener el ID con verificación adicional
+      let navigationId = property._id || property.id;
+      
+      // Si no hay ID, intentar buscar en meta_data (para propiedades de WooCommerce)
+      if (!navigationId && property.meta_data) {
+        const idMeta = property.meta_data.find(meta => meta.key === 'property_id');
+        if (idMeta && idMeta.value) {
+          navigationId = idMeta.value;
+        }
+      }
+
+      // Verificación final del ID
       if (!navigationId) {
         console.error('ID de propiedad no válido:', property);
         return;
@@ -1183,15 +999,17 @@ export default function PropertyPage() {
 
       console.log('[NAVEGACIÓN] Navegando a propiedad:', {
         id: navigationId,
-        source: property.source
+        source: property.source || (property._id ? 'mongodb' : 'woocommerce')
       });
 
       // Usar window.location.href para asegurar navegación completa
       window.location.href = `/property/${navigationId}`;
     } catch (error) {
       console.error('[PropertyPage] Error al navegar:', error);
-      // Fallback de navegación
-      window.location.href = `/property/${property.id || property._id}`;
+      // Fallback de navegación solo si tenemos algún ID
+      if (property && (property.id || property._id)) {
+        window.location.href = `/property/${property.id || property._id}`;
+      }
     }
   }, []);
 
@@ -1344,210 +1162,92 @@ export default function PropertyPage() {
 
             {/* Grid de propiedades */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredProperties.map((property) => {
-                // Asegurarse de que tenemos una imagen válida
-                const mainImage = property.images && property.images.length > 0 
-                  ? property.images[0]?.url || '/img/default-property-image.jpg'
-                  : '/img/default-property-image.jpg';
-                const imageAlt = property.images && property.images.length > 0 
-                  ? property.images[0]?.alt || property.title
-                  : property.title;
+              {filteredProperties.map((property, index) => {
+                // Determinar si es una propiedad de MongoDB
+                const isMongoDBProperty = property.source === 'mongodb' || property._id || 
+                  (property.id && typeof property.id === 'string' && property.id.length > 20);
                 
-                // Formatear el precio
-                const formattedPrice = typeof property.price === 'number' 
-                  ? property.price.toLocaleString('es-ES')
-                  : property.price;
+                // Obtener ID según el tipo de propiedad
+                const propertyId = isMongoDBProperty ? property._id : property.id;
+                
+                // Extraer título
+                const title = isMongoDBProperty 
+                  ? (property.title || 'Propiedad sin título') 
+                  : (property.name || 'Propiedad sin título');
+                
+                // Obtener precio formateado
+                let formattedPrice = 'Consultar';
+                try {
+                  if (property.price) {
+                    // Convertir a número si es una cadena de texto
+                    let price = typeof property.price === 'string' 
+                      ? parseFloat(property.price.replace(/[^\d.-]/g, '')) 
+                      : property.price;
+                    
+                    // Verificar si el precio parece muy bajo (probablemente en miles)
+                    if (price < 10000 && price > 100) {
+                      price = price * 1000; // Convertir a euros reales
+                    }
+                    
+                    formattedPrice = new Intl.NumberFormat('es-ES', {
+                      style: 'currency',
+                      currency: 'EUR',
+                      maximumFractionDigits: 0
+                    }).format(price);
+                  }
+                } catch (e) {
+                  console.error('Error al formatear precio:', e);
+                }
+                
+                // Obtener imagen principal
+                let mainImage = '/img/default-property-image.jpg';
+                let imageAlt = title;
+                
+                if (property.images && Array.isArray(property.images) && property.images.length > 0) {
+                  const firstImage = property.images[0];
+                  console.log(`[DEBUG] Primera imagen para propiedad ${propertyId}:`, firstImage);
                   
-                // Obtener características principales
-                const propertyMetadata = property.metadata || {};
-                
-                // Extraer datos de características con manejo mejorado
-                // MEJORA: Recopilar datos tanto del objeto features como de metadata
-                
-                // Habitaciones (bedrooms)
-                let bedrooms = 0;
-                // Primero intentar con property.features
-                if (property.features && typeof property.features.bedrooms === 'number') {
-                  bedrooms = property.features.bedrooms;
-                } 
-                // Luego con property directo
-                else if (typeof property.bedrooms === 'number') {
-                  bedrooms = property.bedrooms;
-                }
-                // Finalmente buscar en metadata con múltiples claves posibles
-                else {
-                  const bedroomKeys = ['bedrooms', 'habitaciones', 'dormitorios', 'rooms', 'dormitorio', 'bedroom'];
-                  for (const key of bedroomKeys) {
-                    if (propertyMetadata[key] !== undefined) {
-                      const val = parseInt(propertyMetadata[key]);
-                      if (!isNaN(val) && val >= 0) {
-                        bedrooms = val;
-                        break;
-                      }
-                    }
-                  }
-                }
-                
-                // Baños (bathrooms)
-                let bathrooms = 0;
-                // Primero intentar con property.features
-                if (property.features && typeof property.features.bathrooms === 'number') {
-                  bathrooms = property.features.bathrooms;
-                } 
-                // Luego con property directo
-                else if (typeof property.bathrooms === 'number') {
-                  bathrooms = property.bathrooms;
-                }
-                // Finalmente buscar en metadata con múltiples claves posibles
-                else {
-                  const bathroomKeys = ['bathrooms', 'baños', 'banos', 'bath', 'bathroom', 'aseos', 'toilet'];
-                  for (const key of bathroomKeys) {
-                    if (propertyMetadata[key] !== undefined) {
-                      const val = parseInt(propertyMetadata[key]);
-                      if (!isNaN(val) && val >= 0) {
-                        bathrooms = val;
-                        break;
-                      }
-                    }
-                  }
-                }
-                
-                // Área (superficie en m²)
-                let area = 0;
-                // Primero intentar con property.features
-                if (property.features && typeof property.features.area === 'number') {
-                  area = property.features.area;
-                } 
-                // Luego con property directo
-                else if (typeof property.area === 'number') {
-                  area = property.area;
-                }
-                // Finalmente buscar en metadata con múltiples claves posibles
-                else {
-                  const areaKeys = ['living_area', 'area', 'superficie', 'metros', 'm2', 'square_meters', 'metros_cuadrados'];
-                  for (const key of areaKeys) {
-                    if (propertyMetadata[key] !== undefined) {
-                      // Intentar extraer el valor numérico
-                      let val;
-                      if (typeof propertyMetadata[key] === 'string') {
-                        // Eliminar cualquier texto no numérico (como "m²" o "metros") y convertir a número
-                        val = parseInt(propertyMetadata[key].replace(/[^\d.-]/g, ''));
-                      } else {
-                        val = parseInt(propertyMetadata[key]);
-                      }
-                      if (!isNaN(val) && val > 0) {
-                        area = val;
-                        break;
-                      }
-                    }
-                  }
-                }
-                
-                // MEJORA: Si los datos siguen siendo 0, intentar buscar en la descripción
-                const description = property.description || property.short_description || '';
-                
-                if (bedrooms === 0) {
-                  const bedroomRegex = /(\d+)\s*(?:habitaci[oó]n|habitaciones|dormitorio|dormitorios|hab|dorm)/i;
-                  const match = description.match(bedroomRegex);
-                  if (match && match[1]) {
-                    bedrooms = parseInt(match[1]);
-                  }
-                }
-                
-                if (bathrooms === 0) {
-                  const bathroomRegex = /(\d+)\s*(?:baño|baños|aseo|aseos|ba[ñn]o)/i;
-                  const match = description.match(bathroomRegex);
-                  if (match && match[1]) {
-                    bathrooms = parseInt(match[1]);
-                  }
-                }
-                
-                if (area === 0) {
-                  // Buscar también en la descripción con patrones más flexibles
-                  // Incluir casos como "167m" (sin el ²) que aparecen en la API
-                  const areaRegex = /(\d+)\s*(?:m²|metros cuadrados|m2|metros|m(?!\w))/i;
-                  const match = description.match(areaRegex);
-                  if (match && match[1]) {
-                    area = parseInt(match[1]);
+                  if (typeof firstImage === 'string') {
+                    mainImage = firstImage;
+                  } else if (typeof firstImage === 'object') {
+                    mainImage = firstImage.src || firstImage.url || firstImage.source_url || '/img/default-property-image.jpg';
+                    imageAlt = firstImage.alt || title;
                   }
                   
-                  // Buscar específicamente en elementos <li> de la descripción HTML
-                  if (area === 0 && description.includes('<li>')) {
-                    const liRegex = /<li[^>]*>([^<]*\d+\s*m[²2]?[^<]*)<\/li>/gi;
-                    let liMatch;
-                    while ((liMatch = liRegex.exec(description)) !== null) {
-                      const liContent = liMatch[1];
-                      const numberMatch = liContent.match(/(\d+)\s*m[²2]?/i);
-                      if (numberMatch && numberMatch[1]) {
-                        area = parseInt(numberMatch[1]);
-                        if (area > 0) break;
-                      }
-                    }
-                  }
+                  // Usar la función de proxy para asegurar que la imagen se cargue correctamente
+                  mainImage = getProxiedImageUrl(mainImage);
                 }
                 
-                // Validar que los valores sean realistas
-                if (area < 10 || area > 5000) {
-                  // Verificar si hay algún número que podría ser área en la descripción
-                  // Los apartamentos en Madrid típicamente tienen al menos 25-30m²
-                  // Si es menos de 10m² o más de 5000m², probablemente sea un error
-                  
-                  // Intentar extracción adicional en el título/nombre
-                  if (property.name) {
-                    const titleMatch = property.name.match(/(\d+)\s*(?:m²|m2|metros|m\b)/i);
-                    if (titleMatch && titleMatch[1]) {
-                      const extractedArea = parseInt(titleMatch[1]);
-                      if (extractedArea >= 10 && extractedArea <= 5000) {
-                        area = extractedArea;
-                      }
-                    }
-                  }
-                  
-                  // Si aún no tenemos un valor realista, usar valores predeterminados
-                  if (area < 10 || area > 5000) {
-                    // Establecer un valor predeterminado según el número de habitaciones
-                    if (bedrooms <= 1) {
-                      area = 50; // Estudio o 1 habitación
-                    } else if (bedrooms === 2) {
-                      area = 70; // 2 habitaciones
-                    } else if (bedrooms === 3) {
-                      area = 90; // 3 habitaciones
-                    } else if (bedrooms >= 4) {
-                      area = 120; // 4+ habitaciones
-                    } else {
-                      area = 80; // Valor promedio si no sabemos habitaciones
-                    }
-                  }
-                }
+                // Extraer características
+                const bedrooms = property.bedrooms || property.rooms || '1';
+                const bathrooms = property.bathrooms || property.wc || '1';
+                const area = property.area || property.m2 || '0';
                 
-                // Validar habitaciones y baños para valores realistas
-                if (bedrooms < 0 || bedrooms > 20) {
-                  bedrooms = 1; // Valor predeterminado más realista
-                }
+                // Extraer características adicionales
+                const floor = property.piso || property.floor || null;
+                const hasPool = property.pool || property.piscina || false;
+                const hasGarage = property.garage || property.garaje || false;
+                const hasTerrace = property.terrace || property.terraza || false;
+                const hasGarden = property.garden || property.jardin || false;
                 
-                if (bathrooms < 0 || bathrooms > 15) {
-                  bathrooms = 1; // Valor predeterminado más realista
-                }
+                // Estilo de sombra para legibilidad
+                const textShadowStyle = {
+                  textShadow: '1px 1px 3px rgba(0, 0, 0, 0.8)'
+                };
+                
+                // Generar delay para la animación escalonada
+                const delay = index * 0.1;
 
-                const floor = property.floor || property.features?.floor || null;
-                
-                // Obtener características adicionales (metadatos)
-                const hasPool = propertyMetadata.piscina || propertyMetadata.pool || false;
-                const hasGarage = propertyMetadata.garaje || propertyMetadata.garage || false;
-                const hasTerrace = propertyMetadata.terraza || propertyMetadata.terrace || false;
-                const hasGarden = propertyMetadata.jardin || propertyMetadata.garden || false;
-                
                 return (
                   <motion.div
-                    key={property.id}
+                    key={propertyId || index}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    className="group relative overflow-hidden rounded-xl transition-all duration-500"
-                    onClick={() => handlePropertyClick(property)}
-                    role="button"
-                    tabIndex={0}
-                    aria-label={`Ver detalles de ${property.title}`}
+                    transition={{ duration: 0.5, delay }}
+                    whileHover={{ y: -5 }}
+                    className="group cursor-pointer"
+                    onClick={() => router.push(`/property/${propertyId}`)}
+                    aria-label={`Ver detalles de ${title}`}
                   >
                     {/* Tarjeta principal con efecto de vidrio */}
                     <div className="bg-black/40 backdrop-blur-md rounded-xl overflow-hidden shadow-2xl hover:shadow-[0_20px_50px_rgba(255,215,0,0.2)] transition-all duration-500 hover:scale-[1.02] border border-white/10">

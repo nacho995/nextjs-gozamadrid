@@ -114,11 +114,11 @@ const storage = new CloudinaryStorage({
 const upload = multer({ storage: storage });
 
 // Rutas
+app.use('/api/properties', propertyRoutes);
 app.use('/api', notificationRouter);
 app.use("/prefix", prefixRouter);
 app.use("/api/blogs", blogRouter);
 app.use("/user", userRouter);
-app.use('/api/properties', propertyRoutes);
 
 // Rutas específicas para ofertas y visitas de propiedades
 app.use('/api/property-visit', propertyVisitRoutes);

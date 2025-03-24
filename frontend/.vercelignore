@@ -1,66 +1,10 @@
-# Dependencias
+.git
 node_modules
-
-# Archivos de desarrollo
-.DS_Store
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.env.local
-.env.development.local
-.env.test.local
-
-# Archivos temporales
-.vercel
-
-# Ignorar archivos de test
 __tests__
 test
 tests
 *.test.js
 *.spec.js
-
-# Ignorar directorios de compilación
-.next
-.turbo
-.swc
-
-# Logs y archivos temporales
-*.log
+.vscode
 .DS_Store
-
-# Directorios que no necesitamos en producción
-.git
-.github
-.next/cache
-tests
-test
-.vercel/output
-
-# Archivos de configuración de desarrollo
-.eslintrc.js
-.prettierrc
-.gitignore
-README.md
-CHANGELOG.md
-*.log
-*.md
-*.txt
-*.log.*
-.env.local
-.env.development.local
-.env.test.local
-.env.test
-.env.example
-.env.template
-*.temp
-.nvmrc
-
-# Archivos específicos no necesarios en producción
-package-lock.json
-yarn.lock
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log* 
+npm-debug.log

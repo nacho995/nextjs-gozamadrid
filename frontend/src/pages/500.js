@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 
-function Error({ statusCode, err }) {
+export default function Custom500() {
   const router = useRouter();
   const [timeLeft, setTimeLeft] = useState(5);
   
@@ -62,7 +62,7 @@ function Error({ statusCode, err }) {
       padding: '1rem'
     }}>
       <Head>
-        <title>Error {statusCode || 'Desconocido'} - Goza Madrid</title>
+        <title>Error del Servidor - Goza Madrid</title>
         <meta name="robots" content="noindex" />
       </Head>
       <div style={{
@@ -80,17 +80,13 @@ function Error({ statusCode, err }) {
           marginBottom: '1rem',
           color: '#C7A336'
         }}>
-          {statusCode === 404 
-            ? 'Página no encontrada' 
-            : `Error ${statusCode || 'Desconocido'}`}
+          Error del Servidor
         </h1>
         <p style={{
           fontSize: '1.125rem',
           marginBottom: '0.5rem'
         }}>
-          {statusCode === 404 
-            ? 'Lo sentimos, la página que estás buscando no existe o ha sido trasladada.' 
-            : 'Lo sentimos, ha ocurrido un error inesperado.'}
+          Lo sentimos, ha ocurrido un error en nuestro servidor.
         </p>
         <p style={{
           fontSize: '0.925rem',
@@ -98,7 +94,7 @@ function Error({ statusCode, err }) {
           marginBottom: '2rem'
         }}>
           {isPropertyPage 
-            ? 'No se ha podido cargar la información de esta propiedad. Puede deberse a un problema temporal o a que la propiedad ya no esté disponible.' 
+            ? 'No se ha podido cargar la información de esta propiedad. Estamos trabajando para solucionar este problema lo antes posible.' 
             : 'Estamos trabajando para solucionar este problema lo antes posible.'}
         </p>
         
@@ -174,12 +170,4 @@ function Error({ statusCode, err }) {
       </div>
     </div>
   );
-}
-
-// Obtener información inicial del servidor
-Error.getInitialProps = ({ res, err }) => {
-  const statusCode = res ? res.statusCode : err ? err.statusCode : 404;
-  return { statusCode, err };
-};
-
-export default Error; 
+} 

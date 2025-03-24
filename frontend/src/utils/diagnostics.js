@@ -28,9 +28,14 @@ const ENDPOINTS = {
     }
   },
   BACKEND: {
-    BASE: config.API_ROUTES.BEANSTALK,
-    HEALTH: `${config.API_ROUTES.BEANSTALK}/health`,
-    ROOT: config.API_ROUTES.BEANSTALK.replace('/api', ''),
+    BASE: config.API_ROUTES?.BEANSTALK || 'https://api.realestategozamadrid.com/api',
+    HEALTH: `${config.API_ROUTES?.BEANSTALK || 'https://api.realestategozamadrid.com/api'}/health`,
+    ROOT: (config.API_ROUTES?.BEANSTALK || 'https://api.realestategozamadrid.com/api').replace('/api', ''),
+    ALTERNATE: {
+      BASE: 'https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api',
+      HEALTH: 'https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api/health',
+      ROOT: 'https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com'
+    },
     CONFIG: {
       REGION: 'eu-west-3',
       ENVIRONMENT: 'prod',
@@ -66,16 +71,34 @@ async function testConnection(url, options = {}) {
   };
 
   try {
+    // Usamos un timeout más largo para entornos de producción
+    const timeout = options.timeout || (process.env.NODE_ENV === 'production' ? 30000 : 5000);
+    console.log(`Probando conexión a ${url} con timeout de ${timeout}ms`);
+    
+    // Crear un AbortController con timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+      console.log(`Conexión abortada por timeout después de ${timeout}ms: ${url}`);
+    }, timeout);
+    
     const start = performance.now();
     const response = await fetch(url, {
       ...options,
-      signal: AbortSignal.timeout(5000),
+      signal: controller.signal,
       headers: {
         'Accept': 'application/json',
+        'Cache-Control': 'no-cache, no-store',
+        'Pragma': 'no-cache',
         ...options.headers
       },
-      mode: 'cors'
+      mode: options.mode || 'cors',
+      keepalive: true
     });
+    
+    // Limpiar el timeout ya que la petición completó a tiempo
+    clearTimeout(timeoutId);
+    
     const end = performance.now();
     
     result.latency = Math.round(end - start);
@@ -153,6 +176,31 @@ async function testConnection(url, options = {}) {
     if (error.name === 'AbortError') {
       result.details.connection.description = 'Tiempo de espera agotado';
       result.details.connection.causes = ['La solicitud tardó demasiado en completarse'];
+      
+      // Si hay una URL alternativa, intentamos con ella
+      if (options.fallbackUrl) {
+        console.log(`Intentando URL alternativa después de timeout: ${options.fallbackUrl}`);
+        try {
+          const fallbackResult = await testConnection(options.fallbackUrl, {
+            ...options,
+            fallbackUrl: null // Evitar bucles infinitos
+          });
+          
+          if (fallbackResult.success) {
+            console.log(`Conexión exitosa a URL alternativa: ${options.fallbackUrl}`);
+            return {
+              ...fallbackResult,
+              details: {
+                ...fallbackResult.details,
+                originalUrl: url,
+                fallback: true
+              }
+            };
+          }
+        } catch (fallbackError) {
+          console.error(`Error al intentar URL alternativa:`, fallbackError);
+        }
+      }
     } else if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
       result.details.connection.description = 'No se pudo establecer la conexión';
       result.details.connection.causes = ['El servidor no está accesible o no responde'];
@@ -205,18 +253,55 @@ async function testEndpointGroup(name, endpoints, options = {}) {
   if (name === 'Backend') {
     for (const [key, url] of Object.entries(endpoints)) {
       if (typeof url === 'string' && key !== 'CONFIG') {
+        // Obtener URL alternativa si existe
+        let fallbackUrl = null;
+        if (endpoints.ALTERNATE && endpoints.ALTERNATE[key]) {
+          fallbackUrl = endpoints.ALTERNATE[key];
+        }
+        
+        // Intentar con primera URL
         results.direct[key] = await testConnection(url, {
           ...options,
           mode: 'cors',
-          credentials: 'omit'
+          credentials: 'omit',
+          fallbackUrl,  // Pasar URL alternativa
+          timeout: 30000 // Aumentar timeout para el backend
         });
+        
         results.summary.total++;
         
         if (results.direct[key].success) {
           results.summary.success++;
           results.summary.avgLatency += results.direct[key].latency;
         } else {
-          results.summary.failed++;
+          // Si falló y tenemos URL alternativa pero no se intentó, intentar manualmente
+          if (fallbackUrl && !results.direct[key].details.fallback) {
+            console.log(`Conexión a ${url} falló, intentando manualmente con alternativa: ${fallbackUrl}`);
+            
+            const fallbackResult = await testConnection(fallbackUrl, {
+              ...options,
+              mode: 'cors',
+              credentials: 'omit',
+              timeout: 30000
+            });
+            
+            if (fallbackResult.success) {
+              // Registrar éxito con URL alternativa
+              results.direct[key] = {
+                ...fallbackResult,
+                originalUrl: url,
+                fallbackUrl: fallbackUrl,
+                usedFallback: true
+              };
+              results.summary.success++;
+              results.summary.failed--; // Restar el fallo previo
+              results.summary.avgLatency += fallbackResult.latency;
+            } else {
+              results.summary.failed++;
+            }
+          } else {
+            results.summary.failed++;
+          }
         }
       }
     }

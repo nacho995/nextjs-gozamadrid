@@ -1,17 +1,19 @@
 import config from '@/config/config';
+import wooConfig from '@/config/woocommerce';
 
 export default async function handler(req, res) {
-  // Configurar CORS
+  // Configurar CORS - Añadir todos los encabezados necesarios
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cache-Control, Accept, X-Requested-With, Origin, X-Api-Key');
+  res.setHeader('Access-Control-Max-Age', '86400'); // 24 horas, para reducir preflight
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
   const { slug = [] } = req.query;
-  const service = slug[0]; // wordpress o woocommerce
+  const service = slug[0]; // wordpress o woocommerce o woocommerce-product
   const endpoint = slug.slice(1).join('/') || '';
 
   if (!service) {
@@ -27,8 +29,9 @@ export default async function handler(req, res) {
     };
 
     // Obtener credenciales de WooCommerce
-    const WOO_COMMERCE_KEY = process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY || process.env.WOO_COMMERCE_KEY || config.WOO_COMMERCE_KEY;
-    const WOO_COMMERCE_SECRET = process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET || process.env.WOO_COMMERCE_SECRET || config.WOO_COMMERCE_SECRET;
+    const WOO_COMMERCE_KEY = wooConfig.WOO_COMMERCE_KEY;
+    const WOO_COMMERCE_SECRET = wooConfig.WOO_COMMERCE_SECRET;
+    const WC_API_URL = wooConfig.WC_API_URL;
 
     // Log de estado de credenciales
     console.log('[Proxy] Estado de credenciales:', {
@@ -37,20 +40,18 @@ export default async function handler(req, res) {
       hasWooCommerceSecret: !!WOO_COMMERCE_SECRET,
       keyLength: WOO_COMMERCE_KEY?.length,
       secretLength: WOO_COMMERCE_SECRET?.length,
-      fromEnv: !!(process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY || process.env.WOO_COMMERCE_KEY),
-      fromConfig: !!config.WOO_COMMERCE_KEY
+      wcApiUrl: WC_API_URL,
+      wpApiUrl: config.WP_API_URL
     });
 
     // Verificar credenciales si es necesario
-    if (service === 'woocommerce') {
-      if (!WOO_COMMERCE_KEY || !WOO_COMMERCE_SECRET) {
-        console.error('[Proxy] Error: Faltan credenciales de WooCommerce');
-        return res.status(500).json({ 
-          error: 'Error de configuración del servidor',
-          details: 'Faltan credenciales de WooCommerce',
-          service: 'woocommerce'
-        });
-      }
+    if ((service === 'woocommerce' || service === 'woocommerce-product') && !wooConfig.hasCredentials()) {
+      console.error('[Proxy] Error: Faltan credenciales de WooCommerce');
+      return res.status(500).json({ 
+        error: 'Error de configuración del servidor',
+        details: 'Faltan credenciales de WooCommerce',
+        service: 'woocommerce'
+      });
     }
 
     switch (service) {
@@ -59,11 +60,31 @@ export default async function handler(req, res) {
         break;
 
       case 'woocommerce':
-        targetUrl = `${config.WC_API_URL}${endpoint ? `/${endpoint}` : ''}`;
+        targetUrl = `${WC_API_URL}${endpoint ? `/${endpoint}` : ''}`;
         
         // Añadir credenciales de WooCommerce
         const separator = targetUrl.includes('?') ? '&' : '?';
         targetUrl += `${separator}consumer_key=${WOO_COMMERCE_KEY}&consumer_secret=${WOO_COMMERCE_SECRET}`;
+        break;
+        
+      case 'woocommerce-product':
+        // Manejar solicitud de producto específico
+        const productId = slug[1] || req.query.id;
+        if (!productId) {
+          return res.status(400).json({
+            error: 'Falta el ID del producto',
+            message: 'Se requiere el ID del producto en la URL o como parámetro id'
+          });
+        }
+        
+        console.log(`[Proxy] Solicitando producto WooCommerce con ID: ${productId}`);
+        
+        // Utilizar la función getProductUrl de la configuración
+        targetUrl = wooConfig.getProductUrl(productId);
+        
+        // Log adicional para depuración
+        console.log(`[Proxy] URL generada para producto: ${targetUrl.replace(/consumer_key=([^&]+)/, 'consumer_key=HIDDEN')
+                                 .replace(/consumer_secret=([^&]+)/, 'consumer_secret=HIDDEN')}`);
         break;
 
       case 'backend':
@@ -73,13 +94,39 @@ export default async function handler(req, res) {
       default:
         return res.status(400).json({ 
           error: 'Servicio no válido',
-          message: 'Los servicios válidos son: wordpress, woocommerce, backend'
+          message: 'Los servicios válidos son: wordpress, woocommerce, woocommerce-product, backend'
         });
     }
 
+    // Verificar si la URL de destino es válida
+    if (!targetUrl || !targetUrl.startsWith('http')) {
+      console.error('[Proxy] URL de destino inválida:', {
+        service,
+        endpoint,
+        targetUrl: targetUrl || 'undefined',
+        config: {
+          WP_API_URL: config.WP_API_URL || 'no definido',
+          WC_API_URL: config.WC_API_URL || 'no definido',
+          BACKEND_API_URL: config.BACKEND_API_URL || 'no definido'
+        }
+      });
+      
+      return res.status(500).json({
+        error: 'URL de destino inválida',
+        message: 'La configuración del servidor no tiene una URL válida para este servicio',
+        service
+      });
+    }
+
     // Agregar parámetros de consulta adicionales
-    const queryParams = new URLSearchParams(req.query);
-    queryParams.delete('slug'); // Eliminar el parámetro slug que usa Next.js
+    const queryParams = new URLSearchParams();
+    
+    // Copiar todos los parámetros excepto los que ya procesamos
+    Object.keys(req.query).forEach(key => {
+      if (key !== 'slug' && key !== 'id' && !(service === 'woocommerce-product' && key === 'id')) {
+        queryParams.append(key, req.query[key]);
+      }
+    });
 
     // Agregar los parámetros a la URL
     if (queryParams.toString()) {
@@ -94,9 +141,12 @@ export default async function handler(req, res) {
       endpoint,
       targetUrl: safeUrl,
       method: req.method,
-      headers: Object.keys(headers)
+      headers: Object.keys(headers),
+      query: req.query,
+      slug: slug
     });
 
+    // Realizar la petición al endpoint destino
     const response = await fetch(targetUrl, {
       method: req.method,
       headers,
@@ -111,6 +161,7 @@ export default async function handler(req, res) {
       url: safeUrl
     });
 
+    // Manejo especial para errores 404 en woocommerce-product
     if (!response.ok) {
       const errorText = await response.text();
       console.error('[Proxy] Error response:', {
@@ -118,13 +169,59 @@ export default async function handler(req, res) {
         statusText: response.statusText,
         service,
         endpoint,
-        body: errorText.substring(0, 200)
+        url: safeUrl,
+        body: errorText.substring(0, 500)
       });
+      
+      // Manejo específico para errores 404 en productos WooCommerce
+      if (service === 'woocommerce-product' && response.status === 404) {
+        console.log(`[Proxy] Error 404 para producto ID ${slug[1] || req.query.id} en WooCommerce`);
+        
+        // Intentar obtener una lista de productos disponibles para sugerir alternativas
+        try {
+          const productsUrl = `${WC_API_URL}/products?consumer_key=${WOO_COMMERCE_KEY}&consumer_secret=${WOO_COMMERCE_SECRET}&per_page=5`;
+          console.log('[Proxy] Obteniendo productos alternativos');
+          
+          const alternativesResponse = await fetch(productsUrl, {
+            headers,
+            method: 'GET'
+          });
+          
+          if (alternativesResponse.ok) {
+            const alternatives = await alternativesResponse.json();
+            console.log(`[Proxy] Se encontraron ${alternatives.length} productos alternativos`);
+            
+            return res.status(404).json({
+              error: 'Producto no encontrado',
+              message: `La propiedad con ID ${slug[1] || req.query.id} no existe o ya no está disponible.`,
+              suggestions: alternatives.slice(0, 5).map(p => ({
+                id: p.id,
+                name: p.name,
+                price: p.price,
+                images: p.images && p.images.length > 0 ? [p.images[0].src] : []
+              })),
+              source: 'woocommerce',
+              // Información detallada para depuración
+              debug: {
+                requestedId: slug[1] || req.query.id,
+                requestUrl: safeUrl.split('?')[0],
+                service,
+                status: response.status
+              }
+            });
+          }
+        } catch (altError) {
+          console.error('[Proxy] Error al obtener alternativas:', altError.message);
+        }
+      }
+      
       return res.status(response.status).json({ 
         error: 'Error en la respuesta del servidor',
         status: response.status,
         message: errorText,
-        service
+        service,
+        endpoint,
+        url: safeUrl.split('?')[0]  // URL sin parámetros para debugging
       });
     }
 
@@ -156,7 +253,13 @@ export default async function handler(req, res) {
     return res.status(500).json({ 
       error: 'Error interno del servidor',
       message: process.env.NODE_ENV === 'development' ? error.message : 'Error al procesar la solicitud',
-      service
+      service,
+      // Incluir detalles adicionales en desarrollo
+      debug: process.env.NODE_ENV === 'development' ? {
+        errorName: error.name,
+        stack: error.stack,
+        timestamp: new Date().toISOString()
+      } : undefined
     });
   }
 } 

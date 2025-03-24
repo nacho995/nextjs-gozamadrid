@@ -11,7 +11,7 @@
     {
       "pattern": "/api/*",
       "forward": {
-        "hostname": "realestatgozamadrid.com"
+        "hostname": "realestategozamadrid.com"
       }
     },
     {

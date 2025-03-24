@@ -27,5 +27,9 @@
     "react-loading-skeleton": "^3.3.1",
     "react-responsive-carousel": "^3.2.23",
     "sass": "^1.66.1"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.7",
+    "node-fetch": "^2.6.7"
   }
 }

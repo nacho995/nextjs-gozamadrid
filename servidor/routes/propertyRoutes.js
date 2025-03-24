@@ -9,6 +9,9 @@ const router = express.Router();
 router.get('/', propertyController.getAllProperties);
 router.get('/:id', propertyController.getPropertyById);
 
+// Ruta específica para MongoDB
+router.get('/sources/mongodb', propertyController.getAllProperties);
+
 // Rutas protegidas (requieren autenticación)
 router.post('/', verifyToken, isAdmin, upload.array('images', 10), propertyController.createProperty);
 router.put('/:id', verifyToken, isAdmin, upload.array('images', 10), propertyController.updateProperty);

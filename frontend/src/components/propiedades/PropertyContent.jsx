@@ -297,6 +297,13 @@ export default function DefaultPropertyContent({ property }) {
           return imageUrl;
         }
         
+        // Si es una URL de WooCommerce en Cloudways, usarla directamente
+        if (imageUrl.includes('wordpress-1430059-5339263.cloudwaysapps.com')) {
+          console.log("URL de WooCommerce detectada:", imageUrl);
+          // Usar el servicio de proxy para evitar problemas CORS pero manteniendo la URL original como respaldo
+          return `https://images.weserv.nl/?url=${encodeURIComponent(imageUrl)}&n=-1&errorredirect=${encodeURIComponent(imageUrl)}`;
+        }
+        
         // Si es una URL relativa, convertirla a absoluta
         if (!imageUrl.startsWith('http') && !imageUrl.startsWith('/') && !imageUrl.startsWith('data:')) {
           const baseUrl = window.location.origin;
@@ -308,7 +315,7 @@ export default function DefaultPropertyContent({ property }) {
         // Para URLs externas, usar un servicio de proxy para evitar errores CORS y QUIC_PROTOCOL_ERROR
         if (imageUrl.startsWith('http')) {
           // Configuración básica sin conversión de formato para evitar problemas
-          const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(imageUrl)}&n=-1&default=https://via.placeholder.com/800x600?text=Sin+Imagen`;
+          const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(imageUrl)}&n=-1&errorredirect=${encodeURIComponent(imageUrl)}`;
           console.log("URL convertida a proxy:", proxyUrl);
           return proxyUrl;
         }
@@ -323,15 +330,42 @@ export default function DefaultPropertyContent({ property }) {
         if (propertyState.images && Array.isArray(propertyState.images)) {
           // Convertir cada imagen a formato proxy
           images = propertyState.images.map(img => {
-            const imageUrl = img.src || (typeof img === 'string' ? img : '');
-            const processedUrl = processImageUrl(imageUrl);
+            // Determinar si la imagen es un objeto o una cadena de texto
+            if (typeof img === 'string') {
+              // Es solo la URL como cadena
+              const processedUrl = processImageUrl(img);
+              return {
+                src: processedUrl,
+                alt: `${propertyState.name || propertyState.title || 'Propiedad'} - Imagen`,
+                originalSrc: img
+              };
+            } else if (typeof img === 'object') {
+              // Es un objeto de imagen con propiedades
+              const imageUrl = img.src || img.url || img.source_url || '';
+              const processedUrl = processImageUrl(imageUrl);
+              
+              return {
+                src: processedUrl,
+                alt: img.alt || `${propertyState.name || propertyState.title || 'Propiedad'} - Imagen`,
+                name: img.name || '',
+                id: img.id || '',
+                originalSrc: imageUrl
+              };
+            }
             
+            // Si no es string ni objeto, intentar extraer algo
+            const fallbackUrl = img?.toString() || '';
+            const processedFallback = processImageUrl(fallbackUrl);
             return {
-              src: processedUrl,
-              alt: img.alt || `${propertyState.name || 'Propiedad'} - Imagen`,
-              originalSrc: imageUrl
+              src: processedFallback,
+              alt: 'Imagen de propiedad',
+              originalSrc: fallbackUrl
             };
           }).filter(img => img.src); // Filtrar imágenes sin src
+          
+          // Log detallado para depuración
+          console.log(`Procesadas ${images.length} imágenes. Primera imagen:`, 
+            images.length > 0 ? images[0] : 'No hay imágenes');
         }
       } 
       // Procesar imágenes de MongoDB
@@ -442,18 +476,34 @@ export default function DefaultPropertyContent({ property }) {
     
     // Intentar usar el proxy de imágenes si la URL original falló
     if (e.target.src && !e.target.src.includes('images.weserv.nl') && e.target.src.startsWith('http')) {
-      const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(e.target.src)}&n=-1&default=/img/default-property-image.jpg`;
+      // Usar un mejor servicio de proxy para las imágenes de WooCommerce
+      const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(e.target.src)}&n=-1`;
       console.log("Reintentando con proxy:", proxyUrl);
       e.target.src = proxyUrl;
     } else if (e.target.src && e.target.src.includes('images.weserv.nl')) {
-      // Si ya estamos usando el proxy y sigue fallando, usar la imagen por defecto
-      console.log("El proxy también falló, usando imagen por defecto");
-      e.target.src = '/img/default-property-image.jpg';
-      e.target.alt = 'Imagen por defecto (error al cargar)';
+      // Si ya estamos usando el proxy y sigue fallando, buscar imagen original en WooCommerce
+      console.log("El proxy también falló, buscando imagen original");
+      
+      // Buscar la imagen original en el arreglo de imágenes
+      const originalImage = propertyImages && propertyImages.find(img => img.src === e.target.src)?.originalSrc;
+      
+      if (originalImage && originalImage.startsWith('http')) {
+        // Intentar con la URL original directamente
+        console.log("Intentando con la URL original:", originalImage);
+        e.target.src = originalImage;
+      } else {
+        // Si no hay URL original, verificar en la propiedad
+        const wooCommerceDirectImage = propertyState.images?.[0]?.src || 
+                                       propertyState.featuredImage || 
+                                       'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-content/uploads/2023/05/placeholder-image.jpg';
+        
+        console.log("Usando imagen de WooCommerce:", wooCommerceDirectImage);
+        e.target.src = wooCommerceDirectImage;
+      }
     } else {
-      // Si es una URL local o no HTTP, usar la imagen por defecto
-      console.log("URL no es HTTP o es local, usando imagen por defecto");
-      e.target.src = '/img/default-property-image.jpg';
+      // Si es una URL local o no HTTP, usar la URL de Cloudways
+      console.log("URL no es HTTP o es local, usando URL de Cloudways");
+      e.target.src = 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-content/uploads/2023/05/placeholder-image.jpg';
       e.target.alt = 'Imagen por defecto (error al cargar)';
     }
     

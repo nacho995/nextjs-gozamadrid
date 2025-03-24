@@ -22,18 +22,30 @@ const transformProperty = (wcProperty) => {
     if (typeof price === 'string') {
       price = parseFloat(price.replace(/[^\d.-]/g, ''));
     }
-
+    
+    // Verificar imágenes
+    let images = [];
+    if (wcProperty.images && Array.isArray(wcProperty.images) && wcProperty.images.length > 0) {
+      console.log(`[WooCommerce Transform] Propiedad ${wcProperty.id} tiene ${wcProperty.images.length} imágenes`);
+      console.log(`[WooCommerce Transform] Primera imagen:`, wcProperty.images[0]);
+      
+      images = wcProperty.images.map(img => ({
+        id: img.id,
+        src: img.src,
+        alt: img.alt || wcProperty.name,
+        name: img.name
+      }));
+    } else {
+      console.log(`[WooCommerce Transform] Propiedad ${wcProperty.id} no tiene imágenes`);
+    }
+    
     const transformed = {
       _id: wcProperty.id.toString(),
       id: wcProperty.id.toString(),
       title: wcProperty.name,
       description: wcProperty.description || wcProperty.short_description || '',
       price: price || 0,
-      images: wcProperty.images?.map(img => ({
-        src: img.src,
-        alt: img.alt || wcProperty.name,
-        _id: img.id?.toString()
-      })) || [],
+      images: images,
       bedrooms: getMeta('bedrooms') || getMeta('habitaciones') || '0',
       bathrooms: getMeta('baños') || getMeta('bathrooms') || getMeta('banos') || '0',
       area: getMeta('living_area') || getMeta('area') || getMeta('m2') || '0',
@@ -50,8 +62,8 @@ const transformProperty = (wcProperty) => {
     console.log('[WooCommerce Transform] Propiedad transformada:', transformed._id);
     return transformed;
   } catch (error) {
-    console.error('[WooCommerce Transform] Error transformando propiedad:', error);
-    return null;
+    console.error('[WooCommerce Transform] Error transformando propiedad:', error.message);
+    return wcProperty; // Devolver la propiedad original en caso de error
   }
 };
 

@@ -1,28 +1,11 @@
-# Ignorar todo por defecto
-*
-
-# No ignorar archivos y carpetas necesarios del frontend
-!src/
-!public/
-!package.json
-!next.config.js
-!next.config.mjs
-!tailwind.config.js
-!postcss.config.js
-!jsconfig.json
-!.env.production
-!.npmrc
-!.nvmrc
-!styles/
-!vercel.json
-
-# Ignorar archivos innecesarios dentro de las carpetas permitidas
-**/.DS_Store
-**/node_modules
-**/.next
-**/out
-**/.vercel
-**/*.log
-**/.env.local
-**/.env.development.local
-**/.env.test.local 
+# Ignorar archivos y carpetas no necesarios para el despliegue
+servidor/
+worker-api/
+scripts/
+node_modules/
+.git/
+.github/
+.vscode/
+.next/
+.DS_Store
+npm-debug.log 
