@@ -130,31 +130,14 @@ export const sendPropertyEmail = async (data) => {
   try {
     console.log(`Intentando enviar datos de contacto a través de la API del backend...`);
     
-    // 1. Primero intentar enviar a través de la API del backend
+    // 1. Intentar enviar a través del proxy API local para evitar problemas de mixed content
     try {
-      // URL del backend
-      const backendUrl = 'https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com';
-      
-      // Verificar primero si el backend está disponible
-      console.log('Verificando disponibilidad del backend...');
-      try {
-        const checkResponse = await fetch(`${backendUrl}/api/health`, { 
-          method: 'HEAD',
-          cache: 'no-store',
-          timeout: 3000 
-        });
-        console.log('Backend parece estar disponible:', checkResponse.status);
-      } catch (checkError) {
-        console.warn('Backend podría no estar disponible:', checkError);
-        // Continuar de todos modos, por si acaso
-      }
-      
       // Determinar el endpoint según el tipo de solicitud
-      let targetUrl;
+      let targetPath;
       let formattedData = { ...data };
       
       if (data.type === 'visit') {
-        targetUrl = `${backendUrl}/api/property-visit/create`;
+        targetPath = 'api/property-visit/create';
         
         // Adaptar el formato a lo que espera la API del backend
         formattedData = {
@@ -165,10 +148,11 @@ export const sendPropertyEmail = async (data) => {
           name: data.name || '',
           email: data.email || '',
           phone: data.phone || '',
-          message: data.message || ''
+          message: data.message || '',
+          ccEmail: 'ignaciodalesio1995@gmail.com,marta@gozamadrid.com' // Asegurar copia a ambos emails
         };
       } else if (data.type === 'offer') {
-        targetUrl = `${backendUrl}/api/property-offer/create`;
+        targetPath = 'api/property-offer/create';
         
         // Adaptar el formato para ofertas
         formattedData = {
@@ -179,77 +163,149 @@ export const sendPropertyEmail = async (data) => {
           name: data.name || '',
           email: data.email || '',
           phone: data.phone || '',
-          message: data.message || ''
+          message: data.message || '',
+          ccEmail: 'ignaciodalesio1995@gmail.com,marta@gozamadrid.com' // Asegurar copia a ambos emails
         };
+      } else if (data.type === 'contact') {
+        // Formulario de contacto explícito
+        targetPath = 'api/contact';
+        
+        // Adaptar el formato para el formulario de contacto explícitamente
+        // Asegurarnos de enviar EXACTAMENTE lo que espera el backend según el modelo
+        formattedData = {
+          nombre: data.name || '',
+          email: data.email || '',
+          telefono: data.phone || '',
+          prefix: data.prefix || '+34',
+          mensaje: data.message || '',
+          asunto: data.asunto || 'Formulario de contacto web',
+          ccEmail: 'ignaciodalesio1995@gmail.com,marta@gozamadrid.com' // Asegurar copia a ambos emails
+        };
+        
+        console.log('Enviando datos de formulario de contacto:', formattedData);
       } else {
-        targetUrl = `${backendUrl}/api/contact`;
+        // Formulario de contacto general
+        targetPath = 'api/contact';
+        
+        // Adaptar el formato para el formulario de contacto
+        formattedData = {
+          nombre: data.nombre || data.name || '',
+          email: data.email || '',
+          telefono: data.telefono || data.phone || '',
+          prefix: data.prefix || '+34',
+          mensaje: data.mensaje || data.message || '',
+          asunto: data.asunto || 'Contacto desde la web',
+          ccEmail: 'ignaciodalesio1995@gmail.com,marta@gozamadrid.com' // Asegurar copia a ambos emails
+        };
       }
       
-      console.log(`Enviando a API backend: ${targetUrl}`, formattedData);
+      // Usar el proxy local para evitar problemas de mixed content
+      console.log(`Enviando a través del proxy local: /api/api-proxy?path=${targetPath}`);
+      
+      // Endpoint directo para producción
+      const endpoint = `/api/api-proxy?path=${targetPath}`;
       
       // Timeout para no bloquear la interfaz - aumentar a 15 segundos
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 segundos
       
-      const response = await fetch(targetUrl, {
+      // Incluir todas las opciones necesarias en la petición
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
         },
         body: JSON.stringify(formattedData),
-        signal: controller.signal
+        signal: controller.signal,
+        credentials: 'same-origin'
       });
       
       clearTimeout(timeoutId);
       
       if (response.ok) {
         const responseData = await response.json();
-        console.log('Solicitud procesada exitosamente por el backend:', responseData);
+        console.log('Solicitud procesada exitosamente por el proxy:', responseData);
         return {
           success: true,
           message: 'Solicitud enviada correctamente'
         };
       } else {
-        console.error(`Error del backend (${response.status})`);
+        console.error(`Error del proxy (${response.status})`);
         const errorText = await response.text();
         console.error('Respuesta de error:', errorText);
         // Continuar con los métodos alternativos
       }
-    } catch (backendError) {
-      console.error('Error con API backend:', backendError);
+    } catch (proxyError) {
+      console.error('Error con API proxy:', proxyError);
       // Continuar con los métodos alternativos
     }
     
-    // 2. Si el backend falla, intentar con FormSubmit.co
+    // 2. Si el proxy falla, intentar con FormSubmit.co
     try {
       console.log('API backend falló, enviando a FormSubmit.co...');
-      const formSubmitResponse = await fetch('https://formsubmit.co/ajax/marta@gozamadrid.com', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          name: data.name || 'Cliente',
-          email: data.email,
-          _subject: `${data.type === 'visit' ? 'Visita' : data.type === 'offer' ? 'Oferta' : 'Contacto'}: ${data.propertyTitle || 'Propiedad'}`,
-          message: formatEmailContent(data),
-          _template: 'box'
-        })
-      });
       
-      if (formSubmitResponse.ok) {
-        console.log('Solicitud a FormSubmit completada con éxito');
+      // Preparar un mensaje con formato HTML atractivo
+      const htmlMessage = formatEmailContent(data);
+      
+      // Usar el código de activación proporcionado por FormSubmit
+      const formSubmitCode = '655e72bc841f663154fb80111510aa54';
+      
+      // Enviar a ambos emails
+      const formSubmitPromises = [
+        // Enviar a marta@gozamadrid.com (usando el código de activación)
+        fetch(`https://formsubmit.co/ajax/${formSubmitCode}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            name: data.name || data.nombre || 'Cliente',
+            email: data.email || 'contacto@gozamadrid.com',
+            _subject: `Nuevo mensaje de contacto de ${data.name || data.nombre || 'Cliente'}`,
+            _template: 'box',
+            message: htmlMessage,
+            _captcha: 'false'
+          })
+        }),
+        
+        // Enviar a ignaciodalesio1995@gmail.com
+        fetch('https://formsubmit.co/ajax/ignaciodalesio1995@gmail.com', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            name: data.name || data.nombre || 'Cliente',
+            email: data.email || 'contacto@gozamadrid.com',
+            _subject: `Nuevo mensaje de contacto de ${data.name || data.nombre || 'Cliente'}`,
+            _template: 'box',
+            message: htmlMessage,
+            _captcha: 'false'
+          })
+        })
+      ];
+      
+      // Esperar a que se completen las solicitudes
+      const formSubmitResults = await Promise.allSettled(formSubmitPromises);
+      const successfulSends = formSubmitResults.filter(r => r.status === 'fulfilled' && r.value.ok).length;
+      
+      if (successfulSends > 0) {
+        console.log(`Solicitud a FormSubmit completada con éxito: ${successfulSends} de ${formSubmitPromises.length} emails enviados`);
         return {
           success: true,
           message: 'Solicitud enviada correctamente'
         };
       } else {
-        console.error('Error con FormSubmit:', await formSubmitResponse.text());
+        console.error('Error con FormSubmit: no se enviaron emails');
+        // Continuar con el siguiente método
       }
     } catch (formSubmitError) {
       console.error('Error con FormSubmit:', formSubmitError);
+      // Continuar con el siguiente método
     }
     
     // 3. Como tercera opción, usar nuestro endpoint simplificado
@@ -303,42 +359,70 @@ export const sendPropertyEmail = async (data) => {
 
 // Función auxiliar para formatear contenido del email
 function formatEmailContent(data) {
+  // Crear un estilo base común para todos los tipos de mensajes
+  const baseStyle = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+      <div style="background-color: #000; padding: 15px; text-align: center; border-radius: 5px 5px 0 0;">
+        <h1 style="color: #D4AF37; margin: 0; font-size: 24px;">
+  `;
+  
+  const footerStyle = `
+      </div>
+      <div style="background-color: #000; color: #fff; text-align: center; padding: 10px; border-radius: 0 0 5px 5px;">
+        <p style="margin: 0; font-size: 14px;">Goza Madrid - Mensaje desde la Web</p>
+      </div>
+    </div>
+  `;
+  
   if (data.type === 'visit') {
-    return `
-Solicitud de visita a propiedad
-
-Propiedad: ${data.propertyTitle || 'No especificada'}
-Ref. Propiedad: ${data.propertyId || 'No especificada'}
-Fecha: ${data.visitDate || 'No especificada'}
-Hora: ${data.visitTime || 'No especificada'}
-
-Cliente: ${data.name || 'No especificado'}
-Email: ${data.email}
-Teléfono: ${data.phone || 'No especificado'}
-Mensaje: ${data.message || 'No hay mensaje'}
-    `;
+    return `${baseStyle}Solicitud de Visita a Propiedad</h1></div>
+      <div style="padding: 20px; background-color: #f9f9f9;">
+        <p style="margin-bottom: 15px; font-size: 16px;"><strong>Propiedad:</strong> ${data.propertyTitle || 'No especificada'}</p>
+        <p style="margin-bottom: 15px; font-size: 16px;"><strong>Ref. Propiedad:</strong> ${data.propertyId || 'No especificada'}</p>
+        <p style="margin-bottom: 15px; font-size: 16px;"><strong>Fecha:</strong> ${data.visitDate || 'No especificada'}</p>
+        <p style="margin-bottom: 15px; font-size: 16px;"><strong>Hora:</strong> ${data.visitTime || 'No especificada'}</p>
+        
+        <div style="margin: 25px 0; border-top: 1px solid #e0e0e0;"></div>
+        
+        <p style="margin-bottom: 15px; font-size: 16px;"><strong>Cliente:</strong> ${data.name || 'No especificado'}</p>
+        <p style="margin-bottom: 15px; font-size: 16px;"><strong>Email:</strong> ${data.email || 'No especificado'}</p>
+        <p style="margin-bottom: 15px; font-size: 16px;"><strong>Teléfono:</strong> ${data.phone || 'No especificado'}</p>
+        
+        <div style="background-color: #fff; padding: 15px; border-left: 4px solid #D4AF37; margin-top: 20px;">
+          <p style="margin: 0; font-size: 16px;"><strong>Mensaje:</strong></p>
+          <p style="margin: 10px 0 0; font-size: 16px;">${data.message || 'No hay mensaje'}</p>
+        </div>
+      ${footerStyle}`;
   } else if (data.type === 'offer') {
-    return `
-Oferta para propiedad
-
-Propiedad: ${data.propertyTitle || 'No especificada'}
-Ref. Propiedad: ${data.propertyId || 'No especificada'}
-Oferta: ${data.offerAmount || 'No especificada'} ${data.offerLabel || ''}
-
-Cliente: ${data.name || 'No especificado'}
-Email: ${data.email}
-Teléfono: ${data.phone || 'No especificado'}
-Mensaje: ${data.message || 'No hay mensaje'}
-    `;
+    return `${baseStyle}Oferta para Propiedad</h1></div>
+      <div style="padding: 20px; background-color: #f9f9f9;">
+        <p style="margin-bottom: 15px; font-size: 16px;"><strong>Propiedad:</strong> ${data.propertyTitle || 'No especificada'}</p>
+        <p style="margin-bottom: 15px; font-size: 16px;"><strong>Ref. Propiedad:</strong> ${data.propertyId || 'No especificada'}</p>
+        <p style="margin-bottom: 15px; font-size: 16px; color: #D4AF37; font-weight: bold;"><strong>Oferta:</strong> ${data.offerAmount || 'No especificada'} ${data.offerLabel || ''}</p>
+        
+        <div style="margin: 25px 0; border-top: 1px solid #e0e0e0;"></div>
+        
+        <p style="margin-bottom: 15px; font-size: 16px;"><strong>Cliente:</strong> ${data.name || 'No especificado'}</p>
+        <p style="margin-bottom: 15px; font-size: 16px;"><strong>Email:</strong> ${data.email || 'No especificado'}</p>
+        <p style="margin-bottom: 15px; font-size: 16px;"><strong>Teléfono:</strong> ${data.phone || 'No especificado'}</p>
+        
+        <div style="background-color: #fff; padding: 15px; border-left: 4px solid #D4AF37; margin-top: 20px;">
+          <p style="margin: 0; font-size: 16px;"><strong>Mensaje:</strong></p>
+          <p style="margin: 10px 0 0; font-size: 16px;">${data.message || 'No hay mensaje'}</p>
+        </div>
+      ${footerStyle}`;
   } else {
-    return `
-Mensaje de contacto
-
-Nombre: ${data.name || 'No especificado'}
-Email: ${data.email}
-Teléfono: ${data.phone || 'No especificado'}
-Mensaje: ${data.message || 'No hay mensaje'}
-    `;
+    return `${baseStyle}Mensaje de Contacto</h1></div>
+      <div style="padding: 20px; background-color: #f9f9f9;">
+        <p style="margin-bottom: 15px; font-size: 16px;"><strong>Nombre:</strong> ${data.name || 'No especificado'}</p>
+        <p style="margin-bottom: 15px; font-size: 16px;"><strong>Email:</strong> ${data.email || 'No especificado'}</p>
+        <p style="margin-bottom: 15px; font-size: 16px;"><strong>Teléfono:</strong> ${data.phone || 'No especificado'}</p>
+        
+        <div style="background-color: #fff; padding: 15px; border-left: 4px solid #D4AF37; margin-top: 20px;">
+          <p style="margin: 0; font-size: 16px;"><strong>Mensaje:</strong></p>
+          <p style="margin: 10px 0 0; font-size: 16px;">${data.message || 'No hay mensaje'}</p>
+        </div>
+      ${footerStyle}`;
   }
 }
 

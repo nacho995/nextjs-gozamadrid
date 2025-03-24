@@ -29,7 +29,7 @@ import userRouter from "./routes/userContentRouter.js";
 import propertyRoutes from './routes/propertyRoutes.js';
 import propertyOfferRoutes from './routes/propertyOfferRoutes.js';
 import healthRoutes from './routes/healthRoutes.js';
-import { sendContactEmail } from './controller/contactController.js';
+import { sendContactEmail, testEmail } from './controller/contactController.js';
 
 const app = express();
 const PORT = process.env.PORT || 8081;
@@ -136,6 +136,9 @@ app.use('/api/health', healthRoutes);
 app.post('/api/contact', sendContactEmail);
 // Añadir la misma ruta con barra final para manejar ambos casos
 app.post('/api/contact/', sendContactEmail);
+
+// Ruta de prueba para el envío de correos
+app.post('/api/test-email', testEmail);
 
 // Middleware para manejar rutas con barra final o sin ella
 app.use((req, res, next) => {

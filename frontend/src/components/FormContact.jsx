@@ -6,6 +6,7 @@ import { toast } from 'react-hot-toast';
 import Head from 'next/head';
 import CountryPrefix from "./CountryPrefix";
 import AnimatedOnScroll from "./AnimatedScroll";
+import { sendPropertyEmail } from '../services/api';
 
 const FormContact = () => {
   // Referencias para los inputs
@@ -42,41 +43,55 @@ const FormContact = () => {
     const loadingToast = toast.loading('Enviando mensaje...');
 
     try {
-      // Crear el objeto de datos con el formato correcto
-      const contactData = {
-        nombre: name,
-        email: email,
-        telefono: phone,
-        prefix: prefix,
-        mensaje: message,
-        ccEmail: 'ignaciodalesio1995@gmail.com' // Añadir siempre ignaciodalesio1995@gmail.com en copia
-      };
-      
-      console.log("Enviando datos de contacto:", contactData);
-      
-      // Usar el proxy local para evitar problemas de mixed content
-      const response = await fetch(`/api/api-proxy?path=api/contact`, {
+      // Primero probar con nuestro endpoint directo API
+      const directContactResponse = await fetch('/api/direct-contact', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(contactData)
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          phone,
+          prefix,
+          message
+        })
       });
-
-      // Verificar respuesta
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error del servidor:', errorText);
-        throw new Error('Error al enviar el mensaje');
+      
+      console.log("Estado respuesta API directa:", directContactResponse.status);
+      
+      // Si la API directa es exitosa, terminar aquí
+      if (directContactResponse.ok) {
+        const directData = await directContactResponse.json();
+        console.log("Respuesta API directa:", directData);
+        
+        toast.success('¡Mensaje enviado correctamente!', { id: loadingToast });
+        
+        // Limpiar formulario
+        nameRef.current.value = '';
+        emailRef.current.value = '';
+        phoneRef.current.value = '';
+        messageRef.current.value = '';
+        setPrefix('+34');
+        
+        setIsSubmitting(false);
+        return;
       }
       
-      const data = await response.json();
-      console.log("Respuesta API:", data);
-      
-      // Log adicional para depuración
-      console.log("Respuesta completa:", {
-        status: response.status,
-        headers: Object.fromEntries([...response.headers.entries()]),
-        data: data
+      // Si la API directa falla, intentar con la API del backend como fallback
+      const result = await sendPropertyEmail({
+        type: 'contact',
+        name: name,
+        email: email,
+        phone: phone,
+        prefix: prefix,
+        message: message,
+        asunto: 'Formulario de contacto web',
+        ccEmail: 'ignaciodalesio1995@gmail.com,marta@gozamadrid.com'
       });
+      
+      console.log("Respuesta API fallback:", result);
       
       toast.success('¡Mensaje enviado correctamente!', { id: loadingToast });
       

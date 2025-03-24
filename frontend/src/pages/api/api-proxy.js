@@ -3,7 +3,7 @@ export default async function handler(req, res) {
   // Permitir CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With');
   
   // Manejar preflight requests
   if (req.method === 'OPTIONS') {
@@ -43,7 +43,9 @@ export default async function handler(req, res) {
       method: req.method,
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'User-Agent': 'GozaMadrid-Frontend/1.0'
       }
     };
     
@@ -55,16 +57,34 @@ export default async function handler(req, res) {
       
       // Para rutas específicas, añadir email adicional como copia
       if (path === 'api/contact') {
-        // Añadir un campo adicional para indicar que debe enviarse copia
-        modifiedBody.ccEmail = 'ignaciodalesio1995@gmail.com';
-        console.log('[Proxy] Añadido email adicional en copia para contacto:', modifiedBody);
+        // Asegurar que ccEmail contiene ambos correos
+        modifiedBody.ccEmail = 'ignaciodalesio1995@gmail.com,marta@gozamadrid.com';
+        
+        // Asegurar que todos los campos requeridos están presentes
+        if (modifiedBody.name && !modifiedBody.nombre) {
+          modifiedBody.nombre = modifiedBody.name;
+        }
+        
+        if (modifiedBody.message && !modifiedBody.mensaje) {
+          modifiedBody.mensaje = modifiedBody.message;
+        }
+        
+        if (!modifiedBody.asunto) {
+          modifiedBody.asunto = 'Formulario de contacto web';
+        }
+        
+        if (modifiedBody.phone && !modifiedBody.telefono) {
+          modifiedBody.telefono = modifiedBody.phone;
+        }
+        
+        console.log('[Proxy] Datos de contacto modificados:', modifiedBody);
       } else if (path === 'api/property-visit/create') {
-        // Añadir un campo adicional para indicar que debe enviarse copia
-        modifiedBody.ccEmail = 'ignaciodalesio1995@gmail.com';
-        console.log('[Proxy] Añadido email adicional en copia para visita:', modifiedBody);
+        // Asegurar que ccEmail contiene ambos correos
+        modifiedBody.ccEmail = 'ignaciodalesio1995@gmail.com,marta@gozamadrid.com';
+        console.log('[Proxy] Añadidos ambos emails en copia para visita:', modifiedBody);
       } else if (path === 'api/property-offer/create') {
-        // Añadir un campo adicional para indicar que debe enviarse copia
-        modifiedBody.ccEmail = 'ignaciodalesio1995@gmail.com';
+        // Asegurar que ccEmail contiene ambos correos
+        modifiedBody.ccEmail = 'ignaciodalesio1995@gmail.com,marta@gozamadrid.com';
         
         // Asegurarse de que los datos tienen el formato correcto para ofertas
         if (modifiedBody.offerAmount && !modifiedBody.offerPrice) {
@@ -85,31 +105,92 @@ export default async function handler(req, res) {
       body: fetchOptions.body ? JSON.parse(fetchOptions.body) : null
     });
     
-    // Realizar la solicitud al API backend
-    const response = await fetch(targetUrl, fetchOptions);
+    // Aumentar el timeout para evitar problemas de conexión
+    const controller = new AbortController();
+    fetchOptions.signal = controller.signal;
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 segundos
     
-    // Obtener los datos de la respuesta
-    let data;
-    const contentType = response.headers.get('content-type');
-    
-    if (contentType && contentType.includes('application/json')) {
-      data = await response.json();
-    } else {
-      data = await response.text();
+    try {
+      // Realizar la solicitud al API backend
+      const response = await fetch(targetUrl, fetchOptions);
+      clearTimeout(timeoutId);
+      
+      // Obtener los datos de la respuesta
+      let data;
+      const contentType = response.headers.get('content-type');
+      
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        data = await response.text();
+      }
+      
+      // Log detallado de la respuesta
+      console.log('[Proxy] Respuesta del backend:', {
+        status: response.status,
+        headers: Object.fromEntries([...response.headers.entries()]),
+        data: data
+      });
+      
+      // Responder con los datos y el mismo código de estado
+      return res.status(response.status).json(data);
+    } catch (fetchError) {
+      console.error('[Proxy] Error en la petición fetch:', fetchError.message);
+      clearTimeout(timeoutId);
+      
+      // Si falló la comunicación con el backend, intentar usar FormSubmit como respaldo
+      if (path === 'api/contact' && req.body) {
+        try {
+          console.log('[Proxy] Intentando enviar vía FormSubmit como alternativa');
+          const formSubmitCode = '655e72bc841f663154fb80111510aa54';
+          
+          // Preparar datos para FormSubmit
+          const formData = {
+            name: req.body.nombre || req.body.name || 'Cliente',
+            email: req.body.email || 'contacto@gozamadrid.com',
+            _subject: `Nuevo mensaje de contacto (vía proxy)`,
+            message: `
+              Nombre: ${req.body.nombre || req.body.name || 'No especificado'}\n
+              Email: ${req.body.email || 'No especificado'}\n
+              Teléfono: ${req.body.prefix || '+34'} ${req.body.telefono || req.body.phone || 'No especificado'}\n
+              Mensaje: ${req.body.mensaje || req.body.message || 'No hay mensaje'}
+            `,
+            _template: 'box',
+            _captcha: 'false'
+          };
+          
+          // Enviar a FormSubmit
+          const formSubmitResponse = await fetch(`https://formsubmit.co/ajax/${formSubmitCode}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify(formData)
+          });
+          
+          if (formSubmitResponse.ok) {
+            console.log('[Proxy] Envío vía FormSubmit exitoso');
+            return res.status(200).json({
+              success: true,
+              message: 'Mensaje enviado vía FormSubmit como alternativa',
+              source: 'formsubmit'
+            });
+          }
+        } catch (formSubmitError) {
+          console.error('[Proxy] Error al usar FormSubmit:', formSubmitError);
+        }
+      }
+      
+      // Si todo falló, devolver error
+      return res.status(500).json({ 
+        error: 'Error en la comunicación con el backend',
+        message: fetchError.message
+      });
     }
     
-    // Log detallado de la respuesta
-    console.log('[Proxy] Respuesta del backend:', {
-      status: response.status,
-      headers: Object.fromEntries([...response.headers.entries()]),
-      data: data
-    });
-    
-    // Responder con los datos y el mismo código de estado
-    res.status(response.status).json(data);
-    
   } catch (error) {
-    console.error('[Proxy] Error:', error);
+    console.error('[Proxy] Error general:', error);
     res.status(500).json({ 
       error: 'Error en el proxy',
       message: error.message

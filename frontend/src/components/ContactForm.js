@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { sendEmail } from '../pages/api';
+import { sendPropertyEmail } from '../services/api';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/router';
 import CountrySelect from './CountrySelect';
@@ -75,38 +75,15 @@ const ContactForm = () => {
     setError(null);
     
     try {
-      // Usar la configuración global para la URL de la API
-      const apiUrl = window.appConfig?.apiUrl || 'https://gozamadrid-env.eba-dwhnvgbt.eu-west-3.elasticbeanstalk.com';
-      const url = `${apiUrl}/api/contact`;
-      
-      console.log('Enviando formulario a:', url);
-      
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-        credentials: 'include',
+      // Usar la función sendPropertyEmail para enviar el formulario
+      const result = await sendPropertyEmail({
+        // Se envía con el formato que será interpretado correctamente
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        prefix: formData.prefix,
+        message: formData.message
       });
-      
-      // Verificar si la respuesta es exitosa
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error en la respuesta:', response.status, errorText);
-        throw new Error(`Error ${response.status}: ${errorText || 'No se pudo enviar el formulario'}`);
-      }
-      
-      // Intentar parsear la respuesta como JSON
-      let data;
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
-        data = await response.json();
-      } else {
-        const text = await response.text();
-        console.log('Respuesta no JSON:', text);
-        data = { message: 'Formulario enviado correctamente' };
-      }
       
       // Resetear el formulario y mostrar mensaje de éxito
       setFormData({
@@ -116,7 +93,7 @@ const ContactForm = () => {
         prefix: '+34',
         message: ''
       });
-      setSuccess(data.message || 'Mensaje enviado correctamente');
+      setSuccess(result.message || 'Mensaje enviado correctamente');
       setTimeout(() => setSuccess(null), 5000);
     } catch (err) {
       console.error('Error al enviar el formulario:', err);

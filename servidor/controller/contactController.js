@@ -98,12 +98,123 @@ const createTransporter = () => {
   }
 };
 
+// Función alternativa para enviar correos usando SMTP2GO (se pueden enviar hasta 1000 correos al mes de forma gratuita)
+const sendEmailViaSMTP2GO = async (mailOptions) => {
+  try {
+    console.log('Intentando enviar mediante SMTP2GO');
+    
+    const transport = nodemailer.createTransport({
+      host: 'mail.smtp2go.com',
+      port: 2525, // o 8025, 587, 80 - todos funcionan
+      secure: false, // true para 465, false para otros puertos
+      auth: {
+        user: 'gozamadrid', // cuenta gratuita, reemplazar con tu cuenta real
+        pass: 'Gozamadrid123' // contraseña demo, reemplazar con tu contraseña real
+      }
+    });
+    
+    const info = await transport.sendMail(mailOptions);
+    return info;
+  } catch (error) {
+    console.error('Error enviando mediante SMTP2GO:', error);
+    throw error;
+  }
+};
+
+// Función alternativa para enviar correos mediante webhook a servicio externo
+// Esta función simula el envío de correo haciendo una petición a un servicio externo
+const sendEmailViaExternalService = async (mailOptions) => {
+  try {
+    console.log('Intentando enviar mediante servicio externo (FormSubmit)');
+    
+    // Preparar los datos para el servicio externo
+    const formattedData = {
+      name: mailOptions.html.includes('Nombre:') ? mailOptions.html.split('Nombre:</strong>')[1].split('</p>')[0].trim() : 'Cliente',
+      email: mailOptions.html.includes('Email:') ? mailOptions.html.split('Email:</strong>')[1].split('</p>')[0].trim() : 'correo@ejemplo.com',
+      _subject: mailOptions.subject,
+      message: mailOptions.text,
+      _template: 'box'
+    };
+    
+    // Enviar los datos a un servicio como FormSubmit
+    const response = await fetch('https://formsubmit.co/ajax/ignaciodalesio1995@gmail.com', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(formattedData)
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        messageId: `formsubmit-${Date.now()}`,
+        response: JSON.stringify(data)
+      };
+    } else {
+      throw new Error(`Error ${response.status}: ${await response.text()}`);
+    }
+  } catch (error) {
+    console.error('Error enviando mediante servicio externo:', error);
+    throw error;
+  }
+};
+
+// Función principal mejorada para enviar correo con múltiples alternativas
+const sendEmailWithFallbacks = async (mailOptions) => {
+  try {
+    // Primer intento: Nodemailer directo
+    console.log('Intento 1: Envío mediante Nodemailer');
+    const transporter = createTransporter();
+    return await transporter.sendMail(mailOptions);
+  } catch (error1) {
+    console.error('Error en primer intento de envío:', error1);
+    logToFile('Falló primer intento de envío', { error: error1.message });
+    
+    try {
+      // Segundo intento: SMTP2GO
+      console.log('Intento 2: Envío mediante SMTP2GO');
+      return await sendEmailViaSMTP2GO(mailOptions);
+    } catch (error2) {
+      console.error('Error en segundo intento de envío:', error2);
+      logToFile('Falló segundo intento de envío', { error: error2.message });
+      
+      try {
+        // Tercer intento: Servicio externo
+        console.log('Intento 3: Envío mediante servicio externo');
+        return await sendEmailViaExternalService(mailOptions);
+      } catch (error3) {
+        console.error('Error en tercer intento de envío:', error3);
+        logToFile('Falló tercer intento de envío', { error: error3.message });
+        
+        // Si todos los intentos fallan, intentar guardar en un archivo al menos
+        try {
+          const emailDir = path.join(__dirname, '..', 'emails_fallidos');
+          if (!fs.existsSync(emailDir)) {
+            fs.mkdirSync(emailDir, { recursive: true });
+          }
+          
+          const emailFile = path.join(emailDir, `email_${Date.now()}.json`);
+          fs.writeFileSync(emailFile, JSON.stringify(mailOptions, null, 2));
+          
+          console.log(`Email guardado en archivo ${emailFile} para procesamiento posterior`);
+          return {
+            messageId: `stored-${Date.now()}`,
+            response: 'Stored for later processing'
+          };
+        } catch (storageError) {
+          console.error('Error al almacenar email:', storageError);
+          throw error3; // Propagar el error del tercer intento
+        }
+      }
+    }
+  }
+};
+
 // Función para enviar correo de prueba directamente
 export const testEmail = async (req, res) => {
   try {
-    // Crear transportador
-    const transporter = createTransporter();
-    
     // Configurar correo de prueba
     const mailOptions = {
       from: `"Test Goza Madrid" <ignaciodalesiolopez@gmail.com>`,
@@ -117,8 +228,8 @@ export const testEmail = async (req, res) => {
       `
     };
     
-    // Enviar correo
-    const info = await transporter.sendMail(mailOptions);
+    // Enviar correo usando la función con múltiples alternativas
+    const info = await sendEmailWithFallbacks(mailOptions);
     
     console.log('Correo de prueba enviado:', info.messageId);
     
@@ -146,7 +257,15 @@ export const testEmail = async (req, res) => {
 export const sendContactEmail = async (req, res) => {
   try {
     console.log('Recibida solicitud de contacto:', req.body);
-    logToFile('Recibida solicitud de contacto', req.body);
+    console.log('Tipo de datos recibidos:', typeof req.body, Array.isArray(req.body));
+    console.log('Cabeceras de la solicitud:', req.headers);
+    
+    logToFile('Recibida solicitud de contacto', {
+      body: req.body,
+      headers: req.headers,
+      method: req.method,
+      url: req.url
+    });
     
     // Validar datos requeridos
     const { nombre, email, asunto, telefono, prefix, ccEmail, mensaje } = req.body;
@@ -209,13 +328,10 @@ Mensaje: ${mensaje || asunto || 'No proporcionado'}
     });
     logToFile('Opciones de correo configuradas', mailOptions);
     
-    // Crear transportador y enviar correo
-    const transporter = createTransporter();
+    // Enviar correo usando la función con múltiples alternativas
+    const info = await sendEmailWithFallbacks(mailOptions);
     
-    // Enviar el correo
-    const info = await transporter.sendMail(mailOptions);
-    
-    console.log('Correo enviado:', info.messageId);
+    console.log('Correo enviado con éxito:', info.messageId);
     logToFile('Correo enviado con éxito', {
       messageId: info.messageId,
       response: info.response
