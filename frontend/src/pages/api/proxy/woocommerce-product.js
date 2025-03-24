@@ -25,7 +25,7 @@ export default async function handler(req, res) {
     let productId = id;
     
     // Si la URL tiene formato /producto/[id], extraer el ID
-    if (req.url.includes('/woocommerce-product/')) {
+    if (typeof req.url === 'string' && req.url.includes('/woocommerce-product/')) {
       const match = req.url.match(/\/woocommerce-product\/([^\/\?]+)/);
       if (match && match[1]) {
         productId = match[1];

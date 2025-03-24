@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { HiMiniSquare3Stack3D } from "react-icons/hi2";
 import { FaRestroom, FaBuilding, FaEuroSign, FaCalendarAlt, FaClock, FaHandshake, FaEnvelope, FaUser, FaTimes, FaMapMarkerAlt, FaChevronLeft, FaChevronRight, FaRuler, FaBed, FaBath } from "react-icons/fa";
 import Link from "next/link";
@@ -14,10 +14,17 @@ import Head from "next/head";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://goza-madrid.onrender.com';
 
+// Al inicio del archivo, agregar esta constante para controlar logs
+const isDev = process.env.NODE_ENV === 'development';
+const logDebug = (message, ...args) => {
+  if (isDev && window.appConfig?.debug) {
+    console.log(message, ...args);
+  }
+};
+
 // Extraer datos de características de la propiedad
 const extractPropertyData = (property) => {
   if (!property) {
-    console.error("No se puede extraer datos de una propiedad que es null");
     return {
       livingArea: 0,
       bedrooms: 0,
@@ -29,8 +36,6 @@ const extractPropertyData = (property) => {
   try {
     // Para propiedades de WordPress (WooCommerce)
     if (property.source === 'woocommerce' || (!property.source && property.meta_data)) {
-      console.log("Extrayendo datos de propiedad WooCommerce");
-      
       let livingArea = 0;
       let bedrooms = 0;
       let bathrooms = 0;
@@ -38,31 +43,25 @@ const extractPropertyData = (property) => {
       
       // Buscar en meta_data los valores específicos
       if (property.meta_data && Array.isArray(property.meta_data)) {
-        console.log("Metadatos disponibles:", property.meta_data.map(m => `${m.key}: ${m.value}`).join(', '));
-        
         property.meta_data.forEach(meta => {
           // Área/superficie
           if (['living_area', 'superficie', 'area', 'metros', 'm2'].includes(meta.key) && meta.value) {
             livingArea = parseInt(meta.value, 10) || 0;
-            console.log(`Encontrado área: ${meta.key} = ${meta.value} (convertido a ${livingArea})`);
           }
           
           // Dormitorios/habitaciones
           if (['bedrooms', 'dormitorios', 'habitaciones'].includes(meta.key) && meta.value) {
             bedrooms = parseInt(meta.value, 10) || 0;
-            console.log(`Encontradas habitaciones: ${meta.key} = ${meta.value} (convertido a ${bedrooms})`);
           }
           
           // Baños
           if (['baños', 'bathrooms', 'banos'].includes(meta.key) && meta.value && meta.value !== "-1") {
             bathrooms = parseInt(meta.value, 10) || 0;
-            console.log(`Encontrados baños: ${meta.key} = ${meta.value} (convertido a ${bathrooms})`);
           }
           
           // Planta
           if (['Planta', 'planta', 'floor'].includes(meta.key) && meta.value) {
             floor = parseInt(meta.value, 10) || 0;
-            console.log(`Encontrada planta: ${meta.key} = ${meta.value} (convertido a ${floor})`);
           }
         });
       }
@@ -93,8 +92,6 @@ const extractPropertyData = (property) => {
         bathrooms = parseInt(property.features.bathrooms, 10) || 0;
       }
       
-      console.log(`Datos finales extraídos: Área=${livingArea}, Baños=${bathrooms}, Habitaciones=${bedrooms}, Planta=${floor}`);
-      
       return {
         livingArea,
         bedrooms,
@@ -104,8 +101,6 @@ const extractPropertyData = (property) => {
     } 
     // Para propiedades de MongoDB
     else if (property.source === 'mongodb') {
-      console.log("Extrayendo datos de propiedad MongoDB");
-      
       // Extraer área de varias propiedades posibles
       let livingArea = 0;
       if (property.m2) livingArea = parseInt(property.m2, 10) || 0;
@@ -128,7 +123,6 @@ const extractPropertyData = (property) => {
     } 
     // Fallback general
     else {
-      console.log("Usando fallback para extracción de datos");
       return {
         livingArea: property.living_area || property.size || 0,
         bedrooms: property.bedrooms || 0,
@@ -137,7 +131,6 @@ const extractPropertyData = (property) => {
       };
     }
   } catch (error) {
-    console.error("Error al extraer datos de la propiedad:", error);
     return {
       livingArea: 0,
       bedrooms: 0,
@@ -147,7 +140,7 @@ const extractPropertyData = (property) => {
   }
 };
 
-// Función para obtener la URL de la imagen a través del proxy
+// Función para obtener la URL de la imagen a través del proxy - optimizada
 const getProxiedImageUrl = (originalUrl) => {
   if (!originalUrl) {
     return '/img/default-property-image.jpg';
@@ -162,11 +155,113 @@ const getProxiedImageUrl = (originalUrl) => {
   return `/api/proxy-image?url=${encodeURIComponent(originalUrl)}`;
 };
 
+// Función para procesar las imágenes de la propiedad de forma optimizada
+const processPropertyImages = (propertyState) => {
+  if (!propertyState) return [];
+  
+  const images = [];
+  
+  try {
+    // Procesar diferentes formatos de imágenes según la fuente
+    if (propertyState.source === 'woocommerce' || propertyState.source === 'woocommerce_direct' || 
+        (!propertyState.source && propertyState.images)) {
+      
+      // Formato WooCommerce - array de objetos con src, alt, etc.
+      if (propertyState.images && Array.isArray(propertyState.images)) {
+        propertyState.images.forEach((img, index) => {
+          let imageUrl = '';
+          
+          if (typeof img === 'string') {
+            imageUrl = img;
+          } else if (typeof img === 'object') {
+            imageUrl = img.src || img.url || img.source_url || '';
+          }
+          
+          if (imageUrl) {
+            // Procesar la URL
+            const processedUrl = getProxiedImageUrl(imageUrl);
+            
+            images.push({
+              id: index,
+              src: processedUrl,
+              alt: propertyState.title || propertyState.name || 'Imagen de propiedad',
+              original: imageUrl
+            });
+          }
+        });
+      }
+    } 
+    // Procesar imágenes de MongoDB
+    else if (propertyState.source === 'mongodb' || propertyState._id) {
+      if (propertyState.images && Array.isArray(propertyState.images)) {
+        propertyState.images.forEach((img, index) => {
+          let imageUrl = '';
+          
+          if (typeof img === 'string') {
+            imageUrl = img;
+          } else if (typeof img === 'object') {
+            imageUrl = img.url || img.src || '';
+          }
+          
+          if (imageUrl) {
+            // Procesar la URL
+            const processedUrl = getProxiedImageUrl(imageUrl);
+            
+            images.push({
+              id: index,
+              src: processedUrl,
+              alt: propertyState.title || 'Imagen de propiedad',
+              original: imageUrl
+            });
+          }
+        });
+      }
+    }
+  } catch (error) {
+    // Silenciar errores en producción
+  }
+  
+  return images;
+};
+
 // Función para limpiar texto para SEO (elimina HTML y limita longitud)
 const cleanTextForSEO = (htmlText, maxLength = 160) => {
   if (!htmlText) return '';
   const plainText = htmlText.replace(/<[^>]*>/g, '');
   return plainText.length > maxLength ? plainText.substring(0, maxLength) + '...' : plainText;
+};
+
+const cleanWordPressContent = (content) => {
+  if (!content) return "";
+  
+  let cleanContent = content;
+  
+  try {
+    // Método simple - solo eliminar shortcodes específicos
+    cleanContent = cleanContent.replace(/\[vc_row[^\]]*\]/g, "");
+    cleanContent = cleanContent.replace(/\[\/vc_row\]/g, "");
+    cleanContent = cleanContent.replace(/\[vc_column[^\]]*\]/g, "");
+    cleanContent = cleanContent.replace(/\[\/vc_column\]/g, "");
+    cleanContent = cleanContent.replace(/\[vc_column_text[^\]]*\]/g, "");
+    cleanContent = cleanContent.replace(/\[\/vc_column_text\]/g, "");
+    
+    // Solo eliminar iframes de Google Maps
+    cleanContent = cleanContent.replace(/<iframe[^>]*(?:google\.com\/maps|maps\.google)[^>]*>[\s\S]*?<\/iframe>/gi, "");
+    
+    // Mejorar visualización básica
+    cleanContent = cleanContent.replace(/<p/g, '<p class="mb-4"');
+  } catch (error) {
+    console.error("Error en la limpieza del contenido:", error);
+    return content; // Devolver el contenido original si hay error
+  }
+  
+  // Si después de limpiar hay poco contenido, usar el original
+  if (cleanContent.trim().length < 50 && content.length > 100) {
+    console.log("La limpieza eliminó demasiado contenido, usando original");
+    return content;
+  }
+  
+  return cleanContent;
 };
 
 export default function DefaultPropertyContent({ property }) {
@@ -183,7 +278,6 @@ export default function DefaultPropertyContent({ property }) {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [propertyImages, setPropertyImages] = useState([]);
   const [cleanedContent, setCleanedContent] = useState("");
   const [propertyUrl, setPropertyUrl] = useState("");
   const [imageLoading, setImageLoading] = useState(true);
@@ -231,201 +325,16 @@ export default function DefaultPropertyContent({ property }) {
     }
   }, []);
 
-  // Extraer y procesar los datos de la propiedad
-  useEffect(() => {
-    if (propertyState) {
-      // Extraer y configurar los datos de la propiedad
-      const data = extractPropertyData(propertyState);
-      setPropertyData(data);
-      console.log("Datos extraídos de la propiedad:", data);
-    }
+  // Usar useMemo para el procesamiento de imágenes
+  const propertyImages = useMemo(() => {
+    return processPropertyImages(propertyState);
   }, [propertyState]);
 
-  // Procesar las imágenes de la propiedad
+  // Extraer y procesar los datos de la propiedad con useMemo
   useEffect(() => {
-    if (!propertyState) {
-      console.error("No se recibieron datos de propiedad");
-      return;
-    }
-    
-    try {
-      console.log("Procesando imágenes de propiedad:", propertyState.title || propertyState.name);
-      
-      let images = [];
-      const defaultImage = {
-        src: '/img/default-property-image.jpg',
-        alt: 'Imagen por defecto',
-        isDefault: true
-      };
-      
-      // Función optimizada para procesar URLs de imágenes
-      const processImageUrl = (imageUrl) => {
-        if (!imageUrl) {
-          console.log("URL de imagen nula o indefinida");
-          return null;
-        }
-        
-        console.log("Procesando URL de imagen:", imageUrl);
-        
-        // Si es un objeto, extraer la URL
-        if (typeof imageUrl === 'object') {
-          console.log("URL es un objeto:", imageUrl);
-          if (imageUrl.src) {
-            console.log("Usando imageUrl.src:", imageUrl.src);
-            return processImageUrl(imageUrl.src);
-          } else if (imageUrl.url) {
-            console.log("Usando imageUrl.url:", imageUrl.url);
-            return processImageUrl(imageUrl.url);
-          } else if (imageUrl.source_url) {
-            console.log("Usando imageUrl.source_url:", imageUrl.source_url);
-            return processImageUrl(imageUrl.source_url);
-          } else {
-            console.log("Objeto de imagen sin URL reconocible");
-            return null;
-          }
-        }
-        
-        // Asegurarse de que la URL sea una cadena
-        if (typeof imageUrl !== 'string') {
-          console.log("URL no es una cadena ni un objeto reconocible:", typeof imageUrl);
-          return null;
-        }
-        
-        // Si ya es una URL de proxy, devolverla tal cual
-        if (imageUrl.includes('images.weserv.nl')) {
-          console.log("URL ya es proxy, devolviendo tal cual:", imageUrl);
-          return imageUrl;
-        }
-        
-        // Si es una URL de WooCommerce en Cloudways, usarla directamente
-        if (imageUrl.includes('wordpress-1430059-5339263.cloudwaysapps.com')) {
-          console.log("URL de WooCommerce detectada:", imageUrl);
-          // Usar el servicio de proxy para evitar problemas CORS pero manteniendo la URL original como respaldo
-          return `https://images.weserv.nl/?url=${encodeURIComponent(imageUrl)}&n=-1&errorredirect=${encodeURIComponent(imageUrl)}`;
-        }
-        
-        // Si es una URL relativa, convertirla a absoluta
-        if (!imageUrl.startsWith('http') && !imageUrl.startsWith('/') && !imageUrl.startsWith('data:')) {
-          const baseUrl = window.location.origin;
-          const absoluteUrl = `${baseUrl}/${imageUrl}`;
-          console.log("URL relativa convertida a absoluta:", absoluteUrl);
-          return absoluteUrl;
-        }
-        
-        // Para URLs externas, usar un servicio de proxy para evitar errores CORS y QUIC_PROTOCOL_ERROR
-        if (imageUrl.startsWith('http')) {
-          // Configuración básica sin conversión de formato para evitar problemas
-          const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(imageUrl)}&n=-1&errorredirect=${encodeURIComponent(imageUrl)}`;
-          console.log("URL convertida a proxy:", proxyUrl);
-          return proxyUrl;
-        }
-        
-        // Si es una ruta local, devolverla tal cual
-        console.log("URL local, devolviendo tal cual:", imageUrl);
-        return imageUrl;
-      };
-      
-      // Procesar imágenes de WordPress
-      if (propertyState.source === 'woocommerce' || propertyState.source === 'woocommerce_direct' || (!propertyState.source && propertyState.images)) {
-        if (propertyState.images && Array.isArray(propertyState.images)) {
-          console.log(`Procesando imágenes de WooCommerce: ${propertyState.images.length} imágenes disponibles`);
-          if (propertyState.images.length > 0) {
-            console.log("Primera imagen WooCommerce:", propertyState.images[0]);
-          }
-          
-          // Convertir cada imagen a formato proxy
-          images = propertyState.images.map((img, index) => {
-            // Determinar si la imagen es un objeto o una cadena de texto
-            if (typeof img === 'string') {
-              // Es solo la URL como cadena
-              const processedUrl = processImageUrl(img);
-              return {
-                src: processedUrl,
-                alt: `${propertyState.name || propertyState.title || 'Propiedad'} - Imagen ${index + 1}`,
-                originalSrc: img
-              };
-            } else if (typeof img === 'object') {
-              // Es un objeto de imagen con propiedades
-              const imageUrl = img.src || img.url || img.source_url || '';
-              
-              // Log detallado del objeto de imagen
-              console.log(`Procesando imagen WooCommerce #${index}:`, {
-                srcProperty: img.src,
-                urlProperty: img.url,
-                sourceUrlProperty: img.source_url,
-                altProperty: img.alt,
-                id: img.id
-              });
-              
-              const processedUrl = processImageUrl(imageUrl);
-              
-              return {
-                src: processedUrl,
-                alt: img.alt || `${propertyState.name || propertyState.title || 'Propiedad'} - Imagen ${index + 1}`,
-                name: img.name || '',
-                id: img.id || '',
-                originalSrc: imageUrl
-              };
-            }
-            
-            // Si no es string ni objeto, intentar extraer algo
-            const fallbackUrl = img?.toString() || '';
-            const processedFallback = processImageUrl(fallbackUrl);
-            return {
-              src: processedFallback,
-              alt: `Imagen de propiedad ${index + 1}`,
-              originalSrc: fallbackUrl
-            };
-          }).filter(img => img.src); // Filtrar imágenes sin src
-          
-          // Log detallado para depuración
-          console.log(`Procesadas ${images.length} imágenes de WooCommerce. Primera imagen:`, 
-            images.length > 0 ? images[0] : 'No hay imágenes');
-        } else {
-          console.log("No se encontraron imágenes en la propiedad de WooCommerce");
-        }
-      } 
-      // Procesar imágenes de MongoDB
-      else if (propertyState.source === 'mongodb' && propertyState.images) {
-        if (Array.isArray(propertyState.images)) {
-          console.log("Procesando imágenes de MongoDB:", propertyState.images);
-          images = propertyState.images.map((img, index) => {
-            // Verificar si es un objeto con src o una URL string
-            let imageUrl = '';
-            if (typeof img === 'string') {
-              imageUrl = img;
-            } else if (typeof img === 'object') {
-              imageUrl = img.src || img.url || '';
-              console.log(`Imagen MongoDB #${index} es objeto:`, img);
-            }
-            
-            const processedUrl = processImageUrl(imageUrl);
-            console.log(`Imagen MongoDB #${index} - URL original: ${imageUrl} - Procesada: ${processedUrl}`);
-            
-            return {
-              src: processedUrl,
-              alt: `${propertyState.title || 'Propiedad'} - Imagen ${index + 1}`,
-              originalSrc: imageUrl
-            };
-          }).filter(img => img.src); // Filtrar imágenes sin src
-          
-          console.log(`Procesadas ${images.length} imágenes de MongoDB.`);
-        }
-      }
-      
-      // Si no hay imágenes, no usar imagen por defecto
-      if (!images || images.length === 0) {
-        console.log("No se encontraron imágenes. Dejando el array vacío.");
-        images = [];
-      }
-      
-      console.log("Imágenes procesadas:", images.length);
-      setPropertyImages(images);
-      
-    } catch (error) {
-      console.error("Error al procesar imágenes:", error);
-      // En caso de error, dejar el array de imágenes vacío
-      setPropertyImages([]);
+    if (propertyState) {
+      const data = extractPropertyData(propertyState);
+      setPropertyData(data);
     }
   }, [propertyState]);
 
@@ -433,66 +342,42 @@ export default function DefaultPropertyContent({ property }) {
   useEffect(() => {
     if (!propertyState) return;
     
-    const cleanWordPressContent = (content) => {
-      if (!content) return "";
-      
-      let cleanContent = content;
-      
-      // Eliminar shortcodes de WPBakery
-      cleanContent = cleanContent.replace(/\[\/?vc_[^\]]*\]/g, "");
-      cleanContent = cleanContent.replace(/\[\/?(fusion|vc)_[^\]]*\]/g, "");
-      
-      // Eliminar cualquier shortcode entre corchetes [] que pueda quedar
-      cleanContent = cleanContent.replace(/\[[^\]]*\]/g, "");
-      
-      // Eliminar los botones "Mostrar más/Mostrar menos" que aparecen como texto
-      cleanContent = cleanContent.replace(/Mostrar más|Mostrar menos/gi, "");
-      cleanContent = cleanContent.replace(/Mostrar másMostrar menos/gi, "");
-      
-      // Eliminar también los botones con elementos HTML
-      cleanContent = cleanContent.replace(/<button[^>]*>(Mostrar más|Mostrar menos)<\/button>/gi, "");
-      cleanContent = cleanContent.replace(/<a[^>]*class="[^"]*mostrarmas[^"]*"[^>]*>.*?<\/a>/gi, "");
-      cleanContent = cleanContent.replace(/<a[^>]*class="[^"]*mostrarmenos[^"]*"[^>]*>.*?<\/a>/gi, "");
-      
-      // Eliminar toda la sección de Ubicación completa (desde el h2 hasta el siguiente h2 o hasta el final)
-      cleanContent = cleanContent.replace(/<h2[^>]*>Ubicación<\/h2>[\s\S]*?(?=<h2|$)/gi, "");
-      
-      // Eliminar específicamente la sección que usa el nombre en español
-      cleanContent = cleanContent.replace(/<h2[^>]*>\s*Ubicación\s*<\/h2>[\s\S]*?(?=<h2|<div class="elementor|$)/gi, "");
-      
-      // Eliminar iframes de Google Maps más específicamente
-      cleanContent = cleanContent.replace(/<iframe[^>]*google\.com\/maps[^>]*>[\s\S]*?<\/iframe>/gi, "");
-      
-      // Eliminar divs con clase "ubicacion"
-      cleanContent = cleanContent.replace(/<div[^>]*class="[^"]*ubicacion[^"]*"[^>]*>[\s\S]*?<\/div>/gi, "");
-      
-      // Eliminar secciones completas que contengan mapas o ubicación
-      cleanContent = cleanContent.replace(/<section[^>]*class="[^"]*mapa[^"]*"[^>]*>[\s\S]*?<\/section>/gi, "");
-      
-      // Limpiar divs vacíos y espacios en blanco excesivos
-      cleanContent = cleanContent.replace(/<div[^>]*>\s*<\/div>/g, "");
-      cleanContent = cleanContent.replace(/\s{2,}/g, " ");
-      
-      // Add more semantic HTML structure
-      cleanContent = cleanContent.replace(/<p/g, '<p class="mb-4"');
-      cleanContent = cleanContent.replace(/<ul/g, '<ul class="ml-6 mb-6 list-disc"');
-      cleanContent = cleanContent.replace(/<h2/g, '<h2 class="text-2xl font-bold mb-4 mt-8"');
-      
-      return cleanContent;
-    };
-    
     // Procesar el contenido según el tipo de propiedad
     let processedContent = "";
     
-    if (propertyState.source === 'woocommerce' || propertyState.id) {
-      processedContent = cleanWordPressContent(propertyState.description || propertyState.content || "");
-    } else {
-      // Para MongoDB no necesitamos limpiar tanto, pero podemos aplicar algunas mejoras básicas
-      processedContent = propertyState.description || "";
+    // Obtener cualquier contenido disponible (descripción o contenido)
+    const rawContent = propertyState.description || propertyState.content || propertyState.shortDescription || '';
+    console.log("Contenido raw inicial:", rawContent.substring(0, 100));
+    
+    // Solo intentar limpiar si hay contenido para evitar errores
+    if (rawContent) {
+      try {
+        if (propertyState.source === 'woocommerce' || propertyState.id) {
+          processedContent = cleanWordPressContent(rawContent);
+        } else {
+          // Para MongoDB simplemente usar el contenido tal cual
+          processedContent = rawContent;
+        }
+      } catch (error) {
+        console.error("Error al procesar contenido:", error);
+        processedContent = rawContent; // En caso de error, usar el contenido original
+      }
+    }
+    
+    // Debugging
+    console.log("Contenido original length:", rawContent.length);
+    console.log("Contenido procesado length:", processedContent.length);
+    
+    // Si el contenido procesado está vacío o muy corto, usar el original
+    if (!processedContent || processedContent.trim().length < 20) {
+      console.log("El contenido procesado está vacío, usando el original");
+      processedContent = rawContent;
     }
     
     // Actualizar el estado con el contenido procesado
+    console.log("Estableciendo cleanedContent");
     setCleanedContent(processedContent);
+    
   }, [propertyState]);
 
   // Actualizar el manejo de errores de imágenes
@@ -720,11 +605,17 @@ export default function DefaultPropertyContent({ property }) {
   const location = propertyState.location || 'Madrid, España';
   const propertyType = propertyState.type || 'Propiedad';
   
+  // Asegurarse de que location sea una cadena de texto
+  const locationString = typeof location === 'string' ? location : (location?.toString() || "Madrid");
+  
   // Preparar datos para SEO
-  const seoTitle = `${title} | Propiedad en ${location}`;
-  const seoDescription = cleanTextForSEO(description, 160) || `${propertyType} en ${location}. ${propertyData.bedrooms > 0 ? propertyData.bedrooms + ' habitaciones, ' : ''}${propertyData.bathrooms > 0 ? propertyData.bathrooms + ' baños, ' : ''}${propertyData.livingArea > 0 ? propertyData.livingArea + ' m². ' : ''}`;
-  const seoKeywords = `${propertyType}, ${location}, inmobiliaria, comprar, alquilar, ${propertyData.bedrooms > 0 ? propertyData.bedrooms + ' habitaciones, ' : ''}${propertyData.livingArea > 0 ? propertyData.livingArea + ' m², ' : ''}`;
+  const seoTitle = `${title} | Propiedad en ${locationString}`;
+  const seoDescription = cleanTextForSEO(description, 160) || `${propertyType} en ${locationString}. ${propertyData.bedrooms > 0 ? propertyData.bedrooms + ' habitaciones, ' : ''}${propertyData.bathrooms > 0 ? propertyData.bathrooms + ' baños, ' : ''}${propertyData.livingArea > 0 ? propertyData.livingArea + ' m². ' : ''}`;
+  const seoKeywords = `${propertyType}, ${locationString}, inmobiliaria, comprar, alquilar, ${propertyData.bedrooms > 0 ? propertyData.bedrooms + ' habitaciones, ' : ''}${propertyData.livingArea > 0 ? propertyData.livingArea + ' m², ' : ''}`;
   const seoImage = propertyImages && propertyImages.length > 0 ? propertyImages[0].src : '/img/default-property-image.jpg';
+  
+  // Asegurarse de que location sea una cadena de texto antes de usar split
+  const locationText = typeof location === 'string' ? location : (location?.toString() || "Madrid");
   
   // Datos estructurados para Schema.org
   const structuredData = {
@@ -736,7 +627,7 @@ export default function DefaultPropertyContent({ property }) {
     "image": propertyImages.map(img => img.src),
     "address": {
       "@type": "PostalAddress",
-      "addressLocality": location.split(',')[0] || "Madrid",
+      "addressLocality": locationString.split(',')[0] || "Madrid",
       "addressRegion": "Madrid",
       "addressCountry": "ES"
     },
@@ -787,7 +678,7 @@ export default function DefaultPropertyContent({ property }) {
         
         {/* Additional SEO meta tags */}
         <meta name="geo.region" content="ES-MD" />
-        <meta name="geo.placename" content={location.split(',')[0] || "Madrid"} />
+        <meta name="geo.placename" content={locationText.split(',')[0] || "Madrid"} />
         <meta name="author" content="Goza Madrid" />
         <meta name="publisher" content="Goza Madrid" />
         
@@ -826,7 +717,7 @@ export default function DefaultPropertyContent({ property }) {
                     <FaMapMarkerAlt className="text-black text-xl" />
                   </div>
                   <p className="text-xl text-white font-light" itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
-                    <span itemProp="addressLocality">{location}</span>
+                    <span itemProp="addressLocality">{locationString}</span>
                   </p>
                 </div>
               </div>
@@ -1021,38 +912,23 @@ export default function DefaultPropertyContent({ property }) {
             </div>
             
             <div className="p-10">
-              <div 
-                className="prose prose-xl max-w-none text-gray-100 prose-headings:text-white prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h1:font-bold prose-h2:font-bold prose-h3:font-medium prose-p:text-gray-200 prose-p:leading-relaxed prose-li:text-gray-200 prose-strong:text-amarillo prose-a:text-amarillo hover:prose-a:text-amarillo/80 prose-img:rounded-2xl prose-h2:!text-white prose-h2:before:!text-amarillo prose-h2:after:!text-amarillo [&>h2]:!text-white [&>h2]:before:!text-amarillo [&>h2]:after:!text-amarillo" 
-                dangerouslySetInnerHTML={{ __html: cleanedContent }} 
-                itemProp="description"
-              />
-            </div>
-          </div>
-
-          {/* Mapa con estilo premium */}
-          <div className="mt-16 bg-black/80 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-amarillo/20 overflow-hidden">
-            <div className="p-8 border-b border-amarillo/20 flex items-center">
-              <FaMapMarkerAlt className="text-amarillo mr-4 text-3xl" />
-              <h2 className="text-3xl font-bold  tracking-wide !text-white">Ubicación Privilegiada</h2>
-            </div>
-            
-            <div className="p-10">
-              <div className="relative w-full h-[500px] rounded-2xl overflow-hidden shadow-2xl border border-amarillo/10">
-                <iframe
-                  src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyAZAI0_oecmQkuzwZ4IM2H_NLynxD2Lkxo&q=${encodeURIComponent(
-                    title + ', ' + location
-                  )}&zoom=15`}
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen=""
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  className="rounded-2xl"
-                  title={`Mapa de ubicación de ${title} en ${location}`}
-                  aria-label={`Ubicación de ${title} en ${location}`}
-                ></iframe>
-              </div>
+              {cleanedContent ? (
+                <div 
+                  className="prose prose-xl max-w-none text-gray-100 prose-headings:text-white prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h1:font-bold prose-h2:font-bold prose-h3:font-medium prose-p:text-gray-200 prose-p:leading-relaxed prose-li:text-gray-200 prose-strong:text-amarillo prose-a:text-amarillo hover:prose-a:text-amarillo/80 prose-img:rounded-2xl prose-h2:!text-white prose-h2:before:!text-amarillo prose-h2:after:!text-amarillo [&>h2]:!text-white [&>h2]:before:!text-amarillo [&>h2]:after:!text-amarillo" 
+                  dangerouslySetInnerHTML={{ __html: cleanedContent }} 
+                  itemProp="description"
+                />
+              ) : (
+                <div className="text-white">
+                  {propertyState.description ? (
+                    <div dangerouslySetInnerHTML={{ __html: propertyState.description }} />
+                  ) : propertyState.content ? (
+                    <div dangerouslySetInnerHTML={{ __html: propertyState.content }} />
+                  ) : (
+                    <p className="text-gray-400 italic">No hay descripción disponible para esta propiedad.</p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 

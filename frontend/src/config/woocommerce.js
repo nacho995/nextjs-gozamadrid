@@ -67,6 +67,15 @@ const buildUrl = (endpoint, params = {}) => {
   }
 };
 
+// Función segura para split que verifica el tipo
+const safeSplit = (value, separator) => {
+  if (typeof value !== 'string') {
+    console.warn('[WooConfig] Intento de split en un valor no string:', value);
+    return [];
+  }
+  return value.split(separator);
+};
+
 const config = {
   WC_API_URL,
   WOO_COMMERCE_KEY,
@@ -92,7 +101,21 @@ const config = {
   
   // URLs directas para acceso a la API
   getDirectProductUrl: (id) => `${WC_API_URL}/products/${id}?consumer_key=${WOO_COMMERCE_KEY}&consumer_secret=${WOO_COMMERCE_SECRET}`,
-  getDirectProductsUrl: () => `${WC_API_URL}/products?consumer_key=${WOO_COMMERCE_KEY}&consumer_secret=${WOO_COMMERCE_SECRET}`
+  getDirectProductsUrl: () => `${WC_API_URL}/products?consumer_key=${WOO_COMMERCE_KEY}&consumer_secret=${WOO_COMMERCE_SECRET}`,
+  
+  // Función de utilidad para split seguro
+  safeSplit,
+  
+  // Función segura para obtener la base de una URL
+  getWooCommerceApiUrl: () => {
+    if (typeof WC_API_URL !== 'string') {
+      console.warn('[WooConfig] WC_API_URL no es una cadena válida:', WC_API_URL);
+      return 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3';
+    }
+    
+    const parts = safeSplit(WC_API_URL, '?');
+    return parts[0] || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3';
+  }
 };
 
 export default config; 

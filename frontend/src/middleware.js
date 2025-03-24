@@ -120,8 +120,9 @@ export async function middleware(request) {
 
   // Si es una solicitud a la página de detalles de propiedad
   if (pathname.startsWith('/property/')) {
-    // Obtener el ID de la propiedad
-    const id = pathname.split('/').pop();
+    // Obtener el ID de la propiedad de forma segura
+    const pathParts = typeof pathname === 'string' ? pathname.split('/') : [];
+    const id = pathParts.length > 0 ? pathParts.pop() : '';
     
     // Modificar la solicitud para incluir información de autenticación
     const requestHeaders = new Headers(request.headers);
