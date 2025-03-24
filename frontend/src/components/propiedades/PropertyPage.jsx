@@ -290,7 +290,7 @@ const extractLocations = (properties) => {
 const ITEMS_PER_PAGE = config.ITEMS_PER_PAGE || 12;
 const DEFAULT_PAGE = 1;
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gozamadrid.com';
-const API_URL = process.env.MONGODB_URL || '//api.realestategozamadrid.com';
+const API_URL = process.env.NEXT_PUBLIC_API_MONGODB_URL || process.env.NEXT_PUBLIC_API_URL || 'https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com';
 
 // Función para validar y parsear respuestas JSON
 const safeJsonParse = (data) => {
@@ -563,10 +563,11 @@ export default function PropertyPage() {
   // Efecto para cargar propiedades
   const fetchPropertiesFromAPI = async () => {
     try {
-      console.log(`[PropertyPage] Obteniendo propiedades de MongoDB usando: ${API_URL}/api/properties`);
+      console.log('[PropertyPage] Obteniendo propiedades de MongoDB usando el proxy interno');
       
-      // Reducir el timeout para no bloquear la UI durante tanto tiempo
-      const response = await axios.get(`${API_URL}/api/properties`, {
+      // Usar el proxy interno en lugar de la URL directa
+      // Esto resuelve los problemas de Mixed Content y CORS
+      const response = await axios.get('/api/proxy/mongodb/properties', {
         params: {
           page: currentPage,
           limit: ITEMS_PER_PAGE
@@ -575,11 +576,22 @@ export default function PropertyPage() {
       });
       
       if (validateResponse(response.data)) {
-        const properties = response.data.properties || [];
-        // Añadir indicador de fuente
+        console.log('[PropertyPage] Respuesta de MongoDB:', response.data);
+        let properties = [];
+        
+        // Manejar diferentes formatos de respuesta
+        if (Array.isArray(response.data)) {
+          properties = response.data;
+        } else if (response.data.properties && Array.isArray(response.data.properties)) {
+          properties = response.data.properties;
+        } else if (response.data.data && Array.isArray(response.data.data)) {
+          properties = response.data.data;
+        }
+        
+        // Añadir indicador de fuente si no lo tienen ya
         return properties.map(property => ({
           ...property,
-          source: 'mongodb'
+          source: property.source || 'mongodb'
         }));
       }
       return [];
@@ -732,32 +744,32 @@ export default function PropertyPage() {
       let mongoDbError = null;
       let wooCommerceError = null;
       
-      // Primero intentamos obtener las propiedades de WooCommerce, que suelen ser más rápidas y estables
+      // Primero intentamos obtener las propiedades de MongoDB (nueva API)
       try {
-        console.log('[PropertyPage] Iniciando carga de propiedades de WooCommerce...');
-        wooCommerceProperties = await fetchWooCommerceProperties();
-        console.log(`[PropertyPage] Propiedades de WooCommerce cargadas: ${wooCommerceProperties.length}`);
-      } catch (wooError) {
-        console.error('[PropertyPage] Error al cargar propiedades de WooCommerce:', wooError);
-        wooCommerceError = wooError.message || 'Error al obtener propiedades de WooCommerce';
+        console.log('[PropertyPage] Iniciando carga de propiedades de MongoDB...');
+        apiProperties = await fetchPropertiesFromAPI();
+        console.log(`[PropertyPage] Propiedades de MongoDB cargadas: ${apiProperties.length}`);
+      } catch (mongoError) {
+        console.error('[PropertyPage] Error al cargar propiedades de MongoDB:', mongoError);
+        mongoDbError = mongoError.message || 'Error al obtener propiedades de MongoDB';
       }
       
-      // Solo intentamos cargar de MongoDB si WooCommerce no devolvió suficientes resultados
-      if (wooCommerceProperties.length < 5) {
+      // Solo intentamos cargar de WooCommerce si MongoDB no devolvió suficientes resultados
+      if (apiProperties.length < 5) {
         try {
-          console.log('[PropertyPage] Iniciando carga de propiedades de MongoDB...');
-          apiProperties = await fetchPropertiesFromAPI();
-          console.log(`[PropertyPage] Propiedades de MongoDB cargadas: ${apiProperties.length}`);
-        } catch (mongoError) {
-          console.error('[PropertyPage] Error al cargar propiedades de MongoDB:', mongoError);
-          mongoDbError = mongoError.message || 'Error al obtener propiedades de MongoDB';
+          console.log('[PropertyPage] Iniciando carga de propiedades de WooCommerce...');
+          wooCommerceProperties = await fetchWooCommerceProperties();
+          console.log(`[PropertyPage] Propiedades de WooCommerce cargadas: ${wooCommerceProperties.length}`);
+        } catch (wooError) {
+          console.error('[PropertyPage] Error al cargar propiedades de WooCommerce:', wooError);
+          wooCommerceError = wooError.message || 'Error al obtener propiedades de WooCommerce';
         }
       } else {
-        console.log('[PropertyPage] Omitiendo carga de MongoDB porque WooCommerce ya devolvió suficientes propiedades');
+        console.log('[PropertyPage] Omitiendo carga de WooCommerce porque MongoDB ya devolvió suficientes propiedades');
       }
       
-      // Combinar todas las propiedades disponibles, priorizando WooCommerce
-      const allProperties = [...wooCommerceProperties, ...apiProperties];
+      // Combinar todas las propiedades disponibles, priorizando MongoDB
+      const allProperties = [...apiProperties, ...wooCommerceProperties];
       
       if (allProperties.length > 0) {
         console.log(`[PropertyPage] Total de propiedades combinadas: ${allProperties.length}`);

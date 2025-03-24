@@ -66,11 +66,13 @@ export default async function handler(req, res) {
           params: {}
         },
         mongodb: {
-          url: '/api/properties/sources/mongodb',
+          url: '/api/proxy/mongodb/properties', // Forzar el uso del proxy para MongoDB
           available: true,
           params: {}
         }
-      }
+      },
+      // Indicar que debe usar el proxy para MongoDB
+      useProxyForMongoDB: true
     };
 
     // Verificar disponibilidad de endpoints

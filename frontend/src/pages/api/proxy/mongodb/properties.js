@@ -28,8 +28,17 @@ const fetchWithRetry = async (url, options = {}, maxRetries = 3) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      const data = await response.json();
-      return data;
+      // Intentar parsear como JSON primero
+      try {
+        const data = await response.json();
+        return data;
+      } catch (jsonError) {
+        // Si no es JSON, intentar obtener como texto
+        console.error(`[MongoDB Proxy] Error al parsear JSON: ${jsonError.message}`);
+        const text = await response.text();
+        console.log(`[MongoDB Proxy] Respuesta como texto: ${text.substring(0, 200)}...`);
+        throw new Error(`Respuesta no es JSON válido: ${jsonError.message}`);
+      }
     } catch (error) {
       console.error(`[MongoDB Proxy] Error en intento ${attempt + 1}:`, error);
       lastError = error;
@@ -61,45 +70,119 @@ export default async function handler(req, res) {
   }
 
   try {
-    const MONGODB_API_URL = process.env.NEXT_PUBLIC_MONGODB_API_URL || 'https://gozamadrid-backend.onrender.com/api/properties';
+    // Usar URL hardcodeada para evitar problemas con variables de entorno
+    // Siempre utilizar HTTP ya que HTTPS no está configurado correctamente
+    const MONGODB_API_URL = 'http://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api/properties';
     
     console.log('[MongoDB Proxy] Iniciando petición a:', MONGODB_API_URL);
 
-    const data = await fetchWithRetry(MONGODB_API_URL, {
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Origin': 'https://www.realestategozamadrid.com'
-      }
-    });
-
-    // Verificar que la respuesta es un array
-    if (!Array.isArray(data)) {
-      console.error('[MongoDB Proxy] Respuesta no es un array:', data);
-      return res.status(500).json({ 
-        error: 'Formato de respuesta inválido',
-        details: typeof data
+    // Añadir los parámetros de consulta si existen
+    let url = new URL(MONGODB_API_URL);
+    
+    // Pasar los parámetros de la petición original
+    if (req.query) {
+      Object.keys(req.query).forEach(key => {
+        if (key !== 'slug') {
+          url.searchParams.append(key, req.query[key]);
+        }
       });
     }
 
-    // Añadir source y type a cada propiedad
-    const properties = data.map(property => ({
-      ...property,
-      source: 'mongodb',
-      type: 'mongodb'
-    }));
+    // Intentar obtener los datos
+    try {
+      const data = await fetchWithRetry(url.toString(), {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Origin': 'https://www.realestategozamadrid.com',
+          'Referer': 'https://www.realestategozamadrid.com/'
+        }
+      });
 
-    console.log(`[MongoDB Proxy] Obtenidas ${properties.length} propiedades`);
+      // Verificar formato de respuesta
+      if (Array.isArray(data)) {
+        // Añadir source y type a cada propiedad
+        const properties = data.map(property => ({
+          ...property,
+          source: 'mongodb',
+          type: 'mongodb'
+        }));
 
-    // Cachear la respuesta por 5 minutos
-    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate');
-    return res.status(200).json(properties);
+        console.log(`[MongoDB Proxy] Obtenidas ${properties.length} propiedades`);
 
+        // Cachear la respuesta por 5 minutos
+        res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate');
+        return res.status(200).json(properties);
+      } else if (data && typeof data === 'object') {
+        // Si es un objeto con propiedades
+        if (data.properties && Array.isArray(data.properties)) {
+          const properties = data.properties.map(property => ({
+            ...property,
+            source: 'mongodb',
+            type: 'mongodb'
+          }));
+
+          console.log(`[MongoDB Proxy] Obtenidas ${properties.length} propiedades desde data.properties`);
+          res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate');
+          return res.status(200).json(properties);
+        }
+
+        // Si no tiene campo properties pero es un objeto, devolver tal cual
+        console.log('[MongoDB Proxy] Respuesta es un objeto, devolviendo tal cual');
+        res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate');
+        return res.status(200).json(data);
+      }
+
+      // Si llegamos aquí, la respuesta tiene un formato desconocido
+      console.error('[MongoDB Proxy] Formato de respuesta desconocido:', typeof data);
+      return res.status(500).json({ 
+        error: 'Formato de respuesta desconocido',
+        details: typeof data,
+        sample: JSON.stringify(data).substring(0, 200) + '...'
+      });
+    } catch (fetchError) {
+      console.error('[MongoDB Proxy] Error obteniendo datos:', fetchError);
+      
+      // Probar con una URL alternativa
+      try {
+        console.log('[MongoDB Proxy] Intentando con URL alternativa...');
+        const alternativeUrl = 'http://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api/properties/sources/mongodb';
+        
+        const alternativeData = await fetchWithRetry(alternativeUrl, {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Origin': 'https://www.realestategozamadrid.com',
+            'Referer': 'https://www.realestategozamadrid.com/'
+          }
+        });
+        
+        if (Array.isArray(alternativeData)) {
+          const properties = alternativeData.map(property => ({
+            ...property,
+            source: 'mongodb',
+            type: 'mongodb'
+          }));
+          
+          console.log(`[MongoDB Proxy] (Alternativa) Obtenidas ${properties.length} propiedades`);
+          res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate');
+          return res.status(200).json(properties);
+        }
+        
+        // Si llegamos aquí y la URL alternativa también falló, devolver respuesta de error
+        throw new Error('Ambos endpoints fallaron');
+      } catch (alternativeError) {
+        console.error('[MongoDB Proxy] Error con URL alternativa:', alternativeError);
+        throw fetchError; // Rethrow del error original
+      }
+    }
   } catch (error) {
-    console.error('[MongoDB Proxy] Error:', error);
-    return res.status(500).json({ 
-      error: 'Error al obtener propiedades de MongoDB',
-      details: error.message 
-    });
+    console.error('[MongoDB Proxy] Error general:', error);
+    
+    // Respuesta de fallback: Devolver un array vacío en lugar de un error
+    // Esto permite que la interfaz de usuario siga funcionando aunque no haya datos
+    console.log('[MongoDB Proxy] Devolviendo array vacío como fallback');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    return res.status(200).json([]);
   }
 } 
