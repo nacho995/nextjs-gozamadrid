@@ -14,6 +14,14 @@ import axios from 'axios';
 const textShadowStyle = { textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' };
 const textShadowLightStyle = { textShadow: '1px 1px 2px rgba(0, 0, 0, 0.5)' };
 
+// Al inicio del archivo, agregar esta constante para controlar logs
+const isDev = process.env.NODE_ENV === 'development';
+const logDebug = (message, ...args) => {
+  if (isDev && window.appConfig?.debug) {
+    console.log(message, ...args);
+  }
+};
+
 // Componente de Paginación
 const Pagination = ({ totalPages, currentPage, onPageChange }) => {
   const router = useRouter();
@@ -112,73 +120,51 @@ const Pagination = ({ totalPages, currentPage, onPageChange }) => {
   );
 };
 
-// Modificar la función para obtener la URL de la imagen
+// Optimizar la función getProxiedImageUrl con useMemo
 const getProxiedImageUrl = (url) => {
   if (!url) {
-    console.log("PropertyPage - URL nula o indefinida, usando imagen por defecto");
     return '/img/default-property-image.jpg';
   }
-  
-  console.log("PropertyPage - URL original:", url);
-  
-  // Asegurarse de que url sea una cadena de texto
-  if (typeof url !== 'string') {
-    // Si es un objeto con src o url, usar esa propiedad
-    if (url && typeof url === 'object') {
-      console.log("PropertyPage - URL es un objeto:", url);
+
+  try {
+    if (typeof url === 'object') {
       if (url.src) {
-        console.log("PropertyPage - Usando url.src:", url.src);
-        return getProxiedImageUrl(url.src);
-      }
-      if (url.url) {
-        console.log("PropertyPage - Usando url.url:", url.url);
-        return getProxiedImageUrl(url.url);
-      }
-      if (url.source_url) {
-        console.log("PropertyPage - Usando url.source_url:", url.source_url);
-        return getProxiedImageUrl(url.source_url);
+        url = url.src;
+      } else if (url.url) {
+        url = url.url;
+      } else if (url.source_url) {
+        url = url.source_url;
+      } else {
+        return '/img/default-property-image.jpg';
       }
     }
-    // Si no es una cadena ni un objeto con src/url, devolver la imagen por defecto
-    console.log("PropertyPage - URL no válida, usando imagen por defecto");
-    return '/img/default-property-image.jpg';
-  }
-  
-  // Si ya es una URL de proxy o Cloudinary, devolverla tal cual
-  if (url.includes('images.weserv.nl') || url.includes('cloudinary.com')) {
-    console.log("PropertyPage - URL ya es proxy o Cloudinary, devolviendo tal cual:", url);
-    return url;
-  }
-  
-  // Si es una ruta relativa, construir la URL completa
-  if (!url.startsWith('http') && !url.startsWith('/')) {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com';
-    url = `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
-    console.log("PropertyPage - URL relativa convertida a absoluta:", url);
-  }
-  
-  // Para URLs externas, usar un servicio de proxy para evitar errores CORS y QUIC_PROTOCOL_ERROR
-  if (url.startsWith('http')) {
-    // No usar proxy para URLs de Cloudinary, ya que son seguras y optimizadas
-    if (url.includes('cloudinary.com')) {
-      console.log("PropertyPage - URL de Cloudinary, devolviendo tal cual:", url);
+
+    if (typeof url !== 'string') {
+      return '/img/default-property-image.jpg';
+    }
+
+    // Si ya es una URL de proxy o Cloudinary, devolverla tal cual
+    if (url.includes('/api/proxy-image') || url.includes('cloudinary.com')) {
       return url;
     }
-    
-    // Para otras URLs, usar un servicio de proxy de imágenes
-    try {
-      const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(url)}&default=https://www.realestategozamadrid.com/img/default-property-image.jpg`;
-      console.log("PropertyPage - URL con proxy:", proxyUrl);
-      return proxyUrl;
-    } catch (e) {
-      console.error("PropertyPage - Error al generar URL con proxy:", e);
-      return url; // Devolver la URL original si hay un error
+
+    // Si es una URL relativa, convertirla a absoluta
+    if (url.startsWith('/')) {
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+      return `${baseUrl}${url}`;
     }
+
+    // Si es una URL de Cloudinary, devolverla tal cual
+    if (url.includes('cloudinary.com')) {
+      return url;
+    }
+
+    // Añadir proxy para URLs externas
+    const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(url)}`;
+    return proxyUrl;
+  } catch (error) {
+    return '/img/default-property-image.jpg';
   }
-  
-  // Si no es una URL completa, usar la imagen por defecto
-  console.log("PropertyPage - URL no es URL completa, devolviendo original:", url);
-  return url;
 };
 
 // Modificar la función para obtener la ubicación correcta
@@ -796,42 +782,32 @@ export default function PropertyPage() {
     fetchAllProperties();
   }, [router.isReady, currentPage, configLoaded]);
 
-  // Memoizar las propiedades filtradas
+  // Usar useMemo para almacenar propiedades filtradas
   const filteredProperties = useMemo(() => {
-    if (!properties || properties.length === 0) {
-      console.log('[PropertyPage] No hay propiedades para filtrar');
+    if (!Array.isArray(properties) || properties.length === 0) {
       return [];
     }
-    
-    console.log(`[PropertyPage] Filtrando ${properties.length} propiedades con término: "${searchTerm}", tipo: "${selectedType}", ubicación: "${selectedLocation}"`);
-    
+
     return properties.filter(property => {
       // Filtrar por término de búsqueda
-      if (searchTerm) {
-        const searchLower = searchTerm.toLowerCase();
-        const location = (property.location || property.address || '').toLowerCase();
-        const title = (property.title || property.name || '').toLowerCase();
-        const description = (property.description || '').toLowerCase();
-        
-        if (!location.includes(searchLower) && 
-            !title.includes(searchLower) && 
-            !description.includes(searchLower)) {
-          return false;
-        }
-      }
-      
+      const searchMatch = !searchTerm || (
+        (property.title && property.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (property.name && property.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (property.description && property.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (property.location && property.location.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+
       // Filtrar por tipo
-      if (selectedType && property.propertyType !== selectedType) {
-        return false;
-      }
-      
+      const typeMatch = !selectedType || selectedType === 'Todos' || (
+        property.propertyType && property.propertyType.toLowerCase().includes(selectedType.toLowerCase())
+      );
+
       // Filtrar por ubicación
-      if (selectedLocation && 
-          (!property.location || !property.location.includes(selectedLocation))) {
-        return false;
-      }
-      
-      return true;
+      const locationMatch = !selectedLocation || selectedLocation === 'Todas' || (
+        property.location && property.location.toLowerCase().includes(selectedLocation.toLowerCase())
+      );
+
+      return searchMatch && typeMatch && locationMatch;
     });
   }, [properties, searchTerm, selectedType, selectedLocation]);
 

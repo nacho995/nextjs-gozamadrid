@@ -100,6 +100,11 @@ const config = {
     return id ? `${base}/${id}` : base;
   },
 
+  getWordPressBaseUrl: () => {
+    const base = typeof window !== 'undefined' ? window.location.origin : SITE_URL;
+    return `${base}/api/proxy/wordpress`;
+  },
+
   getWooCommerceAuth: () => ({
     key: config.WOO_COMMERCE_KEY,
     secret: config.WOO_COMMERCE_SECRET

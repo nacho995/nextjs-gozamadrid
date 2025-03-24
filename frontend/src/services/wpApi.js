@@ -5,7 +5,7 @@
 import config from '@/config/config';
 
 // URL base para el proxy de WordPress
-const WP_PROXY_URL = `${config.API_URL}/proxy?service=wordpress`;
+const WP_PROXY_URL = config.getWordPressBaseUrl();
 
 const WORDPRESS_API_URL = process.env.WORDPRESS_API_URL;
 
@@ -35,19 +35,41 @@ const safeRenderValue = (value) => {
 };
 
 /**
- * Obtiene los posts del blog
+ * Obtiene los posts del blog usando el endpoint proxy moderno
  * @param {number} page - Número de página
  * @param {number} perPage - Cantidad de posts por página
  * @returns {Promise} - Promesa con los posts
  */
-export async function getBlogPostsFromServer(page = 1, perPage = 3) {
+export async function getBlogPostsFromServer(page = 1, perPage = 10) {
   try {
-    const response = await fetch(`${WP_PROXY_URL}&resource=posts&page=${page}&per_page=${perPage}`);
+    console.log(`Obteniendo posts de blog desde ${WP_PROXY_URL}/posts (página ${page}, ${perPage} por página)`);
+    
+    const url = `${WP_PROXY_URL}/posts?page=${page}&per_page=${perPage}&_embed`;
+    
+    const response = await fetch(url, {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    });
+    
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Error en respuesta de WordPress: ${response.status}`, errorText);
       throw new Error(`Error en la respuesta de WordPress: ${response.status}`);
     }
-    const data = await response.json();
-    return data;
+    
+    const posts = await response.json();
+    
+    // Obtener los headers para el total de páginas y posts
+    const totalPages = parseInt(response.headers.get('X-WP-TotalPages') || '1');
+    const totalPosts = parseInt(response.headers.get('X-WP-Total') || posts.length);
+    
+    return {
+      posts,
+      totalPages,
+      totalPosts
+    };
   } catch (error) {
     console.error('Error en getBlogPostsFromServer:', error);
     throw new Error('Error al obtener los posts');
@@ -62,8 +84,10 @@ export async function getBlogPostsFromServer(page = 1, perPage = 3) {
  */
 export async function getBlogPostBySlug(slug, retries = 5) {
   try {
-    // Construir URL para usar el proxy
-    const url = `${WP_PROXY_URL}&resource=posts&slug=${encodeURIComponent(slug)}`;
+    // Construir URL para usar el proxy moderno
+    const url = `${WP_PROXY_URL}/posts?slug=${encodeURIComponent(slug)}&_embed`;
+    
+    console.log(`Obteniendo post por slug desde ${url}`);
     
     // Añadir timeout para evitar que la petición se quede colgada
     const controller = new AbortController();
@@ -73,10 +97,8 @@ export async function getBlogPostBySlug(slug, retries = 5) {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache'
+        'Accept': 'application/json'
       },
-      cache: 'no-store', // Evitar caché en Next.js
       signal: controller.signal
     });
     
@@ -165,11 +187,8 @@ export function getImageUrl(wpPost) {
 
 export async function getPosts(page = 1, perPage = 10) {
   try {
-    const response = await fetch(
-      `${WORDPRESS_API_URL}/wp/v2/posts?page=${page}&per_page=${perPage}&_embed`
-    );
-    if (!response.ok) throw new Error('Error fetching posts');
-    return await response.json();
+    const { posts } = await getBlogPostsFromServer(page, perPage);
+    return posts;
   } catch (error) {
     console.error('Error in getPosts:', error);
     return [];
@@ -178,12 +197,7 @@ export async function getPosts(page = 1, perPage = 10) {
 
 export async function getPost(slug) {
   try {
-    const response = await fetch(
-      `${WORDPRESS_API_URL}/wp/v2/posts?slug=${slug}&_embed`
-    );
-    if (!response.ok) throw new Error('Error fetching post');
-    const posts = await response.json();
-    return posts[0];
+    return await getBlogPostBySlug(slug);
   } catch (error) {
     console.error('Error in getPost:', error);
     return null;
@@ -192,9 +206,7 @@ export async function getPost(slug) {
 
 export async function getCategories() {
   try {
-    const response = await fetch(
-      `${WORDPRESS_API_URL}/wp/v2/categories`
-    );
+    const response = await fetch(`${WP_PROXY_URL}/categories`);
     if (!response.ok) throw new Error('Error fetching categories');
     return await response.json();
   } catch (error) {
@@ -206,7 +218,7 @@ export async function getCategories() {
 export async function getPostsByCategory(categoryId, page = 1, perPage = 10) {
   try {
     const response = await fetch(
-      `${WORDPRESS_API_URL}/wp/v2/posts?categories=${categoryId}&page=${page}&per_page=${perPage}&_embed`
+      `${WP_PROXY_URL}/posts?categories=${categoryId}&page=${page}&per_page=${perPage}&_embed`
     );
     if (!response.ok) throw new Error('Error fetching posts by category');
     return await response.json();
