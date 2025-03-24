@@ -14,8 +14,57 @@ const formatWooCommerceProperties = (properties) => {
   }
   
   return properties.map(property => {
-    // Agregar un identificador explícito para la fuente
+    // Extraer metadatos para cada propiedad
+    const extractMetadata = () => {
+      if (!property.meta_data || !Array.isArray(property.meta_data)) return {};
+      
+      const metadata = {};
+      property.meta_data.forEach(meta => {
+        if (!meta.key.startsWith('_')) {
+          metadata[meta.key] = meta.value;
+        }
+      });
+      return metadata;
+    };
+    
+    const metadata = extractMetadata();
+    
+    // Extraer características importantes
+    const bedrooms = parseInt(metadata.bedrooms) || 0;
+    const bathrooms = parseInt(metadata.baños) || parseInt(metadata.bathrooms) || parseInt(metadata.banos) || 0;
+    const area = parseInt(metadata.living_area) || parseInt(metadata.area) || parseInt(metadata.m2) || 0;
+    
+    // Extraer dirección/ubicación
+    let location = '';
+    if (property.name && (
+        property.name.includes("Calle") || 
+        property.name.includes("Avenida") || 
+        property.name.includes("Plaza") || 
+        /^(Calle|C\/|Avda\.|Av\.|Pza\.|Plaza)\s+[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+\d*/.test(property.name)
+    )) {
+      location = property.name;
+    } else if (metadata.address) {
+      if (typeof metadata.address === 'string') {
+        location = metadata.address;
+      } else if (typeof metadata.address === 'object') {
+        location = metadata.address.address || metadata.address.name || '';
+      }
+    }
+    
+    // Añadir campos de características a la propiedad
     property.source = 'woocommerce';
+    property.features = {
+      bedrooms,
+      bathrooms,
+      area,
+      floor: metadata.Planta || null
+    };
+    property.location = location;
+    property.metadata = metadata;
+    
+    // Log para depuración
+    console.log(`[WooCommerce] ID: ${property.id}, Título: ${property.name}, Habitaciones: ${bedrooms}, Baños: ${bathrooms}, Área: ${area}m²`);
+    
     return property;
   });
 };
@@ -51,6 +100,9 @@ export default async function handler(req, res) {
     const formattedProperties = formatWooCommerceProperties(response.data);
     
     console.log(`[API WooCommerce] ${formattedProperties.length} propiedades encontradas`);
+    
+    // Establecer cabeceras de caché para mejorar el rendimiento
+    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=60');
     
     return res.status(200).json(formattedProperties);
   } catch (error) {

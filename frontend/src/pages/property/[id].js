@@ -397,11 +397,63 @@ export default function PropertyDetail() {
       setLoading(true);
       setError(null);
       
-      // CORRECCIÓN: Usamos la URL directa a la API de WooCommerce para asegurar que todas las imágenes se obtienen
-      const wooUrl = `https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3/products/${id}?consumer_key=ck_d69e61427264a7beea70ca9ee543b45dd00cae85&consumer_secret=cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e`;
-      console.log(`[PropertyID] Obteniendo propiedad con ID ${id} directamente de WooCommerce`);
+      const detectedSource = detectSourceFromId(id);
+      console.log(`[PropertyID] Fuente detectada para ID ${id}: ${detectedSource}`);
       
+      // Si es una propiedad de MongoDB
+      if (detectedSource === 'mongodb') {
+        try {
+          console.log(`[PropertyID] Obteniendo propiedad de MongoDB con ID ${id}`);
+          // Construir la URL para obtener la propiedad de MongoDB
+          const mongoDBUrl = `/api/properties/sources/mongodb/${id}`;
+          
+          const response = await fetch(mongoDBUrl);
+          
+          if (response.ok) {
+            const propertyData = await response.json();
+            
+            if (propertyData) {
+              console.log(`[PropertyID] Propiedad MongoDB encontrada: ${propertyData.title || 'Sin título'}`);
+              setProperty({
+                ...propertyData,
+                source: 'mongodb'
+              });
+              setLoading(false);
+              return;
+            }
+          } else {
+            // Si falla, intentar con API alternativa
+            const fallbackUrl = `/api/proxy/mongodb/${id}`;
+            console.log(`[PropertyID] Intentando con API alternativa: ${fallbackUrl}`);
+            
+            const fallbackResponse = await fetch(fallbackUrl);
+            
+            if (fallbackResponse.ok) {
+              const fallbackData = await fallbackResponse.json();
+              setProperty({
+                ...fallbackData,
+                source: 'mongodb'
+              });
+              setLoading(false);
+              return;
+            }
+            
+            throw new Error(`No se pudo obtener la propiedad de MongoDB con ID ${id}`);
+          }
+        } catch (error) {
+          console.error(`[PropertyID] Error al cargar propiedad de MongoDB:`, error);
+          setError(`Error al cargar la propiedad: ${error.message}`);
+          setLoading(false);
+          return;
+        }
+      } 
+      
+      // Si es una propiedad de WooCommerce (o no se pudo determinar)
       try {
+        // CORRECCIÓN: Usamos la URL directa a la API de WooCommerce para asegurar que todas las imágenes se obtienen
+        const wooUrl = `https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3/products/${id}?consumer_key=ck_d69e61427264a7beea70ca9ee543b45dd00cae85&consumer_secret=cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e`;
+        console.log(`[PropertyID] Obteniendo propiedad con ID ${id} directamente de WooCommerce`);
+        
         const response = await fetch(wooUrl);
         
         if (response.ok) {

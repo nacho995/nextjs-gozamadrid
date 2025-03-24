@@ -7,11 +7,8 @@ export default async function handler(req, res) {
   }
   
   try {
-    // Verificar si tenemos un origen de API configurado
-    const apiUrl = process.env.API_BASE_URL || 'https://api.realestategozamadrid.com';
-    
-    // Construir la URL para obtener la propiedad
-    const url = `${apiUrl}/api/properties/sources/mongodb/${id}`;
+    // Usar directamente la URL del backend de MongoDB que funciona
+    const url = `http://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api/properties/${id}`;
     
     console.log(`[API] Solicitando propiedad MongoDB con ID ${id} desde ${url}`);
     
@@ -63,7 +60,7 @@ export default async function handler(req, res) {
         description: "Información temporal. Estamos experimentando problemas al conectar con la base de datos. Por favor, inténtelo de nuevo más tarde.",
         source: 'mongodb',
         price: "Consultar",
-        images: ['/img/default-property-image.jpg'],
+        images: [],
         _fallback: true,
         features: {
           bedrooms: 0,
@@ -94,7 +91,7 @@ export default async function handler(req, res) {
         description: "Se agotó el tiempo de espera al intentar cargar la información. Por favor, inténtelo de nuevo más tarde.",
         source: 'mongodb',
         price: "Consultar",
-        images: ['/img/default-property-image.jpg'],
+        images: [],
         _fallback: true,
         features: {
           bedrooms: 0,
@@ -119,7 +116,7 @@ export default async function handler(req, res) {
       description: "Ocurrió un error al intentar cargar la información. Por favor, inténtelo de nuevo más tarde.",
       source: 'mongodb',
       price: "Consultar",
-      images: ['/img/default-property-image.jpg'],
+      images: [],
       _fallback: true,
       features: {
         bedrooms: 0,

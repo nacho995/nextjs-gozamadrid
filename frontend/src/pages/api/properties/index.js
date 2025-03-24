@@ -43,6 +43,34 @@ const transformWooCommerceProperty = (property) => {
       price *= 1000; // Convertir precios en miles a su valor real
     }
 
+    // Extraer nombre de calle
+    let location = '';
+    // Primero intentar obtener del nombre de la propiedad si parece una dirección
+    if (property.name && (
+        property.name.includes("Calle") || 
+        property.name.includes("Avenida") || 
+        property.name.includes("Plaza") || 
+        /^(Calle|C\/|Avda\.|Av\.|Pza\.|Plaza)\s+[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+\d*/.test(property.name)
+    )) {
+      location = property.name;
+    } 
+    // Luego buscar en los metadatos
+    else if (metadata.address) {
+      if (typeof metadata.address === 'string') {
+        location = metadata.address;
+      } else if (typeof metadata.address === 'object') {
+        location = metadata.address.address || metadata.address.name || '';
+      }
+    }
+
+    // Extraer características principales
+    const bedrooms = parseInt(metadata.bedrooms) || 0;
+    const bathrooms = parseInt(metadata.baños) || parseInt(metadata.bathrooms) || parseInt(metadata.banos) || 0;
+    const area = parseInt(metadata.living_area) || parseInt(metadata.area) || parseInt(metadata.m2) || 0;
+    const floor = metadata.Planta || null;
+
+    console.log(`[WooCommerce Transform] Propiedad ${property.id} - Habitaciones: ${bedrooms}, Baños: ${bathrooms}, Área: ${area}m², Ubicación: ${location}`);
+
     const transformed = {
       id: property.id.toString(),
       title: property.name || '',
@@ -54,12 +82,12 @@ const transformWooCommerceProperty = (property) => {
         alt: img.alt || property.name || 'Imagen de propiedad'
       })) || [],
       features: {
-        bedrooms: parseInt(metadata.bedrooms) || 0,
-        bathrooms: parseInt(metadata.baños) || parseInt(metadata.bathrooms) || 0,
-        area: parseInt(metadata.living_area) || parseInt(metadata.area) || 0,
-        floor: metadata.Planta || null
+        bedrooms: bedrooms,
+        bathrooms: bathrooms,
+        area: area,
+        floor: floor
       },
-      location: metadata.address?.address || metadata.address || '',
+      location: location,
       metadata,
       createdAt: property.date_created || new Date().toISOString(),
       updatedAt: property.date_modified || new Date().toISOString()

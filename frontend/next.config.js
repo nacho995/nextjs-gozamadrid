@@ -8,7 +8,8 @@ const nextConfig = {
       'api.realestategozamadrid.com',
       'realestategozamadrid.com',
       'wordpress-1430059-5339263.cloudwaysapps.com',
-      'res.cloudinary.com'
+      'res.cloudinary.com',
+      'gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com'
     ],
     remotePatterns: [
       {

@@ -1245,17 +1245,87 @@ export default function PropertyPage() {
                   mainImage = getProxiedImageUrl(mainImage);
                 }
                 
-                // Extraer características
-                const bedrooms = property.bedrooms || property.rooms || '1';
-                const bathrooms = property.bathrooms || property.wc || '1';
-                const area = property.area || property.m2 || '0';
+                // Extraer características - Mejorado para WooCommerce
+                let bedrooms = '?';
+                let bathrooms = '?';
+                let area = '?';
+                let location = '';
+                
+                if (isMongoDBProperty) {
+                  // Si es propiedad de MongoDB, usar los campos directos
+                  bedrooms = property.bedrooms || property.rooms || '?';
+                  bathrooms = property.bathrooms || property.wc || '?';
+                  area = property.area || property.m2 || '?';
+                  location = property.location || property.address || '';
+                } else {
+                  // Si es WooCommerce, extraer de meta_data
+                  if (property.meta_data && Array.isArray(property.meta_data)) {
+                    // Extraer dormitorios
+                    const bedroomMeta = property.meta_data.find(meta => 
+                      meta.key === 'bedrooms' || meta.key === 'habitaciones' || meta.key === 'dormitorios'
+                    );
+                    bedrooms = bedroomMeta ? bedroomMeta.value : 
+                               property.bedrooms || property.rooms || '?';
+                    
+                    // Extraer baños
+                    const bathroomMeta = property.meta_data.find(meta => 
+                      meta.key === 'ba\u00f1os' || meta.key === 'banos' || meta.key === 'bathrooms' || meta.key === 'wc'
+                    );
+                    bathrooms = bathroomMeta ? bathroomMeta.value : 
+                                property.bathrooms || property.ba_os || property.wc || '?';
+                    
+                    // Extraer metros cuadrados
+                    const areaMeta = property.meta_data.find(meta => 
+                      meta.key === 'living_area' || meta.key === 'area' || meta.key === 'm2' || meta.key === 'metros'
+                    );
+                    area = areaMeta ? areaMeta.value : 
+                           property.area || property.m2 || property.metros || '?';
+                    
+                    // Extraer dirección
+                    const addressMeta = property.meta_data.find(meta => 
+                      meta.key === 'address' || meta.key === 'direccion' || meta.key === 'ubicacion' || meta.key === 'Ubicación'
+                    );
+                    
+                    if (addressMeta) {
+                      if (typeof addressMeta.value === 'string') {
+                        location = addressMeta.value;
+                      } else if (typeof addressMeta.value === 'object') {
+                        // Si es un objeto, intentar extraer la dirección
+                        location = addressMeta.value.address || 
+                                 addressMeta.value.name || 
+                                 (addressMeta.value.street_number && addressMeta.value.street_name ? 
+                                   `${addressMeta.value.street_number} ${addressMeta.value.street_name}, ${addressMeta.value.city}` : 
+                                   '');
+                      }
+                    }
+                    
+                    // Si no hay dirección en meta_data, intentar extraerla del nombre
+                    if (!location && property.name) {
+                      if (property.name.includes("Calle") || 
+                          property.name.includes("Avenida") || 
+                          property.name.includes("Plaza") || 
+                          /^(Calle|C\/|Avda\.|Av\.|Pza\.|Plaza)\s+[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+\d*/.test(property.name)) {
+                        location = property.name;
+                      }
+                    }
+                  }
+                }
                 
                 // Extraer características adicionales
-                const floor = property.piso || property.floor || null;
-                const hasPool = property.pool || property.piscina || false;
-                const hasGarage = property.garage || property.garaje || false;
-                const hasTerrace = property.terrace || property.terraza || false;
-                const hasGarden = property.garden || property.jardin || false;
+                const floor = property.piso || property.floor || 
+                             (property.meta_data ? property.meta_data.find(meta => meta.key === 'Planta' || meta.key === 'storeys')?.value : null);
+                
+                const hasPool = property.pool || property.piscina || 
+                              (property.meta_data ? !!property.meta_data.find(meta => meta.key === 'piscina' || meta.key === 'pool') : false);
+                
+                const hasGarage = property.garage || property.garaje || 
+                                (property.meta_data ? !!property.meta_data.find(meta => meta.key === 'garaje' || meta.key === 'garage') : false);
+                
+                const hasTerrace = property.terrace || property.terraza || 
+                                 (property.meta_data ? !!property.meta_data.find(meta => meta.key === 'terraza' || meta.key === 'terrace') : false);
+                
+                const hasGarden = property.garden || property.jardin || 
+                                (property.meta_data ? !!property.meta_data.find(meta => meta.key === 'jardin' || meta.key === 'garden') : false);
                 
                 // Estilo de sombra para legibilidad
                 const textShadowStyle = {
@@ -1304,14 +1374,11 @@ export default function PropertyPage() {
                       <div className="p-6">
                         {/* Título con ubicación */}
                         <h3 className="text-xl font-semibold text-white mb-3 line-clamp-2" style={textShadowStyle}>
-                          {property.title === 'Sin título' ? 
-                            (property.location ? `${property.location.split(',')[0]}` : 'Propiedad') : 
-                            property.title
-                          }
-                          {property.location && property.location.trim() !== "" && (
+                          {title}
+                          {location && location.trim() !== "" && (
                             <span className="block text-sm font-light text-amarillo mt-2">
                               <FaMapMarkerAlt className="inline-block mr-1 text-xs" /> 
-                              {property.location}
+                              {location}
                             </span>
                           )}
                         </h3>

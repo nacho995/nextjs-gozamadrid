@@ -1,156 +1,163 @@
-// Este endpoint sirve como proxy para obtener una propiedad específica de WooCommerce
+import axios from 'axios';
+
+// Configuración de WooCommerce
+const WC_API_URL = process.env.NEXT_PUBLIC_WC_API_URL || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3';
+const WC_KEY = process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY || 'ck_d69e61427264a7beea70ca9ee543b45dd00cae85';
+const WC_SECRET = process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET || 'cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e';
+const TIMEOUT = parseInt(process.env.NEXT_PUBLIC_API_TIMEOUT || '15000');
+
+// Función para transformar la propiedad de WooCommerce
+const transformProperty = (property) => {
+  try {
+    console.log(`[WooCommerce Transform] Transformando propiedad ID: ${property.id}`);
+    
+    // Extraer metadatos
+    const metadata = {};
+    if (property.meta_data && Array.isArray(property.meta_data)) {
+      property.meta_data.forEach(meta => {
+        if (!meta.key.startsWith('_')) {
+          metadata[meta.key] = meta.value;
+        }
+      });
+    }
+    
+    // Extraer características importantes
+    const bedrooms = parseInt(metadata.bedrooms) || 0;
+    const bathrooms = parseInt(metadata.baños) || parseInt(metadata.bathrooms) || parseInt(metadata.banos) || 0;
+    const area = parseInt(metadata.living_area) || parseInt(metadata.area) || parseInt(metadata.m2) || 0;
+    
+    // Extraer dirección/ubicación
+    let location = '';
+    if (property.name && (
+        property.name.includes("Calle") || 
+        property.name.includes("Avenida") || 
+        property.name.includes("Plaza") || 
+        /^(Calle|C\/|Avda\.|Av\.|Pza\.|Plaza)\s+[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+\d*/.test(property.name)
+    )) {
+      location = property.name;
+    } else if (metadata.address) {
+      if (typeof metadata.address === 'string') {
+        location = metadata.address;
+      } else if (typeof metadata.address === 'object') {
+        location = metadata.address.address || metadata.address.name || '';
+      }
+    }
+    
+    // Procesamiento del precio
+    let price = property.price;
+    if (typeof price === 'string') {
+      price = parseFloat(price.replace(/[^\d.-]/g, ''));
+    }
+    if (price < 10000 && price > 100) {
+      price *= 1000; // Convertir precios en miles a su valor real
+    }
+    
+    // Preparar imágenes
+    const images = property.images ? property.images.map(img => ({
+      id: img.id,
+      src: img.src,
+      alt: img.alt || property.name,
+      name: img.name || ''
+    })) : [];
+    
+    console.log(`[WooCommerce Transform] Datos extraídos - Habitaciones: ${bedrooms}, Baños: ${bathrooms}, Área: ${area}m², Ubicación: ${location}`);
+    
+    // Devolver objeto transformado
+    return {
+      id: property.id.toString(),
+      title: property.name,
+      description: property.description || property.short_description || '',
+      price: price,
+      images: images,
+      bedrooms: bedrooms,
+      bathrooms: bathrooms,
+      area: area,
+      location: location,
+      type: property.categories?.[0]?.name || 'Venta',
+      features: {
+        bedrooms: bedrooms,
+        bathrooms: bathrooms,
+        area: area,
+        floor: metadata.Planta || null
+      },
+      source: 'woocommerce',
+      createdAt: property.date_created || new Date().toISOString(),
+      updatedAt: property.date_modified || new Date().toISOString(),
+      metadata: metadata
+    };
+  } catch (error) {
+    console.error('[WooCommerce Transform] Error transformando propiedad:', error.message);
+    // Devolver un objeto mínimo con los datos disponibles
+    return {
+      id: property.id?.toString() || '',
+      title: property.name || 'Propiedad sin título',
+      description: property.description || property.short_description || '',
+      source: 'woocommerce',
+      error: error.message
+    };
+  }
+};
+
 export default async function handler(req, res) {
   const { id } = req.query;
   
   if (!id) {
     return res.status(400).json({ error: 'Se requiere un ID de propiedad' });
   }
-  
+
+  console.log(`[API WooCommerce] Solicitando propiedad con ID: ${id}`);
+  console.log(`[API WooCommerce] URL base: ${WC_API_URL}`);
+
   try {
-    // Obtener las claves de WooCommerce
-    const wcKey = process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY || 'ck_d69e61427264a7beea70ca9ee543b45dd00cae85';
-    const wcSecret = process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET || 'cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e';
+    // Construir la URL para obtener un producto específico de WooCommerce
+    const url = `${WC_API_URL}/products/${id}`;
+    console.log(`[API WooCommerce] URL completa: ${url}`);
     
-    // Construir la URL para obtener la propiedad de WooCommerce
-    const wcUrl = process.env.NEXT_PUBLIC_WC_API_URL || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3';
-    const url = `${wcUrl}/products/${id}?consumer_key=${wcKey}&consumer_secret=${wcSecret}`;
+    const response = await axios.get(url, {
+      params: {
+        consumer_key: WC_KEY,
+        consumer_secret: WC_SECRET
+      },
+      timeout: TIMEOUT
+    });
+
+    // Verificar si la respuesta es válida
+    if (!response.data) {
+      console.log('[API WooCommerce] No se recibieron datos de la API');
+      return res.status(404).json({ error: 'Propiedad no encontrada' });
+    }
+
+    // Transformar la propiedad para uso en la aplicación
+    const transformedProperty = transformProperty(response.data);
     
-    console.log(`[API] Solicitando propiedad WooCommerce con ID ${id} desde ${wcUrl}`);
+    console.log(`[API WooCommerce] Propiedad ${id} obtenida correctamente`);
     
-    // Configurar la solicitud con un timeout adecuado
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 segundos
+    // Establecer cabeceras de caché para mejorar el rendimiento
+    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=60');
     
-    try {
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        signal: controller.signal
-      });
+    return res.status(200).json(transformedProperty);
+  } catch (error) {
+    console.error(`[API WooCommerce] Error al obtener propiedad ${id}:`, error.message);
+    
+    if (error.response) {
+      const status = error.response.status;
       
-      clearTimeout(timeoutId);
-      
-      // Si la solicitud no es exitosa, intentar con el proxy alternativo
-      if (!response.ok) {
-        console.log(`[API] Error en la primera solicitud WooCommerce (${response.status}), intentando proxy alternativo...`);
-        return await tryAlternativeProxy(id, res);
-      }
-      
-      // Obtener los datos de la propiedad
-      const property = await response.json();
-      
-      // Si no hay propiedad o está vacía
-      if (!property) {
+      if (status === 404) {
         return res.status(404).json({ 
-          error: 'Propiedad no encontrada',
-          id,
-          source: 'woocommerce'
+          error: `Propiedad con ID ${id} no encontrada`,
+          status: 404
         });
       }
       
-      // Si todo es correcto, devolver la propiedad
-      return res.status(200).json({
-        ...property,
-        source: 'woocommerce' // Asegurarse de que tenga la fuente correcta
+      return res.status(status).json({
+        error: `Error de WooCommerce: ${error.response.data?.message || 'Error desconocido'}`,
+        status
       });
-    } catch (fetchError) {
-      console.error(`[API] Error de fetch al obtener propiedad WooCommerce ${id}:`, fetchError);
-      
-      // Intentar con el proxy alternativo
-      console.log('[API] Intentando obtener datos mediante proxy alternativo...');
-      return await tryAlternativeProxy(id, res);
     }
     
-  } catch (error) {
-    console.error(`[API] Error general al obtener propiedad WooCommerce ${id}:`, error);
-    
-    // Si ya intentamos con el proxy alternativo o si el error es crítico, devolver fallback
-    if (error.message && error.message.includes('after proxy attempt')) {
-      // Proporcionar una propiedad de fallback
-      const errorFallbackProperty = createFallbackProperty(id, error.message);
-      return res.status(207).json(errorFallbackProperty);
-    }
-    
-    // Intentar con el proxy alternativo
-    try {
-      return await tryAlternativeProxy(id, res);
-    } catch (proxyError) {
-      const errorFallbackProperty = createFallbackProperty(id, `${error.message}, Proxy error: ${proxyError.message}`);
-      return res.status(207).json(errorFallbackProperty);
-    }
-  }
-}
-
-// Función para intentar obtener la propiedad mediante un proxy alternativo
-async function tryAlternativeProxy(id, res) {
-  try {
-    // Construir la URL para el proxy alternativo
-    const proxyUrl = `/api/proxy/woocommerce-product?id=${id}`;
-    
-    console.log(`[API] Solicitando proxy alternativo: ${proxyUrl}`);
-    
-    // Usar un timeout más largo para el proxy alternativo
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 segundos
-    
-    const proxyResponse = await fetch(proxyUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      signal: controller.signal
+    return res.status(500).json({ 
+      error: `Error al obtener la propiedad: ${error.message}`,
+      status: 500
     });
-    
-    clearTimeout(timeoutId);
-    
-    if (!proxyResponse.ok) {
-      // Si el proxy también falla, lanzar error
-      throw new Error(`Proxy alternativo falló con estado: ${proxyResponse.status}`);
-    }
-    
-    const property = await proxyResponse.json();
-    
-    // Si el proxy devuelve correctamente los datos
-    return res.status(200).json({
-      ...property,
-      source: 'woocommerce'
-    });
-  } catch (proxyError) {
-    console.error(`[API] Error en proxy alternativo:`, proxyError);
-    
-    // Si el proxy falla, crear propiedad fallback
-    const fallbackProperty = createFallbackProperty(id, `Error después de intento de proxy: ${proxyError.message}`);
-    return res.status(207).json(fallbackProperty);
   }
-}
-
-// Función para crear una propiedad fallback
-function createFallbackProperty(id, errorMessage) {
-  return {
-    id: id,
-    name: `Propiedad ${id}`,
-    description: "Información temporal. Estamos experimentando problemas al conectar con la base de datos. Por favor, inténtelo de nuevo más tarde.",
-    source: 'woocommerce',
-    price: "Consultar",
-    images: [
-      {
-        src: '/img/default-property-image.jpg',
-        alt: 'Imagen por defecto'
-      }
-    ],
-    _fallback: true,
-    meta_data: [
-      { key: 'bedrooms', value: '0' },
-      { key: 'bathrooms', value: '0' },
-      { key: 'living_area', value: '0' },
-      { key: 'location', value: 'Madrid' }
-    ],
-    location: 'Madrid',
-    type: 'Propiedad',
-    error: errorMessage || 'Error al obtener datos'
-  };
 } 

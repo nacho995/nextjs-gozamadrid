@@ -388,23 +388,35 @@ export default function DefaultPropertyContent({ property }) {
       // Procesar imágenes de MongoDB
       else if (propertyState.source === 'mongodb' && propertyState.images) {
         if (Array.isArray(propertyState.images)) {
-          images = propertyState.images.map(img => {
-            const imageUrl = typeof img === 'string' ? img : (img.src || img.url || '');
+          console.log("Procesando imágenes de MongoDB:", propertyState.images);
+          images = propertyState.images.map((img, index) => {
+            // Verificar si es un objeto con src o una URL string
+            let imageUrl = '';
+            if (typeof img === 'string') {
+              imageUrl = img;
+            } else if (typeof img === 'object') {
+              imageUrl = img.src || img.url || '';
+              console.log(`Imagen MongoDB #${index} es objeto:`, img);
+            }
+            
             const processedUrl = processImageUrl(imageUrl);
+            console.log(`Imagen MongoDB #${index} - URL original: ${imageUrl} - Procesada: ${processedUrl}`);
             
             return {
               src: processedUrl,
-              alt: `${propertyState.title || 'Propiedad'} - Imagen`,
+              alt: `${propertyState.title || 'Propiedad'} - Imagen ${index + 1}`,
               originalSrc: imageUrl
             };
           }).filter(img => img.src); // Filtrar imágenes sin src
+          
+          console.log(`Procesadas ${images.length} imágenes de MongoDB.`);
         }
       }
       
-      // Si no hay imágenes, usar imagen por defecto
+      // Si no hay imágenes, no usar imagen por defecto
       if (!images || images.length === 0) {
-        console.log("No se encontraron imágenes. Usando imagen por defecto");
-        images = [defaultImage];
+        console.log("No se encontraron imágenes. Dejando el array vacío.");
+        images = [];
       }
       
       console.log("Imágenes procesadas:", images.length);
@@ -412,12 +424,8 @@ export default function DefaultPropertyContent({ property }) {
       
     } catch (error) {
       console.error("Error al procesar imágenes:", error);
-      // En caso de error, establecer al menos una imagen por defecto
-      setPropertyImages([{
-        src: '/img/default-property-image.jpg',
-        alt: 'Imagen por defecto (error)',
-        isDefault: true
-      }]);
+      // En caso de error, dejar el array de imágenes vacío
+      setPropertyImages([]);
     }
   }, [propertyState]);
 
@@ -491,37 +499,51 @@ export default function DefaultPropertyContent({ property }) {
   const handleImageError = (e) => {
     console.error("Error al cargar imagen:", e.target.src);
     
+    // Verificar si ya hemos reintentado con esta imagen
+    const isRetried = e.target.getAttribute('data-retried');
+    if (isRetried === 'true') {
+      console.log("El proxy también falló, mostrando mensaje de no disponible");
+      // Reemplazar la imagen con un div
+      const parentElement = e.target.parentNode;
+      if (parentElement) {
+        const noImageDiv = document.createElement('div');
+        noImageDiv.className = "w-full h-full flex items-center justify-center bg-gray-800";
+        
+        const textElement = document.createElement('p');
+        textElement.className = "text-2xl text-gray-400";
+        textElement.textContent = "Imagen no disponible";
+        
+        noImageDiv.appendChild(textElement);
+        parentElement.replaceChild(noImageDiv, e.target);
+      }
+      return;
+    }
+    
+    // Marcar como reintentada para no entrar en un bucle infinito
+    e.target.setAttribute('data-retried', 'true');
+    
     // Intentar usar el proxy de imágenes si la URL original falló
     if (e.target.src && !e.target.src.includes('images.weserv.nl') && e.target.src.startsWith('http')) {
-      // Usar un mejor servicio de proxy para las imágenes de WooCommerce
+      // Usar un mejor servicio de proxy para las imágenes
       const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(e.target.src)}&n=-1`;
       console.log("Reintentando con proxy:", proxyUrl);
       e.target.src = proxyUrl;
-    } else if (e.target.src && e.target.src.includes('images.weserv.nl')) {
-      // Si ya estamos usando el proxy y sigue fallando, buscar imagen original en WooCommerce
-      console.log("El proxy también falló, buscando imagen original");
-      
-      // Buscar la imagen original en el arreglo de imágenes
-      const originalImage = propertyImages && propertyImages.find(img => img.src === e.target.src)?.originalSrc;
-      
-      if (originalImage && originalImage.startsWith('http')) {
-        // Intentar con la URL original directamente
-        console.log("Intentando con la URL original:", originalImage);
-        e.target.src = originalImage;
-      } else {
-        // Si no hay URL original, verificar en la propiedad
-        const wooCommerceDirectImage = propertyState.images?.[0]?.src || 
-                                       propertyState.featuredImage || 
-                                       'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-content/uploads/2023/05/placeholder-image.jpg';
-        
-        console.log("Usando imagen de WooCommerce:", wooCommerceDirectImage);
-        e.target.src = wooCommerceDirectImage;
-      }
     } else {
-      // Si es una URL local o no HTTP, usar la URL de Cloudways
-      console.log("URL no es HTTP o es local, usando URL de Cloudways");
-      e.target.src = 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-content/uploads/2023/05/placeholder-image.jpg';
-      e.target.alt = 'Imagen por defecto (error al cargar)';
+      // Si es una URL local o ya es proxy, mostrar mensaje de no disponible
+      console.log("URL no es HTTP o ya es proxy, mostrando mensaje de no disponible");
+      // Reemplazar la imagen con un div
+      const parentElement = e.target.parentNode;
+      if (parentElement) {
+        const noImageDiv = document.createElement('div');
+        noImageDiv.className = "w-full h-full flex items-center justify-center bg-gray-800";
+        
+        const textElement = document.createElement('p');
+        textElement.className = "text-2xl text-gray-400";
+        textElement.textContent = "Imagen no disponible";
+        
+        noImageDiv.appendChild(textElement);
+        parentElement.replaceChild(noImageDiv, e.target);
+      }
     }
     
     setImageLoading(false); // Ocultar el loader incluso si hay un error
@@ -827,7 +849,7 @@ export default function DefaultPropertyContent({ property }) {
             {/* Imagen principal con marco elegante */}
             <div className="relative w-full h-[75vh] mb-8 rounded-[2rem] overflow-hidden shadow-2xl border border-amarillo/20 group">
               {/* Indicador de carga mejorado que solo aparece cuando la imagen actual está cargando */}
-              {imageLoading && !loadedImages[current] && (
+              {imageLoading && !loadedImages[current] && propertyImages.length > 0 && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/90">
                   <div className="w-24 h-12 relative">
                     <div className="absolute left-0 w-12 h-12 rounded-full border-4 border-amarillo animate-[spin_2s_linear_infinite]"></div>
@@ -836,7 +858,7 @@ export default function DefaultPropertyContent({ property }) {
                 </div>
               )}
               
-              {propertyImages && propertyImages.length > 0 && propertyImages[current] ? (
+              {propertyImages && propertyImages.length > 0 ? (
                 <motion.img
                   key={current}
                   src={propertyImages[current].src}
@@ -859,16 +881,12 @@ export default function DefaultPropertyContent({ property }) {
                   itemProp="image"
                 />
               ) : (
-                <img 
-                  src="/img/default-property-image.jpg" 
-                  alt={`${title} - Imagen por defecto`}
-                  className="w-full h-full object-cover"
-                  onLoad={() => setImageLoading(false)}
-                  itemProp="image"
-                />
+                <div className="w-full h-full flex items-center justify-center bg-gray-800">
+                  <p className="text-2xl text-gray-400">Sin imágenes disponibles</p>
+                </div>
               )}
               
-              {/* Controles de navegación elegantes */}
+              {/* Controles de navegación elegantes - solo mostrar si hay más de una imagen */}
               {propertyImages.length > 1 && (
                 <>
                   <button 
@@ -885,51 +903,57 @@ export default function DefaultPropertyContent({ property }) {
                   >
                     <FaChevronRight className="text-xl group-hover:transform group-hover:translate-x-1 transition-transform" />
                   </button>
+                  
+                  {/* Contador de imágenes elegante */}
+                  <div className="absolute bottom-6 right-6 bg-black/60 backdrop-blur-xl text-white px-6 py-3 rounded-2xl text-lg font-light tracking-wider shadow-xl border border-white/10">
+                    {current + 1} / {propertyImages.length}
+                  </div>
                 </>
               )}
-              
-              {/* Contador de imágenes elegante */}
-              <div className="absolute bottom-6 right-6 bg-black/60 backdrop-blur-xl text-white px-6 py-3 rounded-2xl text-lg font-light tracking-wider shadow-xl border border-white/10">
-                {current + 1} / {propertyImages.length}
-              </div>
             </div>
             
             {/* Miniaturas con efecto premium */}
-            <div className="bg-black/80 backdrop-blur-xl p-6 rounded-[2rem] border border-amarillo/20 shadow-2xl hidden sm:block">
-              <h3 className="text-xl text-white mb-4 font-light text-center">
-                {propertyImages.length > 0 
-                  ? `${propertyImages.length} imágenes disponibles` 
-                  : 'No hay imágenes disponibles'}
-              </h3>
-              
-              <div className="flex flex-wrap justify-center gap-4">
-                {propertyImages.map((image, index) => (
-                  <button
-                    key={`thumb-${index}`}
-                    onClick={() => setCurrent(index)}
-                    className={`relative w-28 h-28 rounded-xl overflow-hidden transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amarillo 
-                      ${current === index ? 'ring-4 ring-amarillo scale-105' : 'opacity-50 hover:opacity-100'}`}
-                    aria-label={`Ver imagen ${index + 1}`}
-                    aria-current={current === index ? 'true' : 'false'}
-                  >
-                    <img
-                      src={image.src}
-                      alt={image.alt || `${title} - Miniatura ${index + 1}`}
-                      className="w-full h-full object-cover"
-                      onError={handleImageError}
-                    />
-                    {/* Indicador de imagen actual */}
-                    {current === index && (
-                      <div className="absolute inset-0 bg-amarillo/20 border-2 border-amarillo"></div>
-                    )}
-                    {/* Número de imagen */}
-                    <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-2 py-1 rounded-lg">
-                      {index + 1}
-                    </div>
-                  </button>
-                ))}
+            {propertyImages.length > 0 ? (
+              <div className="bg-black/80 backdrop-blur-xl p-6 rounded-[2rem] border border-amarillo/20 shadow-2xl hidden sm:block">
+                <h3 className="text-xl text-white mb-4 font-light text-center">
+                  {propertyImages.length} imágenes disponibles
+                </h3>
+                
+                <div className="flex flex-wrap justify-center gap-4">
+                  {propertyImages.map((image, index) => (
+                    <button
+                      key={`thumb-${index}`}
+                      onClick={() => setCurrent(index)}
+                      className={`relative w-28 h-28 rounded-xl overflow-hidden transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amarillo 
+                        ${current === index ? 'ring-4 ring-amarillo scale-105' : 'opacity-50 hover:opacity-100'}`}
+                      aria-label={`Ver imagen ${index + 1}`}
+                      aria-current={current === index ? 'true' : 'false'}
+                    >
+                      <img
+                        src={image.src}
+                        alt={image.alt || `${title} - Miniatura ${index + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={handleImageError}
+                      />
+                      {/* Indicador de imagen actual */}
+                      {current === index && (
+                        <div className="absolute inset-0 bg-amarillo/20 border-2 border-amarillo"></div>
+                      )}
+                      {/* Número de imagen */}
+                      <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-2 py-1 rounded-lg">
+                        {index + 1}
+                      </div>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="bg-black/80 backdrop-blur-xl p-6 rounded-[2rem] border border-amarillo/20 shadow-2xl hidden sm:block">
+                <h3 className="text-xl text-white mb-4 font-light text-center">
+                  No hay imágenes disponibles
+                </h3>
+              </div>
+            )}
           </section>
 
           {/* Características premium */}
