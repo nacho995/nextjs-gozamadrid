@@ -326,27 +326,42 @@ export default function DefaultPropertyContent({ property }) {
       };
       
       // Procesar imágenes de WordPress
-      if (propertyState.source === 'woocommerce' || (!propertyState.source && propertyState.images)) {
+      if (propertyState.source === 'woocommerce' || propertyState.source === 'woocommerce_direct' || (!propertyState.source && propertyState.images)) {
         if (propertyState.images && Array.isArray(propertyState.images)) {
+          console.log(`Procesando imágenes de WooCommerce: ${propertyState.images.length} imágenes disponibles`);
+          if (propertyState.images.length > 0) {
+            console.log("Primera imagen WooCommerce:", propertyState.images[0]);
+          }
+          
           // Convertir cada imagen a formato proxy
-          images = propertyState.images.map(img => {
+          images = propertyState.images.map((img, index) => {
             // Determinar si la imagen es un objeto o una cadena de texto
             if (typeof img === 'string') {
               // Es solo la URL como cadena
               const processedUrl = processImageUrl(img);
               return {
                 src: processedUrl,
-                alt: `${propertyState.name || propertyState.title || 'Propiedad'} - Imagen`,
+                alt: `${propertyState.name || propertyState.title || 'Propiedad'} - Imagen ${index + 1}`,
                 originalSrc: img
               };
             } else if (typeof img === 'object') {
               // Es un objeto de imagen con propiedades
               const imageUrl = img.src || img.url || img.source_url || '';
+              
+              // Log detallado del objeto de imagen
+              console.log(`Procesando imagen WooCommerce #${index}:`, {
+                srcProperty: img.src,
+                urlProperty: img.url,
+                sourceUrlProperty: img.source_url,
+                altProperty: img.alt,
+                id: img.id
+              });
+              
               const processedUrl = processImageUrl(imageUrl);
               
               return {
                 src: processedUrl,
-                alt: img.alt || `${propertyState.name || propertyState.title || 'Propiedad'} - Imagen`,
+                alt: img.alt || `${propertyState.name || propertyState.title || 'Propiedad'} - Imagen ${index + 1}`,
                 name: img.name || '',
                 id: img.id || '',
                 originalSrc: imageUrl
@@ -358,14 +373,16 @@ export default function DefaultPropertyContent({ property }) {
             const processedFallback = processImageUrl(fallbackUrl);
             return {
               src: processedFallback,
-              alt: 'Imagen de propiedad',
+              alt: `Imagen de propiedad ${index + 1}`,
               originalSrc: fallbackUrl
             };
           }).filter(img => img.src); // Filtrar imágenes sin src
           
           // Log detallado para depuración
-          console.log(`Procesadas ${images.length} imágenes. Primera imagen:`, 
+          console.log(`Procesadas ${images.length} imágenes de WooCommerce. Primera imagen:`, 
             images.length > 0 ? images[0] : 'No hay imágenes');
+        } else {
+          console.log("No se encontraron imágenes en la propiedad de WooCommerce");
         }
       } 
       // Procesar imágenes de MongoDB
@@ -879,24 +896,36 @@ export default function DefaultPropertyContent({ property }) {
             
             {/* Miniaturas con efecto premium */}
             <div className="bg-black/80 backdrop-blur-xl p-6 rounded-[2rem] border border-amarillo/20 shadow-2xl hidden sm:block">
+              <h3 className="text-xl text-white mb-4 font-light text-center">
+                {propertyImages.length > 0 
+                  ? `${propertyImages.length} imágenes disponibles` 
+                  : 'No hay imágenes disponibles'}
+              </h3>
+              
               <div className="flex flex-wrap justify-center gap-4">
                 {propertyImages.map((image, index) => (
                   <button
-                    key={index}
+                    key={`thumb-${index}`}
                     onClick={() => setCurrent(index)}
-                    className={`relative w-[120px] h-[90px] md:w-[150px] md:h-[100px] rounded-xl overflow-hidden transition-all duration-500 ${
-                      index === current
-                        ? "ring-4 ring-amarillo shadow-2xl scale-110 z-10"
-                        : "ring-1 ring-white/10 hover:ring-amarillo hover:shadow-xl hover:scale-105"
-                    }`}
-                    aria-label={`Ver imagen ${index + 1} de ${propertyImages.length}`}
+                    className={`relative w-28 h-28 rounded-xl overflow-hidden transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amarillo 
+                      ${current === index ? 'ring-4 ring-amarillo scale-105' : 'opacity-50 hover:opacity-100'}`}
+                    aria-label={`Ver imagen ${index + 1}`}
+                    aria-current={current === index ? 'true' : 'false'}
                   >
                     <img
                       src={image.src}
-                      alt={image.alt || `${title} - Imagen ${index + 1}`}
-                      className="h-full w-full object-cover transition-transform duration-3000 hover:scale-125"
+                      alt={image.alt || `${title} - Miniatura ${index + 1}`}
+                      className="w-full h-full object-cover"
                       onError={handleImageError}
                     />
+                    {/* Indicador de imagen actual */}
+                    {current === index && (
+                      <div className="absolute inset-0 bg-amarillo/20 border-2 border-amarillo"></div>
+                    )}
+                    {/* Número de imagen */}
+                    <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-2 py-1 rounded-lg">
+                      {index + 1}
+                    </div>
                   </button>
                 ))}
               </div>

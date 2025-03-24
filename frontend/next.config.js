@@ -33,8 +33,8 @@ const nextConfig = {
     NEXT_PUBLIC_WOO_COMMERCE_SECRET: process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET || 'cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e',
     NEXT_PUBLIC_WC_API_URL: process.env.NEXT_PUBLIC_WC_API_URL || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3',
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://realestategozamadrid.com'),
-    MONGODB_URL: process.env.MONGODB_URL || 'https://api.realestategozamadrid.com',
-    API_BASE_URL: process.env.API_BASE_URL || 'https://api.realestategozamadrid.com'
+    MONGODB_URL: process.env.MONGODB_URL || '',
+    API_BASE_URL: process.env.API_BASE_URL || ''
   },
   // Eliminamos output: 'export' para permitir API routes
   distDir: '.next',
@@ -50,57 +50,45 @@ const nextConfig = {
   pageExtensions: ['js', 'jsx', 'mdx'],
   
   async rewrites() {
-    const apiUrl = process.env.API_BASE_URL || 'https://api.realestategozamadrid.com';
-    const wcUrl = process.env.NEXT_PUBLIC_WC_API_URL || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3';
-    const wcKey = process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY || 'ck_d69e61427264a7beea70ca9ee543b45dd00cae85';
-    const wcSecret = process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET || 'cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e';
-
+    // Para desarrollo y producción, usamos nuestra propia API interna
+    // Esto evita problemas de CORS y errores de timeout
     return [
       // Rutas específicas para las fuentes
       {
         source: '/api/properties/sources/:source',
-        destination: `${apiUrl}/api/properties/sources/:source`
+        destination: '/api/properties/sources/:source'
       },
       {
         source: '/api/properties/sources/:source/:id',
-        destination: `${apiUrl}/api/properties/sources/:source/:id`
+        destination: '/api/properties/sources/:source/:id'
       },
       // Ruta específica para WooCommerce
       {
         source: '/api/woocommerce/:path*',
-        destination: `${wcUrl}/:path*?consumer_key=${wcKey}&consumer_secret=${wcSecret}`
+        destination: `https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3/:path*?consumer_key=ck_d69e61427264a7beea70ca9ee543b45dd00cae85&consumer_secret=cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e`
       },
-      // API Routes para propiedades
+      // API Routes para propiedades - usar los endpoints internos
       {
         source: '/api/properties',
-        destination: `${apiUrl}/api/properties`
+        destination: '/api/properties'
       },
       {
         source: '/api/properties/:id',
-        destination: `${apiUrl}/api/properties/:id`
+        destination: '/api/properties/:id'
       },
       {
         source: '/api/properties/:path*',
-        destination: `${apiUrl}/api/properties/:path*`
+        destination: '/api/properties/:path*'
       },
       // Proxy routes
       {
         source: '/api/proxy/woocommerce/:path*',
-        destination: `${wcUrl}/:path*?consumer_key=${wcKey}&consumer_secret=${wcSecret}`
-      },
-      {
-        source: '/api/proxy/mongodb/:path*',
-        destination: `${apiUrl}/api/:path*`
-      },
-      // Proxy directo para imágenes (evitar problemas CORS)
-      {
-        source: '/api/proxy-image',
-        destination: `${apiUrl}/api/proxy-image`
+        destination: `https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3/:path*?consumer_key=ck_d69e61427264a7beea70ca9ee543b45dd00cae85&consumer_secret=cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e`
       },
       // Fallbacks para manejo de errores
       {
         source: '/api/:path*',
-        destination: `${apiUrl}/api/:path*`
+        destination: '/api/:path*'
       }
     ];
   },

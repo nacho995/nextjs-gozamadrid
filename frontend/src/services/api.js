@@ -66,9 +66,9 @@ const fetchWithRetry = async (url, options = {}, retries = MAX_RETRIES) => {
 export const getProperties = async (page = 1, limit = 12) => {
   try {
     console.log(`Obteniendo propiedades: página ${page}, límite ${limit}`);
-    console.log('URL de la API:', config.API_BASE_URL);
     
-    const url = `${config.API_BASE_URL}/api/properties?page=${page}&limit=${limit}`;
+    // Usar ruta relativa para evitar problemas de Mixed Content
+    const url = `/api/properties?page=${page}&limit=${limit}`;
     console.log('URL completa:', url);
     
     const data = await fetchWithRetry(url, {
@@ -90,7 +90,8 @@ export const getProperties = async (page = 1, limit = 12) => {
 export const getProperty = async (id) => {
   try {
     console.log(`Obteniendo propiedad con ID: ${id}`);
-    const url = `${config.API_BASE_URL}/api/properties/${id}`;
+    // Usar ruta relativa para evitar problemas de Mixed Content
+    const url = `/api/properties/${id}`;
     console.log('URL completa:', url);
     
     const data = await fetchWithRetry(url);

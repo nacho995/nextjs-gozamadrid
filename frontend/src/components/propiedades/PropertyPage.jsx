@@ -290,7 +290,7 @@ const extractLocations = (properties) => {
 const ITEMS_PER_PAGE = config.ITEMS_PER_PAGE || 12;
 const DEFAULT_PAGE = 1;
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gozamadrid.com';
-const API_URL = process.env.MONGODB_URL || 'https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com';
+const API_URL = process.env.MONGODB_URL || '//api.realestategozamadrid.com';
 
 // Función para validar y parsear respuestas JSON
 const safeJsonParse = (data) => {
@@ -565,12 +565,13 @@ export default function PropertyPage() {
     try {
       console.log(`[PropertyPage] Obteniendo propiedades de MongoDB usando: ${API_URL}/api/properties`);
       
+      // Reducir el timeout para no bloquear la UI durante tanto tiempo
       const response = await axios.get(`${API_URL}/api/properties`, {
         params: {
           page: currentPage,
           limit: ITEMS_PER_PAGE
         },
-        timeout: 30000 // Aumentar el timeout a 30 segundos
+        timeout: 15000  // Reducir el timeout a 15 segundos en lugar de 30
       });
       
       if (validateResponse(response.data)) {
@@ -583,8 +584,16 @@ export default function PropertyPage() {
       }
       return [];
     } catch (error) {
-      console.error('[PropertyPage] Error al obtener propiedades de MongoDB:', error);
-      throw error; // Propagar el error para manejarlo en fetchAllProperties
+      // Mejorar mensaje de error para timeouts
+      if (error.code === 'ECONNABORTED') {
+        console.error('[PropertyPage] Timeout al obtener propiedades de MongoDB (tiempo de espera agotado)');
+      } else {
+        console.error('[PropertyPage] Error al obtener propiedades de MongoDB:', error);
+      }
+      
+      // Es importante devolver un array vacío, no propagar el error
+      // para que la aplicación pueda seguir funcionando con otras fuentes de datos
+      return [];
     }
   };
 
@@ -723,15 +732,7 @@ export default function PropertyPage() {
       let mongoDbError = null;
       let wooCommerceError = null;
       
-      try {
-        console.log('[PropertyPage] Iniciando carga de propiedades de MongoDB...');
-        apiProperties = await fetchPropertiesFromAPI();
-        console.log(`[PropertyPage] Propiedades de MongoDB cargadas: ${apiProperties.length}`);
-      } catch (mongoError) {
-        console.error('[PropertyPage] Error al cargar propiedades de MongoDB:', mongoError);
-        mongoDbError = mongoError.message || 'Error al obtener propiedades de MongoDB';
-      }
-      
+      // Primero intentamos obtener las propiedades de WooCommerce, que suelen ser más rápidas y estables
       try {
         console.log('[PropertyPage] Iniciando carga de propiedades de WooCommerce...');
         wooCommerceProperties = await fetchWooCommerceProperties();
@@ -741,8 +742,22 @@ export default function PropertyPage() {
         wooCommerceError = wooError.message || 'Error al obtener propiedades de WooCommerce';
       }
       
-      // Combinar todas las propiedades disponibles
-      const allProperties = [...apiProperties, ...wooCommerceProperties];
+      // Solo intentamos cargar de MongoDB si WooCommerce no devolvió suficientes resultados
+      if (wooCommerceProperties.length < 5) {
+        try {
+          console.log('[PropertyPage] Iniciando carga de propiedades de MongoDB...');
+          apiProperties = await fetchPropertiesFromAPI();
+          console.log(`[PropertyPage] Propiedades de MongoDB cargadas: ${apiProperties.length}`);
+        } catch (mongoError) {
+          console.error('[PropertyPage] Error al cargar propiedades de MongoDB:', mongoError);
+          mongoDbError = mongoError.message || 'Error al obtener propiedades de MongoDB';
+        }
+      } else {
+        console.log('[PropertyPage] Omitiendo carga de MongoDB porque WooCommerce ya devolvió suficientes propiedades');
+      }
+      
+      // Combinar todas las propiedades disponibles, priorizando WooCommerce
+      const allProperties = [...wooCommerceProperties, ...apiProperties];
       
       if (allProperties.length > 0) {
         console.log(`[PropertyPage] Total de propiedades combinadas: ${allProperties.length}`);

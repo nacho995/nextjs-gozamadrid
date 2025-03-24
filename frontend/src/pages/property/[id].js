@@ -397,72 +397,56 @@ export default function PropertyDetail() {
       setLoading(true);
       setError(null);
       
-      // MODIFICACIÓN: Usar woocommerce/products?include=ID en lugar de woocommerce-product/ID
-      // Ya que hemos verificado que el endpoint woocommerce-product no está funcionando correctamente
-      const wooUrl = `/api/proxy/woocommerce/products?include=${id}`;
-      console.log(`[PropertyID] Obteniendo propiedad con ID ${id} desde ${wooUrl}`);
+      // CORRECCIÓN: Usamos la URL directa a la API de WooCommerce para asegurar que todas las imágenes se obtienen
+      const wooUrl = `https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3/products/${id}?consumer_key=ck_d69e61427264a7beea70ca9ee543b45dd00cae85&consumer_secret=cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e`;
+      console.log(`[PropertyID] Obteniendo propiedad con ID ${id} directamente de WooCommerce`);
       
       try {
         const response = await fetch(wooUrl);
         
         if (response.ok) {
-          const data = await response.json();
+          const propertyData = await response.json();
           
-          // Verificar si hay resultados y procesar la propiedad correcta
-          if (Array.isArray(data) && data.length > 0) {
-            // Encontrar la propiedad específica por ID
-            const propertyData = data.find(item => item.id.toString() === id.toString());
+          if (propertyData) {
+            console.log(`[PropertyID] Propiedad encontrada: ${propertyData.name || 'Sin nombre'}`);
+            console.log(`[PropertyID] Imágenes encontradas: ${propertyData.images ? propertyData.images.length : 0}`);
             
-            if (propertyData) {
-              console.log(`[PropertyID] Propiedad encontrada: ${propertyData.name || 'Sin nombre'}`);
-              setProperty(normalizeWooCommerceData(propertyData));
-              return;
-            } else {
-              console.error(`[PropertyID] Propiedad con ID ${id} no encontrada en los resultados`);
-              setError('not_found');
+            if (propertyData.images && propertyData.images.length > 0) {
+              console.log('[PropertyID] Primera imagen:', propertyData.images[0]);
             }
-          } else {
-            console.error(`[PropertyID] No se encontraron propiedades en la respuesta`);
-            setError('not_found');
+            
+            setProperty(normalizeWooCommerceData(propertyData));
+            setLoading(false);
+            return;
           }
-        } else if (response.status === 404) {
-          // Intentar analizar sugerencias
-          try {
-            const errorData = await response.json();
-            if (errorData.suggestions && errorData.suggestions.length > 0) {
-              console.log(`[PropertyID] Propiedad no encontrada pero hay ${errorData.suggestions.length} sugerencias`);
-              setError({
-                type: 'not_found',
-                suggestions: errorData.suggestions
-              });
-              return;
+        } else {
+          // Si falla la conexión directa, intentamos con el proxy
+          console.log('[PropertyID] No se pudo obtener la propiedad directamente, intentando con proxy...');
+          const proxyUrl = `/api/proxy/woocommerce/products?include=${id}`;
+          
+          const proxyResponse = await fetch(proxyUrl);
+          
+          if (proxyResponse.ok) {
+            const data = await proxyResponse.json();
+            
+            // Verificar si hay resultados y procesar la propiedad correcta
+            if (Array.isArray(data) && data.length > 0) {
+              // Encontrar la propiedad específica por ID
+              const propertyData = data.find(item => item.id.toString() === id.toString());
+              
+              if (propertyData) {
+                console.log(`[PropertyID] Propiedad encontrada vía proxy: ${propertyData.name || 'Sin nombre'}`);
+                console.log(`[PropertyID] Imágenes encontradas: ${propertyData.images ? propertyData.images.length : 0}`);
+                setProperty(normalizeWooCommerceData(propertyData));
+                setLoading(false);
+                return;
+              }
             }
-          } catch (e) {
-            console.log('[PropertyID] No hay sugerencias disponibles');
           }
           
-          // ALTERNATIVA: Intentar con el endpoint de woocommerce-product como backup
-          try {
-            console.log(`[PropertyID] Intentando obtener propiedad con endpoint alternativo...`);
-            const backupUrl = `/api/proxy/woocommerce-product/${id}`;
-            const backupResponse = await fetch(backupUrl);
-            
-            if (backupResponse.ok) {
-              const backupData = await backupResponse.json();
-              console.log(`[PropertyID] Propiedad encontrada con endpoint alternativo: ${backupData.name || 'Sin nombre'}`);
-              setProperty(normalizeWooCommerceData(backupData));
-              return;
-            } else {
-              console.error(`[PropertyID] Propiedad no encontrada con endpoint alternativo: ${backupResponse.status}`);
-            }
-          } catch (backupErr) {
-            console.error(`[PropertyID] Error con endpoint alternativo:`, backupErr);
-          }
+          // Si también falla el proxy, lanzamos un error
+          throw new Error(`No se pudo obtener la propiedad con ID ${id}`);
         }
-        
-        // Si el producto no se encontró, mostrar mensaje de error
-        console.error(`[PropertyID] Propiedad no encontrada: ${response.status}`);
-        setError('not_found');
       } catch (err) {
         console.error(`[PropertyID] Error al cargar propiedad:`, err);
         setError(`Error al cargar la propiedad: ${err.message}`);
