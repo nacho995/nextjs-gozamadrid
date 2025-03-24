@@ -26,7 +26,7 @@ export default function GuiaCompraInmuebles() {
                 <meta property="og:title" content="Guía Completa para Comprar Inmuebles en España" />
                 <meta property="og:description" content="Asesoramiento experto para comprar propiedades en España. Proceso paso a paso con profesionales inmobiliarios." />
                 <meta property="og:image" content="/guiacompra.png" />
-                <link rel="canonical" href="https://gozamadrid.com/servicios/guia-compra-inmuebles" />
+                <link rel="canonical" href="https://realestategozamadrid.com/servicios/guia-compra-inmuebles" />
             </Head>
 
             <div className="min-h-screen py-16">

@@ -12,13 +12,13 @@ export default function Terminos() {
                 <title>{pageTitle}</title>
                 <meta name="description" content={pageDescription} />
                 <meta name="robots" content="index, follow" />
-                <link rel="canonical" href="https://gozamadrid.com/terminos" />
+                <link rel="canonical" href="https://realestategozamadrid.com/terminos" />
 
                 {/* Open Graph */}
                 <meta property="og:type" content="website" />
                 <meta property="og:title" content={pageTitle} />
                 <meta property="og:description" content={pageDescription} />
-                <meta property="og:url" content="https://gozamadrid.com/terminos" />
+                <meta property="og:url" content="https://realestategozamadrid.com/terminos" />
                 <meta property="og:site_name" content="Goza Madrid Inmobiliaria" />
                 <meta property="article:modified_time" content={lastUpdated} />
 
@@ -38,7 +38,7 @@ export default function Terminos() {
                         "publisher": {
                             "@type": "Organization",
                             "name": "Goza Madrid Inmobiliaria",
-                            "url": "https://gozamadrid.com"
+                            "url": "https://realestategozamadrid.com"
                         },
                         "mainEntity": {
                             "@type": "TermsAndConditions",
@@ -64,13 +64,13 @@ export default function Terminos() {
                                 "@type": "ListItem",
                                 "position": 1,
                                 "name": "Inicio",
-                                "item": "https://gozamadrid.com"
+                                "item": "https://realestategozamadrid.com"
                             },
                             {
                                 "@type": "ListItem",
                                 "position": 2,
                                 "name": "Términos y Condiciones",
-                                "item": "https://gozamadrid.com/terminos"
+                                "item": "https://realestategozamadrid.com/terminos"
                             }
                         ]
                     })}
@@ -82,7 +82,7 @@ export default function Terminos() {
                         "@context": "https://schema.org",
                         "@type": "Organization",
                         "name": "Goza Madrid Inmobiliaria",
-                        "url": "https://gozamadrid.com",
+                        "url": "https://realestategozamadrid.com",
                         "contactPoint": {
                             "@type": "ContactPoint",
                             "telephone": "+34 919 012 103",

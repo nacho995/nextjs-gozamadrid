@@ -6,7 +6,6 @@ import { toast } from 'react-hot-toast';
 import Head from 'next/head';
 import CountryPrefix from "./CountryPrefix";
 import AnimatedOnScroll from "./AnimatedScroll";
-import { sendPropertyEmail } from '../services/api';
 
 const FormContact = () => {
   // Referencias para los inputs
@@ -43,55 +42,21 @@ const FormContact = () => {
     const loadingToast = toast.loading('Enviando mensaje...');
 
     try {
-      // Primero probar con nuestro endpoint directo API
-      const directContactResponse = await fetch('/api/direct-contact', {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+      
+      const response = await fetch(`${API_URL}/api/contact`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name,
-          email,
-          phone,
-          prefix,
-          message
+          nombre: name,
+          email: email,
+          prefix: prefix,
+          telefono: phone,
+          asunto: message
         })
       });
-      
-      console.log("Estado respuesta API directa:", directContactResponse.status);
-      
-      // Si la API directa es exitosa, terminar aquí
-      if (directContactResponse.ok) {
-        const directData = await directContactResponse.json();
-        console.log("Respuesta API directa:", directData);
-        
-        toast.success('¡Mensaje enviado correctamente!', { id: loadingToast });
-        
-        // Limpiar formulario
-        nameRef.current.value = '';
-        emailRef.current.value = '';
-        phoneRef.current.value = '';
-        messageRef.current.value = '';
-        setPrefix('+34');
-        
-        setIsSubmitting(false);
-        return;
-      }
-      
-      // Si la API directa falla, intentar con la API del backend como fallback
-      const result = await sendPropertyEmail({
-        type: 'contact',
-        name: name,
-        email: email,
-        phone: phone,
-        prefix: prefix,
-        message: message,
-        asunto: 'Formulario de contacto web',
-        ccEmail: 'ignaciodalesio1995@gmail.com,marta@gozamadrid.com'
-      });
-      
-      console.log("Respuesta API fallback:", result);
+
+      if (!response.ok) throw new Error('Error en el envío');
       
       toast.success('¡Mensaje enviado correctamente!', { id: loadingToast });
       
@@ -104,15 +69,7 @@ const FormContact = () => {
       
     } catch (error) {
       console.error('Error:', error);
-      // Mostrar mensaje positivo de todas formas para mejorar UX
-      toast.success('Mensaje recibido. Te contactaremos pronto.', { id: loadingToast });
-      
-      // Limpiar formulario de todas formas
-      nameRef.current.value = '';
-      emailRef.current.value = '';
-      phoneRef.current.value = '';
-      messageRef.current.value = '';
-      setPrefix('+34');
+      toast.error('Error al enviar el mensaje. Por favor, inténtalo de nuevo.', { id: loadingToast });
     } finally {
       setIsSubmitting(false);
     }
@@ -124,7 +81,7 @@ const FormContact = () => {
     "@type": "ContactPage",
     "name": "Contacto - Goza Madrid",
     "description": "Contacta con nuestro equipo de expertos inmobiliarios en Madrid. Estamos aquí para ayudarte con todas tus necesidades inmobiliarias.",
-    "url": "https://gozamadrid.com/contacto",
+    "url": "https://realestategozamadrid.com/contacto",
     "mainEntity": {
       "@type": "RealEstateAgent",
       "name": "Goza Madrid",
@@ -152,8 +109,8 @@ const FormContact = () => {
         <meta property="og:title" content="Contacto - Goza Madrid | Expertos Inmobiliarios" />
         <meta property="og:description" content="Contacta con nuestro equipo de expertos inmobiliarios en Madrid. Respuesta rápida y atención personalizada." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://gozamadrid.com/contacto" />
-        <meta property="og:image" content="https://gozamadrid.com/og-image.jpg" />
+        <meta property="og:url" content="https://realestategozamadrid.com/contacto" />
+        <meta property="og:image" content="https://realestategozamadrid.com/og-image.jpg" />
         <script type="application/ld+json">
           {JSON.stringify(structuredData)}
         </script>

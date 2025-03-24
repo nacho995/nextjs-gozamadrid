@@ -403,7 +403,7 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
               />
               <meta name="author" content={blog.author || 'Goza Madrid'} />
               <meta name="robots" content="index, follow" />
-              <link rel="canonical" href={`https://gozamadrid.com/blog/${blog.slug || id}`} />
+              <link rel="canonical" href={`https://realestategozamadrid.com/blog/${blog.slug || id}`} />
 
               {/* Open Graph */}
               <meta property="og:type" content="article" />
@@ -411,7 +411,7 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
               <meta property="og:description" content={blog.excerpt?.substring(0, 160).replace(/<[^>]*>?/gm, '') || 
                 blog.content?.substring(0, 160).replace(/<[^>]*>?/gm, '')} />
               <meta property="og:image" content={blog.imageUrl || DEFAULT_IMAGE} />
-              <meta property="og:url" content={`https://gozamadrid.com/blog/${blog.slug || id}`} />
+              <meta property="og:url" content={`https://realestategozamadrid.com/blog/${blog.slug || id}`} />
               <meta property="og:site_name" content="Goza Madrid Inmobiliaria" />
 
               {/* Twitter Card */}
@@ -428,7 +428,7 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
                   "@type": "BlogPosting",
                   "mainEntityOfPage": {
                     "@type": "WebPage",
-                    "@id": `https://gozamadrid.com/blog/${blog.slug || id}`
+                    "@id": `https://realestategozamadrid.com/blog/${blog.slug || id}`
                   },
                   "headline": blog.title,
                   "image": [blog.imageUrl || DEFAULT_IMAGE],
@@ -443,7 +443,7 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
                     "name": "Goza Madrid Inmobiliaria",
                     "logo": {
                       "@type": "ImageObject",
-                      "url": "https://gozamadrid.com/logo.png"
+                      "url": "https://realestategozamadrid.com/logo.png"
                     }
                   },
                   "description": blog.excerpt?.substring(0, 160).replace(/<[^>]*>?/gm, '') || 
@@ -476,7 +476,7 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
               />
               <meta name="author" content={blog.author || 'Goza Madrid'} />
               <meta name="robots" content="index, follow" />
-              <link rel="canonical" href={`https://gozamadrid.com/blog/${blog._id}`} />
+              <link rel="canonical" href={`https://realestategozamadrid.com/blog/${blog._id}`} />
 
               {/* Open Graph */}
               <meta property="og:type" content="article" />
@@ -484,7 +484,7 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
               <meta property="og:description" content={blog.description?.substring(0, 160) || 
                 blog.content?.substring(0, 160).replace(/<[^>]*>?/gm, '')} />
               <meta property="og:image" content={blog.imageUrl || DEFAULT_IMAGE} />
-              <meta property="og:url" content={`https://gozamadrid.com/blog/${blog._id}`} />
+              <meta property="og:url" content={`https://realestategozamadrid.com/blog/${blog._id}`} />
               <meta property="og:site_name" content="Goza Madrid Inmobiliaria" />
 
               {/* Twitter Card */}
@@ -501,7 +501,7 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
                   "@type": "BlogPosting",
                   "mainEntityOfPage": {
                     "@type": "WebPage",
-                    "@id": `https://gozamadrid.com/blog/${blog._id}`
+                    "@id": `https://realestategozamadrid.com/blog/${blog._id}`
                   },
                   "headline": blog.title,
                   "image": [blog.imageUrl || DEFAULT_IMAGE],
@@ -516,7 +516,7 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
                     "name": "Goza Madrid Inmobiliaria",
                     "logo": {
                       "@type": "ImageObject",
-                      "url": "https://gozamadrid.com/logo.png"
+                      "url": "https://realestategozamadrid.com/logo.png"
                     }
                   },
                   "description": blog.description?.substring(0, 160) || 

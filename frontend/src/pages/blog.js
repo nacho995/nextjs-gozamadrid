@@ -12,21 +12,21 @@ export default function BlogPreview() {
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
         <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://gozamadrid.com/blog" />
+        <link rel="canonical" href="https://realestategozamadrid.com/blog" />
 
         {/* Open Graph */}
         <meta property="og:type" content="blog" />
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={pageDescription} />
-        <meta property="og:image" content="https://gozamadrid.com/img/blog-header.jpg" />
-        <meta property="og:url" content="https://gozamadrid.com/blog" />
+        <meta property="og:image" content="https://realestategozamadrid.com/img/blog-header.jpg" />
+        <meta property="og:url" content="https://realestategozamadrid.com/blog" />
         <meta property="og:site_name" content="Goza Madrid Inmobiliaria" />
 
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={pageTitle} />
         <meta name="twitter:description" content={pageDescription} />
-        <meta name="twitter:image" content="https://gozamadrid.com/img/blog-header.jpg" />
+        <meta name="twitter:image" content="https://realestategozamadrid.com/img/blog-header.jpg" />
 
         {/* Schema.org Blog */}
         <script type="application/ld+json">
@@ -35,20 +35,20 @@ export default function BlogPreview() {
             "@type": "Blog",
             "name": "Blog Inmobiliario Goza Madrid",
             "description": pageDescription,
-            "url": "https://gozamadrid.com/blog",
-            "image": "https://gozamadrid.com/img/blog-header.jpg",
+            "url": "https://realestategozamadrid.com/blog",
+            "image": "https://realestategozamadrid.com/img/blog-header.jpg",
             "publisher": {
               "@type": "Organization",
               "name": "Goza Madrid Inmobiliaria",
               "logo": {
                 "@type": "ImageObject",
-                "url": "https://gozamadrid.com/logo.png"
+                "url": "https://realestategozamadrid.com/logo.png"
               }
             },
             "author": {
               "@type": "Organization",
               "name": "Goza Madrid Inmobiliaria",
-              "url": "https://gozamadrid.com"
+              "url": "https://realestategozamadrid.com"
             },
             "inLanguage": "es",
             "copyrightYear": new Date().getFullYear(),
@@ -67,13 +67,13 @@ export default function BlogPreview() {
                 "@type": "ListItem",
                 "position": 1,
                 "name": "Inicio",
-                "item": "https://gozamadrid.com"
+                "item": "https://realestategozamadrid.com"
               },
               {
                 "@type": "ListItem",
                 "position": 2,
                 "name": "Blog",
-                "item": "https://gozamadrid.com/blog"
+                "item": "https://realestategozamadrid.com/blog"
               }
             ]
           })}

@@ -91,7 +91,7 @@ export default function Agreements() {
                 <meta property="og:title" content="Red de Colaboradores y Servicios Inmobiliarios" />
                 <meta property="og:description" content="Alianzas estratégicas con las mejores empresas del sector inmobiliario y servicios relacionados." />
                 <meta property="og:image" content="/acuerdosyconvenios.jpg" />
-                <link rel="canonical" href="https://gozamadrid.com/acuerdos" />
+                <link rel="canonical" href="https://realestategozamadrid.com/acuerdos" />
             </Head>
 
             <AnimatedOnScroll>

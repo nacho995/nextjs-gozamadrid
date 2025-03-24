@@ -11,21 +11,21 @@ export default function ImpuestoRenta() {
                 <title>{pageTitle}</title>
                 <meta name="description" content={pageDescription} />
                 <meta name="robots" content="index, follow" />
-                <link rel="canonical" href="https://gozamadrid.com/servicios/residentes-extranjero/impuesto-renta" />
+                <link rel="canonical" href="https://realestategozamadrid.com/servicios/residentes-extranjero/impuesto-renta" />
 
                 {/* Open Graph */}
                 <meta property="og:type" content="article" />
                 <meta property="og:title" content={pageTitle} />
                 <meta property="og:description" content={pageDescription} />
-                <meta property="og:image" content="https://gozamadrid.com/img/impuestos-extranjeros.jpg" />
-                <meta property="og:url" content="https://gozamadrid.com/servicios/residentes-extranjero/impuesto-renta" />
+                <meta property="og:image" content="https://realestategozamadrid.com/img/impuestos-extranjeros.jpg" />
+                <meta property="og:url" content="https://realestategozamadrid.com/servicios/residentes-extranjero/impuesto-renta" />
                 <meta property="og:site_name" content="Goza Madrid Inmobiliaria" />
 
                 {/* Twitter Card */}
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content={pageTitle} />
                 <meta name="twitter:description" content={pageDescription} />
-                <meta name="twitter:image" content="https://gozamadrid.com/img/impuestos-extranjeros.jpg" />
+                <meta name="twitter:image" content="https://realestategozamadrid.com/img/impuestos-extranjeros.jpg" />
 
                 {/* Schema.org Article */}
                 <script type="application/ld+json">
@@ -34,11 +34,11 @@ export default function ImpuestoRenta() {
                         "@type": "Article",
                         "mainEntityOfPage": {
                             "@type": "WebPage",
-                            "@id": "https://gozamadrid.com/servicios/residentes-extranjero/impuesto-renta"
+                            "@id": "https://realestategozamadrid.com/servicios/residentes-extranjero/impuesto-renta"
                         },
                         "headline": "Guía del Impuesto sobre la Renta para Extranjeros en España",
                         "description": pageDescription,
-                        "image": "https://gozamadrid.com/img/impuestos-extranjeros.jpg",
+                        "image": "https://realestategozamadrid.com/img/impuestos-extranjeros.jpg",
                         "author": {
                             "@type": "Organization",
                             "name": "Goza Madrid Inmobiliaria"
@@ -48,7 +48,7 @@ export default function ImpuestoRenta() {
                             "name": "Goza Madrid Inmobiliaria",
                             "logo": {
                                 "@type": "ImageObject",
-                                "url": "https://gozamadrid.com/logo.png"
+                                "url": "https://realestategozamadrid.com/logo.png"
                             }
                         },
                         "datePublished": "2024-01-01",
@@ -74,7 +74,7 @@ export default function ImpuestoRenta() {
                         "provider": {
                             "@type": "Organization",
                             "name": "Goza Madrid Inmobiliaria",
-                            "image": "https://gozamadrid.com/logo.png"
+                            "image": "https://realestategozamadrid.com/logo.png"
                         },
                         "areaServed": {
                             "@type": "Country",
@@ -97,25 +97,25 @@ export default function ImpuestoRenta() {
                                 "@type": "ListItem",
                                 "position": 1,
                                 "name": "Inicio",
-                                "item": "https://gozamadrid.com"
+                                "item": "https://realestategozamadrid.com"
                             },
                             {
                                 "@type": "ListItem",
                                 "position": 2,
                                 "name": "Servicios",
-                                "item": "https://gozamadrid.com/servicios"
+                                "item": "https://realestategozamadrid.com/servicios"
                             },
                             {
                                 "@type": "ListItem",
                                 "position": 3,
                                 "name": "Residentes Extranjero",
-                                "item": "https://gozamadrid.com/servicios/residentes-extranjero"
+                                "item": "https://realestategozamadrid.com/servicios/residentes-extranjero"
                             },
                             {
                                 "@type": "ListItem",
                                 "position": 4,
                                 "name": "Impuesto sobre la Renta",
-                                "item": "https://gozamadrid.com/servicios/residentes-extranjero/impuesto-renta"
+                                "item": "https://realestategozamadrid.com/servicios/residentes-extranjero/impuesto-renta"
                             }
                         ]
                     })}
@@ -131,8 +131,8 @@ export default function ImpuestoRenta() {
                 <meta name="article:tag" content="Impuestos Extranjeros" />
 
                 {/* Metadatos multilenguaje */}
-                <link rel="alternate" hreflang="es" href="https://gozamadrid.com/servicios/residentes-extranjero/impuesto-renta" />
-                <link rel="alternate" hreflang="en" href="https://gozamadrid.com/en/services/foreign-residents/income-tax" />
+                <link rel="alternate" hreflang="es" href="https://realestategozamadrid.com/servicios/residentes-extranjero/impuesto-renta" />
+                <link rel="alternate" hreflang="en" href="https://realestategozamadrid.com/en/services/foreign-residents/income-tax" />
             </Head>
 
             <div

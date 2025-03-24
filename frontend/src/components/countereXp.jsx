@@ -78,7 +78,7 @@ const CounterExp = () => {
                 <meta property="og:type" content="website" />
                 <meta property="og:title" content="eXp Realty - Red Global de Agentes Inmobiliarios" />
                 <meta property="og:description" content="Red global de más de 95,000 agentes inmobiliarios en 25 países. Únete a la revolución del sector inmobiliario." />
-                <link rel="canonical" href="https://gozamadrid.com/exp-realty" />
+                <link rel="canonical" href="https://realestategozamadrid.com/exp-realty" />
 
                 {/* Schema.org markup para organización */}
                 <script type="application/ld+json">
@@ -102,7 +102,7 @@ const CounterExp = () => {
                         "memberOf": {
                             "@type": "Organization",
                             "name": "Goza Madrid",
-                            "url": "https://gozamadrid.com"
+                            "url": "https://realestategozamadrid.com"
                         }
                     })}
                 </script>

@@ -15,7 +15,7 @@ const SCHEMA_DATA = {
   "author": {
     "@type": "Organization",
     "name": "Goza Madrid",
-    "url": "https://gozamadrid.com"
+    "url": "https://realestategozamadrid.com"
   },
   "publisher": {
     "@type": "Organization",
@@ -28,7 +28,7 @@ const SCHEMA_DATA = {
   "datePublished": new Date().toISOString(),
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://gozamadrid.com/guia-venta-propiedad"
+    "@id": "https://realestategozamadrid.com/guia-venta-propiedad"
   }
 };
 
@@ -43,7 +43,7 @@ export default function Guide() {
                 <meta property="og:description" content="Aprende a vender tu propiedad en España con nuestra guía completa. Consejos expertos y proceso detallado." />
                 <meta property="og:image" content="/guia.jpg" />
                 <meta property="og:type" content="article" />
-                <link rel="canonical" href="https://gozamadrid.com/guia-venta-propiedad" />
+                <link rel="canonical" href="https://realestategozamadrid.com/guia-venta-propiedad" />
                 <script type="application/ld+json">
                     {JSON.stringify(SCHEMA_DATA)}
                 </script>

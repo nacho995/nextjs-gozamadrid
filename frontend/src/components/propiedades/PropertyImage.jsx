@@ -6,7 +6,7 @@ import Head from 'next/head';
 const isDev = process.env.NODE_ENV === 'development';
 const logDebug = (message, ...args) => {
   if (isDev && window.appConfig?.debug) {
-    console.log(message, ...args);
+    // console.log(message, ...args);
   }
 };
 
@@ -27,6 +27,19 @@ export default function PropertyImage({
   // Normalizar la fuente de la imagen para garantizar consistencia
   const safeSrc = useMemo(() => {
     if (!src) return '/img/property-placeholder.jpg';
+    
+    // Si es un array (común en WooCommerce), usar el primer elemento
+    if (Array.isArray(src)) {
+      if (src.length === 0) return '/img/property-placeholder.jpg';
+      
+      // Si el primer elemento es un objeto, extraer la URL
+      if (typeof src[0] === 'object') {
+        return src[0].src || src[0].url || src[0].source_url || '/img/property-placeholder.jpg';
+      }
+      
+      // Si el primer elemento es una cadena, usarla
+      return src[0];
+    }
     
     if (typeof src === 'string') return src;
     
@@ -80,7 +93,7 @@ export default function PropertyImage({
     }
     
     // Si ya es una URL de proxy o una ruta local, devolverla tal cual
-    if (url.includes('images.weserv.nl')) {
+    if (url.includes('images.weserv.nl') || url.includes('/api/proxy-image')) {
       return url;
     }
     
@@ -99,11 +112,20 @@ export default function PropertyImage({
       const absoluteUrl = `${baseUrl}/${url}`;
       return absoluteUrl;
     }
+
+    // Si la URL no tiene protocolo, añadirle https://
+    if (url.startsWith('//')) {
+      return `https:${url}`;
+    }
     
-    // Usar un servicio de proxy confiable para todas las imágenes externas
-    // Configuración básica sin conversión de formato para evitar problemas
-    const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(url)}&n=-1&default=https://via.placeholder.com/800x600?text=Sin+Imagen`;
-    return proxyUrl;
+    // Usar el proxy de imágenes para URLs externas
+    // Este enfoque evita errores CORS y problemas de seguridad
+    try {
+      return `/api/proxy-image?url=${encodeURIComponent(url)}`;
+    } catch (error) {
+      console.error('Error al formatear URL para proxy:', error);
+      return '/img/property-placeholder.jpg';
+    }
   }, []);
   
   // Obtener la URL del proxy para la imagen actual

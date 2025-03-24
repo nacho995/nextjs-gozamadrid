@@ -24,7 +24,7 @@ export default function VenderPropiedad() {
                 <meta property="og:title" content="Vende tu Propiedad en Madrid con Expertos Inmobiliarios" />
                 <meta property="og:description" content="Servicio integral de venta de propiedades. Valoración gratuita y asesoramiento profesional para maximizar el valor de tu inmueble." />
                 <meta property="og:image" content="/casaVender.jpg" />
-                <link rel="canonical" href="https://gozamadrid.com/vender" />
+                <link rel="canonical" href="https://realestategozamadrid.com/vender" />
             </Head>
 
             {/* Fondo fijo */}

@@ -12,21 +12,21 @@ export default function ResidentesEspaña() {
                 <title>{pageTitle}</title>
                 <meta name="description" content={pageDescription} />
                 <meta name="robots" content="index, follow" />
-                <link rel="canonical" href="https://gozamadrid.com/servicios/residentes-espana" />
+                <link rel="canonical" href="https://realestategozamadrid.com/servicios/residentes-espana" />
 
                 {/* Open Graph */}
                 <meta property="og:type" content="website" />
                 <meta property="og:title" content={pageTitle} />
                 <meta property="og:description" content={pageDescription} />
-                <meta property="og:image" content="https://gozamadrid.com/img/servicios-residentes.jpg" />
-                <meta property="og:url" content="https://gozamadrid.com/servicios/residentes-espana" />
+                <meta property="og:image" content="https://realestategozamadrid.com/img/servicios-residentes.jpg" />
+                <meta property="og:url" content="https://realestategozamadrid.com/servicios/residentes-espana" />
                 <meta property="og:site_name" content="Goza Madrid Inmobiliaria" />
 
                 {/* Twitter Card */}
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content={pageTitle} />
                 <meta name="twitter:description" content={pageDescription} />
-                <meta name="twitter:image" content="https://gozamadrid.com/img/servicios-residentes.jpg" />
+                <meta name="twitter:image" content="https://realestategozamadrid.com/img/servicios-residentes.jpg" />
 
                 {/* Schema.org Service */}
                 <script type="application/ld+json">
@@ -35,9 +35,9 @@ export default function ResidentesEspaña() {
                         "@type": "RealEstateAgent",
                         "name": "Goza Madrid Inmobiliaria",
                         "description": pageDescription,
-                        "url": "https://gozamadrid.com/servicios/residentes-espana",
-                        "logo": "https://gozamadrid.com/logo.png",
-                        "image": "https://gozamadrid.com/img/servicios-residentes.jpg",
+                        "url": "https://realestategozamadrid.com/servicios/residentes-espana",
+                        "logo": "https://realestategozamadrid.com/logo.png",
+                        "image": "https://realestategozamadrid.com/img/servicios-residentes.jpg",
                         "address": {
                             "@type": "PostalAddress",
                             "addressLocality": "Madrid",
@@ -96,19 +96,19 @@ export default function ResidentesEspaña() {
                                 "@type": "ListItem",
                                 "position": 1,
                                 "name": "Inicio",
-                                "item": "https://gozamadrid.com"
+                                "item": "https://realestategozamadrid.com"
                             },
                             {
                                 "@type": "ListItem",
                                 "position": 2,
                                 "name": "Servicios",
-                                "item": "https://gozamadrid.com/servicios"
+                                "item": "https://realestategozamadrid.com/servicios"
                             },
                             {
                                 "@type": "ListItem",
                                 "position": 3,
                                 "name": "Residentes en España",
-                                "item": "https://gozamadrid.com/servicios/residentes-espana"
+                                "item": "https://realestategozamadrid.com/servicios/residentes-espana"
                             }
                         ]
                     })}

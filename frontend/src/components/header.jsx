@@ -33,8 +33,8 @@ const ORGANIZATION_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "RealEstateAgent",
   "name": "Goza Madrid",
-  "url": "https://gozamadrid.com",
-  "logo": "https://gozamadrid.com/logo.png",
+  "url": "https://realestategozamadrid.com",
+  "logo": "https://realestategozamadrid.com/logo.png",
   "sameAs": [
     "https://www.facebook.com/GozaMadridAI",
     "https://www.instagram.com/Gozamadrid54"

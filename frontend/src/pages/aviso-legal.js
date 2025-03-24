@@ -11,13 +11,13 @@ export default function AvisoLegal() {
                 <title>{pageTitle}</title>
                 <meta name="description" content={pageDescription} />
                 <meta name="robots" content="index, follow" />
-                <link rel="canonical" href="https://gozamadrid.com/aviso-legal" />
+                <link rel="canonical" href="https://realestategozamadrid.com/aviso-legal" />
 
                 {/* Open Graph */}
                 <meta property="og:type" content="website" />
                 <meta property="og:title" content={pageTitle} />
                 <meta property="og:description" content={pageDescription} />
-                <meta property="og:url" content="https://gozamadrid.com/aviso-legal" />
+                <meta property="og:url" content="https://realestategozamadrid.com/aviso-legal" />
                 <meta property="og:site_name" content="Goza Madrid Inmobiliaria" />
 
                 {/* Twitter Card */}
@@ -46,7 +46,7 @@ export default function AvisoLegal() {
                             },
                             "telephone": "+34 919 012 103",
                             "email": "marta@gozamadrid.com",
-                            "url": "https://gozamadrid.com"
+                            "url": "https://realestategozamadrid.com"
                         },
                         "knowsAbout": [
                             "Términos y condiciones",
@@ -67,13 +67,13 @@ export default function AvisoLegal() {
                                 "@type": "ListItem",
                                 "position": 1,
                                 "name": "Inicio",
-                                "item": "https://gozamadrid.com"
+                                "item": "https://realestategozamadrid.com"
                             },
                             {
                                 "@type": "ListItem",
                                 "position": 2,
                                 "name": "Aviso Legal",
-                                "item": "https://gozamadrid.com/aviso-legal"
+                                "item": "https://realestategozamadrid.com/aviso-legal"
                             }
                         ]
                     })}

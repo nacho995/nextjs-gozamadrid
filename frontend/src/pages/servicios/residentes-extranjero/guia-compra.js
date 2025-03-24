@@ -11,21 +11,21 @@ export default function GuiaCompra() {
                 <title>{pageTitle}</title>
                 <meta name="description" content={pageDescription} />
                 <meta name="robots" content="index, follow" />
-                <link rel="canonical" href="https://gozamadrid.com/servicios/residentes-extranjero/guia-compra" />
+                <link rel="canonical" href="https://realestategozamadrid.com/servicios/residentes-extranjero/guia-compra" />
 
                 {/* Open Graph */}
                 <meta property="og:type" content="article" />
                 <meta property="og:title" content={pageTitle} />
                 <meta property="og:description" content={pageDescription} />
-                <meta property="og:image" content="https://gozamadrid.com/img/guia-compra-extranjeros.jpg" />
-                <meta property="og:url" content="https://gozamadrid.com/servicios/residentes-extranjero/guia-compra" />
+                <meta property="og:image" content="https://realestategozamadrid.com/img/guia-compra-extranjeros.jpg" />
+                <meta property="og:url" content="https://realestategozamadrid.com/servicios/residentes-extranjero/guia-compra" />
                 <meta property="og:site_name" content="Goza Madrid Inmobiliaria" />
 
                 {/* Twitter Card */}
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content={pageTitle} />
                 <meta name="twitter:description" content={pageDescription} />
-                <meta name="twitter:image" content="https://gozamadrid.com/img/guia-compra-extranjeros.jpg" />
+                <meta name="twitter:image" content="https://realestategozamadrid.com/img/guia-compra-extranjeros.jpg" />
 
                 {/* Schema.org Article */}
                 <script type="application/ld+json">
@@ -34,11 +34,11 @@ export default function GuiaCompra() {
                         "@type": "Article",
                         "mainEntityOfPage": {
                             "@type": "WebPage",
-                            "@id": "https://gozamadrid.com/servicios/residentes-extranjero/guia-compra"
+                            "@id": "https://realestategozamadrid.com/servicios/residentes-extranjero/guia-compra"
                         },
                         "headline": "Guía Completa para Comprar Inmuebles en Madrid siendo Extranjero",
                         "description": pageDescription,
-                        "image": "https://gozamadrid.com/img/guia-compra-extranjeros.jpg",
+                        "image": "https://realestategozamadrid.com/img/guia-compra-extranjeros.jpg",
                         "author": {
                             "@type": "Organization",
                             "name": "Goza Madrid Inmobiliaria"
@@ -48,7 +48,7 @@ export default function GuiaCompra() {
                             "name": "Goza Madrid Inmobiliaria",
                             "logo": {
                                 "@type": "ImageObject",
-                                "url": "https://gozamadrid.com/logo.png"
+                                "url": "https://realestategozamadrid.com/logo.png"
                             }
                         },
                         "datePublished": "2024-01-01",
@@ -111,25 +111,25 @@ export default function GuiaCompra() {
                                 "@type": "ListItem",
                                 "position": 1,
                                 "name": "Inicio",
-                                "item": "https://gozamadrid.com"
+                                "item": "https://realestategozamadrid.com"
                             },
                             {
                                 "@type": "ListItem",
                                 "position": 2,
                                 "name": "Servicios",
-                                "item": "https://gozamadrid.com/servicios"
+                                "item": "https://realestategozamadrid.com/servicios"
                             },
                             {
                                 "@type": "ListItem",
                                 "position": 3,
                                 "name": "Residentes Extranjero",
-                                "item": "https://gozamadrid.com/servicios/residentes-extranjero"
+                                "item": "https://realestategozamadrid.com/servicios/residentes-extranjero"
                             },
                             {
                                 "@type": "ListItem",
                                 "position": 4,
                                 "name": "Guía de Compra",
-                                "item": "https://gozamadrid.com/servicios/residentes-extranjero/guia-compra"
+                                "item": "https://realestategozamadrid.com/servicios/residentes-extranjero/guia-compra"
                             }
                         ]
                     })}
@@ -147,8 +147,8 @@ export default function GuiaCompra() {
                 <meta name="article:tag" content="Inversión Extranjera" />
 
                 {/* Metadatos multilenguaje */}
-                <link rel="alternate" hreflang="es" href="https://gozamadrid.com/servicios/residentes-extranjero/guia-compra" />
-                <link rel="alternate" hreflang="en" href="https://gozamadrid.com/en/services/foreign-residents/buying-guide" />
+                <link rel="alternate" hreflang="es" href="https://realestategozamadrid.com/servicios/residentes-extranjero/guia-compra" />
+                <link rel="alternate" hreflang="en" href="https://realestategozamadrid.com/en/services/foreign-residents/buying-guide" />
             </Head>
 
             <div

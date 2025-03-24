@@ -12,13 +12,13 @@ export default function Privacidad() {
                 <title>{pageTitle}</title>
                 <meta name="description" content={pageDescription} />
                 <meta name="robots" content="index, follow" />
-                <link rel="canonical" href="https://gozamadrid.com/privacidad" />
+                <link rel="canonical" href="https://realestategozamadrid.com/privacidad" />
 
                 {/* Open Graph */}
                 <meta property="og:type" content="website" />
                 <meta property="og:title" content={pageTitle} />
                 <meta property="og:description" content={pageDescription} />
-                <meta property="og:url" content="https://gozamadrid.com/privacidad" />
+                <meta property="og:url" content="https://realestategozamadrid.com/privacidad" />
                 <meta property="og:site_name" content="Goza Madrid Inmobiliaria" />
                 <meta property="article:modified_time" content={lastUpdated} />
 
@@ -38,7 +38,7 @@ export default function Privacidad() {
                         "publisher": {
                             "@type": "Organization",
                             "name": "Goza Madrid Inmobiliaria",
-                            "url": "https://gozamadrid.com"
+                            "url": "https://realestategozamadrid.com"
                         },
                         "keywords": "privacidad, RGPD, protección datos, cookies, derechos usuario",
                         "inLanguage": "es",
@@ -60,13 +60,13 @@ export default function Privacidad() {
                                 "@type": "ListItem",
                                 "position": 1,
                                 "name": "Inicio",
-                                "item": "https://gozamadrid.com"
+                                "item": "https://realestategozamadrid.com"
                             },
                             {
                                 "@type": "ListItem",
                                 "position": 2,
                                 "name": "Política de Privacidad",
-                                "item": "https://gozamadrid.com/privacidad"
+                                "item": "https://realestategozamadrid.com/privacidad"
                             }
                         ]
                     })}
@@ -78,7 +78,7 @@ export default function Privacidad() {
                         "@context": "https://schema.org",
                         "@type": "Organization",
                         "name": "Goza Madrid Inmobiliaria",
-                        "url": "https://gozamadrid.com",
+                        "url": "https://realestategozamadrid.com",
                         "contactPoint": {
                             "@type": "ContactPoint",
                             "telephone": "+34 919 012 103",

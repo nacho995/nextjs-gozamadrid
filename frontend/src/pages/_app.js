@@ -270,17 +270,17 @@ function MyApp({ Component, pageProps }) {
           
           {/* Open Graph / Facebook */}
           <meta property="og:type" content="website" />
-          <meta property="og:url" content="https://gozamadrid.com/" />
+          <meta property="og:url" content="https://realestategozamadrid.com/" />
           <meta property="og:title" content="Goza Madrid | Inmobiliaria de Lujo en Madrid" />
           <meta property="og:description" content="Expertos en servicios inmobiliarios de lujo en Madrid. Compra, venta y alquiler de propiedades exclusivas. Asesoramiento personalizado para inversores nacionales e internacionales." />
-          <meta property="og:image" content="https://gozamadrid.com/og-image.jpg" />
+          <meta property="og:image" content="https://realestategozamadrid.com/og-image.jpg" />
           
           {/* Twitter */}
           <meta property="twitter:card" content="summary_large_image" />
-          <meta property="twitter:url" content="https://gozamadrid.com/" />
+          <meta property="twitter:url" content="https://realestategozamadrid.com/" />
           <meta property="twitter:title" content="Goza Madrid | Inmobiliaria de Lujo en Madrid" />
           <meta property="twitter:description" content="Expertos en servicios inmobiliarios de lujo en Madrid. Compra, venta y alquiler de propiedades exclusivas. Asesoramiento personalizado para inversores nacionales e internacionales." />
-          <meta property="twitter:image" content="https://gozamadrid.com/twitter-image.jpg" />
+          <meta property="twitter:image" content="https://realestategozamadrid.com/twitter-image.jpg" />
         </Head>
         
         {/* Script para interceptar peticiones HEAD */}
