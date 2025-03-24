@@ -11,21 +11,21 @@ export default function ExpRealtyPage() {
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
         <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://gozamadrid.com/exp-realty" />
+        <link rel="canonical" href="https://realestategozamadrid.com/exp-realty" />
 
         {/* Open Graph */}
         <meta property="og:type" content="website" />
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={pageDescription} />
-        <meta property="og:image" content="https://gozamadrid.com/img/exp-realty-header.jpg" />
-        <meta property="og:url" content="https://gozamadrid.com/exp-realty" />
+        <meta property="og:image" content="https://realestategozamadrid.com/img/exp-realty-header.jpg" />
+        <meta property="og:url" content="https://realestategozamadrid.com/exp-realty" />
         <meta property="og:site_name" content="Goza Madrid Inmobiliaria" />
 
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={pageTitle} />
         <meta name="twitter:description" content={pageDescription} />
-        <meta name="twitter:image" content="https://gozamadrid.com/img/exp-realty-header.jpg" />
+        <meta name="twitter:image" content="https://realestategozamadrid.com/img/exp-realty-header.jpg" />
 
         {/* Schema.org Organization */}
         <script type="application/ld+json">
@@ -34,8 +34,8 @@ export default function ExpRealtyPage() {
             "@type": "Organization",
             "name": "eXp Realty Madrid",
             "description": pageDescription,
-            "url": "https://gozamadrid.com/exp-realty",
-            "logo": "https://gozamadrid.com/logo.png",
+            "url": "https://realestategozamadrid.com/exp-realty",
+            "logo": "https://realestategozamadrid.com/logo.png",
             "sameAs": [
               "https://www.facebook.com/gozamadrid",
               "https://www.instagram.com/gozamadrid",
@@ -67,7 +67,7 @@ export default function ExpRealtyPage() {
             "hiringOrganization": {
               "@type": "Organization",
               "name": "eXp Realty Madrid",
-              "sameAs": "https://gozamadrid.com/exp-realty"
+              "sameAs": "https://realestategozamadrid.com/exp-realty"
             },
             "jobLocation": {
               "@type": "Place",
@@ -98,13 +98,13 @@ export default function ExpRealtyPage() {
                 "@type": "ListItem",
                 "position": 1,
                 "name": "Inicio",
-                "item": "https://gozamadrid.com"
+                "item": "https://realestategozamadrid.com"
               },
               {
                 "@type": "ListItem",
                 "position": 2,
                 "name": "eXp Realty",
-                "item": "https://gozamadrid.com/exp-realty"
+                "item": "https://realestategozamadrid.com/exp-realty"
               }
             ]
           })}

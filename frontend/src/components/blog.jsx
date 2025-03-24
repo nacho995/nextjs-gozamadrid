@@ -210,14 +210,14 @@ const BlogCard = ({ blog, index }) => {
   const description = truncateText(getDescription(blog), 150);
   
   // Añadir log para depuración
-  console.log('Blog processing:', {
+  /* console.log('Blog processing:', {
     id: blog._id || blog.id,
     title,
     hasDescription: !!blog.description,
     hasExcerpt: !!blog.excerpt,
     hasContent: !!blog.content,
     finalDescription: description
-  });
+  }); */
 
   // Función auxiliar para formatear la fecha de manera segura
   const formatDate = (dateString) => {
@@ -473,7 +473,7 @@ const BlogHome = (props) => {
         <meta property="og:title" content="Blog Inmobiliario Goza Madrid" />
         <meta property="og:description" content="Noticias y análisis del mercado inmobiliario en Madrid" />
         <meta property="og:image" content="/img/blog-banner.jpg" />
-        <link rel="canonical" href="https://gozamadrid.com/blog" />
+        <link rel="canonical" href="https://realestategozamadrid.com/blog" />
         
         {/* Schema.org markup para la página de blog */}
         <script type="application/ld+json">
@@ -487,7 +487,7 @@ const BlogHome = (props) => {
               "name": "Goza Madrid",
               "logo": {
                 "@type": "ImageObject",
-                "url": "https://gozamadrid.com/logo.png"
+                "url": "https://realestategozamadrid.com/logo.png"
               }
             },
             "blogPost": blogs.map(blog => {
@@ -506,7 +506,7 @@ const BlogHome = (props) => {
                 "image": typeof blog.image === 'string' ? blog.image : blog.image?.src,
                 ...(formattedDate && { "datePublished": formattedDate }),
                 "articleBody": truncateText(blog.description || blog.content),
-                "url": `https://gozamadrid.com/blog/${blog.slug || blog._id || blog.id}`
+                "url": `https://realestategozamadrid.com/blog/${blog.slug || blog._id || blog.id}`
               };
             }).filter(post => post.headline) // Solo incluir posts con título válido
           })}

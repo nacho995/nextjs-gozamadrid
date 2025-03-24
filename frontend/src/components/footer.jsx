@@ -21,7 +21,7 @@ const SCHEMA_DATA = {
   "description": "Agencia inmobiliaria especializada en Madrid, ofreciendo servicios de compra, venta y alquiler de propiedades",
   "address": {
     "@type": "PostalAddress",
-    "streetAddress": "Calle de Alcalá, 96",
+    "streetAddress": "Nueva España",
     "addressLocality": "Madrid",
     "postalCode": "28009",
     "addressCountry": "ES"
@@ -55,7 +55,7 @@ const Footer = () => {
     contact: {
       address: {
         label: "Dirección",
-        street: "Calle de Alcalá, 96",
+        street: "Nueva España",
         city: "28009 Madrid",
         mapUrl: "https://goo.gl/maps/tuDirección"
       },

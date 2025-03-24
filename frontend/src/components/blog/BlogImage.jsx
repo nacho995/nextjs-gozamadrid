@@ -6,14 +6,14 @@ import Head from 'next/head';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
-const BlogImage = ({ src, alt, className = "", priority = false, sizes = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" }) => {
+const BlogImage = ({ src, alt, className = "", priority = false, sizes = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw", fallbackSrc }) => {
   const [mounted, setMounted] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
   const imageRef = useRef(null);
   const [imageDimensions, setImageDimensions] = useState({ width: 800, height: 600 });
   const [debugInfo, setDebugInfo] = useState({ original: null, processed: null });
-  const [safeSrc, setSafeSrc] = useState('/img/default-blog-image.jpg');
+  const [safeSrc, setSafeSrc] = useState(fallbackSrc || 'https://via.placeholder.com/800x600?text=GozaMadrid');
 
   useEffect(() => {
     setMounted(true);
@@ -23,7 +23,7 @@ const BlogImage = ({ src, alt, className = "", priority = false, sizes = "(max-w
   useEffect(() => {
     // Función para procesar la URL de la imagen
     const processImageUrl = (url) => {
-      let processedUrl = '/img/default-blog-image.jpg';
+      let processedUrl = fallbackSrc || 'https://via.placeholder.com/800x600?text=GozaMadrid';
       
       if (!url) return processedUrl;
 
@@ -51,25 +51,51 @@ const BlogImage = ({ src, alt, className = "", priority = false, sizes = "(max-w
         return processedUrl;
       }
 
+      // Si la URL ya es un servicio de proxy, usarla directamente
+      if (url.includes('images.weserv.nl') || url.includes('via.placeholder.com')) {
+        return url;
+      }
+      
+      // Reemplazar http: con https: para evitar problemas de contenido mixto
+      if (url.startsWith('http:')) {
+        url = url.replace('http:', 'https:');
+      }
+
       // Eliminar referencias a imageproxy
       if (url.includes('imageproxy/')) {
         return processedUrl;
       }
 
-      // Si la URL es de WordPress, usar un proxy de imágenes para evitar errores HTTP2_PROTOCOL_ERROR
-      if (url.includes('realestategozamadrid.com') || url.includes('gozamadrid.com') || url.includes('wp-content')) {
-        // Usar images.weserv.nl como proxy de imágenes
-        processedUrl = `https://images.weserv.nl/?url=${encodeURIComponent(url)}&default=https://via.placeholder.com/800x600?text=Sin+Imagen`;
+      // Si es una URL relativa y no empieza con /, agregarlo
+      if (!url.startsWith('http') && !url.startsWith('/')) {
+        url = '/' + url;
+      }
+
+      // Si es una URL relativa al servidor, mantenerla tal cual (excepto default-blog-image)
+      if (url.startsWith('/') && !url.startsWith('//')) {
+        // Comprobar si es la imagen por defecto problemática
+        if (url === '/img/default-blog-image.jpg') {
+          return 'https://via.placeholder.com/800x600?text=GozaMadrid';
+        }
+        
+        // Si es una URL relativa, intentar usar la URL completa del servidor
+        const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+        return `${baseUrl}${url}`;
+      }
+
+      // Para todas las demás URLs (externas), usar weserv.nl directamente
+      if (url.startsWith('http') || url.startsWith('https') || url.startsWith('//')) {
+        // Asegurarse de que la URL tenga el protocolo
+        if (url.startsWith('//')) {
+          url = 'https:' + url;
+        }
+
+        // Usar weserv.nl directamente para todas las imágenes externas
+        processedUrl = `https://images.weserv.nl/?url=${encodeURIComponent(url)}&n=-1`;
         return processedUrl;
       }
 
-      // Si la URL es externa, usar nuestro proxy de imágenes solo para imágenes que no son de WordPress
-      if (url.startsWith('http') || url.startsWith('https')) {
-        // Usar la URL directamente para imágenes externas que no son de WordPress
-        return url;
-      }
-
-      // Si la URL es relativa, construir la URL completa usando la URL base de la API
+      // Para cualquier otro caso, usar la URL base de la API para construir la URL completa
       processedUrl = `${API_URL}${url.startsWith('/') ? '' : '/'}${url}`;
       return processedUrl;
     };
@@ -83,7 +109,7 @@ const BlogImage = ({ src, alt, className = "", priority = false, sizes = "(max-w
       original: src,
       processed: processedSrc
     });
-  }, [src]);
+  }, [src, fallbackSrc]);
 
   // Generate a unique ID for structured data references
   const imageId = `blog-image-${Math.random().toString(36).substring(2, 9)}`;
@@ -93,15 +119,18 @@ const BlogImage = ({ src, alt, className = "", priority = false, sizes = "(max-w
     "@context": "https://schema.org",
     "@type": "ImageObject",
     "@id": `#${imageId}`,
-    "contentUrl": safeSrc || "/img/default-blog-image.jpg",
+    "contentUrl": safeSrc || fallbackSrc || "/img/default-blog-image.jpg",
     "name": alt || "Imagen del blog",
     "description": alt || "Fotografía del blog",
     "representativeOfPage": priority
   };
 
   const handleImageError = () => {
+    console.warn(`Error cargando imagen: ${safeSrc}, usando fallback`);
     setError(true);
     setLoading(false);
+    // Usar un placeholder externo en lugar de la imagen local
+    setSafeSrc('https://via.placeholder.com/800x600?text=GozaMadrid');
   };
 
   if (!mounted) {
@@ -118,7 +147,7 @@ const BlogImage = ({ src, alt, className = "", priority = false, sizes = "(max-w
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify({
               ...imageSchema,
-              contentUrl: "/img/default-blog-image.jpg" 
+              contentUrl: 'https://via.placeholder.com/800x600?text=GozaMadrid' 
             }) }}
           />
         </Head>
@@ -131,8 +160,12 @@ const BlogImage = ({ src, alt, className = "", priority = false, sizes = "(max-w
           role="img"
           itemID={`#${imageId}`}
         >
-          <span className="text-gray-500">Sin imagen disponible</span>
-          <meta itemProp="contentUrl" content="/img/default-blog-image.jpg" />
+          <img 
+            src="https://via.placeholder.com/800x600?text=GozaMadrid" 
+            alt={alt || "Imagen no disponible"} 
+            className="object-cover w-full h-full"
+          />
+          <meta itemProp="contentUrl" content="https://via.placeholder.com/800x600?text=GozaMadrid" />
           <meta itemProp="name" content={alt || "Imagen no disponible"} />
         </div>
       </>

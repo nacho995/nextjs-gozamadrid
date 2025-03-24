@@ -12,21 +12,21 @@ export default function ServiciosPage() {
                 <title>{pageTitle}</title>
                 <meta name="description" content={pageDescription} />
                 <meta name="robots" content="index, follow" />
-                <link rel="canonical" href="https://gozamadrid.com/servicios" />
+                <link rel="canonical" href="https://realestategozamadrid.com/servicios" />
 
                 {/* Open Graph */}
                 <meta property="og:type" content="website" />
                 <meta property="og:title" content={pageTitle} />
                 <meta property="og:description" content={pageDescription} />
-                <meta property="og:image" content="https://gozamadrid.com/img/servicios-inmobiliarios.jpg" />
-                <meta property="og:url" content="https://gozamadrid.com/servicios" />
+                <meta property="og:image" content="https://realestategozamadrid.com/img/servicios-inmobiliarios.jpg" />
+                <meta property="og:url" content="https://realestategozamadrid.com/servicios" />
                 <meta property="og:site_name" content="Goza Madrid Inmobiliaria" />
 
                 {/* Twitter Card */}
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content={pageTitle} />
                 <meta name="twitter:description" content={pageDescription} />
-                <meta name="twitter:image" content="https://gozamadrid.com/img/servicios-inmobiliarios.jpg" />
+                <meta name="twitter:image" content="https://realestategozamadrid.com/img/servicios-inmobiliarios.jpg" />
 
                 {/* Schema.org Organization y Services */}
                 <script type="application/ld+json">
@@ -35,9 +35,9 @@ export default function ServiciosPage() {
                         "@type": "RealEstateAgent",
                         "name": "Goza Madrid Inmobiliaria",
                         "description": pageDescription,
-                        "url": "https://gozamadrid.com/servicios",
-                        "logo": "https://gozamadrid.com/logo.png",
-                        "image": "https://gozamadrid.com/img/servicios-inmobiliarios.jpg",
+                        "url": "https://realestategozamadrid.com/servicios",
+                        "logo": "https://realestategozamadrid.com/logo.png",
+                        "image": "https://realestategozamadrid.com/img/servicios-inmobiliarios.jpg",
                         "address": {
                             "@type": "PostalAddress",
                             "addressLocality": "Madrid",
@@ -91,13 +91,13 @@ export default function ServiciosPage() {
                                 "@type": "ListItem",
                                 "position": 1,
                                 "name": "Inicio",
-                                "item": "https://gozamadrid.com"
+                                "item": "https://realestategozamadrid.com"
                             },
                             {
                                 "@type": "ListItem",
                                 "position": 2,
                                 "name": "Servicios",
-                                "item": "https://gozamadrid.com/servicios"
+                                "item": "https://realestategozamadrid.com/servicios"
                             }
                         ]
                     })}
@@ -111,9 +111,9 @@ export default function ServiciosPage() {
                 <meta name="ICBM" content="40.4168, -3.7038" />
 
                 {/* Metadatos multilenguaje */}
-                <link rel="alternate" hrefLang="es" href="https://gozamadrid.com/servicios" />
-                <link rel="alternate" hrefLang="en" href="https://gozamadrid.com/en/services" />
-                <link rel="alternate" hrefLang="x-default" href="https://gozamadrid.com/servicios" />
+                <link rel="alternate" hrefLang="es" href="https://realestategozamadrid.com/servicios" />
+                <link rel="alternate" hrefLang="en" href="https://realestategozamadrid.com/en/services" />
+                <link rel="alternate" hrefLang="x-default" href="https://realestategozamadrid.com/servicios" />
             </Head>
 
             <div

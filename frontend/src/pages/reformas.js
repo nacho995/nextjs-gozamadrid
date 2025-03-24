@@ -11,21 +11,21 @@ export default function ReformsPage() {
                 <title>{pageTitle}</title>
                 <meta name="description" content={pageDescription} />
                 <meta name="robots" content="index, follow" />
-                <link rel="canonical" href="https://gozamadrid.com/reformas" />
+                <link rel="canonical" href="https://realestategozamadrid.com/reformas" />
 
                 {/* Open Graph */}
                 <meta property="og:type" content="website" />
                 <meta property="og:title" content={pageTitle} />
                 <meta property="og:description" content={pageDescription} />
-                <meta property="og:image" content="https://gozamadrid.com/img/reformas-hero.jpg" />
-                <meta property="og:url" content="https://gozamadrid.com/reformas" />
+                <meta property="og:image" content="https://realestategozamadrid.com/img/reformas-hero.jpg" />
+                <meta property="og:url" content="https://realestategozamadrid.com/reformas" />
                 <meta property="og:site_name" content="Goza Madrid Inmobiliaria" />
 
                 {/* Twitter Card */}
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content={pageTitle} />
                 <meta name="twitter:description" content={pageDescription} />
-                <meta name="twitter:image" content="https://gozamadrid.com/img/reformas-hero.jpg" />
+                <meta name="twitter:image" content="https://realestategozamadrid.com/img/reformas-hero.jpg" />
 
                 {/* Schema.org Service */}
                 <script type="application/ld+json">
@@ -37,7 +37,7 @@ export default function ReformsPage() {
                         "provider": {
                             "@type": "Organization",
                             "name": "Goza Madrid Inmobiliaria",
-                            "url": "https://gozamadrid.com"
+                            "url": "https://realestategozamadrid.com"
                         },
                         "areaServed": {
                             "@type": "City",
@@ -86,19 +86,19 @@ export default function ReformsPage() {
                                 "@type": "ListItem",
                                 "position": 1,
                                 "name": "Inicio",
-                                "item": "https://gozamadrid.com"
+                                "item": "https://realestategozamadrid.com"
                             },
                             {
                                 "@type": "ListItem",
                                 "position": 2,
                                 "name": "Servicios",
-                                "item": "https://gozamadrid.com/servicios"
+                                "item": "https://realestategozamadrid.com/servicios"
                             },
                             {
                                 "@type": "ListItem",
                                 "position": 3,
                                 "name": "Reformas",
-                                "item": "https://gozamadrid.com/reformas"
+                                "item": "https://realestategozamadrid.com/reformas"
                             }
                         ]
                     })}
@@ -110,7 +110,7 @@ export default function ReformsPage() {
                         "@context": "https://schema.org",
                         "@type": "LocalBusiness",
                         "name": "Goza Madrid Reformas",
-                        "image": "https://gozamadrid.com/img/reformas-hero.jpg",
+                        "image": "https://realestategozamadrid.com/img/reformas-hero.jpg",
                         "description": pageDescription,
                         "address": {
                             "@type": "PostalAddress",
@@ -124,7 +124,7 @@ export default function ReformsPage() {
                             "latitude": "40.423697",
                             "longitude": "-3.676181"
                         },
-                        "url": "https://gozamadrid.com/reformas",
+                        "url": "https://realestategozamadrid.com/reformas",
                         "telephone": "+34 919 012 103",
                         "priceRange": "€€€",
                         "areaServed": "Madrid"

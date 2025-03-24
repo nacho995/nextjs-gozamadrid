@@ -26,7 +26,6 @@ const stripHtml = (htmlString) => {
   try {
     return htmlString.replace(/<[^>]*>?/gm, '');
   } catch (error) {
-    console.error('Error al eliminar HTML:', error);
     return String(htmlString);
   }
 };
@@ -125,6 +124,23 @@ const getSafeId = (id) => {
   return typeof id === 'string' ? id : String(id);
 };
 
+// Mejor manejo de errores para no saturar la consola
+const fetchWithTimeout = async (url, options = {}, timeout = 8000) => {
+  try {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+    clearTimeout(id);
+    return response;
+  } catch (error) {
+    console.error(`Error en fetch a ${url}:`, error.message);
+    throw error;
+  }
+};
+
 export default function BlogPage() {
     const [blogs, setBlogs] = useState([]);
     const [selectedBlog, setSelectedBlog] = useState(null);
@@ -180,153 +196,435 @@ export default function BlogPage() {
             
             const combinedBlogs = [];
             const seenPosts = new Map();
-            
+            let hasLoadedAnyBlogs = false;
+
+            // PASO 1: Intentar obtener blogs de WordPress directamente desde proxy/wordpress/posts
             try {
-                console.log("Cargando blogs del endpoint combinado...");
-                
-                // Usar el nuevo endpoint de Cloudflare que combina blogs de WordPress y MongoDB
-                const apiUrl = `${window.location.origin}/api/blogs`;
-                console.log(`Consultando API: ${apiUrl}`);
-                
-                const response = await fetch(apiUrl, {
+                console.log("Cargando blogs desde el proxy de WordPress...");
+                const wpResponse = await fetch('/api/proxy/wordpress/posts?per_page=100', {
+                    method: 'GET',
                     headers: {
                         'Accept': 'application/json',
-                        'Cache-Control': 'no-cache'
+                        'Cache-Control': 'no-store, no-cache, must-revalidate'
                     }
                 });
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    
-                    if (data.blogs && Array.isArray(data.blogs)) {
-                        console.log(`Obtenidos ${data.blogs.length} blogs combinados (${data.sources.wordpress} de WordPress, ${data.sources.mongodb} de MongoDB)`);
+                if (wpResponse.ok) {
+                    const wpData = await wpResponse.json();
+                    if (wpData && Array.isArray(wpData)) {
+                        console.log(`Obtenidos ${wpData.length} blogs de WordPress`);
+                        hasLoadedAnyBlogs = true;
                         
-                        // Procesar y agregar blogs
-                        data.blogs.forEach(blog => {
-                            const blogId = blog._id || blog.id;
-                            const blogSlug = blog.slug || blogId;
+                        wpData.forEach(post => {
+                            const wpKey = post.slug;
+                            const wpId = `wp-${post.id}`;
                             
-                            if (!seenPosts.has(blogId) && !seenPosts.has(blogSlug)) {
-                                // Asegurarse de que tiene una imagen
-                                if (!blog.image || !blog.image.src) {
-                                    blog.image = {
-                                        src: '/img/default-blog-image.jpg',
-                                        alt: blog.title || 'Imagen de blog'
-                                    };
+                            if (!seenPosts.has(wpKey)) {
+                                let featuredImageUrl = null;
+                                
+                                // Extraer imagen destacada
+                                if (post._embedded && 
+                                    post._embedded['wp:featuredmedia'] && 
+                                    post._embedded['wp:featuredmedia'][0]) {
+                                    
+                                    const media = post._embedded['wp:featuredmedia'][0];
+                                    featuredImageUrl = media.source_url || null;
+                                    
+                                    // Asegurarnos de que la URL de la imagen sea segura (HTTPS)
+                                    if (featuredImageUrl && featuredImageUrl.startsWith('http:')) {
+                                        featuredImageUrl = featuredImageUrl.replace('http:', 'https:');
+                                    }
+                                    
+                                    // Usar weserv.nl como proxy para evitar errores de contenido mixto
+                                    if (featuredImageUrl) {
+                                        featuredImageUrl = `https://images.weserv.nl/?url=${encodeURIComponent(featuredImageUrl)}&n=-1`;
+                                    }
                                 }
                                 
-                                combinedBlogs.push(blog);
-                                seenPosts.set(blogId, blog);
-                                if (blogSlug) seenPosts.set(blogSlug, blog);
+                                if (!featuredImageUrl && post.featured_media_url) {
+                                    featuredImageUrl = post.featured_media_url;
+                                    if (featuredImageUrl.startsWith('http:')) {
+                                        featuredImageUrl = featuredImageUrl.replace('http:', 'https:');
+                                    }
+                                    featuredImageUrl = `https://images.weserv.nl/?url=${encodeURIComponent(featuredImageUrl)}&n=-1`;
+                                }
+                                
+                                // Intentar obtener la imagen desde uagb_featured_image_src si existe
+                                if (!featuredImageUrl && post.uagb_featured_image_src) {
+                                    let imgSrc = null;
+                                    // Intentar con diferentes tamaños de imagen
+                                    if (post.uagb_featured_image_src.large) {
+                                        imgSrc = post.uagb_featured_image_src.large[0];
+                                    } else if (post.uagb_featured_image_src.medium) {
+                                        imgSrc = post.uagb_featured_image_src.medium[0];
+                                    } else if (post.uagb_featured_image_src.full) {
+                                        imgSrc = post.uagb_featured_image_src.full[0];
+                                    } else if (post.uagb_featured_image_src.thumbnail) {
+                                        imgSrc = post.uagb_featured_image_src.thumbnail[0];
+                                    }
+                                    
+                                    if (imgSrc) {
+                                        featuredImageUrl = imgSrc;
+                                        if (featuredImageUrl.startsWith('http:')) {
+                                            featuredImageUrl = featuredImageUrl.replace('http:', 'https:');
+                                        }
+                                        featuredImageUrl = `https://images.weserv.nl/?url=${encodeURIComponent(featuredImageUrl)}&n=-1`;
+                                    }
+                                }
+                                
+                                if (!featuredImageUrl) {
+                                    featuredImageUrl = 'https://via.placeholder.com/800x600?text=GozaMadrid';
+                                }
+                                
+                                const wpBlog = {
+                                    _id: wpId,
+                                    id: post.id,
+                                    title: post.title?.rendered || 'Sin título',
+                                    description: truncateText(getDescription(post), 150),
+                                    content: post.content?.rendered || '',
+                                    excerpt: post.excerpt?.rendered || '',
+                                    date: new Date(post.date).toISOString(),
+                                    dateFormatted: new Date(post.date).toLocaleDateString('es-ES'),
+                                    image: {
+                                        src: featuredImageUrl,
+                                        alt: post.title?.rendered || 'Imagen del blog'
+                                    },
+                                    slug: post.slug,
+                                    source: 'wordpress',
+                                    author: post.author_name || "Equipo Goza Madrid",
+                                    // Asegurar que cada blog tenga propiedades básicas para mostrar, incluso sin conexión
+                                    _embedded: post._embedded || {},
+                                    categories: post.categories || [],
+                                    tags: post.tags || []
+                                };
+                                
+                                combinedBlogs.push(wpBlog);
+                                seenPosts.set(wpKey, wpBlog);
+                                seenPosts.set(wpId, wpBlog);
                             }
                         });
-                    } else {
-                        console.error("El formato de respuesta no es el esperado:", data);
-                        setError("La respuesta del API no tiene el formato esperado");
                     }
                 } else {
-                    console.error(`Error al obtener blogs: ${response.status} ${response.statusText}`);
-                    
-                    // Si el endpoint combinado falla, intentar los métodos originales
-                    console.log("⚠️ El endpoint combinado falló. Intentando métodos originales...");
-                    
-                    // PASO 1: Cargar blogs desde WordPress primero
-                    console.log("Cargando blogs de WordPress...");
+                    console.error(`Error ${wpResponse.status} al obtener blogs de WordPress`);
+                }
+            } catch (wpError) {
+                console.error("Error cargando blogs de WordPress:", wpError.message);
+                
+                // Intentar con el fallback de WordPress solo si aún no tenemos blogs
+                if (!hasLoadedAnyBlogs) {
                     try {
-                        const { posts } = await getBlogPostsFromServer(1, 10);
-                        if (isMounted && posts && posts.length > 0) {
-                            console.log(`Obtenidos ${posts.length} blogs de WordPress`);
-                            
-                            posts.forEach(post => {
-                                const wpKey = post.slug;
-                                const wpId = `wp-${post.id}`;
+                        const fallbackWpResponse = await fetch('/api/blogs?limit=100', {
+                            headers: {
+                                'Accept': 'application/json',
+                                'Cache-Control': 'no-store, no-cache, must-revalidate'
+                            }
+                        });
+                        
+                        if (fallbackWpResponse.ok) {
+                            const wpBlogs = await fallbackWpResponse.json();
+                            if (Array.isArray(wpBlogs) && wpBlogs.length > 0) {
+                                console.log(`Obtenidos ${wpBlogs.length} blogs desde fallback WordPress`);
+                                hasLoadedAnyBlogs = true;
                                 
-                                if (!seenPosts.has(wpKey)) {
-                                    let featuredImageUrl = null;
-                                    
-                                    if (post._embedded && 
-                                        post._embedded['wp:featuredmedia'] && 
-                                        post._embedded['wp:featuredmedia'][0]) {
-                                        
-                                        const media = post._embedded['wp:featuredmedia'][0];
-                                        
-                                        if (media.media_details && media.media_details.sizes) {
-                                            const sizePriority = ['medium_large', 'medium', 'large', 'full'];
-                                            
-                                            for (const size of sizePriority) {
-                                                if (media.media_details.sizes[size]) {
-                                                    featuredImageUrl = media.media_details.sizes[size].source_url;
-                                                    break;
-                                                }
+                                wpBlogs.forEach(blog => {
+                                    const blogId = blog.id || `wp-${blog.id}`;
+                                    if (!seenPosts.has(blogId)) {
+                                        // Asegurar que tiene imagen
+                                        if (!blog.image) {
+                                            blog.image = {
+                                                src: 'https://via.placeholder.com/800x600?text=GozaMadrid',
+                                                alt: blog.title || 'Imagen del blog'
+                                            };
+                                        } else if (typeof blog.image === 'string') {
+                                            // Asegurarnos de que la URL de la imagen sea segura (HTTPS)
+                                            let imgSrc = blog.image;
+                                            if (imgSrc.startsWith('http:')) {
+                                                imgSrc = imgSrc.replace('http:', 'https:');
                                             }
+                                            // Usar proxy de imágenes
+                                            imgSrc = `/api/proxy-image?url=${encodeURIComponent(imgSrc)}`;
+                                            blog.image = {
+                                                src: imgSrc,
+                                                alt: blog.title || 'Imagen del blog'
+                                            };
+                                        } else if (blog.image.src && blog.image.src.startsWith('http:')) {
+                                            blog.image.src = blog.image.src.replace('http:', 'https:');
+                                            blog.image.src = `/api/proxy-image?url=${encodeURIComponent(blog.image.src)}`;
                                         }
                                         
-                                        if (!featuredImageUrl && media.source_url) {
-                                            featuredImageUrl = media.source_url;
-                                        }
+                                        // Convertir a formato estándar si es necesario
+                                        const processedBlog = {
+                                            _id: blogId,
+                                            id: blog.id,
+                                            title: blog.title || 'Sin título',
+                                            description: truncateText(blog.excerpt || blog.description || '', 150),
+                                            content: blog.content || '',
+                                            date: blog.date || new Date().toISOString(),
+                                            image: typeof blog.image === 'string' 
+                                                ? { src: blog.image, alt: blog.title || 'Imagen del blog' } 
+                                                : blog.image,
+                                            slug: blog.slug,
+                                            source: 'wordpress'
+                                        };
+                                        
+                                        combinedBlogs.push(processedBlog);
+                                        seenPosts.set(blogId, processedBlog);
                                     }
-                                    
-                                    if (!featuredImageUrl) {
-                                        featuredImageUrl = post.uagb_featured_image_src?.medium?.[0] || 
-                                                          post.uagb_featured_image_src?.full?.[0] || 
-                                                          '/img/default-blog-image.jpg';
-                                    }
-                                    
-                                    const wpBlog = {
-                                        _id: wpId,
-                                        title: safeRenderValue(post.title),
-                                        description: truncateText(getDescription(post), 150),
-                                        content: safeRenderValue(post.content),
-                                        date: new Date(post.date).toISOString(),
-                                        dateFormatted: new Date(post.date).toLocaleDateString('es-ES'),
-                                        image: {
-                                            src: featuredImageUrl,
-                                            alt: safeRenderValue(post.title)
-                                        },
-                                        slug: post.slug,
-                                        source: 'wordpress',
-                                        author: post.author_name || post._embedded?.author?.[0]?.name || "Equipo Goza Madrid"
-                                    };
-                                    
-                                    combinedBlogs.push(wpBlog);
-                                    seenPosts.set(wpKey, wpBlog);
-                                    seenPosts.set(wpId, wpBlog);
-                                }
-                            });
+                                });
+                            }
                         }
-                    } catch (wpError) {
-                        console.error("Error cargando blogs de WordPress:", wpError);
-                    }
-                    
-                    // PASO 2: Cargar blogs locales
-                    console.log("Cargando blogs de la API local...");
-                    try {
-                        const localData = await getBlogPosts();
-                        if (isMounted && localData && localData.length > 0) {
-                            console.log(`Obtenidos ${localData.length} blogs locales`);
-                            
-                            localData.forEach(blog => {
-                                const localKey = blog.slug || blog._id;
-                                
-                                if (!seenPosts.has(localKey)) {
-                                    const processedBlog = {
-                                        ...blog,
-                                        image: processImageUrl(blog.image),
-                                        source: 'mongodb'
-                                    };
-                                    
-                                    combinedBlogs.push(processedBlog);
-                                    seenPosts.set(localKey, processedBlog);
-                                }
-                            });
-                        }
-                    } catch (localError) {
-                        console.error("Error cargando blogs locales:", localError);
+                    } catch (fallbackError) {
+                        console.error("Error en fallback de WordPress:", fallbackError.message);
                     }
                 }
-            } catch (error) {
-                console.error("Error general al cargar blogs:", error);
-                setError(`Error al cargar blogs: ${error.message}`);
+            }
+            
+            // SIEMPRE intentamos obtener blogs de AWS Beanstalk, sin importar si ya tenemos blogs de WordPress
+            try {
+                let awsBlogs = [];
+                let hasAwsBlogs = false;
+            
+                // 1. Intentar con el nuevo endpoint AWS Beanstalk
+                try {
+                    console.log("Cargando blogs desde AWS Beanstalk...");
+                    const beanstalkResponse = await fetch('/api/proxy/backend/blogs?limit=100', {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Cache-Control': 'no-store, no-cache, must-revalidate'
+                        },
+                        // Aumentar el timeout para evitar que la carga se quede en espera
+                        signal: AbortSignal.timeout(15000) // Aumentado a 15 segundos para dar más tiempo
+                    }).catch(error => {
+                        console.error("Error en fetch a Beanstalk:", error.message);
+                        return { ok: false, status: 0, statusText: error.message };
+                    });
+                    
+                    if (beanstalkResponse.ok) {
+                        try {
+                            const beanstalkData = await beanstalkResponse.json();
+                            console.log("Respuesta de Beanstalk:", beanstalkData && Array.isArray(beanstalkData) ? 
+                                `Array con ${beanstalkData.length} elementos` : 
+                                `Tipo de datos: ${typeof beanstalkData}`);
+                                
+                            if (beanstalkData && Array.isArray(beanstalkData) && beanstalkData.length > 0) {
+                                awsBlogs = beanstalkData;
+                                hasAwsBlogs = true;
+                                console.log(`Obtenidos ${beanstalkData.length} blogs de AWS Beanstalk`);
+                                hasLoadedAnyBlogs = true; // Marcar que hemos cargado blogs
+                            } else if (beanstalkData && Array.isArray(beanstalkData) && beanstalkData.length === 0) {
+                                console.log("La API de Beanstalk devolvió un array vacío");
+                            } else {
+                                console.log("Formato de respuesta inesperado de Beanstalk:", typeof beanstalkData);
+                            }
+                        } catch (jsonError) {
+                            console.error("Error al procesar JSON de Beanstalk:", jsonError.message);
+                        }
+                    } else {
+                        // Intentar leer el mensaje de error si es posible
+                        try {
+                            const errorText = await beanstalkResponse.text().catch(() => "No se pudo leer el texto de error");
+                            console.log(`Error ${beanstalkResponse.status} al obtener blogs de Beanstalk. Detalle:`, 
+                                errorText.substring(0, 200) + (errorText.length > 200 ? '...' : ''));
+                        } catch (textError) {
+                            console.log(`Error ${beanstalkResponse.status} al obtener blogs de Beanstalk`);
+                        }
+                    }
+                } catch (beanstalkError) {
+                    console.error("Error cargando blogs de AWS Beanstalk:", beanstalkError.message);
+                }
+                
+                // 2. Si no hay blogs de AWS o hubo un error, intentar con alternativas - CONEXIÓN DIRECTA A ELASTIC BEANSTALK
+                if (!hasAwsBlogs) {
+                    // Intentar con un endpoint alternativo utilizando nuestro proxy-raw
+                    try {
+                        console.log("Intentando cargar blogs a través de proxy-raw...");
+                        const directUrl = 'http://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com';
+                        
+                        // Utilizar el nuevo proxy-raw para evitar problemas de contenido mixto
+                        const proxyResponse = await fetch('/api/proxy-raw', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                url: `${directUrl}/api/blogs`,
+                                method: 'GET',
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'Cache-Control': 'no-store, no-cache, must-revalidate',
+                                    'User-Agent': 'GozaMadrid-Frontend/1.0',
+                                    'Origin': 'https://www.realestategozamadrid.com'
+                                },
+                                timeout: 15000
+                            }),
+                            // Aumentar el timeout para evitar que la carga se quede en espera
+                            signal: AbortSignal.timeout(20000) // 20 segundos para el fetch al proxy
+                        }).catch(error => {
+                            console.error("Error en fetch a proxy-raw:", error.message);
+                            return { ok: false, status: 0, statusText: error.message };
+                        });
+                        
+                        if (proxyResponse.ok) {
+                            try {
+                                const proxyData = await proxyResponse.json();
+                                console.log("Respuesta del proxy-raw:", proxyData && Array.isArray(proxyData) ? 
+                                    `Array con ${proxyData.length} elementos` : 
+                                    `Tipo de datos: ${typeof proxyData}`);
+                                    
+                                if (proxyData && Array.isArray(proxyData) && proxyData.length > 0) {
+                                    awsBlogs = proxyData;
+                                    hasAwsBlogs = true;
+                                    hasLoadedAnyBlogs = true; // Marcar que hemos cargado blogs
+                                    console.log(`Obtenidos ${proxyData.length} blogs mediante proxy-raw`);
+                                } else if (proxyData && Array.isArray(proxyData) && proxyData.length === 0) {
+                                    console.log("El proxy-raw devolvió un array vacío");
+                                } else {
+                                    console.log("Formato de respuesta inesperado del proxy-raw:", typeof proxyData);
+                                }
+                            } catch (jsonError) {
+                                console.error("Error al procesar JSON del proxy-raw:", jsonError.message);
+                            }
+                        } else {
+                            // Intentar leer el mensaje de error si es posible
+                            try {
+                                const errorText = await proxyResponse.text().catch(() => "No se pudo leer el texto de error");
+                                console.log(`Error ${proxyResponse.status} al obtener blogs mediante proxy-raw. Detalle:`, 
+                                    errorText.substring(0, 200) + (errorText.length > 200 ? '...' : ''));
+                            } catch (textError) {
+                                console.log(`Error ${proxyResponse.status} al obtener blogs mediante proxy-raw`);
+                            }
+                        }
+                    } catch (proxyError) {
+                        console.error("Error al usar proxy-raw:", proxyError.message);
+                    }
+                }
+                
+                // 3. Procesar blogs de AWS si los obtuvimos
+                if (hasAwsBlogs && awsBlogs.length > 0) {
+                    awsBlogs.forEach(blog => {
+                        const blogKey = blog.slug || blog._id;
+                        
+                        if (!seenPosts.has(blogKey)) {
+                            // Procesar imagen para evitar problemas de mixed content
+                            let blogImage = blog.image;
+                            
+                            // Si no tiene imagen principal pero tiene un array de imágenes, usar la primera
+                            if (!blogImage && blog.images && Array.isArray(blog.images) && blog.images.length > 0) {
+                                const firstImage = blog.images[0];
+                                if (typeof firstImage === 'string') {
+                                    blogImage = firstImage;
+                                } else if (firstImage.src || firstImage.url) {
+                                    blogImage = firstImage.src || firstImage.url;
+                                }
+                            }
+                            
+                            // Si tenemos una URL de imagen directa
+                            if (typeof blogImage === 'string') {
+                                // Asegurarnos de que la URL de la imagen sea segura (HTTPS)
+                                if (blogImage.startsWith('http:')) {
+                                    blogImage = blogImage.replace('http:', 'https:');
+                                }
+                                // Usar weserv.nl directamente para mejor rendimiento
+                                blogImage = {
+                                    src: `https://images.weserv.nl/?url=${encodeURIComponent(blogImage)}&n=-1`,
+                                    alt: blog.title || 'Imagen del blog'
+                                };
+                            } 
+                            // Si tenemos un objeto de imagen
+                            else if (blogImage && typeof blogImage === 'object') {
+                                if (blogImage.src) {
+                                    let imgSrc = blogImage.src;
+                                    if (imgSrc.startsWith('http:')) {
+                                        imgSrc = imgSrc.replace('http:', 'https:');
+                                    }
+                                    blogImage = {
+                                        src: `https://images.weserv.nl/?url=${encodeURIComponent(imgSrc)}&n=-1`,
+                                        alt: blogImage.alt || blog.title || 'Imagen del blog'
+                                    };
+                                } else if (blogImage.url) {
+                                    let imgUrl = blogImage.url;
+                                    if (imgUrl.startsWith('http:')) {
+                                        imgUrl = imgUrl.replace('http:', 'https:');
+                                    }
+                                    blogImage = {
+                                        src: `https://images.weserv.nl/?url=${encodeURIComponent(imgUrl)}&n=-1`,
+                                        alt: blogImage.alt || blog.title || 'Imagen del blog'
+                                    };
+                                }
+                            }
+                            // Si no hay imagen, usar placeholder
+                            else {
+                                blogImage = {
+                                    src: 'https://via.placeholder.com/800x600?text=GozaMadrid',
+                                    alt: blog.title || 'Imagen del blog'
+                                };
+                            }
+                            
+                            const processedBlog = {
+                                ...blog,
+                                _id: blog._id || `aws-${blog.id || Math.random().toString(36).substring(2)}`,
+                                source: 'aws',
+                                image: blogImage,
+                                // Asegurar valores básicos para todos los blogs
+                                title: blog.title || 'Sin título',
+                                description: blog.description || blog.excerpt || 'Sin descripción',
+                                content: blog.content || blog.description || '',
+                                slug: blog.slug || `blog-${blog._id || blog.id || Math.random().toString(36).substring(2, 7)}`,
+                                date: blog.date || blog.createdAt || new Date().toISOString(),
+                                dateFormatted: new Date(blog.date || blog.createdAt || new Date()).toLocaleDateString('es-ES'),
+                                author: blog.author || 'Equipo Goza Madrid',
+                            };
+                            
+                            combinedBlogs.push(processedBlog);
+                            seenPosts.set(blogKey, processedBlog);
+                        }
+                    });
+                }
+            } catch (allAwsError) {
+                // Si hay algún error en todo el bloque de AWS, simplemente lo registramos y continuamos
+                console.error("Error general obteniendo blogs de AWS:", allAwsError.message);
+            }
+            
+            // Si no hemos podido obtener blogs de ninguna fuente, agregar blogs de muestra en desarrollo
+            if (combinedBlogs.length === 0) {
+                console.log("No se obtuvieron blogs de ninguna fuente. Agregando blogs de muestra.");
+                
+                const sampleBlogs = [
+                    {
+                        _id: 'sample1',
+                        title: 'Cómo invertir en el mercado inmobiliario de Madrid en 2023',
+                        description: 'Guía completa para inversores que buscan oportunidades en el mercado inmobiliario madrileño, con análisis de zonas y rentabilidades.',
+                        content: '<p>Este es un artículo de muestra para desarrollo. Aquí iría el contenido completo del blog.</p>',
+                        date: new Date().toISOString(),
+                        dateFormatted: new Date().toLocaleDateString('es-ES'),
+                        image: {
+                            src: 'https://via.placeholder.com/800x600?text=GozaMadrid',
+                            alt: 'Inversión inmobiliaria en Madrid'
+                        },
+                        slug: 'invertir-mercado-inmobiliario-madrid',
+                        source: 'sample',
+                        author: 'Equipo Goza Madrid'
+                    },
+                    {
+                        _id: 'sample2',
+                        title: 'Los 5 barrios con mayor revalorización en Madrid',
+                        description: 'Descubre cuáles son los barrios que más han crecido en valor en los últimos años y por qué son una excelente inversión.',
+                        content: '<p>Este es un artículo de muestra para desarrollo. Aquí iría el contenido completo del blog.</p>',
+                        date: new Date(Date.now() - 7*24*60*60*1000).toISOString(),
+                        dateFormatted: new Date(Date.now() - 7*24*60*60*1000).toLocaleDateString('es-ES'),
+                        image: {
+                            src: 'https://via.placeholder.com/800x600?text=GozaMadrid',
+                            alt: 'Barrios en Madrid'
+                        },
+                        slug: 'barrios-mayor-revalorizacion-madrid',
+                        source: 'sample',
+                        author: 'Equipo Goza Madrid'
+                    }
+                ];
+                
+                combinedBlogs.push(...sampleBlogs);
             }
             
             // Ordenar blogs por fecha (más recientes primero)
@@ -335,6 +633,8 @@ export default function BlogPage() {
                 const dateB = new Date(b.date || b.createdAt || 0);
                 return dateB - dateA;
             });
+            
+            console.log(`Total de blogs obtenidos: ${combinedBlogs.length}`);
             
             if (isMounted) {
                 setBlogs(combinedBlogs);
@@ -381,14 +681,13 @@ export default function BlogPage() {
                     setSelectedBlog(data);
                 }
             } catch (error) {
-                console.error("Error obteniendo contenido del blog:", error);
                 try {
                     const fallbackBlog = blogs.find(blog => String(blog._id) === String(id));
                     if (fallbackBlog) {
                         setSelectedBlog(fallbackBlog);
                     }
                 } catch (fbError) {
-                    console.error("Error incluso con fallback:", fbError);
+                    console.error("Error en fallback de blog:", fbError.message || "Error desconocido");
                 }
             }
         };
@@ -404,7 +703,7 @@ export default function BlogPage() {
                     fetchBlogContent(blogId, blogSource);
                 }
             } catch (error) {
-                console.error("Error procesando el primer blog:", error);
+                console.error("Error al obtener blog inicial:", error.message || "Error desconocido");
             }
         }
     }, [blogs]);
@@ -465,104 +764,105 @@ export default function BlogPage() {
                                             const blogUrl = blog.source === 'wordpress' 
                                                 ? `/blog/${blog.slug}?source=wordpress` 
                                                 : `/blog/${blog._id}`;
-                                            
-                                            // Get published date in readable format
-                                            const publishDate = blog.dateFormatted || 
-                                                (blog.date ? new Date(blog.date).toLocaleDateString('es-ES') : '');
-                                            
-                                            return (
-                                                <article key={safeId} className="group h-full flex flex-col" itemScope itemType="https://schema.org/BlogPosting">
-                                                    {/* Hidden metadata for SEO */}
-                                                    <meta itemProp="datePublished" content={blog.date || ''} />
-                                                    <meta itemProp="author" content={blog.author || 'Equipo Goza Madrid'} />
-                                                    
-                                                    <Link
-                                                        href={blogUrl}
-                                                        className="flex flex-col h-full bg-white rounded-xl overflow-hidden transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl shadow-md"
-                                                        title={`Leer artículo: ${typeof blog.title === 'string' ? blog.title : ''}`}
-                                                    >
-                                                        {/* Contenedor de la imagen con overlay de gradiente */}
-                                                        <div className="relative w-full overflow-hidden aspect-[16/9]">
-                                                            {blog.image ? (
-                                                                <BlogImage
-                                                                    src={blog.image.src}
-                                                                    alt={blog.image.alt || `Imagen para el artículo: ${blog.title}` || "Imagen del blog"}
-                                                                    className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
-                                                                />
-                                                            ) : (
-                                                                <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
-                                                                    <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                                    </svg>
-                                                                </div>
-                                                            )}
-                                                            
-                                                            {/* Gradiente permanente para mejor legibilidad */}
-                                                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
-                                                            
-                                                            {/* Fecha en overlay */}
-                                                            {publishDate && (
-                                                                <div className="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
-                                                                    <time dateTime={blog.date} itemProp="datePublished">{publishDate}</time>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                        
-                                                        {/* Contenido de la tarjeta */}
-                                                        <div className="flex flex-1 flex-col p-6">
-                                                            {/* Título */}
-                                                            <h2 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-amarillo transition-colors line-clamp-2" itemProp="headline">
-                                                                {safeRenderValue(blog.title)}
-                                                            </h2>
-                                                            
-                                                            {/* Resumen */}
-                                                            <p className="text-gray-600 text-sm mb-4 line-clamp-3" itemProp="description">
-                                                                {blog.description || truncateText(getDescription(blog), 100)}
-                                                            </p>
-                                                            
-                                                            {/* Footer con botón de acción */}
-                                                            <div className="mt-auto pt-4 flex items-center justify-between border-t border-gray-100">
-                                                                <span className="flex items-center text-amarillo font-medium group-hover:text-amarillo/80 transition-colors">
-                                                                    Leer más
-                                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                                                    </svg>
-                                                                </span>
-                                                                
-                                                                {/* Categoría si está disponible */}
-                                                                {blog.category && (
-                                                                    <span className="text-xs text-gray-500" itemProp="articleSection">
-                                                                        {blog.category}
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    </Link>
-                                                </article>
-                                            );
-                                        })}
-                                    </div>
-                                ) : (
-                                    <div className="py-16 text-center" role="alert">
-                                        <svg className="w-12 h-12 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                                        </svg>
-                                        <h2 className="text-2xl font-bold mb-2">No hay artículos disponibles</h2>
-                                        <p className="text-gray-500 mb-6">No hemos encontrado artículos de blog en este momento.</p>
-                                        <button 
-                                            onClick={() => window.location.reload()} 
-                                            className="mt-4 px-4 py-2 bg-amarillo text-white rounded-full hover:bg-amarillo/80 transition-colors focus:outline-none focus:ring-2 focus:ring-amarillo/50"
-                                            aria-label="Recargar página"
-                                        >
-                                            Recargar página
-                                        </button>
-                                    </div>
-                                )}
-                            </section>
-                        )}
-                    </div>
-                </AnimatedOnScroll>
-            </main>
-        </>
-    );
+                                             
+                                             // Get published date in readable format
+                                             const publishDate = blog.dateFormatted || 
+                                                 (blog.date ? new Date(blog.date).toLocaleDateString('es-ES') : '');
+                                             
+                                             return (
+                                                 <article key={safeId} className="group h-full flex flex-col" itemScope itemType="https://schema.org/BlogPosting">
+                                                     {/* Hidden metadata for SEO */}
+                                                     <meta itemProp="datePublished" content={blog.date || ''} />
+                                                     <meta itemProp="author" content={blog.author || 'Equipo Goza Madrid'} />
+                                                     
+                                                     <Link
+                                                         href={blogUrl}
+                                                         className="flex flex-col h-full bg-white rounded-xl overflow-hidden transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl shadow-md"
+                                                         title={`Leer artículo: ${typeof blog.title === 'string' ? blog.title : ''}`}
+                                                     >
+                                                         {/* Contenedor de la imagen con overlay de gradiente */}
+                                                         <div className="relative w-full overflow-hidden aspect-[16/9]">
+                                                             {blog.image ? (
+                                                                 <BlogImage
+                                                                     src={blog.image.src}
+                                                                     alt={blog.image.alt || `Imagen para el artículo: ${blog.title}` || "Imagen del blog"}
+                                                                     className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+                                                                     fallbackSrc="https://via.placeholder.com/800x600?text=GozaMadrid"
+                                                                 />
+                                                             ) : (
+                                                                 <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
+                                                                     <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                                     </svg>
+                                                                 </div>
+                                                             )}
+                                                             
+                                                             {/* Gradiente permanente para mejor legibilidad */}
+                                                             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+                                                             
+                                                             {/* Fecha en overlay */}
+                                                             {publishDate && (
+                                                                 <div className="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
+                                                                     <time dateTime={blog.date} itemProp="datePublished">{publishDate}</time>
+                                                                 </div>
+                                                             )}
+                                                         </div>
+                                                         
+                                                         {/* Contenido de la tarjeta */}
+                                                         <div className="flex flex-1 flex-col p-6">
+                                                             {/* Título */}
+                                                             <h2 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-amarillo transition-colors line-clamp-2" itemProp="headline">
+                                                                 {safeRenderValue(blog.title)}
+                                                             </h2>
+                                                             
+                                                             {/* Resumen */}
+                                                             <p className="text-gray-600 text-sm mb-4 line-clamp-3" itemProp="description">
+                                                                 {blog.description || truncateText(getDescription(blog), 100)}
+                                                             </p>
+                                                             
+                                                             {/* Footer con botón de acción */}
+                                                             <div className="mt-auto pt-4 flex items-center justify-between border-t border-gray-100">
+                                                                 <span className="flex items-center text-amarillo font-medium group-hover:text-amarillo/80 transition-colors">
+                                                                     Leer más
+                                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                                                     </svg>
+                                                                 </span>
+                                                                 
+                                                                 {/* Categoría si está disponible */}
+                                                                 {blog.category && (
+                                                                     <span className="text-xs text-gray-500" itemProp="articleSection">
+                                                                         {blog.category}
+                                                                     </span>
+                                                                 )}
+                                                             </div>
+                                                         </div>
+                                                     </Link>
+                                                 </article>
+                                             );
+                                         })}
+                                     </div>
+                                 ) : (
+                                     <div className="py-16 text-center" role="alert">
+                                         <svg className="w-12 h-12 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                                         </svg>
+                                         <h2 className="text-2xl font-bold mb-2">No hay artículos disponibles</h2>
+                                         <p className="text-gray-500 mb-6">No hemos encontrado artículos de blog en este momento.</p>
+                                         <button 
+                                             onClick={() => window.location.reload()} 
+                                             className="mt-4 px-4 py-2 bg-amarillo text-white rounded-full hover:bg-amarillo/80 transition-colors focus:outline-none focus:ring-2 focus:ring-amarillo/50"
+                                             aria-label="Recargar página"
+                                         >
+                                             Recargar página
+                                         </button>
+                                     </div>
+                                 )}
+                             </section>
+                         )}
+                     </div>
+                 </AnimatedOnScroll>
+             </main>
+         </>
+     );
 }

@@ -21,7 +21,7 @@ import { FaUser } from "react-icons/fa";
 
 // Usar una imagen por defecto que sabemos que existe
 const DEFAULT_IMAGE = process.env.NODE_ENV === 'production'
-  ? 'https://gozamadrid.com/default-blog-image.jpg'
+  ? 'https://realestategozamadrid.com/default-blog-image.jpg'
   : 'http://localhost:3003/default-blog-image.jpg';
 
 const safeRenderValue = (value) => {
@@ -39,7 +39,7 @@ const getImageSrc = (image, defaultImage) => {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
   
   if (!image) {
-    console.log('No hay imagen, usando imagen por defecto:', defaultImage);
+    // console.log('No hay imagen, usando imagen por defecto:', defaultImage);
     return defaultImage;
   }
   
@@ -47,13 +47,13 @@ const getImageSrc = (image, defaultImage) => {
   if (image._embedded?.['wp:featuredmedia']?.[0]?.source_url) {
     const wpImageUrl = image._embedded['wp:featuredmedia'][0].source_url;
     const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(wpImageUrl)}&default=https://via.placeholder.com/800x600?text=Sin+Imagen`;
-    console.log('Imagen de WordPress (_embedded) con proxy:', { original: wpImageUrl, proxy: proxyUrl });
+    // console.log('Imagen de WordPress (_embedded) con proxy:', { original: wpImageUrl, proxy: proxyUrl });
     return proxyUrl;
   }
   
   if (image.source_url) {
     const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(image.source_url)}&default=https://via.placeholder.com/800x600?text=Sin+Imagen`;
-    console.log('Imagen de WordPress (source_url) con proxy:', { original: image.source_url, proxy: proxyUrl });
+    // console.log('Imagen de WordPress (source_url) con proxy:', { original: image.source_url, proxy: proxyUrl });
     return proxyUrl;
   }
   
@@ -62,26 +62,26 @@ const getImageSrc = (image, defaultImage) => {
     if (image.src) {
       // Si la URL ya es absoluta, usarla directamente
       if (image.src.startsWith('http') || image.src.startsWith('https')) {
-        console.log('Imagen de MongoDB (objeto con src absoluta):', image.src);
+        // console.log('Imagen de MongoDB (objeto con src absoluta):', image.src);
         return image.src;
       }
       
       // Si la URL es relativa, construir la URL completa
       const imgSrc = `${API_URL}${image.src.startsWith('/') ? '' : '/'}${image.src}`;
-      console.log('Imagen de MongoDB (objeto con src relativa):', { original: image.src, processed: imgSrc });
+      // console.log('Imagen de MongoDB (objeto con src relativa):', { original: image.src, processed: imgSrc });
       return imgSrc;
     }
     
     if (image.url) {
       // Si la URL ya es absoluta, usarla directamente
       if (image.url.startsWith('http') || image.url.startsWith('https')) {
-        console.log('Imagen de MongoDB (objeto con url absoluta):', image.url);
+        // console.log('Imagen de MongoDB (objeto con url absoluta):', image.url);
         return image.url;
       }
       
       // Si la URL es relativa, construir la URL completa
       const imgUrl = `${API_URL}${image.url.startsWith('/') ? '' : '/'}${image.url}`;
-      console.log('Imagen de MongoDB (objeto con url relativa):', { original: image.url, processed: imgUrl });
+      // console.log('Imagen de MongoDB (objeto con url relativa):', { original: image.url, processed: imgUrl });
       return imgUrl;
     }
   }
@@ -91,23 +91,23 @@ const getImageSrc = (image, defaultImage) => {
     // Si es una URL de WordPress, usar proxy
     if (image.includes('realestategozamadrid.com') || image.includes('gozamadrid.com') || image.includes('wp-content')) {
       const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(image)}&default=https://via.placeholder.com/800x600?text=Sin+Imagen`;
-      console.log('Imagen de WordPress (string) con proxy:', { original: image, proxy: proxyUrl });
+      // console.log('Imagen de WordPress (string) con proxy:', { original: image, proxy: proxyUrl });
       return proxyUrl;
     }
     
     // Si la URL ya es absoluta, usarla directamente
     if (image.startsWith('http') || image.startsWith('https')) {
-      console.log('Imagen con URL absoluta:', image);
+      // console.log('Imagen con URL absoluta:', image);
       return image;
     }
     
     // Si la URL es relativa, construir la URL completa
     const imgStr = `${API_URL}${image.startsWith('/') ? '' : '/'}${image}`;
-    console.log('Imagen con URL relativa:', { original: image, processed: imgStr });
+    // console.log('Imagen con URL relativa:', { original: image, processed: imgStr });
     return imgStr;
   }
   
-  console.log('Tipo de imagen no reconocido, usando imagen por defecto:', { image, defaultImage });
+  // console.log('Tipo de imagen no reconocido, usando imagen por defecto:', { image, defaultImage });
   return defaultImage;
 };
 
@@ -348,18 +348,18 @@ const BlogContent = ({ slug }) => {
       setError(null);
       
       try {
-        console.log(`Obteniendo blog con slug: ${slug}`);
+        // console.log(`Obteniendo blog con slug: ${slug}`);
         
         // Si el source es wordpress, buscar por slug
         if (source === 'wordpress') {
-          console.log('Buscando blog de WordPress por slug');
+          // console.log('Buscando blog de WordPress por slug');
           
           try {
             // Intentar obtener el blog directamente de la API de WordPress
             const blogData = await getBlogPostBySlug(slug);
             
             if (blogData) {
-              console.log('Blog de WordPress encontrado por slug');
+              // console.log('Blog de WordPress encontrado por slug');
               
               // Aplicar limpieza y procesamiento al contenido
               const cleanedContent = cleanSpecificProblems(blogData.content?.rendered || blogData.content || '');
@@ -437,13 +437,13 @@ const BlogContent = ({ slug }) => {
           }
         } else {
           // Intentar obtener por ID de MongoDB
-          console.log('Buscando blog por ID de MongoDB');
+          // console.log('Buscando blog por ID de MongoDB');
           
           try {
             const data = await getBlogById(slug);
             
             if (data) {
-              console.log('Blog encontrado por ID');
+              // console.log('Blog encontrado por ID');
               
               // Aplicar limpieza y procesamiento al contenido
               const cleanedContent = cleanSpecificProblems(data.content);
@@ -461,13 +461,13 @@ const BlogContent = ({ slug }) => {
             console.error('Error al obtener blog por ID:', idError);
             
             // Si falla, intentar buscar por slug en todos los blogs
-            console.log('Intentando buscar por slug en todos los blogs');
+            // console.log('Intentando buscar por slug en todos los blogs');
             
             const allBlogs = await getBlogPosts();
             const foundBlog = allBlogs.find(b => b.slug === slug);
             
             if (foundBlog) {
-              console.log('Blog encontrado por slug');
+              // console.log('Blog encontrado por slug');
               
               // Aplicar limpieza y procesamiento al contenido
               const cleanedContent = cleanSpecificProblems(foundBlog.content);
@@ -498,9 +498,9 @@ const BlogContent = ({ slug }) => {
   
   useEffect(() => {
     if (blog) {
-      console.log('Datos del blog recibidos:', blog);
-      console.log('Content:', blog.content);
-      console.log('ReadTime:', blog.readTime);
+      // console.log('Datos del blog recibidos:', blog);
+      // console.log('Content:', blog.content);
+      // console.log('ReadTime:', blog.readTime);
     }
   }, [blog]);
   
@@ -551,8 +551,8 @@ const BlogContent = ({ slug }) => {
   const readTime = blogReadTime || (blog && blog.readTime) || '';
 
   // Añadir log para verificar
-  console.log('Content procesado:', content);
-  console.log('ReadTime procesado:', readTime);
+  // console.log('Content procesado:', content);
+  // console.log('ReadTime procesado:', readTime);
 
   // Procesar la imagen principal usando la función getImageSrc modificada
   const imageSrc = getImageSrc(image || images, DEFAULT_IMAGE);
@@ -597,7 +597,7 @@ const BlogContent = ({ slug }) => {
               "name": "Goza Madrid",
               "logo": {
                 "@type": "ImageObject",
-                "url": "https://gozamadrid.com/logo.png"
+                "url": "https://realestategozamadrid.com/logo.png"
               }
             },
             "description": excerptText?.replace(/<[^>]*>/g, '').slice(0, 160),
@@ -723,12 +723,13 @@ const BlogContent = ({ slug }) => {
           {excerpt && (
             <div className="relative bg-amarillo/10 border-l-4 border-amarillo p-6 mb-8 text-lg italic rounded-r-xl">
               {/* Comillas decorativas */}
-              <div className="absolute -top-6 -left-2 text-8xl text-amarillo/20 font-serif">"</div>
+              <div className="absolute -top-6 -left-2 text-8xl text-amarillo/20 font-serif">&ldquo;</div>
               <div dangerouslySetInnerHTML={{
                 __html: typeof excerpt === 'object' 
                   ? cleanSpecificProblems(excerpt.rendered) 
                   : cleanSpecificProblems(excerpt)
-              }} className="relative z-10" />
+              }} />
+              <div className="absolute -bottom-12 -right-2 text-8xl text-amarillo/20 font-serif">&rdquo;</div>
             </div>
           )}
         </header>

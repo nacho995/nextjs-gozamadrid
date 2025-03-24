@@ -25,7 +25,7 @@ export default function ImpuestoSobreRenta() {
                 <meta property="og:title" content="Gestión del Impuesto sobre la Renta para No Residentes en España" />
                 <meta property="og:description" content="Asesoramiento especializado en la gestión del IRNR y Modelo 210 para no residentes en España. Optimización fiscal y gestión completa." />
                 <meta property="og:image" content="/impuesto.jpg" />
-                <link rel="canonical" href="https://gozamadrid.com/servicios/impuesto-sobre-renta" />
+                <link rel="canonical" href="https://realestategozamadrid.com/servicios/impuesto-sobre-renta" />
             </Head>
 
             <div className="container mx-auto py-8">

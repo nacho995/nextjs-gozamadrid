@@ -25,7 +25,7 @@ export default function ExpPage() {
                 <meta property="og:type" content="website" />
                 <meta property="og:image" content="/exp-realty-banner.jpg" />
                 <meta name="twitter:card" content="summary_large_image" />
-                <link rel="canonical" href="https://gozamadrid.com/exp" />
+                <link rel="canonical" href="https://realestategozamadrid.com/exp" />
             </Head>
 
             <main 
@@ -73,7 +73,7 @@ export default function ExpPage() {
                         "name": "eXp Realty España",
                         "description": "eXp Realty es una innovadora inmobiliaria internacional que revoluciona el sector inmobiliario con tecnología de vanguardia y un modelo de negocio único.",
                         "image": "/exp-realty-banner.jpg",
-                        "url": "https://gozamadrid.com/exp",
+                        "url": "https://realestategozamadrid.com/exp",
                         "areaServed": {
                             "@type": "Country",
                             "name": "España"

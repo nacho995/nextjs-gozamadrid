@@ -19,7 +19,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://goza-madrid.onrender
 const isDev = process.env.NODE_ENV === 'development';
 const logDebug = (message, ...args) => {
   if (isDev && window.appConfig?.debug) {
-    console.log(message, ...args);
+    // console.log(message, ...args);
   }
 };
 
@@ -258,7 +258,7 @@ const cleanWordPressContent = (content) => {
   
   // Si después de limpiar hay poco contenido, usar el original
   if (cleanContent.trim().length < 50 && content.length > 100) {
-    console.log("La limpieza eliminó demasiado contenido, usando original");
+    // console.log("La limpieza eliminó demasiado contenido, usando original");
     return content;
   }
   
@@ -266,7 +266,7 @@ const cleanWordPressContent = (content) => {
 };
 
 export default function DefaultPropertyContent({ property }) {
-  console.log("Renderizando PropertyContent con propiedad:", property ? `ID: ${property.id || property._id}` : 'null');
+  // console.log("Renderizando PropertyContent con propiedad:", property ? `ID: ${property.id || property._id}` : 'null');
   
   const [current, setCurrent] = useState(0);
   const [showCalendar, setShowCalendar] = useState(false);
@@ -300,7 +300,7 @@ export default function DefaultPropertyContent({ property }) {
   // Evento para recibir datos de MongoDB a través del script de integración
   useEffect(() => {
     const handleMongoDBPropertyData = (event) => {
-      console.log("PropertyContent: Recibidos datos de propiedad MongoDB:", event.detail);
+      // console.log("PropertyContent: Recibidos datos de propiedad MongoDB:", event.detail);
       if (event.detail && event.detail.property) {
         setPropertyState(event.detail.property);
       }
@@ -352,7 +352,7 @@ export default function DefaultPropertyContent({ property }) {
     
     // Obtener cualquier contenido disponible (descripción o contenido)
     const rawContent = propertyState.description || propertyState.content || propertyState.shortDescription || '';
-    console.log("Contenido raw inicial:", rawContent.substring(0, 100));
+    // console.log("Contenido raw inicial:", rawContent.substring(0, 100));
     
     // Solo intentar limpiar si hay contenido para evitar errores
     if (rawContent) {
@@ -370,17 +370,17 @@ export default function DefaultPropertyContent({ property }) {
     }
     
     // Debugging
-    console.log("Contenido original length:", rawContent.length);
-    console.log("Contenido procesado length:", processedContent.length);
+    // console.log("Contenido original length:", rawContent.length);
+    // console.log("Contenido procesado length:", processedContent.length);
     
     // Si el contenido procesado está vacío o muy corto, usar el original
     if (!processedContent || processedContent.trim().length < 20) {
-      console.log("El contenido procesado está vacío, usando el original");
+      // console.log("El contenido procesado está vacío, usando el original");
       processedContent = rawContent;
     }
     
     // Actualizar el estado con el contenido procesado
-    console.log("Estableciendo cleanedContent");
+    // console.log("Estableciendo cleanedContent");
     setCleanedContent(processedContent);
     
   }, [propertyState]);
@@ -392,7 +392,7 @@ export default function DefaultPropertyContent({ property }) {
     // Verificar si ya hemos reintentado con esta imagen
     const isRetried = e.target.getAttribute('data-retried');
     if (isRetried === 'true') {
-      console.log("El proxy también falló, mostrando mensaje de no disponible");
+      // console.log("El proxy también falló, mostrando mensaje de no disponible");
       // Reemplazar la imagen con un div
       const parentElement = e.target.parentNode;
       if (parentElement) {
@@ -416,11 +416,11 @@ export default function DefaultPropertyContent({ property }) {
     if (e.target.src && !e.target.src.includes('images.weserv.nl') && e.target.src.startsWith('http')) {
       // Usar un mejor servicio de proxy para las imágenes
       const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(e.target.src)}&n=-1`;
-      console.log("Reintentando con proxy:", proxyUrl);
+      // console.log("Reintentando con proxy:", proxyUrl);
       e.target.src = proxyUrl;
     } else {
       // Si es una URL local o ya es proxy, mostrar mensaje de no disponible
-      console.log("URL no es HTTP o ya es proxy, mostrando mensaje de no disponible");
+      // console.log("URL no es HTTP o ya es proxy, mostrando mensaje de no disponible");
       // Reemplazar la imagen con un div
       const parentElement = e.target.parentNode;
       if (parentElement) {
@@ -607,26 +607,352 @@ export default function DefaultPropertyContent({ property }) {
       try {
         let address = "";
         
+        // Usar el nombre de la propiedad como dirección principal si existe
+        // La mayoría de propiedades en la API tienen el nombre como la dirección
+        if (propertyState.name) {
+          // Verificar si el nombre contiene información de dirección
+          const name = propertyState.name.trim();
+          
+          // Si el nombre parece una dirección (contiene palabras como Calle, Avenida, etc.)
+          if (name.match(/calle|avenida|plaza|paseo|vía|c\/|avda\.|pl\.|pº\.|principe|alcalde|jorge|lope|castelló|castelló|goya/i)) {
+            address = name;
+            
+            // Asegurarse de que termine con "Madrid" o la ciudad correspondiente
+            if (!address.toLowerCase().includes("madrid")) {
+              address += ", Madrid";
+            }
+            
+            return address;
+          }
+          
+          // Si el nombre NO parece una dirección completa, pero puede ser parte de una
+          address = name;
+        }
+        
         // Opción 1: Buscar en la propiedad directamente
-        if (propertyState.address) {
-          address = propertyState.address;
+        if (propertyState.address && !address) {
+          // Si es un objeto, intentar convertirlo a string
+          if (typeof propertyState.address === 'object') {
+            // Si el objeto tiene una propiedad address, utilizarla
+            if (propertyState.address.address) {
+              // Verificar que la dirección sea española
+              const addressStr = propertyState.address.address.toString();
+              if (addressStr.toLowerCase().includes("spain") || 
+                  addressStr.toLowerCase().includes("españa") || 
+                  addressStr.toLowerCase().includes("madrid") ||
+                  addressStr.toLowerCase().includes("barcelona")) {
+                address = addressStr;
+              } else {
+                // Si no es una dirección española, usar el nombre de la propiedad
+                address = propertyState.name ? propertyState.name + ", Madrid, España" : "Madrid, España";
+              }
+            } 
+            // Si tiene lat y lng, formatear como coordenadas
+            else if (propertyState.address.lat && propertyState.address.lng) {
+              const lat = parseFloat(propertyState.address.lat);
+              const lng = parseFloat(propertyState.address.lng);
+              if (!isNaN(lat) && !isNaN(lng)) {
+                // Usar las coordenadas como parte de la dirección
+                setMapLocation({ lat, lng }); // Actualizar mapLocation con las coordenadas exactas
+                
+                // Verificar si las coordenadas parecen ser de España (-10 a 5 longitud, 35 a 44 latitud aproximadamente)
+                const isLikelySpain = (lng >= -10 && lng <= 5 && lat >= 35 && lat <= 44);
+                
+                if (isLikelySpain) {
+                  // Intentar usar cualquier información adicional disponible
+                  const parts = [];
+                  if (propertyState.address.street_name) parts.push(propertyState.address.street_name);
+                  if (propertyState.address.city) parts.push(propertyState.address.city);
+                  
+                  if (parts.length > 0) {
+                    // Verificar que no contiene localizaciones no españolas
+                    const joinedParts = parts.join(", ").toLowerCase();
+                    if (!joinedParts.includes("australia") && 
+                        !joinedParts.includes("canada") && 
+                        !joinedParts.includes("germany") &&
+                        !joinedParts.includes("usa") &&
+                        !joinedParts.includes("united states")) {
+                      address = parts.join(", ");
+                      
+                      // Añadir Madrid, España si no está ya incluido
+                      if (!address.toLowerCase().includes("madrid")) {
+                        address += ", Madrid";
+                      }
+                      if (!address.toLowerCase().includes("españa")) {
+                        address += ", España";
+                      }
+                    } else {
+                      // Si contiene palabras clave de otros países, usar nombre de propiedad
+                      address = propertyState.name ? propertyState.name + ", Madrid, España" : "Madrid, España";
+                    }
+                  } else {
+                    // Si no hay partes de dirección disponibles, usar el nombre de la propiedad
+                    address = propertyState.name ? propertyState.name + ", Madrid, España" : "Madrid, España";
+                  }
+                } else {
+                  // Las coordenadas no parecen ser de España, usar el nombre de la propiedad
+                  address = propertyState.name ? propertyState.name + ", Madrid, España" : "Madrid, España";
+                }
+              }
+            }
+            // Intentar convertir el objeto a string como último recurso
+            else {
+              try {
+                // Filtrar solo valores que parezcan ser de España
+                const addressValues = Object.values(propertyState.address)
+                  .filter(val => {
+                    if (typeof val !== 'string') return false;
+                    const valLower = val.toLowerCase().trim();
+                    return valLower !== '' && 
+                          !valLower.includes("australia") && 
+                          !valLower.includes("canada") &&
+                          !valLower.includes("germany") &&
+                          !valLower.includes("usa") &&
+                          !valLower.includes("united states");
+                  })
+                  .join(", ");
+                
+                if (addressValues) {
+                  address = addressValues;
+                  
+                  // Añadir Madrid, España si no está ya incluido
+                  if (!address.toLowerCase().includes("madrid")) {
+                    address += ", Madrid";
+                  }
+                  if (!address.toLowerCase().includes("españa")) {
+                    address += ", España";
+                  }
+                } else {
+                  // Si no hay valores válidos, usar el nombre de la propiedad
+                  address = propertyState.name ? propertyState.name + ", Madrid, España" : "Madrid, España";
+                }
+              } catch (error) {
+                console.error("Error al procesar dirección compleja:", error);
+                // Usar el nombre de la propiedad en caso de error
+                address = propertyState.name ? propertyState.name + ", Madrid, España" : "Madrid, España";
+              }
+            }
+          } else {
+            // Es un string, verificar que sea una dirección española
+            const addressStr = propertyState.address.toString().toLowerCase();
+            if (addressStr.includes("spain") || 
+                addressStr.includes("españa") || 
+                addressStr.includes("madrid") ||
+                addressStr.includes("barcelona")) {
+              address = propertyState.address;
+            } else if (addressStr.includes("australia") ||
+                      addressStr.includes("canada") ||
+                      addressStr.includes("germany") ||
+                      addressStr.includes("usa") ||
+                      addressStr.includes("united states")) {
+              // Si contiene palabras clave de otros países, usar nombre de propiedad
+              address = propertyState.name ? propertyState.name + ", Madrid, España" : "Madrid, España";
+            } else {
+              // Si no se identifica claramente, añadir Madrid, España al final
+              address = propertyState.address;
+              
+              // Añadir Madrid, España si no está ya incluido
+              if (!address.toLowerCase().includes("madrid")) {
+                address += ", Madrid";
+              }
+              if (!address.toLowerCase().includes("españa")) {
+                address += ", España";
+              }
+            }
+          }
         } 
         // Opción 2: Buscar en la propiedad location
-        else if (propertyState.location) {
-          address = propertyState.location;
+        else if (propertyState.location && !address) {
+          // Manejar también si location es un objeto
+          if (typeof propertyState.location === 'object') {
+            // Similar al manejo de address como objeto
+            try {
+              // Filtrar solo valores que parezcan ser de España
+              const locationValues = Object.values(propertyState.location)
+                .filter(val => {
+                  if (typeof val !== 'string') return false;
+                  const valLower = val.toLowerCase().trim();
+                  return valLower !== '' && 
+                        !valLower.includes("australia") && 
+                        !valLower.includes("canada") &&
+                        !valLower.includes("germany") &&
+                        !valLower.includes("usa") &&
+                        !valLower.includes("united states");
+                })
+                .join(", ");
+              
+              if (locationValues) {
+                address = locationValues;
+                
+                // Añadir Madrid, España si no está ya incluido
+                if (!address.toLowerCase().includes("madrid")) {
+                  address += ", Madrid";
+                }
+                if (!address.toLowerCase().includes("españa")) {
+                  address += ", España";
+                }
+              } else {
+                // Si no hay valores válidos, usar el nombre de la propiedad
+                address = propertyState.name ? propertyState.name + ", Madrid, España" : "Madrid, España";
+              }
+            } catch (error) {
+              console.error("Error al procesar location compleja:", error);
+              // Usar el nombre de la propiedad en caso de error
+              address = propertyState.name ? propertyState.name + ", Madrid, España" : "Madrid, España";
+            }
+          } else {
+            // Es un string, verificar que sea una ubicación española
+            const locationStr = propertyState.location.toString().toLowerCase();
+            if (locationStr.includes("spain") || 
+                locationStr.includes("españa") || 
+                locationStr.includes("madrid") ||
+                locationStr.includes("barcelona")) {
+              address = propertyState.location;
+            } else if (locationStr.includes("australia") ||
+                      locationStr.includes("canada") ||
+                      locationStr.includes("germany") ||
+                      locationStr.includes("usa") ||
+                      locationStr.includes("united states")) {
+              // Si contiene palabras clave de otros países, usar nombre de propiedad
+              address = propertyState.name ? propertyState.name + ", Madrid, España" : "Madrid, España";
+            } else {
+              // Si no se identifica claramente, añadir Madrid, España al final
+              address = propertyState.location;
+              
+              // Añadir Madrid, España si no está ya incluido
+              if (!address.toLowerCase().includes("madrid")) {
+                address += ", Madrid";
+              }
+              if (!address.toLowerCase().includes("españa")) {
+                address += ", España";
+              }
+            }
+          }
         }
         // Opción 3: Buscar en meta_data
-        else if (propertyState.meta_data && Array.isArray(propertyState.meta_data)) {
+        else if (propertyState.meta_data && Array.isArray(propertyState.meta_data) && !address) {
           // Buscar campos comunes para dirección
           const addressFields = ['address', 'direccion', 'location', 'ubicacion'];
           
           for (const field of addressFields) {
             const meta = propertyState.meta_data.find(m => m.key.toLowerCase() === field.toLowerCase());
             if (meta && meta.value) {
-              address = meta.value;
-              break;
+              // Si el valor es un objeto, procesarlo
+              if (typeof meta.value === 'object') {
+                try {
+                  // Si tiene propiedad address, usarla
+                  if (meta.value.address) {
+                    const metaAddressStr = meta.value.address.toString().toLowerCase();
+                    if (metaAddressStr.includes("spain") || 
+                        metaAddressStr.includes("españa") || 
+                        metaAddressStr.includes("madrid") ||
+                        metaAddressStr.includes("barcelona")) {
+                      address = meta.value.address;
+                    } else if (metaAddressStr.includes("australia") ||
+                              metaAddressStr.includes("canada") ||
+                              metaAddressStr.includes("germany") ||
+                              metaAddressStr.includes("usa") ||
+                              metaAddressStr.includes("united states")) {
+                      // Si contiene palabras clave de otros países, omitirlo
+                      continue;
+                    } else {
+                      // Si no se identifica claramente, usar pero añadir Madrid, España
+                      address = meta.value.address;
+                      
+                      // Añadir Madrid, España si no está ya incluido
+                      if (!address.toLowerCase().includes("madrid")) {
+                        address += ", Madrid";
+                      }
+                      if (!address.toLowerCase().includes("españa")) {
+                        address += ", España";
+                      }
+                    }
+                    break;
+                  }
+                  // Si tiene lat y lng, actualizar mapLocation
+                  else if (meta.value.lat && meta.value.lng) {
+                    const lat = parseFloat(meta.value.lat);
+                    const lng = parseFloat(meta.value.lng);
+                    if (!isNaN(lat) && !isNaN(lng)) {
+                      // Verificar si las coordenadas parecen ser de España (-10 a 5 longitud, 35 a 44 latitud aproximadamente)
+                      const isLikelySpain = (lng >= -10 && lng <= 5 && lat >= 35 && lat <= 44);
+                      
+                      if (isLikelySpain) {
+                        setMapLocation({ lat, lng });
+                        break;
+                      } else {
+                        // Ignorar coordenadas que no son de España
+                        continue;
+                      }
+                    }
+                  }
+                  // Intentar extraer valores del objeto
+                  const metaValues = Object.values(meta.value)
+                    .filter(val => {
+                      if (typeof val !== 'string') return false;
+                      const valLower = val.toLowerCase().trim();
+                      return valLower !== '' && 
+                            !valLower.includes("australia") && 
+                            !valLower.includes("canada") &&
+                            !valLower.includes("germany") &&
+                            !valLower.includes("usa") &&
+                            !valLower.includes("united states");
+                    })
+                    .join(", ");
+                  
+                  if (metaValues) {
+                    address = metaValues;
+                    
+                    // Añadir Madrid, España si no está ya incluido
+                    if (!address.toLowerCase().includes("madrid")) {
+                      address += ", Madrid";
+                    }
+                    if (!address.toLowerCase().includes("españa")) {
+                      address += ", España";
+                    }
+                    break;
+                  }
+                } catch (error) {
+                  console.error("Error al procesar meta_data compleja:", error);
+                  continue; // Continuar con el siguiente campo
+                }
+              } else {
+                // Es un string, verificar que sea una ubicación española
+                const metaValueStr = meta.value.toString().toLowerCase();
+                if (metaValueStr.includes("spain") || 
+                    metaValueStr.includes("españa") || 
+                    metaValueStr.includes("madrid") ||
+                    metaValueStr.includes("barcelona")) {
+                  address = meta.value;
+                  break;
+                } else if (metaValueStr.includes("australia") ||
+                          metaValueStr.includes("canada") ||
+                          metaValueStr.includes("germany") ||
+                          metaValueStr.includes("usa") ||
+                          metaValueStr.includes("united states")) {
+                  // Si contiene palabras clave de otros países, ignorar
+                  continue;
+                } else {
+                  // Si no se identifica claramente, añadir Madrid, España al final
+                  address = meta.value;
+                  
+                  // Añadir Madrid, España si no está ya incluido
+                  if (!address.toLowerCase().includes("madrid")) {
+                    address += ", Madrid";
+                  }
+                  if (!address.toLowerCase().includes("españa")) {
+                    address += ", España";
+                  }
+                  break;
+                }
+              }
             }
           }
+        }
+        
+        // Si aún no hay dirección y ya tenemos el nombre, usamos el nombre como dirección
+        if (!address && propertyState.name) {
+          address = propertyState.name;
         }
         
         // Si no se encontró dirección, intentar crear una a partir del título y ubicación
@@ -636,11 +962,41 @@ export default function DefaultPropertyContent({ property }) {
           const locationMatch = title.match(/en\s+([A-Za-zÀ-ÖØ-öø-ÿ\s]+)/i);
           if (locationMatch && locationMatch[1]) {
             address = `${locationMatch[1]}, Madrid, España`;
+          } else {
+            // Si no hay match, usar el título completo
+            address = title;
           }
         }
         
         // Si aún no hay dirección, usar un valor predeterminado
         if (!address) {
+          address = "Madrid, España";
+        }
+        
+        // Garantizar que la dirección incluya "Madrid, España" si no está presente
+        if (!address.toLowerCase().includes("madrid")) {
+          address = `${address}, Madrid, España`;
+        } else if (!address.toLowerCase().includes("españa") && address.toLowerCase().includes("madrid")) {
+          address = `${address}, España`;
+        }
+        
+        // Verificar una última vez que no contenga países no deseados
+        const finalAddressLower = address.toLowerCase();
+        if (finalAddressLower.includes("australia") || 
+            finalAddressLower.includes("canada") || 
+            finalAddressLower.includes("germany") ||
+            finalAddressLower.includes("duisburg") ||
+            finalAddressLower.includes("kardinya") ||
+            finalAddressLower.includes("qc") ||
+            finalAddressLower.includes("wa") ||
+            finalAddressLower.includes("king est")) {
+          // Si contiene palabras clave de otros países, usar un valor predeterminado con el nombre
+          return propertyState.name ? `${propertyState.name}, Madrid, España` : "Madrid, España";
+        }
+        
+        // Asegurarse de que address sea un string
+        if (typeof address !== 'string') {
+          console.error("La dirección no es un string:", address);
           address = "Madrid, España";
         }
         
@@ -662,7 +1018,7 @@ export default function DefaultPropertyContent({ property }) {
   }, [propertyState]);
 
   if (!propertyState) {
-    console.log("Renderizando estado de propiedad no disponible");
+    // console.log("Renderizando estado de propiedad no disponible");
     return (
       <div className="container mx-auto py-8 text-center">
         <p className="text-lg">Información de la propiedad no disponible</p>
@@ -670,8 +1026,8 @@ export default function DefaultPropertyContent({ property }) {
     );
   }
 
-  console.log("Renderizando propiedad completa:", propertyState.title || propertyState.name);
-  console.log("Imágenes disponibles:", propertyImages.length);
+  // console.log("Renderizando propiedad completa:", propertyState.title || propertyState.name);
+  // console.log("Imágenes disponibles:", propertyImages.length);
   
   // Extraer datos básicos de la propiedad
   const title = propertyState.title || propertyState.name || 'Propiedad sin título';
@@ -1032,9 +1388,12 @@ export default function DefaultPropertyContent({ property }) {
             
             <div className="p-6">
               <div className="rounded-xl overflow-hidden shadow-2xl border border-amarillo/20" style={{ height: '400px' }}>
-                {/* Usar iframe básico de Google Maps sin API key */}
+                {/* Usar iframe básico de Google Maps sin API key y manejar diferentes formatos de dirección */}
                 <iframe 
-                  src={`https://www.google.com/maps?q=${encodeURIComponent(formattedAddress)}&output=embed`}
+                  src={typeof formattedAddress === 'string' ? 
+                    `https://www.google.com/maps?q=${encodeURIComponent(formattedAddress)}&output=embed` : 
+                    `https://www.google.com/maps?q=${mapLocation.lat},${mapLocation.lng}&output=embed`
+                  }
                   width="100%" 
                   height="100%" 
                   style={{ border: 0 }} 
@@ -1047,10 +1406,13 @@ export default function DefaultPropertyContent({ property }) {
               
               <div className="mt-6 text-center">
                 <p className="text-white text-lg">
-                  {formattedAddress || "Madrid, España"}
+                  {typeof formattedAddress === 'string' ? formattedAddress : "Madrid, España"}
                 </p>
                 <a 
-                  href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(formattedAddress)}`}
+                  href={typeof formattedAddress === 'string' ? 
+                    `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(formattedAddress)}` : 
+                    `https://www.google.com/maps/dir/?api=1&destination=${mapLocation.lat},${mapLocation.lng}`
+                  }
                   target="_blank"
                   rel="noopener noreferrer" 
                   className="inline-flex items-center gap-2 mt-4 bg-amarillo text-black px-4 py-2 rounded-lg hover:bg-amarillo/90 transition-colors"
@@ -1258,7 +1620,7 @@ export default function DefaultPropertyContent({ property }) {
                             message: `Solicitud de visita para la propiedad ${propertyState.title || propertyState.name || 'Propiedad sin título'} el día ${selectedDate ? selectedDate.toLocaleDateString('es-ES') : ''} a las ${selectedTime ? selectedTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : ''}`
                           };
                           
-                          console.log('Enviando datos de visita:', visitData);
+                          // console.log('Enviando datos de visita:', visitData);
                           
                           // Usar el proxy local para evitar problemas de mixed content
                           const response = await fetch(`/api/api-proxy?path=api/property-visit/create`, {
@@ -1270,8 +1632,8 @@ export default function DefaultPropertyContent({ property }) {
                           });
                           
                           // Logs adicionales para depuración
-                          console.log('Estado de respuesta visita:', response.status);
-                          console.log('Headers de respuesta:', Object.fromEntries([...response.headers.entries()]));
+                          // console.log('Estado de respuesta visita:', response.status);
+                          // console.log('Headers de respuesta:', Object.fromEntries([...response.headers.entries()]));
                           
                           if (!response.ok) {
                             const errorText = await response.text();
@@ -1280,7 +1642,7 @@ export default function DefaultPropertyContent({ property }) {
                           }
                           
                           const data = await response.json();
-                          console.log("Respuesta API visita:", data);
+                          // console.log("Respuesta API visita:", data);
                           
                           toast.success("Solicitud de visita enviada correctamente");
                           
@@ -1425,7 +1787,7 @@ export default function DefaultPropertyContent({ property }) {
                           message: `Oferta de ${selectedOffer.value.toLocaleString()}€ (${selectedOffer.label}) para la propiedad "${propertyState.title || propertyState.name || 'Propiedad sin título'}" por parte de ${name}`
                         };
                         
-                        console.log('Enviando datos de oferta:', offerData);
+                        // console.log('Enviando datos de oferta:', offerData);
                         
                         // Usar el proxy local para evitar problemas de mixed content
                         const response = await fetch(`/api/api-proxy?path=api/property-offer/create`, {
@@ -1437,8 +1799,8 @@ export default function DefaultPropertyContent({ property }) {
                         });
                         
                         // Logs adicionales para depuración
-                        console.log('Estado de respuesta oferta:', response.status);
-                        console.log('Headers de respuesta:', Object.fromEntries([...response.headers.entries()]));
+                        // console.log('Estado de respuesta oferta:', response.status);
+                        // console.log('Headers de respuesta:', Object.fromEntries([...response.headers.entries()]));
                         
                         if (!response.ok) {
                           const errorText = await response.text();
@@ -1447,7 +1809,7 @@ export default function DefaultPropertyContent({ property }) {
                         }
                         
                         const data = await response.json();
-                        console.log("Respuesta API oferta:", data);
+                        // console.log("Respuesta API oferta:", data);
                         
                         toast.success("Oferta enviada correctamente");
                         

@@ -12,21 +12,21 @@ export default function Vender() {
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
         <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://gozamadrid.com/vender" />
+        <link rel="canonical" href="https://realestategozamadrid.com/vender" />
 
         {/* Open Graph */}
         <meta property="og:type" content="website" />
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={pageDescription} />
-        <meta property="og:image" content="https://gozamadrid.com/img/vender-propiedad.jpg" />
-        <meta property="og:url" content="https://gozamadrid.com/vender" />
+        <meta property="og:image" content="https://realestategozamadrid.com/img/vender-propiedad.jpg" />
+        <meta property="og:url" content="https://realestategozamadrid.com/vender" />
         <meta property="og:site_name" content="Goza Madrid Inmobiliaria" />
 
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={pageTitle} />
         <meta name="twitter:description" content={pageDescription} />
-        <meta name="twitter:image" content="https://gozamadrid.com/img/vender-propiedad.jpg" />
+        <meta name="twitter:image" content="https://realestategozamadrid.com/img/vender-propiedad.jpg" />
 
         {/* Schema.org Service */}
         <script type="application/ld+json">
@@ -38,7 +38,7 @@ export default function Vender() {
             "provider": {
               "@type": "RealEstateAgent",
               "name": "Goza Madrid Inmobiliaria",
-              "url": "https://gozamadrid.com",
+              "url": "https://realestategozamadrid.com",
               "telephone": "+34 919 012 103",
               "address": {
                 "@type": "PostalAddress",
@@ -95,19 +95,19 @@ export default function Vender() {
                 "@type": "ListItem",
                 "position": 1,
                 "name": "Inicio",
-                "item": "https://gozamadrid.com"
+                "item": "https://realestategozamadrid.com"
               },
               {
                 "@type": "ListItem",
                 "position": 2,
                 "name": "Servicios",
-                "item": "https://gozamadrid.com/servicios"
+                "item": "https://realestategozamadrid.com/servicios"
               },
               {
                 "@type": "ListItem",
                 "position": 3,
                 "name": "Vender",
-                "item": "https://gozamadrid.com/vender"
+                "item": "https://realestategozamadrid.com/vender"
               }
             ]
           })}
@@ -119,9 +119,9 @@ export default function Vender() {
             "@context": "https://schema.org",
             "@type": "RealEstateAgent",
             "name": "Goza Madrid Inmobiliaria",
-            "image": "https://gozamadrid.com/logo.png",
+            "image": "https://realestategozamadrid.com/logo.png",
             "description": "Agencia inmobiliaria especializada en la venta de propiedades en Madrid",
-            "url": "https://gozamadrid.com",
+            "url": "https://realestategozamadrid.com",
             "telephone": "+34 919 012 103",
             "address": {
               "@type": "PostalAddress",

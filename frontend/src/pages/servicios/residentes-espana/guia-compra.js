@@ -11,21 +11,21 @@ export default function GuiaCompra() {
                 <title>{pageTitle}</title>
                 <meta name="description" content={pageDescription} />
                 <meta name="robots" content="index, follow" />
-                <link rel="canonical" href="https://gozamadrid.com/servicios/residentes-espana/guia-compra" />
+                <link rel="canonical" href="https://realestategozamadrid.com/servicios/residentes-espana/guia-compra" />
 
                 {/* Open Graph */}
                 <meta property="og:type" content="article" />
                 <meta property="og:title" content={pageTitle} />
                 <meta property="og:description" content={pageDescription} />
-                <meta property="og:image" content="https://gozamadrid.com/img/guia-compra.jpg" />
-                <meta property="og:url" content="https://gozamadrid.com/servicios/residentes-espana/guia-compra" />
+                <meta property="og:image" content="https://realestategozamadrid.com/img/guia-compra.jpg" />
+                <meta property="og:url" content="https://realestategozamadrid.com/servicios/residentes-espana/guia-compra" />
                 <meta property="og:site_name" content="Goza Madrid Inmobiliaria" />
 
                 {/* Twitter Card */}
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content={pageTitle} />
                 <meta name="twitter:description" content={pageDescription} />
-                <meta name="twitter:image" content="https://gozamadrid.com/img/guia-compra.jpg" />
+                <meta name="twitter:image" content="https://realestategozamadrid.com/img/guia-compra.jpg" />
 
                 {/* Schema.org Guide */}
                 <script type="application/ld+json">
@@ -34,11 +34,11 @@ export default function GuiaCompra() {
                         "@type": "Article",
                         "mainEntityOfPage": {
                             "@type": "WebPage",
-                            "@id": "https://gozamadrid.com/servicios/residentes-espana/guia-compra"
+                            "@id": "https://realestategozamadrid.com/servicios/residentes-espana/guia-compra"
                         },
                         "headline": "Guía Completa para Comprar Inmuebles en Madrid",
                         "description": pageDescription,
-                        "image": "https://gozamadrid.com/img/guia-compra.jpg",
+                        "image": "https://realestategozamadrid.com/img/guia-compra.jpg",
                         "author": {
                             "@type": "Organization",
                             "name": "Goza Madrid Inmobiliaria"
@@ -48,7 +48,7 @@ export default function GuiaCompra() {
                             "name": "Goza Madrid Inmobiliaria",
                             "logo": {
                                 "@type": "ImageObject",
-                                "url": "https://gozamadrid.com/logo.png"
+                                "url": "https://realestategozamadrid.com/logo.png"
                             }
                         },
                         "datePublished": "2024-01-01",

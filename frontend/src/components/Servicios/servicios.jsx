@@ -23,7 +23,7 @@ export default function Services() {
                 />
                 <meta property="og:title" content="Servicios de Inversión Inmobiliaria en España" />
                 <meta property="og:description" content="Asesoramiento integral inmobiliario para inversores residentes y extranjeros en España. Gestión completa de inversiones inmobiliarias." />
-                <link rel="canonical" href="https://gozamadrid.com/servicios" />
+                <link rel="canonical" href="https://realestategozamadrid.com/servicios" />
             </Head>
 
             <div className="container mx-auto py-4 mt-[5vh] mb-[20vh]">
