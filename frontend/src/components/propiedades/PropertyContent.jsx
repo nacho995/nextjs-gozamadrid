@@ -11,6 +11,7 @@ import es from "date-fns/locale/es";
 import { toast } from "react-hot-toast";
 import { sendPropertyEmail } from '@/services/api';
 import Head from "next/head";
+import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://goza-madrid.onrender.com';
 
@@ -245,8 +246,8 @@ const cleanWordPressContent = (content) => {
     cleanContent = cleanContent.replace(/\[vc_column_text[^\]]*\]/g, "");
     cleanContent = cleanContent.replace(/\[\/vc_column_text\]/g, "");
     
-    // Solo eliminar iframes de Google Maps
-    cleanContent = cleanContent.replace(/<iframe[^>]*(?:google\.com\/maps|maps\.google)[^>]*>[\s\S]*?<\/iframe>/gi, "");
+    // NO eliminar iframes de Google Maps, mantener los mapas configurados por el usuario
+    // cleanContent = cleanContent.replace(/<iframe[^>]*(?:google\.com\/maps|maps\.google)[^>]*>[\s\S]*?<\/iframe>/gi, "");
     
     // Mejorar visualización básica
     cleanContent = cleanContent.replace(/<p/g, '<p class="mb-4"');
@@ -291,6 +292,10 @@ export default function DefaultPropertyContent({ property }) {
   
   // Nuevo estado para guardar la propiedad actualizada desde MongoDB
   const [propertyState, setPropertyState] = useState(property);
+  
+  // Añadir dentro del componente principal cerca de otros useState
+  const [mapLocation, setMapLocation] = useState({ lat: 40.4167, lng: -3.7037 }); // Coordenadas por defecto de Madrid
+  const [formattedAddress, setFormattedAddress] = useState(""); // Estado para guardar la dirección formateada
   
   // Evento para recibir datos de MongoDB a través del script de integración
   useEffect(() => {
@@ -542,6 +547,119 @@ export default function DefaultPropertyContent({ property }) {
       };
     }
   }, [current, propertyImages, loadedImages]);
+
+  // Modificar el useEffect para extraer y mostrar mejor la dirección
+  useEffect(() => {
+    // Extraer ubicación para el mapa
+    const extractLocationForMap = () => {
+      if (!propertyState) return { lat: 40.4167, lng: -3.7037 }; // Coordenadas por defecto de Madrid
+      
+      try {
+        // Primero buscar en metadatos específicos de coordenadas
+        if (propertyState.coordinates) {
+          const { lat, lng } = propertyState.coordinates;
+          if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
+            return { lat: parseFloat(lat), lng: parseFloat(lng) };
+          }
+        }
+        
+        // Buscar en meta_data si es de WooCommerce
+        if (propertyState.meta_data && Array.isArray(propertyState.meta_data)) {
+          // Buscar coordenadas en meta_data
+          const coordinatesMeta = propertyState.meta_data.find(
+            meta => meta.key === 'coordinates' || meta.key === 'location' || meta.key === 'map_location'
+          );
+          
+          if (coordinatesMeta && coordinatesMeta.value) {
+            const value = coordinatesMeta.value;
+            
+            // Si es un string con formato "lat,lng"
+            if (typeof value === 'string' && value.includes(',')) {
+              const [lat, lng] = value.split(',').map(num => parseFloat(num.trim()));
+              if (!isNaN(lat) && !isNaN(lng)) {
+                return { lat, lng };
+              }
+            }
+            
+            // Si es un objeto con lat y lng
+            if (typeof value === 'object' && value.lat && value.lng) {
+              const lat = parseFloat(value.lat);
+              const lng = parseFloat(value.lng);
+              if (!isNaN(lat) && !isNaN(lng)) {
+                return { lat, lng };
+              }
+            }
+          }
+        }
+        
+        // Ubicación por defecto (Madrid)
+        return { lat: 40.4167, lng: -3.7037 };
+      } catch (error) {
+        console.error("Error al extraer ubicación para el mapa:", error);
+        return { lat: 40.4167, lng: -3.7037 }; // Coordenadas por defecto de Madrid
+      }
+    };
+    
+    // Extraer y formatear la dirección de la propiedad
+    const extractAddress = () => {
+      if (!propertyState) return "Madrid, España";
+      
+      try {
+        let address = "";
+        
+        // Opción 1: Buscar en la propiedad directamente
+        if (propertyState.address) {
+          address = propertyState.address;
+        } 
+        // Opción 2: Buscar en la propiedad location
+        else if (propertyState.location) {
+          address = propertyState.location;
+        }
+        // Opción 3: Buscar en meta_data
+        else if (propertyState.meta_data && Array.isArray(propertyState.meta_data)) {
+          // Buscar campos comunes para dirección
+          const addressFields = ['address', 'direccion', 'location', 'ubicacion'];
+          
+          for (const field of addressFields) {
+            const meta = propertyState.meta_data.find(m => m.key.toLowerCase() === field.toLowerCase());
+            if (meta && meta.value) {
+              address = meta.value;
+              break;
+            }
+          }
+        }
+        
+        // Si no se encontró dirección, intentar crear una a partir del título y ubicación
+        if (!address && (propertyState.title || propertyState.name)) {
+          const title = propertyState.title || propertyState.name;
+          // Extraer posible ubicación del título (ej: "Piso en Malasaña")
+          const locationMatch = title.match(/en\s+([A-Za-zÀ-ÖØ-öø-ÿ\s]+)/i);
+          if (locationMatch && locationMatch[1]) {
+            address = `${locationMatch[1]}, Madrid, España`;
+          }
+        }
+        
+        // Si aún no hay dirección, usar un valor predeterminado
+        if (!address) {
+          address = "Madrid, España";
+        }
+        
+        return address;
+      } catch (error) {
+        console.error("Error al extraer dirección:", error);
+        return "Madrid, España";
+      }
+    };
+    
+    // Establecer ubicación para el mapa
+    const location = extractLocationForMap();
+    setMapLocation(location);
+    
+    // Establecer dirección formateada
+    const address = extractAddress();
+    setFormattedAddress(address);
+    
+  }, [propertyState]);
 
   if (!propertyState) {
     console.log("Renderizando estado de propiedad no disponible");
@@ -902,6 +1020,44 @@ export default function DefaultPropertyContent({ property }) {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+
+          {/* Mapa de Ubicación */}
+          <div className="mt-12 mb-16 bg-black/80 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-amarillo/20 overflow-hidden">
+            <div className="p-8 border-b border-amarillo/20 flex items-center">
+              <FaMapMarkerAlt className="text-amarillo mr-4 text-4xl" />
+              <h2 className="text-3xl font-bold tracking-wide !text-amarillo">Ubicación Premium</h2>
+            </div>
+            
+            <div className="p-6">
+              <div className="rounded-xl overflow-hidden shadow-2xl border border-amarillo/20" style={{ height: '400px' }}>
+                {/* Usar iframe básico de Google Maps sin API key */}
+                <iframe 
+                  src={`https://www.google.com/maps?q=${encodeURIComponent(formattedAddress)}&output=embed`}
+                  width="100%" 
+                  height="100%" 
+                  style={{ border: 0 }} 
+                  allowFullScreen="" 
+                  loading="lazy" 
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Ubicación de la propiedad"
+                ></iframe>
+              </div>
+              
+              <div className="mt-6 text-center">
+                <p className="text-white text-lg">
+                  {formattedAddress || "Madrid, España"}
+                </p>
+                <a 
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(formattedAddress)}`}
+                  target="_blank"
+                  rel="noopener noreferrer" 
+                  className="inline-flex items-center gap-2 mt-4 bg-amarillo text-black px-4 py-2 rounded-lg hover:bg-amarillo/90 transition-colors"
+                >
+                  <FaMapMarkerAlt /> Cómo llegar
+                </a>
+              </div>
             </div>
           </div>
 

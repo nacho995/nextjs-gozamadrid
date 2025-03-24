@@ -592,16 +592,64 @@ const BlogDetail = ({ initialBlog, id, isWordPress }) => {
 
 // Función auxiliar para transformar posts de WordPress
 function transformWordPressPost(wpPost, cleanSlug) {
-  if (!wpPost) return null;
-  
-  // Verificar que el slug está definido
-  const slug = cleanSlug || wpPost.slug;
-  if (!slug) {
-    console.error("WordPress post no tiene slug:", wpPost.id);
+  // Verificar que el post existe y tiene las propiedades necesarias
+  if (!wpPost) {
+    console.error('Post de WordPress no válido');
+    return {
+      _id: cleanSlug,
+      title: 'Post no disponible',
+      content: '<p>Lo sentimos, este post no está disponible en este momento.</p>',
+      description: 'Post no disponible',
+      date: new Date().toISOString(),
+      image: { src: '/img/default-blog-image.jpg', alt: 'Imagen por defecto' },
+      source: 'wordpress',
+      slug: cleanSlug
+    };
   }
-  
-  // Función para obtener la URL de imagen con proxy
-  const getImageUrl = (post) => {
+
+  try {
+    const imageUrl = getImageUrl(wpPost);
+    
+    // Construir un objeto con formato consistente
+    return {
+      _id: cleanSlug,
+      title: wpPost.title || 'Sin título',
+      content: wpPost.content || '<p>Sin contenido</p>',
+      description: wpPost.excerpt || wpPost.content?.substring(0, 150) || 'Sin descripción',
+      date: wpPost.date || new Date().toISOString(),
+      dateFormatted: wpPost.date ? new Date(wpPost.date).toLocaleDateString('es-ES') : new Date().toLocaleDateString('es-ES'),
+      image: {
+        src: imageUrl || '/img/default-blog-image.jpg',
+        alt: wpPost.title || 'Imagen de blog'
+      },
+      source: 'wordpress',
+      slug: cleanSlug,
+      author: wpPost.author_name || wpPost._embedded?.author?.[0]?.name || "Equipo Goza Madrid",
+      categories: wpPost.categories || []
+    };
+  } catch (error) {
+    console.error('Error transformando post de WordPress:', error);
+    
+    // Devolver un objeto mínimo en caso de error
+    return {
+      _id: cleanSlug,
+      title: 'Error al cargar el post',
+      content: '<p>Se produjo un error al cargar el contenido.</p>',
+      description: 'Error al cargar el post',
+      date: new Date().toISOString(),
+      image: { src: '/img/default-blog-image.jpg', alt: 'Imagen por defecto' },
+      source: 'wordpress',
+      slug: cleanSlug
+    };
+  }
+}
+
+// Función auxiliar para obtener la URL de imagen con fallback
+const getImageUrl = (post) => {
+  // Manejo de error para post nulo o indefinido
+  if (!post) return '/img/default-blog-image.jpg';
+
+  try {
     // Intentar obtener la imagen de _embedded (disponible gracias a _embed)
     if (post._embedded && 
         post._embedded['wp:featuredmedia'] && 
@@ -630,33 +678,13 @@ function transformWordPressPost(wpPost, cleanSlug) {
     // Intentar métodos alternativos si no hay datos embebidos
     return post.uagb_featured_image_src?.medium?.[0] || 
            post.uagb_featured_image_src?.full?.[0] || 
-           '/placeholder.jpg';
-  };
-  
-  // Transformar a formato común
-  return {
-    _id: `wp-${wpPost.id}`,
-    id: wpPost.id,
-    title: wpPost.title && wpPost.title.rendered ? wpPost.title.rendered : String(wpPost.title || ''),
-    content: wpPost.content && wpPost.content.rendered ? wpPost.content.rendered : String(wpPost.content || ''),
-    excerpt: wpPost.excerpt && wpPost.excerpt.rendered ? wpPost.excerpt.rendered : String(wpPost.excerpt || ''),
-    date: new Date(wpPost.date).toLocaleDateString('es-ES', {
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric'
-    }),
-    imageUrl: getImageUrl(wpPost),
-    image: {
-      src: getImageUrl(wpPost),
-      alt: wpPost.title && wpPost.title.rendered ? wpPost.title.rendered : ''
-    },
-    author: wpPost._embedded?.author?.[0]?.name || 'Goza Madrid',
-    categories: wpPost._embedded?.['wp:term']?.[0]?.map(cat => cat.name) || [],
-    tags: wpPost._embedded?.['wp:term']?.[1]?.map(tag => tag.name) || [],
-    source: 'wordpress',
-    slug: slug
-  };
-}
+           post.image?.src ||
+           '/img/default-blog-image.jpg';
+  } catch (error) {
+    console.error('Error al obtener imagen del post:', error);
+    return '/img/default-blog-image.jpg';
+  }
+};
 
 // Función mejorada para determinar si estamos trabajando con un blog de WordPress
 const identifyBlogType = (id, source) => {
@@ -696,31 +724,75 @@ export async function getStaticPaths() {
 
 // Cambiar a getStaticProps para sitios estáticos
 export async function getStaticProps(context) {
-  const { id } = context.params;
+  const { id, source } = context.params;
+  
+  // Verificar y limpiar el ID
+  if (!id) {
+    console.error('ID no válido:', id);
+    return {
+      props: {
+        initialBlog: {
+          title: 'Blog no encontrado',
+          content: '<p>Lo sentimos, no pudimos encontrar este blog.</p>',
+        },
+        id: 'not-found',
+        isWordPress: false,
+      },
+      revalidate: 60 // Revalidar después de 60 segundos
+    };
+  }
+  
+  const cleanId = id.toString().trim();
   
   // Determinar si es un ID de MongoDB (24 caracteres hexadecimales)
-  const isMongoId = id && id.length === 24 && /^[0-9a-fA-F]{24}$/.test(id);
+  const isMongoId = cleanId && cleanId.length === 24 && /^[0-9a-fA-F]{24}$/.test(cleanId);
   
-  console.log(`[DEBUG] Iniciando getBlogById para ID: ${id}`);
+  console.log(`[DEBUG] Iniciando getBlogById para ID: ${cleanId}, isMongoId: ${isMongoId}`);
   
   try {
-    // 1. Primero intentar obtener de MongoDB si parece ser un ID de MongoDB
+    // 1. Primero intentar obtener de WordPress si el parámetro source=wordpress o no es un ID de MongoDB
+    const sourceParam = context.query?.source;
+    const checkWordPressFirst = sourceParam === 'wordpress' || !isMongoId;
+    
+    if (checkWordPressFirst) {
+      try {
+        console.log('Intentando obtener el blog de WordPress primero');
+        const wpPost = await getBlogPostBySlug(cleanId);
+        
+        if (wpPost) {
+          const transformedPost = transformWordPressPost(wpPost, cleanId);
+          return {
+            props: {
+              initialBlog: transformedPost,
+              id: cleanId,
+              isWordPress: true,
+            },
+            revalidate: 300 // Revalidar cada 5 minutos
+          };
+        }
+      } catch (wpError) {
+        console.error('Error obteniendo blog de WordPress:', wpError);
+        // Continuar con el flujo para intentar MongoDB
+      }
+    }
+    
+    // 2. Luego intentar obtener de MongoDB si parece ser un ID de MongoDB o el enfoque de WordPress falló
     if (isMongoId) {
       // Configurar número de reintentos
-      const maxRetries = 7;
+      const maxRetries = 3;
       let currentTry = 1;
       let blog = null;
       
       while (currentTry <= maxRetries && !blog) {
         try {
-          console.log(`[DEBUG] Intento ${currentTry} de ${maxRetries}`);
+          console.log(`[DEBUG] Intento MongoDB ${currentTry} de ${maxRetries}`);
           const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
           
           // Intentar obtener con timeout
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 30000);
+          const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 segundos timeout
           
-          const response = await fetch(`${apiUrl.replace(/\/+$/, '')}/blog/${id.trim()}`, {
+          const response = await fetch(`${apiUrl.replace(/\/+$/, '')}/blog/${cleanId}`, {
             signal: controller.signal
           });
           
@@ -734,15 +806,16 @@ export async function getStaticProps(context) {
             return {
               props: {
                 initialBlog: blog,
-                id,
+                id: cleanId,
                 isWordPress: false,
-              }
+              },
+              revalidate: 300 // Revalidar cada 5 minutos
             };
           } else {
             throw new Error(`Error HTTP: ${response.status}`);
           }
         } catch (err) {
-          console.error(`[DEBUG] Error en intento ${currentTry}:`, err.message);
+          console.error(`[DEBUG] Error en intento MongoDB ${currentTry}:`, err.message);
           currentTry++;
           
           if (currentTry <= maxRetries) {
@@ -753,43 +826,36 @@ export async function getStaticProps(context) {
       }
     }
     
-    // 2. Si no es un ID de MongoDB o falló la obtención desde MongoDB, intentar WordPress
-    try {
-      const wpPost = await getBlogPostBySlug(id);
-      
-      if (wpPost) {
-        // Transformar datos de WordPress al formato requerido
-        return {
-          props: {
-            initialBlog: transformWordPressPost(wpPost, id),
-            id,
-            isWordPress: true,
-          }
-        };
-      }
-    } catch (wpError) {
-      console.error('Error obteniendo blog de WordPress:', wpError);
-    }
-    
-    // 3. Si llegamos aquí, no encontramos el blog en ninguna fuente
-    // Devolver un objeto vacío para que la página maneje la carga en el cliente
+    // 3. Si no se encontró en ninguna fuente, devolver un objeto de blog "no encontrado"
     return {
       props: {
-        initialBlog: null,
-        id,
-        isWordPress: false
-      }
+        initialBlog: {
+          title: 'Blog no encontrado',
+          content: '<p>Lo sentimos, no pudimos encontrar este blog.</p>',
+          date: new Date().toISOString(),
+          image: { src: '/img/default-blog-image.jpg', alt: 'Imagen por defecto' }
+        },
+        id: cleanId || 'error',
+        isWordPress: false,
+      },
+      revalidate: 60 // Revalidar después de 60 segundos
     };
   } catch (error) {
     console.error('Error al obtener blog en getStaticProps:', error);
     
-    // En caso de error, devolvemos datos mínimos y dejamos que el cliente intente cargar
+    // En caso de error, devolvemos datos mínimos 
     return {
       props: {
-        initialBlog: null,
-        id,
+        initialBlog: {
+          title: 'Error al cargar el blog',
+          content: '<p>Se produjo un error al cargar el contenido del blog.</p>',
+          date: new Date().toISOString(),
+          image: { src: '/img/default-blog-image.jpg', alt: 'Imagen por defecto' }
+        },
+        id: cleanId || 'error',
         isWordPress: false,
-      }
+      },
+      revalidate: 30 // Revalidar más rápido en caso de error
     };
   }
 }

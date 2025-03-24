@@ -83,15 +83,23 @@ export async function getBlogPostsFromServer(page = 1, perPage = 10) {
  * @returns {Promise} - Promesa con el post
  */
 export async function getBlogPostBySlug(slug, retries = 5) {
+  // Validar el slug para evitar problemas
+  if (!slug || typeof slug !== 'string') {
+    console.error('Slug inválido:', slug);
+    return null;
+  }
+
+  const cleanSlug = slug.trim().replace(/\s+/g, '-').toLowerCase();
+  
   try {
     // Construir URL para usar el proxy moderno
-    const url = `${WP_PROXY_URL}/posts?slug=${encodeURIComponent(slug)}&_embed`;
+    const url = `${WP_PROXY_URL}/posts?slug=${encodeURIComponent(cleanSlug)}&_embed`;
     
     console.log(`Obteniendo post por slug desde ${url}`);
     
     // Añadir timeout para evitar que la petición se quede colgada
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 segundos timeout
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 segundos timeout
     
     const response = await fetch(url, {
       method: 'GET',
@@ -100,46 +108,98 @@ export async function getBlogPostBySlug(slug, retries = 5) {
         'Accept': 'application/json'
       },
       signal: controller.signal
+    }).catch(error => {
+      clearTimeout(timeoutId);
+      console.error(`Error de red al obtener el post:`, error);
+      throw error; // Re-lanzar para el manejo posterior
     });
     
     clearTimeout(timeoutId);
     
-    // Si obtenemos un error 503, intentar de nuevo después de un retraso
-    if (response.status === 503 && retries > 0) {
+    // Si obtenemos un error 503 o 502, intentar de nuevo después de un retraso
+    if ((response.status === 503 || response.status === 502) && retries > 0) {
+      console.log(`Recibido ${response.status}, reintentando en 5 segundos...`);
       await new Promise(resolve => setTimeout(resolve, 5000)); // Esperar 5 segundos
-      return getBlogPostBySlug(slug, retries - 1);
+      return getBlogPostBySlug(cleanSlug, retries - 1);
     }
     
     if (!response.ok) {
       console.error(`Error al obtener el post: ${response.status} ${response.statusText}`);
+      // Si es un error de servidor y tenemos reintentos, intentar de nuevo
+      if (response.status >= 500 && retries > 0) {
+        console.log(`Reintentando debido a error ${response.status}...`);
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        return getBlogPostBySlug(cleanSlug, retries - 1);
+      }
       throw new Error(`Error al obtener el post: ${response.status}`);
     }
     
-    const posts = await response.json();
+    // Intentar parsear la respuesta JSON
+    let posts;
+    try {
+      posts = await response.json();
+    } catch (parseError) {
+      console.error('Error al parsear la respuesta JSON:', parseError);
+      if (retries > 0) {
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        return getBlogPostBySlug(cleanSlug, retries - 1);
+      }
+      throw parseError;
+    }
+    
+    // Verificar que posts sea un array
+    if (!Array.isArray(posts)) {
+      console.error('La respuesta no es un array:', posts);
+      return null;
+    }
     
     // Si encontramos el post, procesar sus campos
     if (posts && posts.length > 0) {
       const post = posts[0];
       
-      // Procesar todos los campos que podrían ser objetos
-      post.title = safeRenderValue(post.title);
-      post.content = safeRenderValue(post.content);
-      post.excerpt = safeRenderValue(post.excerpt);
+      // Verificar que post es un objeto válido
+      if (!post || typeof post !== 'object') {
+        console.error('Post no válido:', post);
+        return null;
+      }
       
-      return post;
+      try {
+        // Procesar todos los campos que podrían ser objetos con manejo de errores
+        post.title = safeRenderValue(post.title);
+        post.content = safeRenderValue(post.content);
+        post.excerpt = safeRenderValue(post.excerpt);
+        
+        // Asegurar que los campos esenciales existan
+        if (!post.title) post.title = 'Sin título';
+        if (!post.content) post.content = 'Sin contenido';
+        
+        return post;
+      } catch (processingError) {
+        console.error('Error al procesar los campos del post:', processingError);
+        // Devolver un post básico en caso de error
+        return {
+          title: 'Error al cargar post',
+          content: 'No se pudo cargar el contenido del post correctamente.',
+          date: new Date().toISOString(),
+          slug: cleanSlug
+        };
+      }
     } else {
+      console.log(`No se encontró ningún post con el slug: ${cleanSlug}`);
       return null;
     }
   } catch (error) {
     console.error(`Error en getBlogPostBySlug:`, error);
     
     // Si es un error de timeout o de red y aún tenemos reintentos, intentar de nuevo
-    if ((error.name === 'AbortError' || error.name === 'TypeError') && retries > 0) {
+    if ((error.name === 'AbortError' || error.name === 'TypeError' || error.message.includes('network')) && retries > 0) {
+      console.log(`Reintentando debido a error de red (${retries} intentos restantes)...`);
       await new Promise(resolve => setTimeout(resolve, 5000)); // Esperar 5 segundos
-      return getBlogPostBySlug(slug, retries - 1);
+      return getBlogPostBySlug(cleanSlug, retries - 1);
     }
     
-    throw error;
+    // Devolver null para manejar el error en el nivel superior
+    return null;
   }
 }
 
