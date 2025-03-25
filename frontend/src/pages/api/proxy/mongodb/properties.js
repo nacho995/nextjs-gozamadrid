@@ -1,4 +1,5 @@
-import fetch from 'node-fetch';
+// Ya no necesitamos importar node-fetch, usamos el fetch nativo de Node.js 18+
+// import fetch from 'node-fetch';
 
 const fetchWithRetry = async (url, options = {}, maxRetries = 3) => {
   let lastError;
