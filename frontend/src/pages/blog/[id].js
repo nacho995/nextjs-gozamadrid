@@ -7,7 +7,10 @@ const DEFAULT_IMAGE = '/img/default-image.jpg';
 
 // URLs de API para los blogs
 const MONGODB_BLOGS_API = 'https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api/blogs';
-const WORDPRESS_API = '/api/proxy/wordpress/posts';
+const WORDPRESS_API = process.env.NEXT_PUBLIC_WP_API_URL || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wp/v2/posts';
+
+// Importar la utilidad para WordPress
+import { getPostBySlug } from '../../utils/wp-api';
 
 const BlogDetail = () => {
   const router = useRouter();
@@ -42,32 +45,59 @@ const BlogDetail = () => {
             // URL directa a ElasticBeanstalk para blogs de MongoDB
             console.log(`Consultando MongoDB con ID: ${id}`);
             
-            // Prueba con múltiples URLs para mayor robustez
-            const mongoUrls = [
-              `${MONGODB_BLOGS_API}/${id}`,                                    // URL principal directa
-              `/api/proxy/mongodb/blogs/${id}`,                                // Proxy local si existe
-              `https://www.realestategozamadrid.com/api/blogs/${id}`,          // API desde la URL principal
-              `https://www.realestategozamadrid.com/api/blogs/detail/${id}`    // URL alternativa
-            ];
+            // Utilizar el nuevo endpoint consolidado
+            const proxyUrl = `/api/proxy/blog-by-id?id=${id}`;
             
-            // Intenta cada URL hasta encontrar una que funcione
-            for (const url of mongoUrls) {
-              try {
-                console.log(`Intentando URL: ${url}`);
-                const response = await fetch(url);
-                
-                if (response.ok) {
-                  const data = await response.json();
-                  console.log('MongoDB blog encontrado:', data?.title || 'Sin título');
-                  setBlog(data);
-                  setLoading(false);
-                  return; // Terminar si encontramos el blog
-                } else {
-                  console.log(`Respuesta no OK desde ${url}: ${response.status}`);
+            try {
+              console.log(`Intentando nuevo endpoint: ${proxyUrl}`);
+              const response = await fetch(proxyUrl, {
+                headers: {
+                  'Accept': 'application/json',
+                  'Cache-Control': 'no-cache, no-store',
+                  'Pragma': 'no-cache'
                 }
-              } catch (urlError) {
-                console.error(`Error con URL ${url}:`, urlError);
-                // Continuar con la siguiente URL
+              });
+              
+              if (response.ok) {
+                const data = await response.json();
+                console.log('Blog encontrado a través del proxy:', data?.title || 'Sin título');
+                setBlog(data);
+                setLoading(false);
+                return; // Terminar si encontramos el blog
+              } else {
+                console.log(`Respuesta no OK desde ${proxyUrl}: ${response.status}`);
+              }
+            } catch (proxyError) {
+              console.error(`Error con el endpoint proxy: ${proxyError.message}`);
+              
+              // Si falla el nuevo endpoint, intentar con los métodos anteriores
+              // Prueba con múltiples URLs para mayor robustez
+              const mongoUrls = [
+                `${MONGODB_BLOGS_API}/${id}`,                                    // URL principal directa
+                `/api/proxy/mongodb/blogs/${id}`,                                // Proxy local si existe
+                `https://www.realestategozamadrid.com/api/blogs/${id}`,          // API desde la URL principal
+                `https://www.realestategozamadrid.com/api/blogs/detail/${id}`    // URL alternativa
+              ];
+              
+              // Intenta cada URL hasta encontrar una que funcione
+              for (const url of mongoUrls) {
+                try {
+                  console.log(`Intentando URL: ${url}`);
+                  const response = await fetch(url);
+                  
+                  if (response.ok) {
+                    const data = await response.json();
+                    console.log('MongoDB blog encontrado:', data?.title || 'Sin título');
+                    setBlog(data);
+                    setLoading(false);
+                    return; // Terminar si encontramos el blog
+                  } else {
+                    console.log(`Respuesta no OK desde ${url}: ${response.status}`);
+                  }
+                } catch (urlError) {
+                  console.error(`Error con URL ${url}:`, urlError);
+                  // Continuar con la siguiente URL
+                }
               }
             }
             
@@ -81,10 +111,10 @@ const BlogDetail = () => {
         if (!useMongoDbFirst || !blog) {
           try {
             console.log(`Consultando WordPress con slug: ${id}`);
-            const wpResponse = await fetch(`${WORDPRESS_API}?slug=${encodeURIComponent(id)}&_embed=true`);
             
-            if (wpResponse.ok) {
-              const wpPosts = await wpResponse.json();
+            try {
+              // Usar la utilidad wp-api que usa nuestro proxy
+              const wpPosts = await getPostBySlug(id);
               
               if (wpPosts && wpPosts.length > 0) {
                 const wpPost = wpPosts[0];
@@ -106,11 +136,56 @@ const BlogDetail = () => {
               } else {
                 console.log('No se encontraron posts en WordPress');
               }
-            } else {
-              console.log(`Respuesta no OK desde WordPress: ${wpResponse.status}`);
+            } catch (wpError) {
+              console.error('Error al consultar WordPress vía proxy:', wpError);
+              
+              // Como fallback, probar con una ruta alternativa
+              try {
+                const wpProxyUrl = `/api/proxy-raw`;
+                console.log(`Intentando fallback vía proxy-raw: ${wpProxyUrl}`);
+                
+                const response = await fetch(wpProxyUrl, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    url: `${WORDPRESS_API}?slug=${encodeURIComponent(id)}&_embed=true`,
+                    method: 'GET',
+                    headers: {
+                      'Accept': 'application/json',
+                    }
+                  })
+                });
+                
+                if (response.ok) {
+                  const wpPosts = await response.json();
+                  
+                  if (wpPosts && Array.isArray(wpPosts) && wpPosts.length > 0) {
+                    const wpPost = wpPosts[0];
+                    console.log('WordPress post encontrado vía proxy-raw:', wpPost.id);
+                    
+                    // Transformación segura del post
+                    const transformedPost = {
+                      title: wpPost.title?.rendered || 'Sin título',
+                      content: wpPost.content?.rendered || '<p>Sin contenido</p>',
+                      date: wpPost.date || new Date().toISOString(),
+                      author: wpPost._embedded?.author?.[0]?.name || 'Equipo Goza Madrid',
+                      excerpt: wpPost.excerpt?.rendered || '',
+                      source: 'wordpress'
+                    };
+                    
+                    setBlog(transformedPost);
+                    setLoading(false);
+                    return; // Terminar aquí si encontramos el blog
+                  }
+                }
+              } catch (fallbackError) {
+                console.error('Error en fallback de WordPress:', fallbackError);
+              }
             }
-          } catch (wpError) {
-            console.error('Error al cargar blog de WordPress:', wpError);
+          } catch (generalWpError) {
+            console.error('Error general al cargar blog de WordPress:', generalWpError);
           }
         }
         
