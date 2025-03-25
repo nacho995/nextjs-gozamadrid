@@ -1,10 +1,32 @@
-.git
+# Ignorar archivos node_modules
 node_modules
+node_modules/
+
+# Ignorar directorios de build
+.next
+.next/
+out
+out/
+
+# Ignorar archivos de respaldo
+*.bak
+*.backup
+
+# Ignorar directorios de desarrollo
+.git
+.github
+.vscode
+*.log
+
+# Ignorar archivos de entorno locales (menos de producción)
+.env.local
+.env.development
+.env.test
+
 __tests__
 test
 tests
 *.test.js
 *.spec.js
-.vscode
 .DS_Store
 npm-debug.log

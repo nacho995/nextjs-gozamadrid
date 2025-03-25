@@ -48,14 +48,18 @@ export default async function handler(req, res) {
     const defaultHeaders = {
       'User-Agent': 'GozaMadrid-Frontend/1.0',
       'Accept': 'application/json',
-      ...headers
     };
+    
+    // Eliminar encabezados problemáticos para CORS
+    const safeHeaders = { ...defaultHeaders, ...headers };
+    delete safeHeaders['Cache-Control'];
+    delete safeHeaders['Pragma'];
     
     // Realizar la solicitud a través de axios
     const response = await axios({
       method,
       url,
-      headers: defaultHeaders,
+      headers: safeHeaders,
       data: method !== 'GET' && method !== 'HEAD' ? data : undefined,
       timeout,
       responseType,
