@@ -8,7 +8,8 @@
  * Este endpoint es llamado por el frontend durante la inicialización en _app.js
  */
 
-import fetch from 'node-fetch';
+// Ya no necesitamos importar node-fetch, usamos el fetch nativo de Node.js 18+
+// import fetch from 'node-fetch';
 
 // Función para verificar la disponibilidad de un endpoint
 async function checkEndpointAvailability(url, params = {}, timeout = 5000) {
