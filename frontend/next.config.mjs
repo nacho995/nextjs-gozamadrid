@@ -37,8 +37,6 @@ const nextConfig = {
     API_BASE_URL: process.env.API_BASE_URL || ''
   },
   distDir: '.next',
-  optimizeFonts: false,
-  swcMinify: false,
   eslint: {
     ignoreDuringBuilds: true,
   },
