@@ -6,8 +6,8 @@
  */
 
 const SITE_URL = 'https://www.realestategozamadrid.com';
-const WP_API_URL = 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wp/v2';
-const WC_API_URL = 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3';
+const WP_API_URL = 'https://wordpress.realestategozamadrid.com/wp-json/wp/v2';
+const WC_API_URL = 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3';
 
 // Configuración por defecto para fetch
 const defaultFetchConfig = {

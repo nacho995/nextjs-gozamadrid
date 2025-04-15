@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import Layout from '../components/layout';
 import '@/styles/globals.css';
 import { NavbarProvider } from '../components/context/navBarContext';
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from 'sonner';
 import LoadingScreen from '../components/LoadingScreen';
 import { useRouter } from 'next/router';
 import { UserProvider } from '../context/UserContext';
@@ -255,47 +255,46 @@ function MyApp({ Component, pageProps }) {
   }, [router.pathname]);
 
   return (
-    <CookieProvider>
-      <UserProvider>
-        <Head>
-          <title>Goza Madrid | Inmobiliaria de Lujo en Madrid</title>
-          <meta name="description" content="Expertos en servicios inmobiliarios de lujo en Madrid. Compra, venta y alquiler de propiedades exclusivas. Asesoramiento personalizado para inversores nacionales e internacionales." />
-          <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <link rel="icon" href={`${assetPrefix}/logo.png`} />
-          
-          {/* Metadatos básicos */}
-          <meta charSet="UTF-8" />
-          <meta name="author" content="Goza Madrid" />
-          <meta name="robots" content="index, follow" />
-          
-          {/* Open Graph / Facebook */}
-          <meta property="og:type" content="website" />
-          <meta property="og:url" content="https://realestategozamadrid.com/" />
-          <meta property="og:title" content="Goza Madrid | Inmobiliaria de Lujo en Madrid" />
-          <meta property="og:description" content="Expertos en servicios inmobiliarios de lujo en Madrid. Compra, venta y alquiler de propiedades exclusivas. Asesoramiento personalizado para inversores nacionales e internacionales." />
-          <meta property="og:image" content="https://realestategozamadrid.com/og-image.jpg" />
-          
-          {/* Twitter */}
-          <meta property="twitter:card" content="summary_large_image" />
-          <meta property="twitter:url" content="https://realestategozamadrid.com/" />
-          <meta property="twitter:title" content="Goza Madrid | Inmobiliaria de Lujo en Madrid" />
-          <meta property="twitter:description" content="Expertos en servicios inmobiliarios de lujo en Madrid. Compra, venta y alquiler de propiedades exclusivas. Asesoramiento personalizado para inversores nacionales e internacionales." />
-          <meta property="twitter:image" content="https://realestategozamadrid.com/twitter-image.jpg" />
-        </Head>
+    <>
+      <Head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#000000" />
         
-        {/* Script para interceptar peticiones HEAD */}
-        <Script id="disable-head-requests" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: DISABLE_HEAD_SCRIPT }} />
+        {/* Metatags globales para compartir en redes sociales */}
+        <meta property="og:image" content="https://realestategozamadrid.com/logo-social.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Logo de Goza Madrid eXp Realty" />
+        <meta property="og:site_name" content="Goza Madrid eXp" />
+        <meta property="fb:app_id" content="966242223397117" />
+        <meta property="og:type" content="website" />
         
-        {loading && <LoadingScreen />}
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content="https://realestategozamadrid.com/logo-social.png" />
         
-        <NavbarProvider>
-          <Layout hideControlMenu={hideControlMenu}>
-            <Component {...pageProps} />
-          </Layout>
-          <Toaster />
-        </NavbarProvider>
-      </UserProvider>
-    </CookieProvider>
+        {/* Script para verificar en Facebook */}
+        <meta name="facebook-domain-verification" content="62e9m8ukfxs7w9s8gfsvr1w9fewju9" />
+      </Head>
+      
+      <Script
+        id="disable-head-requests"
+        strategy="beforeInteractive"
+        dangerouslySetInnerHTML={{ __html: DISABLE_HEAD_SCRIPT }}
+      />
+      <CookieProvider>
+        <UserProvider>
+          <NavbarProvider>
+            <Toaster position="top-right" richColors closeButton />
+            {loading && <LoadingScreen />}
+            <Layout hideControlMenu={hideControlMenu}>
+              <Component {...pageProps} />
+            </Layout>
+          </NavbarProvider>
+        </UserProvider>
+      </CookieProvider>
+    </>
   );
 }
 

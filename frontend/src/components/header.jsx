@@ -182,7 +182,19 @@ export default function ControlMenu() {
           type="image/png"
         />
         <script type="application/ld+json">
-          {JSON.stringify(ORGANIZATION_SCHEMA)}
+          {(() => {
+            try {
+              return JSON.stringify(ORGANIZATION_SCHEMA);
+            } catch (e) {
+              console.error("Error serializando ORGANIZATION_SCHEMA:", e);
+              return JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "RealEstateAgent",
+                "name": "Goza Madrid",
+                "url": "https://realestategozamadrid.com"
+              });
+            }
+          })()}
         </script>
       </Head>
 

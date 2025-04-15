@@ -66,7 +66,7 @@ const Layout = ({ children }) => (
       />
     </Head>
 
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-transparent">
       <header className="relative z-50">
         <ControlMenu/>
       </header>

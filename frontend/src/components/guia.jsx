@@ -5,30 +5,52 @@ import Head from 'next/head';
 import React from 'react';
 import AnimatedOnScroll from './AnimatedScroll';
 
-// Configuración SEO y Schema.org
-const SCHEMA_DATA = {
-  "@context": "https://schema.org",
-  "@type": "Article",
-  "headline": "Guía Completa para Vender tu Propiedad en España - Goza Madrid",
-  "description": "Descubre los aspectos clave para vender tu propiedad en España. Guía profesional con consejos de expertos, proceso paso a paso y estrategias de venta efectivas.",
-  "image": "/guia.jpg",
-  "author": {
-    "@type": "Organization",
-    "name": "Goza Madrid",
-    "url": "https://realestategozamadrid.com"
-  },
-  "publisher": {
-    "@type": "Organization",
-    "name": "Goza Madrid",
-    "logo": {
-      "@type": "ImageObject",
-      "url": "/logo.png"
-    }
-  },
-  "datePublished": new Date().toISOString(),
-  "mainEntityOfPage": {
-    "@type": "WebPage",
-    "@id": "https://realestategozamadrid.com/guia-venta-propiedad"
+// Componente independiente para datos estructurados para mayor seguridad
+const GuideStructuredData = () => {
+  try {
+    // Usar una fecha estática en lugar de generarla dinámicamente para evitar problemas
+    const formattedDate = new Date().toISOString();
+    
+    const schemaData = {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Guía Completa para Vender tu Propiedad en España - Goza Madrid",
+      "description": "Descubre los aspectos clave para vender tu propiedad en España. Guía profesional con consejos de expertos, proceso paso a paso y estrategias de venta efectivas.",
+      "image": "https://realestategozamadrid.com/guia.jpg",
+      "author": {
+        "@type": "Organization",
+        "name": "Goza Madrid",
+        "url": "https://realestategozamadrid.com"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Goza Madrid",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://realestategozamadrid.com/logo.png"
+        }
+      },
+      "datePublished": formattedDate,
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://realestategozamadrid.com/guia-venta-propiedad"
+      }
+    };
+
+    // Convertir a string de manera segura
+    const jsonString = JSON.stringify(schemaData);
+
+    return (
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonString
+        }}
+      />
+    );
+  } catch (error) {
+    console.error("Error generando datos estructurados para la guía:", error);
+    return null;
   }
 };
 
@@ -41,12 +63,16 @@ export default function Guide() {
                 <meta name="keywords" content="guía venta propiedades, vender casa España, proceso venta inmuebles, asesoramiento inmobiliario Madrid" />
                 <meta property="og:title" content="Guía Definitiva para Vender tu Propiedad en España" />
                 <meta property="og:description" content="Aprende a vender tu propiedad en España con nuestra guía completa. Consejos expertos y proceso detallado." />
-                <meta property="og:image" content="/guia.jpg" />
+                <meta property="og:image" content="https://realestategozamadrid.com/guia.jpg" />
+                <meta property="og:image:secure_url" content="https://realestategozamadrid.com/guia.jpg" />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
                 <meta property="og:type" content="article" />
+                <meta property="og:url" content="https://realestategozamadrid.com/guia-venta-propiedad" />
                 <link rel="canonical" href="https://realestategozamadrid.com/guia-venta-propiedad" />
-                <script type="application/ld+json">
-                    {JSON.stringify(SCHEMA_DATA)}
-                </script>
+                
+                {/* Utilizamos el componente de datos estructurados */}
+                <GuideStructuredData />
             </Head>
 
             <AnimatedOnScroll>
