@@ -255,46 +255,69 @@ function MyApp({ Component, pageProps }) {
   }, [router.pathname]);
 
   return (
-    <>
-      <Head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#000000" />
-        
-        {/* Metatags globales para compartir en redes sociales */}
-        <meta property="og:image" content="https://realestategozamadrid.com/logo-social.png" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content="Logo de Goza Madrid eXp Realty" />
-        <meta property="og:site_name" content="Goza Madrid eXp" />
-        <meta property="fb:app_id" content="966242223397117" />
-        <meta property="og:type" content="website" />
-        
-        {/* Twitter */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:image" content="https://realestategozamadrid.com/logo-social.png" />
-        
-        {/* Script para verificar en Facebook */}
-        <meta name="facebook-domain-verification" content="62e9m8ukfxs7w9s8gfsvr1w9fewju9" />
-      </Head>
-      
-      <Script
-        id="disable-head-requests"
-        strategy="beforeInteractive"
-        dangerouslySetInnerHTML={{ __html: DISABLE_HEAD_SCRIPT }}
-      />
-      <CookieProvider>
-        <UserProvider>
-          <NavbarProvider>
-            <Toaster position="top-right" richColors closeButton />
+    <CookieProvider>
+      <UserProvider>
+        <NavbarProvider>
+          <>
+            <Head>
+              {/* Meta tags */}
+              <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <meta charSet="UTF-8" />
+              <meta name="theme-color" content="#FFD700" /> {/* Amarillo dorado */}
+
+              {/* Favicon links */}
+              <link rel="icon" href={`${assetPrefix}/favicon.ico`} sizes="any" />
+              <link rel="icon" href={`${assetPrefix}/icon.svg`} type="image/svg+xml" />
+              <link rel="apple-touch-icon" href={`${assetPrefix}/apple-touch-icon.png`} />
+              <link rel="manifest" href={`${assetPrefix}/manifest.json`} />
+
+              {/* Preconnect hints */}
+              <link rel="preconnect" href="https://fonts.googleapis.com" />
+              <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+              
+              {/* Font stylesheet */}
+              <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+              
+              {/* Deshabilitar prefetching para ciertas páginas o globalmente */}
+              <meta httpEquiv="x-dns-prefetch-control" content="off" />
+
+              {/* Script para interceptar HEAD requests (opcional, podría ir en _document o aquí) */}
+              {/* <script dangerouslySetInnerHTML={{ __html: DISABLE_HEAD_SCRIPT }} /> */}
+            </Head>
+
+            {/* Meta Pixel Code - Base */}
+            <Script id="meta-pixel-base" strategy="afterInteractive">
+              {`
+                !function(f,b,e,v,n,t,s)
+                {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+                n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+                if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+                n.queue=[];t=b.createElement(e);t.async=!0;
+                t.src=v;s=b.getElementsByTagName(e)[0];
+                s.parentNode.insertBefore(t,s)}(window, document,'script',
+                'https://connect.facebook.net/en_US/fbevents.js');
+                fbq('init', '952341806905435');
+                fbq('track', 'PageView');
+              `}
+            </Script>
+            {/* Meta Pixel Code - NoScript Fallback */}
+            <noscript>
+              <img height="1" width="1" style={{ display: 'none' }}
+                   src="https://www.facebook.com/tr?id=952341806905435&ev=PageView&noscript=1"
+                   alt="" // Añadido alt vacío por accesibilidad
+              />
+            </noscript>
+            {/* End Meta Pixel Code */}
+
+            {/* Global Loading Screen */}
             {loading && <LoadingScreen />}
             <Layout hideControlMenu={hideControlMenu}>
               <Component {...pageProps} />
             </Layout>
-          </NavbarProvider>
-        </UserProvider>
-      </CookieProvider>
-    </>
+          </>
+        </NavbarProvider>
+      </UserProvider>
+    </CookieProvider>
   );
 }
 

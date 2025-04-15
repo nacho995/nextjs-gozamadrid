@@ -622,6 +622,7 @@ export default function PropertyPage() {
   const [configLoaded, setConfigLoaded] = useState(false);
   const renderCountRef = useRef(0);
   const abortControllerRef = useRef(null);
+  const [showDebugPanel, setShowDebugPanel] = useState(false);
   
   // DEBUG: Imprimir información de la API y configuración
   useEffect(() => {
@@ -826,6 +827,13 @@ export default function PropertyPage() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setCurrentUrl(window.location.href);
+    }
+  }, []);
+
+  // Efecto para mostrar el panel de depuración solo en el cliente tras hidratación
+  useEffect(() => {
+    if (window.appConfig?.debug || process.env.NODE_ENV === 'development') {
+      setShowDebugPanel(true);
     }
   }, []);
 
@@ -1367,8 +1375,8 @@ export default function PropertyPage() {
         )}
       </Head>
 
-      {/* Panel de depuración - solo visible en desarrollo */}
-      {typeof window !== 'undefined' && (window.appConfig?.debug || process.env.NODE_ENV === 'development') && (
+      {/* Panel de depuración - Renderizado condicional con estado */}
+      {showDebugPanel && (
         <div className="fixed top-20 right-4 z-50 bg-black/80 text-white p-4 rounded-lg shadow-lg text-xs font-mono max-w-xs overflow-auto max-h-80">
           <h4 className="font-bold text-amber-400 mb-2">DEBUG</h4>
           <p>Properties: {properties.length}</p>
