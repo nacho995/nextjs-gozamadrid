@@ -8,7 +8,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { motion } from "framer-motion";
 import { addDays, setHours, setMinutes } from "date-fns";
 import es from "date-fns/locale/es";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import { sendPropertyEmail } from '@/services/api';
 import Head from "next/head";
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
