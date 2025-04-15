@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   const { path } = req.query;
   const endpoint = Array.isArray(path) ? path.join('/') : path;
   
-  const wpApiBaseUrl = process.env.NEXT_PUBLIC_WP_API_URL || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wp/v2';
+  const wpApiBaseUrl = process.env.NEXT_PUBLIC_WP_API_URL || 'https://wordpress.realestategozamadrid.com/wp-json/wp/v2';
   const targetUrl = new URL(`${wpApiBaseUrl}/${endpoint}`);
   
   // Copiar los query params de la solicitud original

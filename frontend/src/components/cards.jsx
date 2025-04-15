@@ -3,6 +3,8 @@ import React, { useState, useEffect, useRef } from "react";
 import AnimatedOnScroll from "./AnimatedScroll";
 import Image from "next/image";
 import Head from "next/head";
+import Link from "next/link";
+import { getCleanJsonLd } from "../utils/structuredDataHelper";
 
 const cardData = [
     {
@@ -134,7 +136,7 @@ function DesktopCards({ card, index }) {
                         aria-label="Frente de la tarjeta"
                     >
                         <div className="absolute inset-0 rounded-2xl shadow-lg overflow-hidden">
-                            <div className="absolute inset-0 bg-white/5 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+                            <div className="absolute inset-0 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
                                 <div className="relative w-full h-full">
                                     <Image
                                         src="/fondoamarillo.jpg" 
@@ -144,7 +146,7 @@ function DesktopCards({ card, index }) {
                                         style={{ objectPosition: 'center' }}
                                         priority={index < 2}
                                     />
-                                    <div className="absolute inset-0 bg-black/30 rounded-xl"></div>
+                                    <div className="absolute inset-0 rounded-xl"></div>
                                 </div>
                             </div>
 
@@ -182,7 +184,7 @@ function DesktopCards({ card, index }) {
                                 className="object-cover"
                                 quality={100}
                             />
-                            <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center p-4 sm:p-6">
+                            <div className="absolute inset-0 flex flex-col items-center justify-center p-4 sm:p-6">
                                 <div className="text-center overflow-hidden whitespace-normal break-words max-h-full overflow-y-auto">
                                     <ol className="list-decimal list-inside text-left text-white text-xs sm:text-sm">
                                         {card.back.props.children}
@@ -410,7 +412,80 @@ function TabletCard({ card, index }) {
     );
 }
 
+// Función para generar datos estructurados de servicio
+const createServiceStructuredData = (id, title, description, image, serviceUrl) => {
+    const structuredData = {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "serviceType": "RealEstateService",
+        "name": title || "",
+        "description": typeof description === 'string' ? description : "Servicio inmobiliario en Madrid",
+        "provider": {
+            "@type": "RealEstateAgent",
+            "name": "Goza Madrid",
+            "url": "https://realestategozamadrid.com"
+        },
+        "url": serviceUrl || "https://realestategozamadrid.com"
+    };
+
+    if (image) {
+        structuredData.image = `https://realestategozamadrid.com${image}`;
+    }
+
+    return structuredData;
+};
+
 export default function Cards() {
+    // Extraer descripciones de texto para los datos estructurados
+    const cardDescriptions = cardData.map(card => {
+        let description = "Servicios inmobiliarios profesionales en Madrid";
+        if (typeof card.back === 'object' && card.back.props && card.back.props.children) {
+            const textItems = card.back.props.children
+                .filter(li => typeof li === 'object' && li.props && li.props.children)
+                .map(li => li.props.children);
+            if (textItems.length > 0) {
+                description = textItems.join(" ");
+            }
+        }
+        return { id: card.id, description };
+    });
+    
+    // Crear objeto de datos estructurados
+    const itemListData = {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "itemListElement": cardData.map((card, index) => {
+            // Buscar la descripción correspondiente
+            const descriptionObj = cardDescriptions.find(item => item.id === card.id);
+            const description = descriptionObj ? descriptionObj.description : "Servicios inmobiliarios profesionales en Madrid";
+            
+            return {
+                "@type": "ListItem",
+                "position": index + 1,
+                "item": {
+                    "@type": "Service",
+                    "serviceType": "RealEstateService",
+                    "name": card.front || "Servicio Inmobiliario",
+                    "description": description,
+                    "provider": {
+                        "@type": "RealEstateAgent",
+                        "name": "Goza Madrid",
+                        "url": "https://realestategozamadrid.com",
+                        "areaServed": {
+                            "@type": "City",
+                            "name": "Madrid"
+                        }
+                    },
+                    "url": `https://realestategozamadrid.com/#${card.id}`,
+                    "image": `https://realestategozamadrid.com${card.image}`
+                }
+            };
+        })
+    };
+    
+    // Convertir a JSON-LD limpio
+    const cleanItemListData = getCleanJsonLd(itemListData);
+
     return (
         <section 
             className="cards-section"
@@ -426,32 +501,10 @@ export default function Cards() {
                     name="keywords" 
                     content="servicios inmobiliarios, venta de propiedades, asesoramiento inmobiliario, agentes inmobiliarios madrid, precio de mercado inmobiliario"
                 />
-                <script type="application/ld+json">
-                    {JSON.stringify({
-                        "@context": "https://schema.org",
-                        "@type": "ItemList",
-                        "itemListElement": cardData.map((card, index) => ({
-                            "@type": "ListItem",
-                            "position": index + 1,
-                            "item": {
-                                "@type": "Service",
-                                "name": card.front,
-                                "description": Array.isArray(card.back.props.children) 
-                                    ? card.back.props.children.map(li => li.props.children).join(' ')
-                                    : '',
-                                "provider": {
-                                    "@type": "RealEstateAgent",
-                                    "name": "Goza Madrid",
-                                    "areaServed": {
-                                        "@type": "City",
-                                        "name": "Madrid"
-                                    }
-                                },
-                                "serviceType": "RealEstateService"
-                            }
-                        }))
-                    })}
-                </script>
+                <script 
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: cleanItemListData }}
+                />
             </Head>
             
             <AnimatedOnScroll>

@@ -1,6 +1,87 @@
 import Head from "next/head";
 import AnimatedOnScroll from "@/components/AnimatedScroll";
 
+// Componentes para datos estructurados
+const LegalServiceStructuredData = ({ description }) => {
+  try {
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "LegalService",
+      "name": "Aviso Legal - Goza Madrid Inmobiliaria",
+      "description": description,
+      "provider": {
+        "@type": "RealEstateAgent",
+        "name": "Goza Madrid Inmobiliaria",
+        "legalName": "Goza Madrid",
+        "vatID": "05430931X",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Calle de Alcalá, 96",
+          "addressLocality": "Madrid",
+          "postalCode": "28009",
+          "addressCountry": "ES"
+        },
+        "telephone": "+34 919 012 103",
+        "email": "marta@gozamadrid.com",
+        "url": "https://realestategozamadrid.com"
+      },
+      "knowsAbout": [
+        "Términos y condiciones",
+        "Política de privacidad",
+        "Normativa inmobiliaria",
+        "Derechos de propiedad intelectual"
+      ]
+    };
+
+    return (
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData)
+        }}
+      />
+    );
+  } catch (error) {
+    console.error("Error generando datos estructurados LegalService:", error);
+    return null;
+  }
+};
+
+const BreadcrumbStructuredData = () => {
+  try {
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Inicio",
+          "item": "https://realestategozamadrid.com"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Aviso Legal",
+          "item": "https://realestategozamadrid.com/aviso-legal"
+        }
+      ]
+    };
+
+    return (
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData)
+        }}
+      />
+    );
+  } catch (error) {
+    console.error("Error generando datos estructurados BreadcrumbList:", error);
+    return null;
+  }
+};
+
 export default function AvisoLegal() {
     const pageTitle = "Aviso Legal | Goza Madrid Inmobiliaria";
     const pageDescription = "Información legal, términos y condiciones de uso, política de privacidad y datos de contacto de Goza Madrid Inmobiliaria. Consulta nuestras acreditaciones profesionales y normativa aplicable.";
@@ -25,59 +106,9 @@ export default function AvisoLegal() {
                 <meta name="twitter:title" content={pageTitle} />
                 <meta name="twitter:description" content={pageDescription} />
 
-                {/* Schema.org Organization y Legal */}
-                <script type="application/ld+json">
-                    {JSON.stringify({
-                        "@context": "https://schema.org",
-                        "@type": "LegalService",
-                        "name": "Aviso Legal - Goza Madrid Inmobiliaria",
-                        "description": pageDescription,
-                        "provider": {
-                            "@type": "RealEstateAgent",
-                            "name": "Goza Madrid Inmobiliaria",
-                            "legalName": "Goza Madrid",
-                            "vatID": "05430931X",
-                            "address": {
-                                "@type": "PostalAddress",
-                                "streetAddress": "Calle de Alcalá, 96",
-                                "addressLocality": "Madrid",
-                                "postalCode": "28009",
-                                "addressCountry": "ES"
-                            },
-                            "telephone": "+34 919 012 103",
-                            "email": "marta@gozamadrid.com",
-                            "url": "https://realestategozamadrid.com"
-                        },
-                        "knowsAbout": [
-                            "Términos y condiciones",
-                            "Política de privacidad",
-                            "Normativa inmobiliaria",
-                            "Derechos de propiedad intelectual"
-                        ]
-                    })}
-                </script>
-
-                {/* Schema.org BreadcrumbList */}
-                <script type="application/ld+json">
-                    {JSON.stringify({
-                        "@context": "https://schema.org",
-                        "@type": "BreadcrumbList",
-                        "itemListElement": [
-                            {
-                                "@type": "ListItem",
-                                "position": 1,
-                                "name": "Inicio",
-                                "item": "https://realestategozamadrid.com"
-                            },
-                            {
-                                "@type": "ListItem",
-                                "position": 2,
-                                "name": "Aviso Legal",
-                                "item": "https://realestategozamadrid.com/aviso-legal"
-                            }
-                        ]
-                    })}
-                </script>
+                {/* Datos estructurados */}
+                <LegalServiceStructuredData description={pageDescription} />
+                <BreadcrumbStructuredData />
 
                 {/* Metadatos adicionales */}
                 <meta name="keywords" content="aviso legal goza madrid, términos y condiciones inmobiliaria, política privacidad madrid, normativa inmobiliaria" />

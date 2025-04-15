@@ -7,13 +7,13 @@ function getServiceConfig(serviceName, env) {
   // Configuraciones con prioridad para variables de entorno
   const serviceConfig = {
     wordpress: {
-      baseUrl: env.WP_API_URL || config.WP_API_URL || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wp/v2',
+      baseUrl: env.WP_API_URL || config.WP_API_URL || 'https://wordpress.realestategozamadrid.com/wp-json/wp/v2',
       defaultResource: 'posts',
       defaultPerPage: 10,
       requiresAuth: false
     },
     woocommerce: {
-      baseUrl: env.WC_API_URL || config.WC_API_URL || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3',
+      baseUrl: env.WC_API_URL || config.WC_API_URL || 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3',
       defaultResource: 'products',
       defaultPerPage: 10,
       requiresAuth: true,

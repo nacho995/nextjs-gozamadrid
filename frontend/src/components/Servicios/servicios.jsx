@@ -119,56 +119,59 @@ export default function Services() {
             </div>
 
             {/* Schema.org structured data */}
-            <script type="application/ld+json" dangerouslySetInnerHTML={{
-                __html: JSON.stringify({
-                    "@context": "https://schema.org",
-                    "@type": "Service",
-                    "name": "Servicios de Inversión Inmobiliaria",
-                    "description": "Servicios especializados de inversión y gestión inmobiliaria para residentes españoles e inversores internacionales",
-                    "provider": {
-                        "@type": "Organization",
-                        "name": "Goza Madrid",
-                        "areaServed": {
-                            "@type": "Country",
-                            "name": "España"
-                        }
-                    },
-                    "hasOfferCatalog": {
-                        "@type": "OfferCatalog",
-                        "name": "Servicios Inmobiliarios",
-                        "itemListElement": [
-                            {
-                                "@type": "Offer",
-                                "itemOffered": {
-                                    "@type": "Service",
-                                    "name": "Servicios para Residentes en España",
-                                    "description": "Gestión integral de inversiones inmobiliarias para residentes españoles"
-                                }
-                            },
-                            {
-                                "@type": "Offer",
-                                "itemOffered": {
-                                    "@type": "Service",
-                                    "name": "Servicios para Inversores Internacionales",
-                                    "description": "Asesoramiento completo para inversores extranjeros en el mercado inmobiliario español"
-                                }
+            <script 
+                type="application/ld+json" 
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "Service",
+                        "name": "Servicios de Inversión Inmobiliaria",
+                        "description": "Servicios especializados de inversión y gestión inmobiliaria para residentes españoles e inversores internacionales",
+                        "provider": {
+                            "@type": "Organization",
+                            "name": "Goza Madrid",
+                            "areaServed": {
+                                "@type": "Country",
+                                "name": "España"
                             }
+                        },
+                        "hasOfferCatalog": {
+                            "@type": "OfferCatalog",
+                            "name": "Servicios Inmobiliarios",
+                            "itemListElement": [
+                                {
+                                    "@type": "Offer",
+                                    "itemOffered": {
+                                        "@type": "Service",
+                                        "name": "Servicios para Residentes en España",
+                                        "description": "Gestión integral de inversiones inmobiliarias para residentes españoles"
+                                    }
+                                },
+                                {
+                                    "@type": "Offer",
+                                    "itemOffered": {
+                                        "@type": "Service",
+                                        "name": "Servicios para Inversores Internacionales",
+                                        "description": "Asesoramiento completo para inversores extranjeros en el mercado inmobiliario español"
+                                    }
+                                }
+                            ]
+                        },
+                        "serviceType": "Servicios Inmobiliarios",
+                        "audience": {
+                            "@type": "Audience",
+                            "audienceType": ["Inversores Residentes", "Inversores Internacionales"]
+                        },
+                        "knowsAbout": [
+                            "Inversión inmobiliaria",
+                            "Gestión de propiedades",
+                            "Fiscalidad inmobiliaria",
+                            "Mercado inmobiliario español",
+                            "Inversión internacional"
                         ]
-                    },
-                    "serviceType": "Servicios Inmobiliarios",
-                    "audience": {
-                        "@type": "Audience",
-                        "audienceType": ["Inversores Residentes", "Inversores Internacionales"]
-                    },
-                    "knowsAbout": [
-                        "Inversión inmobiliaria",
-                        "Gestión de propiedades",
-                        "Fiscalidad inmobiliaria",
-                        "Mercado inmobiliario español",
-                        "Inversión internacional"
-                    ]
-                })
-            }} />
+                    })
+                }} 
+            />
         </main>
     );
 }

@@ -14,7 +14,7 @@ export async function onRequest(context) {
   const searchParams = url.searchParams;
   
   // Construir la URL para WordPress - usar configuración centralizada
-  const wpBase = env.WP_API_URL || config.WP_API_URL || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wp/v2';
+  const wpBase = env.WP_API_URL || config.WP_API_URL || 'https://wordpress.realestategozamadrid.com/wp-json/wp/v2';
   
   // Determinar el recurso solicitado (posts, pages, media, etc.)
   const resource = searchParams.get('resource') || 'posts';

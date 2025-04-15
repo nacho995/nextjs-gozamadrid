@@ -4,28 +4,54 @@ import AnimatedOnScroll from "./AnimatedScroll";
 import Head from 'next/head';
 import PropTypes from 'prop-types';
 
-// Schema.org para el video de YouTube
-const getYouTubeSchema = (videoId, title) => ({
-  "@context": "https://schema.org",
-  "@type": "VideoObject",
-  "name": title || "¿Por qué unirte a eXp España?",
-  "description": "Descubre las ventajas de unirte a eXp España, una de las agencias inmobiliarias de mayor crecimiento mundial. Aprende sobre nuevas formas de facturación y desarrollo profesional.",
-  "uploadDate": "2024-01-01",
-  "thumbnailUrl": `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
-  "embedUrl": `https://www.youtube.com/embed/${videoId}`,
-  "publisher": {
-    "@type": "Organization",
-    "name": "Goza Madrid",
-    "logo": {
-      "@type": "ImageObject",
-      "url": "https://www.realestategozamadrid.com/logo.png"
-    }
-  },
-  "potentialAction": {
-    "@type": "WatchAction",
-    "target": `https://www.youtube.com/watch?v=${videoId}`
+// Componente para datos estructurados de video
+const YoutubeStructuredData = ({ videoId, title }) => {
+  try {
+    const schemaData = {
+      "@context": "https://schema.org",
+      "@type": "VideoObject",
+      "name": title || "¿Por qué unirte a eXp España?",
+      "description": "Descubre las ventajas de unirte a eXp España, una de las agencias inmobiliarias de mayor crecimiento mundial. Aprende sobre nuevas formas de facturación y desarrollo profesional.",
+      "uploadDate": "2024-01-01",
+      "thumbnailUrl": `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+      "contentUrl": `https://www.youtube.com/watch?v=${videoId}`,
+      "embedUrl": `https://www.youtube.com/embed/${videoId}`,
+      "duration": "PT2M30S",
+      "interactionStatistic": {
+        "@type": "InteractionCounter",
+        "interactionType": { "@type": "WatchAction" },
+        "userInteractionCount": 5000
+      },
+      "regionsAllowed": "ES",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Goza Madrid",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://www.gozamadrid.com/logo.png",
+          "width": 600,
+          "height": 60
+        }
+      },
+      "potentialAction": {
+        "@type": "WatchAction",
+        "target": `https://www.youtube.com/watch?v=${videoId}`
+      }
+    };
+
+    return (
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(schemaData)
+        }}
+      />
+    );
+  } catch (error) {
+    console.error("Error generando datos estructurados para YouTube:", error);
+    return null;
   }
-});
+};
 
 const YoutubeVideo = ({ videoId, title = "¿Por qué unirte a eXp España?" }) => {
   const iframeRef = useRef(null);
@@ -45,10 +71,7 @@ const YoutubeVideo = ({ videoId, title = "¿Por qué unirte a eXp España?" }) =
   return (
     <>
       <Head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(getYouTubeSchema(videoId, title)) }}
-        />
+        <YoutubeStructuredData videoId={videoId} title={title} />
       </Head>
 
       <AnimatedOnScroll>

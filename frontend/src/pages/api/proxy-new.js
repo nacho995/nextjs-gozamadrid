@@ -36,8 +36,8 @@ export default async function handler(req, res) {
     // Definir URLs base para las diferentes fuentes
     const baseUrls = {
       mongodb: process.env.NEXT_PUBLIC_API_MONGODB_URL || 'https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com',
-      woocommerce: 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3',
-      wordpress: 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wp/v2'
+      woocommerce: 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3',
+      wordpress: 'https://wordpress.realestategozamadrid.com/wp-json/wp/v2'
     };
     
     let targetUrl;

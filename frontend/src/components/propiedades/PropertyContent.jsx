@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { HiMiniSquare3Stack3D } from "react-icons/hi2";
-import { FaRestroom, FaBuilding, FaEuroSign, FaCalendarAlt, FaClock, FaHandshake, FaEnvelope, FaUser, FaTimes, FaMapMarkerAlt, FaChevronLeft, FaChevronRight, FaRuler, FaBed, FaBath } from "react-icons/fa";
+import { FaRestroom, FaBuilding, FaEuroSign, FaCalendarAlt, FaClock, FaHandshake, FaEnvelope, FaUser, FaTimes, FaMapMarkerAlt, FaChevronLeft, FaChevronRight, FaRuler, FaBed, FaBath, FaArrowLeft, FaRegHeart, FaHeart, FaShareAlt, FaWhatsapp, FaPrint, FaSpinner } from "react-icons/fa";
 import Link from "next/link";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -12,6 +12,8 @@ import { toast } from "react-hot-toast";
 import { sendPropertyEmail } from '@/services/api';
 import Head from "next/head";
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import Image from 'next/image';
+import CountryPrefix from "../CountryPrefix";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://goza-madrid.onrender.com';
 

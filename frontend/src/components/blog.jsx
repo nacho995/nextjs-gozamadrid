@@ -307,7 +307,39 @@ const BlogCard = ({ blog, index }) => {
   );
 };
 
-// Componente BlogHome
+/* Componente de datos estructurados separado para mayor seguridad */
+const BlogStructuredData = () => {
+  try {
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "Blog",
+      "name": "Blog de Goza Madrid",
+      "description": "Noticias y tendencias del mercado inmobiliario en Madrid",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Goza Madrid",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://realestategozamadrid.com/logo.png"
+        }
+      },
+      "blogPost": []
+    };
+
+    return (
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData)
+        }}
+      />
+    );
+  } catch (error) {
+    console.error("Error generando datos estructurados del blog:", error);
+    return null;
+  }
+};
+
 const BlogHome = (props) => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -458,59 +490,17 @@ const BlogHome = (props) => {
   }, []);
 
   return (
-    <>
+    <section className="bg-white py-8 lg:py-16 h-[100vh]">
       <Head>
-        <title>Blog de Goza Madrid | Noticias y Tendencias Inmobiliarias</title>
-        <meta 
-          name="description" 
-          content="Descubre las últimas noticias y tendencias del mercado inmobiliario en Madrid. Consejos de expertos, análisis del mercado y guías para inversores."
-        />
-        <meta 
-          name="keywords" 
-          content="blog inmobiliario, noticias inmobiliarias madrid, mercado inmobiliario, inversión inmobiliaria, propiedades madrid"
-        />
-        <meta property="og:type" content="blog" />
-        <meta property="og:title" content="Blog Inmobiliario Goza Madrid" />
-        <meta property="og:description" content="Noticias y análisis del mercado inmobiliario en Madrid" />
-        <meta property="og:image" content="/img/blog-banner.jpg" />
-        <link rel="canonical" href="https://realestategozamadrid.com/blog" />
+        <title>Blog Inmobiliario Goza Madrid</title>
+        <meta property="og:type" content="blog"/>
+        <meta property="og:title" content="Blog Inmobiliario Goza Madrid"/>
+        <meta property="og:description" content="Noticias y análisis del mercado inmobiliario en Madrid"/>
+        <meta property="og:image" content="/img/blog-banner.jpg"/>
+        <link rel="canonical" href="https://realestategozamadrid.com/blog"/>
         
-        {/* Schema.org markup para la página de blog */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Blog",
-            "name": "Blog de Goza Madrid",
-            "description": "Noticias y tendencias del mercado inmobiliario en Madrid",
-            "publisher": {
-              "@type": "Organization",
-              "name": "Goza Madrid",
-              "logo": {
-                "@type": "ImageObject",
-                "url": "https://realestategozamadrid.com/logo.png"
-              }
-            },
-            "blogPost": blogs.map(blog => {
-              const formattedDate = (() => {
-                try {
-                  const date = new Date(blog.date);
-                  return !isNaN(date.getTime()) ? date.toISOString() : null;
-                } catch {
-                  return null;
-                }
-              })();
-
-              return {
-                "@type": "BlogPosting",
-                "headline": typeof blog.title === 'object' ? blog.title.rendered : blog.title,
-                "image": typeof blog.image === 'string' ? blog.image : blog.image?.src,
-                ...(formattedDate && { "datePublished": formattedDate }),
-                "articleBody": truncateText(blog.description || blog.content),
-                "url": `https://realestategozamadrid.com/blog/${blog.slug || blog._id || blog.id}`
-              };
-            }).filter(post => post.headline) // Solo incluir posts con título válido
-          })}
-        </script>
+        {/* Reemplazamos el script inline por el componente seguro */}
+        <BlogStructuredData />
       </Head>
 
       {loading && <LoadingScreen />}
@@ -574,7 +564,7 @@ const BlogHome = (props) => {
           </div>
         </section>
       </AnimatedOnScroll>
-    </>
+    </section>
   );
 };
 

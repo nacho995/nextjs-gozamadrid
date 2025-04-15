@@ -37,7 +37,7 @@ export default async function handler(req, res) {
   }
   
   // URL base para WordPress
-  const wpUrl = process.env.NEXT_PUBLIC_WP_API_URL || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wp/v2';
+  const wpUrl = process.env.NEXT_PUBLIC_WP_API_URL || 'https://wordpress.realestategozamadrid.com/wp-json/wp/v2';
 
   console.log(`[proxy/blog-by-id] Procesando solicitud para ID: ${id}, Fuente: ${source || 'auto'}, Usando MongoDB: ${useMongoDb}`);
   console.log(`[proxy/blog-by-id] URLs configuradas: MongoDB=${mongoUrl}, WordPress=${wpUrl}`);

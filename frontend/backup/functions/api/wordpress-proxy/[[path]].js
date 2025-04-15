@@ -57,7 +57,7 @@ export async function onRequest(context) {
     const endpoint = searchParams.get('endpoint') || 'wp';
     const baseEndpointUrl = endpoint === 'wp' 
       ? wpApiUrl 
-      : `https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/${endpoint}/v2`;
+      : `https://wordpress.realestategozamadrid.com/wp-json/${endpoint}/v2`;
     
     // Copiar otros parámetros útiles
     for (const [key, value] of searchParams.entries()) {

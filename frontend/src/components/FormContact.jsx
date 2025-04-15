@@ -2,7 +2,7 @@
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { FaUser, FaEnvelope, FaPhone, FaComments, FaSpinner } from 'react-icons/fa';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 import Head from 'next/head';
 import CountryPrefix from "./CountryPrefix";
 import AnimatedOnScroll from "./AnimatedScroll";
@@ -75,28 +75,57 @@ const FormContact = () => {
     }
   };
 
-  // Datos estructurados para SEO
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "ContactPage",
-    "name": "Contacto - Goza Madrid",
-    "description": "Contacta con nuestro equipo de expertos inmobiliarios en Madrid. Estamos aquí para ayudarte con todas tus necesidades inmobiliarias.",
-    "url": "https://realestategozamadrid.com/contacto",
-    "mainEntity": {
-      "@type": "RealEstateAgent",
-      "name": "Goza Madrid",
-      "description": "Agencia inmobiliaria especializada en Madrid",
-      "areaServed": {
-        "@type": "City",
-        "name": "Madrid"
-      },
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "telephone": "+34919012103",
-        "contactType": "customer service",
-        "availableLanguage": ["Spanish", "English"],
-        "email": "info@gozamadrid.com"
-      }
+  // Componente de datos estructurados
+  const ContactStructuredData = () => {
+    try {
+      const structuredData = {
+        "@context": "https://schema.org",
+        "@type": "ContactPage",
+        "name": "Contacto - Goza Madrid",
+        "description": "Contacta con nuestro equipo de expertos inmobiliarios en Madrid",
+        "url": "https://realestategozamadrid.com/contacto",
+        "mainEntity": {
+          "@type": "RealEstateAgent",
+          "name": "Goza Madrid",
+          "description": "Agencia inmobiliaria especializada en Madrid",
+          "image": "https://realestategozamadrid.com/logo.png",
+          "url": "https://realestategozamadrid.com",
+          "areaServed": [
+            {
+              "@type": "City",
+              "name": "Madrid"
+            }
+          ],
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+34919012103",
+            "contactType": "customer service",
+            "email": "marta@gozamadrid.com",
+            "availableLanguage": [
+              {
+                "@type": "Language",
+                "name": "Spanish"
+              },
+              {
+                "@type": "Language",
+                "name": "English"
+              }
+            ]
+          }
+        }
+      };
+
+      return (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(structuredData)
+          }}
+        />
+      );
+    } catch (error) {
+      console.error("Error generando datos estructurados para contacto:", error);
+      return null;
     }
   };
 
@@ -111,9 +140,9 @@ const FormContact = () => {
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://realestategozamadrid.com/contacto" />
         <meta property="og:image" content="https://realestategozamadrid.com/og-image.jpg" />
-        <script type="application/ld+json">
-          {JSON.stringify(structuredData)}
-        </script>
+        
+        {/* Utilizamos el componente de datos estructurados */}
+        <ContactStructuredData />
       </Head>
 
       <AnimatedOnScroll>

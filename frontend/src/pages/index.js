@@ -1,6 +1,7 @@
 // src/pages/index.js
 import React from 'react';
 import Head from 'next/head';
+import { getCleanJsonLd } from "@/utils/structuredDataHelper";
 
 // Importación de componentes directamente en lugar de a través de HomeComponent
 import Eslogan from "../components/eslogan";
@@ -20,6 +21,101 @@ export default function Home() {
     backgroundAttachment: "fixed",
   };
 
+  // Datos para RealEstateAgent
+  const agentData = {
+    "@context": "https://schema.org",
+    "@type": "RealEstateAgent",
+    "name": "Goza Madrid",
+    "description": "Agencia inmobiliaria especializada en Madrid, ofreciendo servicios de compra, venta y alquiler de propiedades",
+    "url": "https://realestategozamadrid.com",
+    "logo": "https://realestategozamadrid.com/logo.png",
+    "image": "https://realestategozamadrid.com/og-image.jpg",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Nueva España",
+      "addressLocality": "Madrid",
+      "postalCode": "28009",
+      "addressCountry": "ES"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": "40.423399",
+      "longitude": "-3.676840"
+    },
+    "telephone": "+34 919 012 103",
+    "email": "marta@gozamadrid.com",
+    "sameAs": [
+      "https://www.facebook.com/GozaMadridAI",
+      "https://instagram.com/Gozamadrid54",
+      "https://x.com/Marta12857571",
+      "https://www.linkedin.com/in/marta-lópez-55516099/",
+      "https://www.youtube.com/@gozamadrid2410"
+    ]
+  };
+
+  // Datos para WebSite
+  const websiteData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Goza Madrid",
+    "url": "https://www.realestategozamadrid.com",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://www.realestategozamadrid.com/buscar?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  };
+
+  // Datos para RealEstateAgency
+  const agencyData = {
+    "@context": "https://schema.org",
+    "@type": "RealEstateAgency",
+    "name": "Goza Madrid",
+    "image": "https://realestategozamadrid.com/logo.png",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://realestategozamadrid.com/logo.png",
+      "width": 150,
+      "height": 65
+    },
+    "url": "https://realestategozamadrid.com",
+    "description": "Agencia inmobiliaria especializada en Madrid, ofreciendo servicios de compra, venta y alquiler de propiedades",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Nueva España",
+      "addressLocality": "Madrid",
+      "postalCode": "28009",
+      "addressCountry": "ES"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": "40.423399",
+      "longitude": "-3.676840"
+    },
+    "telephone": "+34 919 012 103",
+    "email": "marta@gozamadrid.com",
+    "sameAs": [
+      "https://www.facebook.com/GozaMadridAI",
+      "https://instagram.com/Gozamadrid54",
+      "https://x.com/Marta12857571",
+      "https://www.linkedin.com/in/marta-lópez-55516099/",
+      "https://www.youtube.com/@gozamadrid2410"
+    ],
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "opens": "09:00",
+        "closes": "18:00"
+      }
+    ]
+  };
+
+  // Convertir a JSON-LD limpio
+  const cleanAgentData = getCleanJsonLd(agentData);
+  const cleanWebsiteData = getCleanJsonLd(websiteData);
+  const cleanAgencyData = getCleanJsonLd(agencyData);
+
   return (
     <>
       <Head>
@@ -27,6 +123,24 @@ export default function Home() {
         <meta name="description" content="Expertos en servicios inmobiliarios de lujo en Madrid. Compra, venta y alquiler de propiedades exclusivas." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
+        
+        {/* Datos estructurados principales - RealEstateAgent */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: cleanAgentData }}
+        />
+        
+        {/* WebSite datos estructurados */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: cleanWebsiteData }}
+        />
+
+        {/* RealEstateAgency datos estructurados */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: cleanAgencyData }}
+        />
       </Head>
       
       <div className="">

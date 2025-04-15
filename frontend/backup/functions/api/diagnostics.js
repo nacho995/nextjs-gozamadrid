@@ -17,17 +17,17 @@ export async function onRequest(context) {
   const urlsToCheck = [
     {
       name: 'WordPress Posts',
-      url: 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wp/v2/posts',
+      url: 'https://wordpress.realestategozamadrid.com/wp-json/wp/v2/posts',
       auth: false
     },
     {
       name: 'WooCommerce Products', 
-      url: `https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3/products?consumer_key=${consumer_key}&consumer_secret=${consumer_secret}`,
+      url: `https://wordpress.realestategozamadrid.com/wp-json/wc/v3/products?consumer_key=${consumer_key}&consumer_secret=${consumer_secret}`,
       auth: true
     },
     {
       name: 'WordPress Site Info',
-      url: 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json',
+      url: 'https://wordpress.realestategozamadrid.com/wp-json',
       auth: false
     },
     {

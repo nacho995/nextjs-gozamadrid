@@ -6,9 +6,11 @@ export default function CookieConsent() {
   const [showBanner, setShowBanner] = useState(false);
 
   useEffect(() => {
-    // Verificar si ya se ha aceptado el consentimiento
+    // Verificar si ya se ha aceptado el consentimiento usando localStorage
+    const consentShown = localStorage.getItem('cookieConsentShown');
     const consent = getCookie(COOKIE_KEYS.COOKIE_CONSENT);
-    if (!consent) {
+    
+    if (!consent && !consentShown) {
       setShowBanner(true);
     }
   }, []);
@@ -19,6 +21,7 @@ export default function CookieConsent() {
       analytics: true,
       marketing: true
     });
+    localStorage.setItem('cookieConsentShown', 'true');
     setShowBanner(false);
   };
 
@@ -28,6 +31,7 @@ export default function CookieConsent() {
       analytics: false,
       marketing: false
     });
+    localStorage.setItem('cookieConsentShown', 'true');
     setShowBanner(false);
   };
 
@@ -37,6 +41,7 @@ export default function CookieConsent() {
       analytics: false,
       marketing: false
     });
+    localStorage.setItem('cookieConsentShown', 'true');
     setShowBanner(false);
   };
 

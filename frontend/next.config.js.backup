@@ -7,7 +7,7 @@ const nextConfig = {
       'images.weserv.nl',
       'api.realestategozamadrid.com',
       'realestategozamadrid.com',
-      'wordpress-1430059-5339263.cloudwaysapps.com',
+      'wordpress.realestategozamadrid.com',
       'res.cloudinary.com',
       'gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com'
     ],
@@ -32,7 +32,7 @@ const nextConfig = {
     VERCEL_ENV: process.env.VERCEL_ENV || 'development',
     NEXT_PUBLIC_WOO_COMMERCE_KEY: process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY || 'ck_d69e61427264a7beea70ca9ee543b45dd00cae85',
     NEXT_PUBLIC_WOO_COMMERCE_SECRET: process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET || 'cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e',
-    NEXT_PUBLIC_WC_API_URL: process.env.NEXT_PUBLIC_WC_API_URL || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3',
+    NEXT_PUBLIC_WC_API_URL: process.env.NEXT_PUBLIC_WC_API_URL || 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3',
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://realestategozamadrid.com'),
     MONGODB_URL: process.env.MONGODB_URL || '',
     API_BASE_URL: process.env.API_BASE_URL || ''
@@ -66,7 +66,7 @@ const nextConfig = {
       // Ruta específica para WooCommerce
       {
         source: '/api/woocommerce/:path*',
-        destination: `https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3/:path*?consumer_key=ck_d69e61427264a7beea70ca9ee543b45dd00cae85&consumer_secret=cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e`
+        destination: `https://wordpress.realestategozamadrid.com/wp-json/wc/v3/:path*?consumer_key=ck_d69e61427264a7beea70ca9ee543b45dd00cae85&consumer_secret=cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e`
       },
       // API Routes para propiedades - usar los endpoints internos
       {
@@ -84,7 +84,7 @@ const nextConfig = {
       // Proxy routes
       {
         source: '/api/proxy/woocommerce/:path*',
-        destination: `https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3/:path*?consumer_key=ck_d69e61427264a7beea70ca9ee543b45dd00cae85&consumer_secret=cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e`
+        destination: `https://wordpress.realestategozamadrid.com/wp-json/wc/v3/:path*?consumer_key=ck_d69e61427264a7beea70ca9ee543b45dd00cae85&consumer_secret=cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e`
       },
       // Fallbacks para manejo de errores
       {
@@ -100,6 +100,22 @@ const nextConfig = {
         source: '/:path*',
         headers: [
           {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=31536000; includeSubDomains'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY'
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block'
+          },
+          {
             key: 'Access-Control-Allow-Origin',
             value: '*'
           },
@@ -131,7 +147,24 @@ const nextConfig = {
         ]
       }
     ];
-  }
+  },
+  // Forzar HTTPS
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'header',
+            key: 'x-forwarded-proto',
+            value: 'http',
+          },
+        ],
+        permanent: true,
+        destination: 'https://:path*',
+      },
+    ];
+  },
 }
 
 module.exports = nextConfig;

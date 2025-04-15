@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 // Constantes y configuración base
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://realestategozamadrid.com';
 const MONGODB_URL = process.env.MONGODB_URL || '//api.realestategozamadrid.com';
-const WOOCOMMERCE_URL = process.env.NEXT_PUBLIC_WORDPRESS_URL || 'https://wordpress-1430059-5339263.cloudwaysapps.com';
+const WOOCOMMERCE_URL = process.env.NEXT_PUBLIC_WORDPRESS_URL || 'https://wordpress.realestategozamadrid.com';
 const CONSUMER_KEY = process.env.WC_CONSUMER_KEY || process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY;
 const CONSUMER_SECRET = process.env.WC_CONSUMER_SECRET || process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET;
 

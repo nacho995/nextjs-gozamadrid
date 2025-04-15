@@ -17,7 +17,14 @@ const SCHEMA_DATA = {
   "@context": "https://schema.org",
   "@type": "RealEstateAgency",
   "name": "Goza Madrid",
-  "image": "/logo.png",
+  "image": "https://realestategozamadrid.com/logo.png",
+  "logo": {
+    "@type": "ImageObject",
+    "url": "https://realestategozamadrid.com/logo.png",
+    "width": 150,
+    "height": 65
+  },
+  "url": "https://realestategozamadrid.com",
   "description": "Agencia inmobiliaria especializada en Madrid, ofreciendo servicios de compra, venta y alquiler de propiedades",
   "address": {
     "@type": "PostalAddress",
@@ -39,6 +46,20 @@ const SCHEMA_DATA = {
     "https://x.com/Marta12857571",
     "https://www.linkedin.com/in/marta-lópez-55516099/",
     "https://www.youtube.com/@gozamadrid2410"
+  ],
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "opens": "09:00",
+      "closes": "18:00"
+    }
   ]
 };
 
@@ -136,9 +157,12 @@ const Footer = () => {
   return (
     <>
       <Head>
-        <script type="application/ld+json">
-          {JSON.stringify(SCHEMA_DATA)}
-        </script>
+        <script 
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(SCHEMA_DATA)
+          }}
+        />
       </Head>
 
       <footer 

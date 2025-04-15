@@ -451,7 +451,7 @@ export default function PropertyDetail() {
       // Si es una propiedad de WooCommerce (o no se pudo determinar)
       try {
         // CORRECCIÓN: Usamos la URL directa a la API de WooCommerce para asegurar que todas las imágenes se obtienen
-        const wooUrl = `https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3/products/${id}?consumer_key=ck_d69e61427264a7beea70ca9ee543b45dd00cae85&consumer_secret=cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e`;
+        const wooUrl = `https://wordpress.realestategozamadrid.com/wp-json/wc/v3/products/${id}?consumer_key=ck_d69e61427264a7beea70ca9ee543b45dd00cae85&consumer_secret=cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e`;
         console.log(`[PropertyID] Obteniendo propiedad con ID ${id} directamente de WooCommerce`);
         
         const response = await fetch(wooUrl);

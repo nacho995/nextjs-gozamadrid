@@ -180,7 +180,20 @@ export default function Reforms() {
                 <meta property="og:type" content="website" />
                 <script
                     type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+                    dangerouslySetInnerHTML={{ 
+                        __html: (() => {
+                            try {
+                                return JSON.stringify(jsonLd);
+                            } catch (e) {
+                                console.error("Error serializando jsonLd:", e);
+                                return JSON.stringify({
+                                    "@context": "https://schema.org",
+                                    "@type": "HomeAndConstructionBusiness",
+                                    "name": "Reformas Sin Obras"
+                                });
+                            }
+                        })()
+                    }}
                 />
             </Head>
             

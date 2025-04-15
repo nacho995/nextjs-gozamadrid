@@ -35,7 +35,7 @@ export async function middleware(request) {
     if (pathname.startsWith('/api/proxy/woocommerce')) {
       try {
         // Usar las credenciales de la nueva configuración
-        const targetUrl = new URL('https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3' + pathname.replace('/api/proxy/woocommerce', ''));
+        const targetUrl = new URL('https://wordpress.realestategozamadrid.com/wp-json/wc/v3' + pathname.replace('/api/proxy/woocommerce', ''));
         
         // Añadir las credenciales de WooCommerce
         targetUrl.searchParams.append('consumer_key', wooConfig.WOO_COMMERCE_KEY);
@@ -58,7 +58,7 @@ export async function middleware(request) {
     
     // Para WordPress
     if (pathname.startsWith('/api/proxy/wordpress')) {
-      const targetUrl = new URL('https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wp/v2' + pathname.replace('/api/proxy/wordpress', ''));
+      const targetUrl = new URL('https://wordpress.realestategozamadrid.com/wp-json/wp/v2' + pathname.replace('/api/proxy/wordpress', ''));
       
       // Copiar los query params existentes
       const url = new URL(request.url);

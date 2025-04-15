@@ -1,13 +1,19 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Head from "next/head";
-import ExpRealty from "./eXpRealty";
-import ExpCountries from "./expCountries";
-import RegisterForm from "../FormContact";
-import ExpRealtyMore from "./ExpRealty2";
+import eXpRealty from "./eXpRealty.jsx";
+import MartaLopez from "./MartaLopez.jsx";
+import ExpCountries from "./expCountries.jsx";
+import ExpRealty2 from "./ExpRealty2.jsx";
+import FormContact from "../FormContact.jsx";
+import { getCleanJsonLd } from "@/utils/structuredDataHelper";
+import { agencyData } from "@/data/expRealtyStructuredData";
 
 export default function ExpPage() {
+    // Preparar datos estructurados limpios
+    const cleanAgencyData = getCleanJsonLd(agencyData);
+    
     return (
         <>
             <Head>
@@ -28,16 +34,36 @@ export default function ExpPage() {
                 <link rel="canonical" href="https://realestategozamadrid.com/exp" />
             </Head>
 
+            {/* Añadimos el div de fondo aquí directamente */}
+            <div
+                className="fixed inset-0 z-0 opacity-100"
+                style={{
+                    backgroundImage: "url('/exp.jpg')",
+                    backgroundAttachment: "fixed",
+                }}
+                aria-hidden="true"
+                role="presentation"
+            ></div>
+
+            <div className="background-glow"></div>
+
             <main 
-                className="m-0 p-0"
+                className="m-0 p-0 bg-transparent relative z-10"
                 itemScope 
                 itemType="https://schema.org/RealEstateAgent"
             >
                 <section 
+                    aria-label="Presentación de Marta López"
+                    itemProp="founder"
+                >
+                    <MartaLopez />
+                </section>
+
+                <section 
                     aria-label="Presentación eXp Realty"
                     itemProp="mainContentOfPage"
                 >
-                    <ExpRealty videoId="4NDjtS50SC4" title="eXp Realty Internacional" />
+                    <eXpRealty videoId="4NDjtS50SC4" title="eXp Realty Internacional" />
                 </section>
 
                 <section 
@@ -51,14 +77,14 @@ export default function ExpPage() {
                     aria-label="Formulario de Contacto"
                     itemProp="hasOfferCatalog"
                 >
-                    <RegisterForm />
+                    <FormContact />
                 </section>
 
                 <section 
                     aria-label="Más Información eXp Realty"
                     itemProp="description"
                 >
-                    <ExpRealtyMore 
+                    <ExpRealty2 
                         videoId2="X-fZBk5sDGQ" 
                         videoId="PYFThiRO9v8" 
                         title="Descubre eXp Realty" 
@@ -66,47 +92,10 @@ export default function ExpPage() {
                 </section>
 
                 {/* Schema.org structured data */}
-                <script type="application/ld+json" dangerouslySetInnerHTML={{
-                    __html: JSON.stringify({
-                        "@context": "https://schema.org",
-                        "@type": "RealEstateAgent",
-                        "name": "eXp Realty España",
-                        "description": "eXp Realty es una innovadora inmobiliaria internacional que revoluciona el sector inmobiliario con tecnología de vanguardia y un modelo de negocio único.",
-                        "image": "/exp-realty-banner.jpg",
-                        "url": "https://realestategozamadrid.com/exp",
-                        "areaServed": {
-                            "@type": "Country",
-                            "name": "España"
-                        },
-                        "hasOfferCatalog": {
-                            "@type": "OfferCatalog",
-                            "name": "Oportunidades Profesionales",
-                            "itemListElement": [
-                                {
-                                    "@type": "Offer",
-                                    "itemOffered": {
-                                        "@type": "Service",
-                                        "name": "Carrera Inmobiliaria",
-                                        "description": "Desarrollo profesional en el sector inmobiliario con tecnología innovadora"
-                                    }
-                                },
-                                {
-                                    "@type": "Offer",
-                                    "itemOffered": {
-                                        "@type": "Service",
-                                        "name": "Formación Continua",
-                                        "description": "Acceso a programas de formación y desarrollo profesional"
-                                    }
-                                }
-                            ]
-                        },
-                        "sameAs": [
-                            "https://www.facebook.com/eXpRealtySpain",
-                            "https://www.linkedin.com/company/exp-realty-spain",
-                            "https://www.instagram.com/exprealty_spain"
-                        ]
-                    })
-                }} />
+                <script 
+                    type="application/ld+json" 
+                    dangerouslySetInnerHTML={{ __html: cleanAgencyData }}
+                />
             </main>
         </>
     );
