@@ -455,19 +455,13 @@ export default function ExpRealtyMore({ videoId, videoId2, title }) {
                                     />
                                     
                                     <a 
-                                        href="/ModeloExpEspaña.pdf"
+                                        href="https://drive.google.com/file/d/1RlwMlfx3QQGthWpkmHgoec2rgD1JHw60/view?usp=drive_link"
                                         target="_blank"
-                                        rel="noopener noreferrer" 
-                                        className="group/link relative inline-flex items-center gap-2 overflow-hidden 
-                                            rounded-full bg-white/20 px-8 py-3 
-                                            transition-all duration-300 
-                                            hover:bg-white/30 
-                                            backdrop-blur-sm"
-                                        aria-label="Descargar PDF con el modelo de negocio de eXp Realty España"
-                                        data-testid="business-model-link"
+                                        rel="noopener noreferrer"
+                                        aria-label="Descarga nuestro modelo de negocio inmobiliario"
                                     >
                                         <span className="relative text-lg font-semibold text-white">
-                                            Ver nuestro modelo de negocio inmobiliario
+                                            Descarga nuestro Modelo
                                         </span>
                                         <span className="absolute bottom-0 left-0 h-1 w-full transform 
                                             bg-gradient-to-r from-blue-400 via-white to-blue-400 
