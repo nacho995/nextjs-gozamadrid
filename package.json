@@ -57,15 +57,15 @@
     "react-refresh": "^0.14.0"
   },
   "resolutions": {
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
     "@react-three/fiber": "8.15.19",
     "postcss": "^8.4.31",
     "@babel/runtime": "^7.26.10"
   },
   "overrides": {
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
     "glob": "^10.3.10",
     "postcss": "latest",
     "@babel/runtime": "^7.26.10"
