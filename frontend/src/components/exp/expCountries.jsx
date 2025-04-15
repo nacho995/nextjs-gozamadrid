@@ -13,17 +13,17 @@ export default function ExpCountries() {
         "@type": "RealEstateAgency",
         "name": "eXp Realty Internacional",
         "description": "eXp Realty con presencia en España (Madrid, Andalucía, Cataluña, Valencia) y otros mercados internacionales como México, Portugal, Miami y Dubai.",
-        "url": "https://www.realestategozamadrid.com/exp-international",
+        "url": "https://www.gozamadrid.com/exp-international",
         "areaServed": [
             { "@type": "Country", "name": "España" },
-            { "@type": "Place", "name": "Madrid, España" },
-            { "@type": "Place", "name": "Andalucía, España" },
-            { "@type": "Place", "name": "Cataluña, España" },
-            { "@type": "Place", "name": "Valencia, España" },
+            { "@type": "City", "name": "Madrid", "addressCountry": "ES" },
+            { "@type": "AdministrativeArea", "name": "Andalucía", "addressCountry": "ES" },
+            { "@type": "AdministrativeArea", "name": "Cataluña", "addressCountry": "ES" },
+            { "@type": "AdministrativeArea", "name": "Valencia", "addressCountry": "ES" },
             { "@type": "Country", "name": "México" },
             { "@type": "Country", "name": "Portugal" },
-            { "@type": "Place", "name": "Miami, Estados Unidos" },
-            { "@type": "Place", "name": "Dubai, Emiratos Árabes Unidos" }
+            { "@type": "City", "name": "Miami", "addressCountry": "US" },
+            { "@type": "City", "name": "Dubai", "addressCountry": "AE" }
         ],
         "makesOffer": {
             "@type": "Offer",
@@ -129,15 +129,28 @@ export default function ExpCountries() {
                 <title>Propiedades Internacionales eXp Realty | España, México, Portugal, Miami, Dubai</title>
                 <meta name="description" content="Descubre nuestras propiedades inmobiliarias internacionales en España (Madrid, Andalucía, Cataluña, Valencia), México, Portugal, Miami y Dubai. Inversión global con eXp Realty." />
                 <meta name="keywords" content="propiedades internacionales, eXp Realty global, inmobiliaria españa internacional, propiedades méxico, propiedades portugal, propiedades miami, propiedades dubai" />
-                <link rel="canonical" href="https://www.realestategozamadrid.com/exp-international" />
+                <link rel="canonical" href="https://www.gozamadrid.com/exp-international" />
                 <meta property="og:title" content="Propiedades Internacionales eXp Realty | Inversión Global" />
                 <meta property="og:description" content="Explore nuestro portafolio internacional de propiedades en España, México, Portugal, Miami y Dubai. Servicios inmobiliarios globales con eXp Realty." />
-                <meta property="og:url" content="https://www.realestategozamadrid.com/exp-international" />
+                <meta property="og:url" content="https://www.gozamadrid.com/exp-international" />
                 <meta property="og:type" content="website" />
-                <meta property="og:image" content="https://www.realestategozamadrid.com/exp-global.jpg" />
+                <meta property="og:image" content="https://www.gozamadrid.com/exp-global.jpg" />
                 <script
                     type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+                    dangerouslySetInnerHTML={{ 
+                        __html: (() => {
+                            try {
+                                return JSON.stringify(jsonLd);
+                            } catch (e) {
+                                console.error("Error serializando jsonLd:", e);
+                                return JSON.stringify({
+                                    "@context": "https://schema.org",
+                                    "@type": "RealEstateAgency",
+                                    "name": "eXp Realty Internacional"
+                                });
+                            }
+                        })()
+                    }}
                 />
             </Head>
             

@@ -2,6 +2,56 @@ import React, { useState, useEffect, useRef } from 'react';
 import { FaChevronDown, FaSearch } from 'react-icons/fa';
 import Head from 'next/head';
 
+// Componente para datos estructurados de la aplicación de prefijos
+const CountryPrefixStructuredData = ({ countries }) => {
+  try {
+    // Seleccionamos solo los países más relevantes para el mercado español
+    // para evitar un JSON-LD demasiado grande
+    const relevantCountries = countries.filter(country => 
+      ['ES', 'US', 'FR', 'GB', 'DE', 'IT', 'PT', 'MX', 'AR', 'CO'].includes(country.code)
+    );
+    
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Selector de Prefijo Telefónico Internacional",
+      "applicationCategory": "BusinessApplication",
+      "description": "Selector de prefijos telefónicos internacionales para comunicación global",
+      "offers": {
+        "@type": "Offer",
+        "price": 0,
+        "priceCurrency": "EUR"
+      },
+      "operatingSystem": "Web",
+      "softwareVersion": "1.0",
+      "url": "https://realestategozamadrid.com/contacto",
+      "provider": {
+        "@type": "Organization",
+        "name": "Goza Madrid",
+        "url": "https://realestategozamadrid.com"
+      },
+      "applicationSubCategory": "CommunicationApplication",
+      "countriesSupported": relevantCountries.map(country => ({
+        "@type": "Country",
+        "name": country.name,
+        "identifier": country.code
+      }))
+    };
+
+    return (
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData)
+        }}
+      />
+    );
+  } catch (error) {
+    console.error("Error generando datos estructurados para prefijos telefónicos:", error);
+    return null;
+  }
+};
+
 // Lista completa de países con sus prefijos y metadatos
 const COUNTRIES = [
   { code: 'ES', name: 'España', prefix: '+34', continent: 'Europa', language: 'es-ES' },
@@ -124,20 +174,7 @@ const CountryPrefix = ({ value, onChange, className, id = 'country-prefix' }) =>
   return (
     <>
       <Head>
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebApplication",
-            "name": "Selector de Prefijo Telefónico Internacional",
-            "applicationCategory": "BusinessApplication",
-            "countriesSupported": COUNTRIES.map(country => ({
-              "@type": "Country",
-              "name": country.name,
-              "telephone": country.prefix,
-              "identifier": country.code
-            }))
-          })}
-        </script>
+        <CountryPrefixStructuredData countries={COUNTRIES} />
       </Head>
 
       <div 

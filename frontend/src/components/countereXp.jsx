@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import AnimatedOnScroll from "./AnimatedScroll";
 import Head from "next/head";
+import { getCleanJsonLd } from "@/utils/structuredDataHelper";
 
 const CounterExp = () => {
     const [count, setCount] = useState(0);
@@ -12,6 +13,66 @@ const CounterExp = () => {
     const incrementTimeCountry = 100;
     const observerRef = useRef(null);
     const [isVisible, setIsVisible] = useState(false);
+
+    // Datos organizacionales para eXp Realty
+    const organizationData = {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "eXp Realty",
+        "description": "Red global de agentes inmobiliarios con presencia en 25 países",
+        "url": "https://realestategozamadrid.com/exp-realty",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://realestategozamadrid.com/logo.png",
+            "width": 180,
+            "height": 60
+        },
+        "numberOfEmployees": {
+            "@type": "QuantitativeValue",
+            "value": 95000,
+            "unitText": "agentes"
+        },
+        "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "ES",
+            "addressLocality": "Madrid"
+        },
+        "areaServed": [
+            {
+                "@type": "Country",
+                "name": "España"
+            },
+            {
+                "@type": "Country",
+                "name": "Estados Unidos"
+            },
+            {
+                "@type": "Country",
+                "name": "Portugal"
+            },
+            {
+                "@type": "Country",
+                "name": "Francia"
+            },
+            {
+                "@type": "Country",
+                "name": "Italia"
+            }
+        ],
+        "parentOrganization": {
+            "@type": "Organization",
+            "name": "eXp World Holdings",
+            "url": "https://expworldholdings.com"
+        },
+        "subOrganization": {
+            "@type": "Organization",
+            "name": "Goza Madrid",
+            "url": "https://realestategozamadrid.com"
+        }
+    };
+
+    // Generar JSON-LD limpio
+    const cleanOrgData = getCleanJsonLd(organizationData);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -80,32 +141,11 @@ const CounterExp = () => {
                 <meta property="og:description" content="Red global de más de 95,000 agentes inmobiliarios en 25 países. Únete a la revolución del sector inmobiliario." />
                 <link rel="canonical" href="https://realestategozamadrid.com/exp-realty" />
 
-                {/* Schema.org markup para organización */}
-                <script type="application/ld+json">
-                    {JSON.stringify({
-                        "@context": "https://schema.org",
-                        "@type": "Organization",
-                        "name": "eXp Realty",
-                        "description": "Red global de agentes inmobiliarios con presencia en 25 países",
-                        "numberOfEmployees": {
-                            "@type": "QuantitativeValue",
-                            "value": targetCount,
-                            "unitText": "agentes"
-                        },
-                        "areaServed": {
-                            "@type": "GeoCircle",
-                            "geoMidpoint": {
-                                "@type": "GeoCoordinates",
-                                "description": `Presente en ${targetCountCountry} países globalmente`
-                            }
-                        },
-                        "memberOf": {
-                            "@type": "Organization",
-                            "name": "Goza Madrid",
-                            "url": "https://realestategozamadrid.com"
-                        }
-                    })}
-                </script>
+                {/* Schema.org markup para organización usando getCleanJsonLd */}
+                <script 
+                    type="application/ld+json" 
+                    dangerouslySetInnerHTML={{ __html: cleanOrgData }} 
+                />
             </Head>
 
             <AnimatedOnScroll>

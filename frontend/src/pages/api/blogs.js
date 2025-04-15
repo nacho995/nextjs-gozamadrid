@@ -25,7 +25,7 @@ export default async function handler(req, res) {
 
   try {
     // URL de la API de WordPress
-    const wpUrl = 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wp/v2/posts';
+    const wpUrl = 'https://wordpress.realestategozamadrid.com/wp-json/wp/v2/posts';
     
     // Parámetros de consulta
     const { limit = 10, page = 1, search } = req.query;

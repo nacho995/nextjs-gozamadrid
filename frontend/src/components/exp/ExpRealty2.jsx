@@ -5,6 +5,99 @@ import Link from "next/link";
 import AnimatedOnScroll from "../AnimatedScroll";
 import Head from "next/head";
 
+// Componentes para datos estructurados
+const AgencyStructuredData = () => {
+  try {
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": "RealEstateAgency",
+      "name": "eXp Realty España",
+      "description": "eXp Realty es una inmobiliaria digital líder mundial con más de 90.000 agentes en todo el mundo.",
+      "url": "https://www.gozamadrid.com/exp-realty",
+      "image": "https://www.gozamadrid.com/exprealty.png",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.gozamadrid.com/exprealty.png",
+        "width": 180,
+        "height": 60
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "ES",
+        "addressLocality": "Madrid"
+      },
+      "telephone": "+34 919 012 103",
+      "email": "marta@gozamadrid.com",
+      "slogan": "Propiedades Sin Fronteras",
+      "parentOrganization": {
+        "@type": "Organization",
+        "name": "eXp World Holdings",
+        "url": "https://expworldholdings.com"
+      }
+    };
+
+    return (
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd)
+        }}
+      />
+    );
+  } catch (error) {
+    console.error("Error generando datos estructurados para la agencia:", error);
+    return null;
+  }
+};
+
+const VideoStructuredData = ({ videoId, name, description, uploadDate, duration }) => {
+  try {
+    const videoSchema = {
+      "@context": "https://schema.org",
+      "@type": "VideoObject",
+      "name": name,
+      "description": description,
+      "uploadDate": uploadDate,
+      "thumbnailUrl": `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+      "contentUrl": `https://www.youtube.com/watch?v=${videoId}`,
+      "embedUrl": `https://www.youtube.com/embed/${videoId}`,
+      "duration": duration,
+      "regionsAllowed": "ES",
+      "interactionStatistic": {
+        "@type": "InteractionCounter",
+        "interactionType": {"@type": "WatchAction"},
+        "userInteractionCount": 1000
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "eXp Realty España",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://www.gozamadrid.com/logo.png",
+          "width": 600,
+          "height": 60
+        }
+      },
+      "potentialAction": {
+        "@type": "WatchAction",
+        "target": `https://www.youtube.com/watch?v=${videoId}`
+      }
+    };
+
+    return (
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(videoSchema)
+        }}
+      />
+    );
+  } catch (error) {
+    console.error("Error generando datos estructurados para el video:", error);
+    return null;
+  }
+};
+
 export default function ExpRealtyMore({ videoId, videoId2, title }) {
     const iframeRef = useRef(null);
     const iframeRef2 = useRef(null);
@@ -21,29 +114,28 @@ export default function ExpRealtyMore({ videoId, videoId2, title }) {
         setIsPlaying2(true);
     };
 
-    // Schema.org structured data for real estate agency
-    const jsonLd = {
-        "@context": "https://schema.org",
-        "@type": "RealEstateAgency",
-        "name": "eXp Realty España",
-        "description": "eXp Realty es una inmobiliaria digital líder mundial con más de 90.000 agentes en todo el mundo.",
-        "image": "/exprealty.png",
-        "address": {
-            "@type": "PostalAddress",
-            "addressCountry": "España"
-        },
-        "slogan": "Propiedades Sin Fronteras"
-    };
-
     return (
         <>
             <Head>
                 <title>eXp Realty España - Inmobiliaria Digital Global</title>
                 <meta name="description" content="eXp Realty España: inmobiliaria digital global con más de 90.000 agentes. Promocionamos propiedades internacionalmente con tecnologías avanzadas y un modelo de negocio basado en la nube." />
                 <meta name="keywords" content="eXp realty, inmobiliaria digital, agentes inmobiliarios madrid, propiedades internacionales, compra venta inmuebles, sector inmobiliario españa" />
-                <script
-                    type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+                
+                {/* Datos estructurados */}
+                <AgencyStructuredData />
+                <VideoStructuredData 
+                  videoId={videoId}
+                  name="eXp Realty Internacional - Propiedades Sin Fronteras"
+                  description="Descubre cómo eXp Realty conecta propiedades más allá de las fronteras, llegando a clientes en mercados clave como México, Estados Unidos, Portugal, Dubái y más."
+                  uploadDate="2023-10-01"
+                  duration="PT3M15S"
+                />
+                <VideoStructuredData 
+                  videoId={videoId2}
+                  name="Comunidad Global de Agentes eXp Realty"
+                  description="Únete a nuestra comunidad de más de 85K agentes inmobiliarios y trabaja con lo último de nuestras tecnologías y nuestro modelo de negocio basado en la nube."
+                  uploadDate="2023-10-15"
+                  duration="PT2M45S"
                 />
             </Head>
 

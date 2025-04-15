@@ -1,9 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import AnimatedOnScroll from "../AnimatedScroll";
 import Head from "next/head";
+import { getCleanJsonLd } from "@/utils/structuredDataHelper";
+import { organizationData, videoData } from "@/data/expRealtyStructuredData";
 
 export default function ExpRealty({ videoId, title }) {
     const iframeRef = useRef(null);
@@ -14,11 +17,33 @@ export default function ExpRealty({ videoId, title }) {
         setIsPlaying(true);
     };
 
+    // Preparar datos estructurados limpios
+    const customizedVideoData = {
+        ...videoData,
+        embedUrl: `https://www.youtube.com/embed/${videoId}`,
+        contentUrl: `https://www.youtube.com/watch?v=${videoId}`,
+        thumbnailUrl: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+    };
+    
+    // Convertir a JSON-LD limpio
+    const cleanOrgData = getCleanJsonLd(organizationData);
+    const cleanVideoData = getCleanJsonLd(customizedVideoData);
+
     return (
         <section className="exp-realty-section" aria-label="eXp Realty - Inmobiliaria Digital Internacional">
+            {/* Datos estructurados - Usando JSON-LD directo sin entidades HTML */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: cleanOrgData }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: cleanVideoData }}
+            />
+            
             {/* Fondo absoluto con gradiente y opacidad */}
             <div
-                className="fixed inset-0 z-0 opacity-100"
+                className="fixed inset-0 -z-10 opacity-100"
                 style={{
                     backgroundImage: "url('/exp.jpg')",
                     backgroundAttachment: "fixed",
@@ -29,29 +54,7 @@ export default function ExpRealty({ videoId, title }) {
 
             <AnimatedOnScroll>
                 <header className="mx-0 text-transparent bg-clip-text">
-                    <h1 className="italic text-6xl md:text-7xl lg:text-8xl font-bold 
-                        text-gold
-                        text-center p-18
-                        hover:scale-105 
-                        transition-all duration-500
-                        drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)]
-                        relative
-                        group"
-                    >
-                        <span className="text-gold dark:text-gold
-                            hover:text-blue-900 dark:hover:text-blue-900
-                            transition-all duration-500"
-                        >
-                            La Inmobiliaria Digital
-                        </span>
-                        <br />
-                        <span className="text-gold dark:text-gold
-                            hover:text-black dark:hover:text-black
-                            transition-all duration-500"
-                        >
-                            Nº1 en el Mundo
-                        </span>
-                    </h1>
+                   
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-0 mt-0 min-h-[40vh] md:min-h-[60vh]">
                         <article className="relative flex items-center justify-start h-full w-full overflow-hidden">
                             <div className="pb-10 bg-gradient-to-tr from-blue-950/60 via-black/40 to-blue-800/50
@@ -383,28 +386,6 @@ export default function ExpRealty({ videoId, title }) {
                     </div>
                 </section>
             </AnimatedOnScroll>
-            
-            {/* Schema.org structured data for Real Estate Agency */}
-            <script type="application/ld+json" dangerouslySetInnerHTML={{
-                __html: JSON.stringify({
-                    "@context": "https://schema.org",
-                    "@type": "RealEstateAgent",
-                    "name": "eXp Realty",
-                    "description": "La inmobiliaria digital número 1 en el mundo con presencia en más de 25 países",
-                    "image": "/exp.jpg",
-                    "url": "https://expglobalspain.com/",
-                    "telephone": "+34900000000",
-                    "address": {
-                        "@type": "PostalAddress",
-                        "addressCountry": "España"
-                    },
-                    "sameAs": [
-                        "https://www.facebook.com/eXpRealtySpain",
-                        "https://www.instagram.com/exprealty_spain/",
-                        "https://www.linkedin.com/company/exp-realty-spain/"
-                    ]
-                })
-            }} />
         </section>
     );
 }

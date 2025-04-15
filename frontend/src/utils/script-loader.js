@@ -42,8 +42,8 @@
         // URLs base para las APIs
         API_URL: "https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api",
         API_BASE_URL: "https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api",
-        WP_API_URL: "https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wp/v2",
-        WC_API_URL: "https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3",
+        WP_API_URL: "https://wordpress.realestategozamadrid.com/wp-json/wp/v2",
+        WC_API_URL: "https://wordpress.realestategozamadrid.com/wp-json/wc/v3",
         
         // Credenciales para WooCommerce
         WC_CONSUMER_KEY: "ck_d69e61427264a7beea70ca9ee543b45dd00cae85",
@@ -51,8 +51,8 @@
         
         // URLs para servicios
         MONGODB_SERVICE_URL: "https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api",
-        WORDPRESS_SERVICE_URL: "https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wp/v2",
-        WOOCOMMERCE_SERVICE_URL: "https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3",
+        WORDPRESS_SERVICE_URL: "https://wordpress.realestategozamadrid.com/wp-json/wp/v2",
+        WOOCOMMERCE_SERVICE_URL: "https://wordpress.realestategozamadrid.com/wp-json/wc/v3",
         
         // Configuración del sitio
         SITE_URL: window.location.origin,

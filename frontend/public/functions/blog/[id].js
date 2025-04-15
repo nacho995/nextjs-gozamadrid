@@ -74,7 +74,7 @@ export async function onRequest(context) {
     if (blogId.startsWith('wp-')) {
       // Es un ID de WordPress
       const wpId = blogId.substring(3); // Quitar el prefijo "wp-"
-      const wpApiUrl = env.WP_API_URL || config.WP_API_URL || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wp/v2';
+      const wpApiUrl = env.WP_API_URL || config.WP_API_URL || 'https://wordpress.realestategozamadrid.com/wp-json/wp/v2';
       const wpUrl = `${wpApiUrl}/posts/${wpId}?_embed=true`;
       
       try {

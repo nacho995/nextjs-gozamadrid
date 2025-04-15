@@ -2,6 +2,101 @@ import AnimatedOnScroll from "./AnimatedScroll";
 import Head from 'next/head';
 import Image from 'next/image';
 
+// Componente para datos estructurados de la organización
+const OrganizationStructuredData = () => {
+  try {
+    const organizationData = {
+      "@context": "https://schema.org",
+      "@type": "RealEstateAgency",
+      "name": "Goza Madrid",
+      "image": "https://realestategozamadrid.com/logo.png",
+      "url": "https://realestategozamadrid.com",
+      "description": "Agencia inmobiliaria especializada en Madrid, ofreciendo servicios de compra, venta y alquiler de propiedades",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Nueva España",
+        "addressLocality": "Madrid",
+        "postalCode": "28009",
+        "addressCountry": "ES"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "40.423399",
+        "longitude": "-3.676840"
+      },
+      "telephone": "+34 919 012 103",
+      "email": "marta@gozamadrid.com",
+      "sameAs": [
+        "https://www.facebook.com/GozaMadridAI",
+        "https://instagram.com/Gozamadrid54",
+        "https://x.com/Marta12857571",
+        "https://www.linkedin.com/in/marta-lópez-55516099/",
+        "https://www.youtube.com/@gozamadrid2410"
+      ]
+    };
+
+    return (
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(organizationData)
+        }}
+      />
+    );
+  } catch (error) {
+    console.error("Error generando datos estructurados para la organización:", error);
+    return null;
+  }
+};
+
+// Componente para datos estructurados de la red de colaboradores
+const PartnersStructuredData = ({ partners }) => {
+  try {
+    // Limitamos la cantidad de partners para evitar un JSON-LD demasiado grande
+    const limitedPartners = partners.slice(0, 5);
+    
+    const partnersData = {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "GozaMadrid - Acuerdos y Convenios",
+      "description": "Red de colaboradores estratégicos en el sector inmobiliario y servicios relacionados",
+      "url": "https://realestategozamadrid.com/acuerdos",
+      "image": "https://realestategozamadrid.com/acuerdosyconvenios.jpg",
+      "member": limitedPartners.map(partner => ({
+        "@type": "Organization",
+        "name": partner.name,
+        "image": `https://realestategozamadrid.com${partner.logo}`,
+        "description": partner.description
+      })),
+      "areaServed": [
+        {
+          "@type": "City",
+          "name": "Madrid"
+        }
+      ],
+      "knowsAbout": [
+        "Servicios inmobiliarios",
+        "Hipotecas",
+        "Reformas",
+        "Eficiencia energética",
+        "Garantía de alquiler"
+      ]
+    };
+
+    return (
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(partnersData)
+        }}
+      />
+    );
+  } catch (error) {
+    console.error("Error generando datos estructurados para colaboradores:", error);
+    return null;
+  }
+};
+
 export default function Agreements() {
     const partners = [
         {
@@ -92,6 +187,10 @@ export default function Agreements() {
                 <meta property="og:description" content="Alianzas estratégicas con las mejores empresas del sector inmobiliario y servicios relacionados." />
                 <meta property="og:image" content="/acuerdosyconvenios.jpg" />
                 <link rel="canonical" href="https://realestategozamadrid.com/acuerdos" />
+
+                {/* Datos estructurados */}
+                <OrganizationStructuredData />
+                <PartnersStructuredData partners={partners} />
             </Head>
 
             <AnimatedOnScroll>
@@ -165,36 +264,6 @@ export default function Agreements() {
                     </section>
                 </div>
             </AnimatedOnScroll>
-
-            {/* Schema.org structured data */}
-            <script type="application/ld+json" dangerouslySetInnerHTML={{
-                __html: JSON.stringify({
-                    "@context": "https://schema.org",
-                    "@type": "Organization",
-                    "name": "GozaMadrid - Acuerdos y Convenios",
-                    "description": "Red de colaboradores estratégicos en el sector inmobiliario y servicios relacionados",
-                    "image": "/acuerdosyconvenios.jpg",
-                    "member": partners.map(partner => ({
-                        "@type": "Organization",
-                        "name": partner.name,
-                        "image": partner.logo,
-                        "description": partner.description
-                    })),
-                    "areaServed": {
-                        "@type": "City",
-                        "name": "Madrid"
-                    },
-                    "knowsAbout": [
-                        "Servicios inmobiliarios",
-                        "Hipotecas",
-                        "Reformas",
-                        "Eficiencia energética",
-                        "Garantía de alquiler",
-                        "Gestión administrativa",
-                        "Organización profesional"
-                    ]
-                })
-            }} />
         </main>
     );
 }

@@ -8,7 +8,7 @@ const isVercel = process.env.VERCEL === '1';
 const isDevelopment = process.env.NODE_ENV === 'development';
 
 // Configuración de URLs
-const WC_API_URL = process.env.NEXT_PUBLIC_WC_API_URL || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3';
+const WC_API_URL = process.env.NEXT_PUBLIC_WC_API_URL || 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3';
 
 // Credenciales
 const WOO_COMMERCE_KEY = process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY || 'ck_d69e61427264a7beea70ca9ee543b45dd00cae85';
@@ -110,11 +110,11 @@ const config = {
   getWooCommerceApiUrl: () => {
     if (typeof WC_API_URL !== 'string') {
       console.warn('[WooConfig] WC_API_URL no es una cadena válida:', WC_API_URL);
-      return 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3';
+      return 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3';
     }
     
     const parts = safeSplit(WC_API_URL, '?');
-    return parts[0] || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wc/v3';
+    return parts[0] || 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3';
   }
 };
 
