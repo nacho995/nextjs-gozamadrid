@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-// Configuración de WooCommerce
-const WC_API_URL = process.env.NEXT_PUBLIC_WC_API_URL || 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3';
-const WC_KEY = process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY || 'ck_d69e61427264a7beea70ca9ee543b45dd00cae85';
-const WC_SECRET = process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET || 'cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e';
+// Configuración de WooCommerce - USAR VARIABLES DE SERVIDOR Y SIN DEFAULTS INSEGUROS
+const WC_API_URL = process.env.WC_API_URL || process.env.NEXT_PUBLIC_WC_API_URL; // Permitir fallback temporal si NEXT_PUBLIC_WC_API_URL está definida
+const WC_KEY = process.env.WC_CONSUMER_KEY;
+const WC_SECRET = process.env.WC_CONSUMER_SECRET;
 const TIMEOUT = parseInt(process.env.NEXT_PUBLIC_API_TIMEOUT || '15000');
 
 // Funciones auxiliares
@@ -74,6 +74,16 @@ export default async function handler(req, res) {
 
   console.log(`[API WooCommerce] Solicitando lista de propiedades. Página: ${page}, Límite: ${limit}`);
   console.log(`[API WooCommerce] URL base: ${WC_API_URL}`);
+
+  // Validar que las claves API están presentes
+  if (!WC_KEY || !WC_SECRET) {
+    console.error('[API WooCommerce] Error: Las variables de entorno WC_CONSUMER_KEY y/o WC_CONSUMER_SECRET no están configuradas en el servidor.');
+    return res.status(500).json({ error: 'Error de configuración interna del servidor.' });
+  }
+  if (!WC_API_URL) {
+      console.error('[API WooCommerce] Error: La variable de entorno WC_API_URL no está configurada.');
+      return res.status(500).json({ error: 'Error de configuración interna del servidor (URL API).' });
+  }
 
   try {
     // Intentar obtener propiedades de WooCommerce
