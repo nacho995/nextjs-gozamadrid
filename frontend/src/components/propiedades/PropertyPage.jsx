@@ -480,76 +480,6 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-// Actualizar la función fetchWooCommerce para usar las rutas de API verificadas
-const fetchWooCommerce = async (attempts = 0) => {
-  const maxAttempts = 3;
-  const timeout = 30000; // 30 segundos de timeout
-  
-  try {
-    // URL de la API de WooCommerce
-    const wooCommerceApiUrl = 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3/products';
-    const consumerKey = 'ck_d69e61427264a7beea70ca9ee543b45dd00cae85';
-    const consumerSecret = 'cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e';
-    
-    try {
-      // Intentar primero con el endpoint de proxy específico para WooCommerce - más confiable
-      const proxyResponse = await axios.get('/api/proxy/woocommerce/products', {
-        timeout: timeout,
-        params: {
-          per_page: 100
-        }
-      });
-      
-      if (Array.isArray(proxyResponse.data) && proxyResponse.data.length > 0) {
-        console.log(`[PropertyPage] Se obtuvieron ${proxyResponse.data.length} propiedades de WooCommerce`);
-        return proxyResponse.data.map(property => ({
-          ...property,
-          source: 'woocommerce'
-        }));
-      }
-    } catch (proxyError) {
-      console.error('[PropertyPage] Error en proxy WooCommerce:', proxyError.message);
-      
-      // Intentar la conexión directa como respaldo
-      try {
-        const directResponse = await axios.get(
-          `${wooCommerceApiUrl}?consumer_key=${consumerKey}&consumer_secret=${consumerSecret}&per_page=100`, {
-            timeout: timeout,
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            }
-          }
-        );
-        
-        if (Array.isArray(directResponse.data) && directResponse.data.length > 0) {
-          console.log(`[PropertyPage] Se obtuvieron ${directResponse.data.length} propiedades directamente`);
-          return directResponse.data.map(property => ({
-            ...property,
-            source: 'woocommerce'
-          }));
-        }
-      } catch (directError) {
-        console.error('[PropertyPage] Error con la API directa de WooCommerce:', directError.message);
-      }
-    }
-    
-    // Si todo falló y aún tenemos intentos
-    if (attempts < maxAttempts - 1) {
-      console.log(`[PropertyPage] Reintentando conexión a WooCommerce (intento ${attempts + 2}/${maxAttempts})`);
-      await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, attempts)));
-      return fetchWooCommerce(attempts + 1);
-    }
-    
-    console.error('[PropertyPage] Todos los intentos de conexión a WooCommerce fallaron');
-    return [];
-    
-  } catch (error) {
-    console.error('[PropertyPage] Error general en fetchWooCommerce:', error.message);
-    return [];
-  }
-};
-
 // Actualizar la función fetchPropertiesFromAPI para usar las rutas verificadas
 const fetchPropertiesFromAPI = async () => {
   try {
@@ -706,73 +636,57 @@ export default function PropertyPage() {
     const fetchAllProperties = async () => {
       setLoading(true);
       setError(null); // Resetear error al inicio
-      
-      // Iniciar ambas peticiones en paralelo para mejorar el rendimiento
-      const [mongoDbPromise, wooPromise] = [
-        fetchPropertiesFromAPI().catch(err => {
-          console.error('[PropertyPage] Error al cargar propiedades de MongoDB:', err);
-          return [];
-        }),
-        fetchWooCommerce().catch(err => {
-          console.error('[PropertyPage] Error al cargar propiedades de WooCommerce:', err);
-          return [];
-        })
-      ];
-      
-      // Esperar a que las dos promesas se resuelvan
-      const [apiProperties, wooCommerceProperties] = await Promise.all([mongoDbPromise, wooPromise]);
-      
-      // Combinar todas las propiedades disponibles
-      const allProperties = [...apiProperties, ...wooCommerceProperties];
-      
-      if (allProperties.length > 0) {
-        setProperties(allProperties);
-        setTotalPages(Math.ceil(allProperties.length / ITEMS_PER_PAGE) || 1);
-        setError(null);
-      } else {
-        console.error('[PropertyPage] No se pudieron cargar propiedades de ninguna fuente');
-        setError('No se pudieron cargar propiedades. Intentando con fuentes alternativas...');
+
+      try {
+        // SOLO LLAMAR A LAS RUTAS API DEL BACKEND
+        // El backend se encargará de llamar a MongoDB y WooCommerce
+        const [mongoResponse, wooResponse] = await Promise.allSettled([
+          axios.get('/api/properties/sources/mongodb').catch(err => {
+             console.error('[PropertyPage] Error API MongoDB:', err.response?.data || err.message);
+             return { data: [] }; // Devolver array vacío en caso de error
+          }),
+          axios.get('/api/properties/sources/woocommerce').catch(err => {
+             console.error('[PropertyPage] Error API WooCommerce:', err.response?.data || err.message);
+             // Guardar el error para mostrarlo si es necesario
+             setError(`Error al cargar datos de WooCommerce: ${err.response?.data?.error || err.message}`); 
+             return { data: [] }; // Devolver array vacío en caso de error
+          })
+        ]);
+
+        const mongoProperties = mongoResponse.status === 'fulfilled' ? (mongoResponse.value?.data || []) : [];
+        const wooCommerceProperties = wooResponse.status === 'fulfilled' ? (wooResponse.value?.data || []) : [];
         
-        // Agregar propiedades de muestra si estamos en modo desarrollo
-        if (process.env.NODE_ENV === 'development') {
-          const sampleProperties = [
-            {
-              id: 'sample1',
-              name: 'Propiedad de Muestra 1',
-              title: 'Apartamento en Madrid Centro',
-              price: 350000,
-              description: 'Apartamento de muestra para desarrollo',
-              location: 'Madrid, España',
-              bedrooms: 2,
-              bathrooms: 1,
-              area: 80,
-              source: 'sample',
-              images: ['/img/default-property-image.jpg']
-            },
-            {
-              id: 'sample2',
-              name: 'Propiedad de Muestra 2',
-              title: 'Piso en Salamanca',
-              price: 450000,
-              description: 'Piso de muestra para desarrollo',
-              location: 'Barrio Salamanca, Madrid, España',
-              bedrooms: 3,
-              bathrooms: 2,
-              area: 120,
-              source: 'sample',
-              images: ['/img/default-property-image.jpg']
-            }
-          ];
-          setProperties(sampleProperties);
-          setTotalPages(1);
+        // Asegurarse de que sean arrays
+        const safeMongoProps = Array.isArray(mongoProperties) ? mongoProperties : [];
+        const safeWooProps = Array.isArray(wooCommerceProperties) ? wooCommerceProperties : [];
+
+        // Marcar la fuente explícitamente si no viene de la API
+        const taggedMongoProps = safeMongoProps.map(p => ({ ...p, source: p.source || 'mongodb' }));
+        const taggedWooProps = safeWooProps.map(p => ({ ...p, source: p.source || 'woocommerce' }));
+
+        const allProperties = [...taggedMongoProps, ...taggedWooProps];
+
+        if (allProperties.length > 0) {
+            setProperties(allProperties);
+            setTotalPages(Math.ceil(allProperties.length / ITEMS_PER_PAGE) || 1);
+            // No limpiar el error aquí si hubo uno parcial (ej. WooCommerce falló pero Mongo no)
+            // setError(null); 
+        } else if (!error) { // Si no hubo error previo pero no hay propiedades
+            console.warn('[PropertyPage] No se encontraron propiedades en ninguna fuente.');
+            setError('No se encontraron propiedades.');
         }
+        
+      } catch (fetchError) {
+          console.error('[PropertyPage] Error inesperado en fetchAllProperties:', fetchError);
+          setError('Error general al cargar propiedades.');
+          setProperties([]);
+      } finally {
+          setLoading(false);
       }
-      
-      setLoading(false);
     };
 
     fetchAllProperties();
-  }, [router.isReady, configLoaded]);
+  }, [router.isReady, configLoaded]); // Dependencias correctas
 
   // Usar useMemo para almacenar propiedades filtradas
   const filteredProperties = useMemo(() => {
