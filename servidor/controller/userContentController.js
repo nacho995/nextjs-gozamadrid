@@ -15,7 +15,6 @@ const userController = {
 
     getMe: async (req, res) => {
         try {
-            // Verificar que req.user existe y tiene id
             if (!req.user || !req.user.id) {
                 console.error("req.user no está disponible o no tiene id:", req.user);
                 return res.status(401).json({ 
@@ -24,7 +23,6 @@ const userController = {
                 });
             }
 
-            // Buscar el usuario con todos los campos necesarios
             const user = await User.findById(req.user.id).select('-password');
             
             if (!user) {
@@ -32,16 +30,33 @@ const userController = {
                 return res.status(404).json({ message: "Usuario no encontrado" });
             }
 
+            // Obtener la URL de la imagen de perfil
+            let profileImageUrl = null;
+            
+            // Primero intentar obtener de profileImage
+            if (user.profileImage && user.profileImage.url) {
+                profileImageUrl = user.profileImage.url;
+            }
+            // Si no hay profileImage, intentar obtener de profilePic
+            else if (user.profilePic && user.profilePic.src) {
+                profileImageUrl = user.profilePic.src;
+            }
+
             // Log de diagnóstico
             console.log("Usuario recuperado correctamente:", {
                 id: user._id,
                 name: user.name,
                 hasProfilePic: !!user.profilePic,
-                hasProfileImage: !!user.profileImage
+                hasProfileImage: !!user.profileImage,
+                profileImageUrl: profileImageUrl
             });
 
-            // Responder con el usuario completo
-            res.json(user);
+            // Responder con el usuario completo incluyendo la URL de la imagen
+            res.json({
+                ...user.toObject(),
+                profileImage: profileImageUrl,
+                profilePic: profileImageUrl
+            });
         } catch (error) {
             console.error("Error en getMe:", error);
             res.status(500).json({ 
@@ -75,30 +90,16 @@ const userController = {
                 return res.status(400).json({ message: "Contraseña incorrecta" });
             }
             
-            // Sincronizar imágenes de perfil (si una existe y la otra no)
-            const updates = {};
+            // Obtener la URL de la imagen de perfil
+            let profileImageUrl = null;
             
-            // Si tiene profileImage pero no profilePic
-            if (user.profileImage && user.profileImage.url && (!user.profilePic || !user.profilePic.src)) {
-                updates.profilePic = {
-                    src: user.profileImage.url,
-                    alt: user.name || 'Foto de perfil'
-                };
+            // Primero intentar obtener de profileImage
+            if (user.profileImage && user.profileImage.url) {
+                profileImageUrl = user.profileImage.url;
             }
-            
-            // Si tiene profilePic pero no profileImage
-            if (user.profilePic && user.profilePic.src && (!user.profileImage || !user.profileImage.url)) {
-                updates.profileImage = {
-                    url: user.profilePic.src,
-                    publicId: user.profilePic.src.split('/').pop() || ''
-                };
-            }
-            
-            // Actualizar usuario si hay cambios
-            if (Object.keys(updates).length > 0) {
-                await User.findByIdAndUpdate(user._id, updates);
-                // Actualizar objeto user para la respuesta
-                Object.assign(user, updates);
+            // Si no hay profileImage, intentar obtener de profilePic
+            else if (user.profilePic && user.profilePic.src) {
+                profileImageUrl = user.profilePic.src;
             }
             
             // Crear token con expiración de 1 hora (3600 segundos)
@@ -108,22 +109,15 @@ const userController = {
                 { expiresIn: '1h' }
             );
             
-            // Obtener URLs finales para la respuesta
-            const profilePicUrl = user.profilePic && user.profilePic.src ? user.profilePic.src : null;
-            const profileImageUrl = user.profileImage && user.profileImage.url ? user.profileImage.url : null;
-            
-            // Usar la primera imagen disponible si la otra no existe
-            const finalProfileUrl = profileImageUrl || profilePicUrl;
-            
-            // Devolver token y datos de usuario, incluyendo AMBOS tipos de imágenes de perfil
+            // Devolver token y datos de usuario, incluyendo la URL de la imagen
             res.json({ 
                 token,
                 user: {
                     _id: user._id,
                     name: user.name,
                     email: user.email,
-                    profilePic: finalProfileUrl,
-                    profileImage: finalProfileUrl,
+                    profileImage: profileImageUrl,
+                    profilePic: profileImageUrl,
                     role: user.role
                 }
             });
@@ -180,85 +174,117 @@ const userController = {
         }
     },
 
-    // Nueva función para sincronizar imágenes de perfil
+    /**
+     * Sincroniza la imagen de perfil entre dispositivos
+     * Este endpoint permite tanto obtener la imagen actual como actualizarla
+     * @param {Request} req - Solicitud HTTP
+     * @param {Response} res - Respuesta HTTP
+     */
     syncProfileImage: async (req, res) => {
         try {
-            // Obtener ID del usuario del token
-            const userId = req.userId || (req.user && req.user.id);
-            
-            if (!userId) {
+            // Verificar si el usuario está autenticado
+            if (!req.user || !req.user.id) {
                 return res.status(401).json({ 
-                    success: false,
-                    message: 'No se proporcionó ID de usuario o token inválido'
+                    success: false, 
+                    message: 'Usuario no autenticado' 
                 });
             }
             
-            // Obtener los datos actuales del usuario
-            const user = await User.findById(userId);
-            
-            if (!user) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Usuario no encontrado'
-                });
-            }
-            
-            // Inicializar objeto de actualizaciones
-            const updates = {};
-            
-            // Sincronizar profilePic con profileImage si existe profileImage pero no profilePic
-            if (user.profileImage && user.profileImage.url && (!user.profilePic || !user.profilePic.src)) {
-                updates.profilePic = {
-                    src: user.profileImage.url,
-                    alt: user.name || 'Foto de perfil'
-                };
-            }
-            
-            // Sincronizar profileImage con profilePic si existe profilePic pero no profileImage
-            if (user.profilePic && user.profilePic.src && (!user.profileImage || !user.profileImage.url)) {
-                updates.profileImage = {
-                    url: user.profilePic.src,
-                    publicId: user.profilePic.src.split('/').pop() || ''
-                };
-            }
-            
-            // Si no hay nada que actualizar, devolver éxito
-            if (Object.keys(updates).length === 0) {
+            // Si es una petición GET, devolver la imagen actual
+            if (req.method === 'GET') {
+                const user = await User.findById(req.user.id);
+                
+                if (!user) {
+                    return res.status(404).json({ 
+                        success: false, 
+                        message: 'Usuario no encontrado' 
+                    });
+                }
+                
+                // Buscar imagen en diferentes campos según esté disponible
+                let profileImage = null;
+                
+                if (user.profilePic) {
+                    profileImage = typeof user.profilePic === 'string' ? 
+                                  user.profilePic : 
+                                  (user.profilePic.url || user.profilePic.src);
+                } else if (user.profileImage) {
+                    profileImage = typeof user.profileImage === 'string' ? 
+                                  user.profileImage : 
+                                  (user.profileImage.url || user.profileImage.src);
+                }
+                
+                // Si no hay imagen, devolver error
+                if (!profileImage) {
+                    return res.status(404).json({ 
+                        success: false, 
+                        message: 'No hay imagen de perfil disponible' 
+                    });
+                }
+                
+                // Devolver la imagen
                 return res.status(200).json({
                     success: true,
-                    message: 'No se requieren actualizaciones en el perfil',
-                    user: {
-                        _id: user._id,
-                        name: user.name,
-                        profilePic: user.profilePic && user.profilePic.src,
-                        profileImage: user.profileImage && user.profileImage.url
-                    }
+                    profilePic: profileImage,
+                    synced: true,
+                    timestamp: new Date()
                 });
             }
             
-            // Actualizar usuario
-            const updatedUser = await User.findByIdAndUpdate(
-                userId,
-                updates,
-                { new: true }
-            );
-            
-            res.status(200).json({
-                success: true,
-                message: 'Perfil sincronizado correctamente',
-                user: {
-                    _id: updatedUser._id,
-                    name: updatedUser.name,
-                    profilePic: updatedUser.profilePic && updatedUser.profilePic.src,
-                    profileImage: updatedUser.profileImage && updatedUser.profileImage.url
+            // Si es una petición POST, actualizar la imagen
+            else if (req.method === 'POST') {
+                // Verificar si se proporcionó una imagen
+                if (!req.body.profilePic && !req.body.profilePicUrl) {
+                    return res.status(400).json({ 
+                        success: false, 
+                        message: 'No se proporcionó imagen de perfil' 
+                    });
                 }
-            });
+                
+                // Determinar qué imagen usar
+                const profileImage = req.body.profilePic || req.body.profilePicUrl;
+                
+                // Actualizar el usuario
+                const updatedUser = await User.findByIdAndUpdate(
+                    req.user.id,
+                    { 
+                        profilePic: profileImage,
+                        // También actualizamos profileImage para asegurar compatibilidad
+                        profileImage: {
+                            url: profileImage
+                        }
+                    },
+                    { new: true }
+                );
+                
+                if (!updatedUser) {
+                    return res.status(404).json({ 
+                        success: false, 
+                        message: 'Usuario no encontrado' 
+                    });
+                }
+                
+                // Devolver confirmación
+                return res.status(200).json({
+                    success: true,
+                    message: 'Imagen de perfil sincronizada correctamente',
+                    synced: true,
+                    timestamp: new Date()
+                });
+            }
             
+            // Si es otro método, devolver error
+            else {
+                return res.status(405).json({ 
+                    success: false, 
+                    message: 'Método no permitido' 
+                });
+            }
         } catch (error) {
-            console.error('Error al sincronizar imágenes de perfil:', error);
-            res.status(500).json({
+            console.error('Error al sincronizar imagen de perfil:', error);
+            return res.status(500).json({
                 success: false,
-                message: 'Error al sincronizar imágenes de perfil',
+                message: 'Error del servidor al sincronizar imagen de perfil',
                 error: error.message
             });
         }
@@ -377,8 +403,6 @@ const userController = {
 
     getUserProfile: async (req, res) => {
         try {
-            // El middleware de autenticación ya debería haber verificado el token
-            // y añadido el ID del usuario a req.userId
             const userId = req.userId;
             
             if (!userId) {
@@ -386,16 +410,29 @@ const userController = {
             }
             
             // Buscar el usuario en la base de datos
-            const user = await User.findById(userId).select('name profilePic email');
+            const user = await User.findById(userId).select('name profilePic profileImage email');
             
             if (!user) {
                 return res.status(404).json({ message: 'Usuario no encontrado' });
             }
             
-            // Devolver los datos del usuario
+            // Obtener la URL de la imagen de perfil
+            let profileImageUrl = null;
+            
+            // Primero intentar obtener de profileImage
+            if (user.profileImage && user.profileImage.url) {
+                profileImageUrl = user.profileImage.url;
+            }
+            // Si no hay profileImage, intentar obtener de profilePic
+            else if (user.profilePic && user.profilePic.src) {
+                profileImageUrl = user.profilePic.src;
+            }
+            
+            // Devolver los datos del usuario con la URL de la imagen
             res.status(200).json({
                 name: user.name,
-                profilePic: user.profilePic,
+                profileImage: profileImageUrl,
+                profilePic: profileImageUrl,
                 email: user.email
             });
         } catch (error) {

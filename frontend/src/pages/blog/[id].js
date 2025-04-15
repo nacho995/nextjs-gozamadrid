@@ -7,7 +7,7 @@ const DEFAULT_IMAGE = '/img/default-image.jpg';
 
 // URLs de API para los blogs
 const MONGODB_BLOGS_API = 'https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api/blogs';
-const WORDPRESS_API = process.env.NEXT_PUBLIC_WP_API_URL || 'https://wordpress-1430059-5339263.cloudwaysapps.com/wp-json/wp/v2/posts';
+const WORDPRESS_API = process.env.NEXT_PUBLIC_WP_API_URL || 'https://wordpress.realestategozamadrid.com/wp-json/wp/v2/posts';
 
 // Importar la utilidad para WordPress
 import { getPostBySlug } from '../../utils/wp-api';

@@ -1,5 +1,18 @@
 import Head from "next/head";
 import ExpPage from "@/components/exp/expPage";
+import { getCleanJsonLd } from "@/utils/structuredDataHelper";
+import { 
+  organizationData, 
+  videoData, 
+  jobPostingData, 
+  breadcrumbData 
+} from "@/data/expRealtyStructuredData";
+
+// Preparar datos limpios
+const cleanOrgData = getCleanJsonLd(organizationData);
+const cleanVideoData = getCleanJsonLd(videoData);
+const cleanJobData = getCleanJsonLd(jobPostingData);
+const cleanBreadcrumbData = getCleanJsonLd(breadcrumbData);
 
 export default function ExpRealtyPage() {
   const pageTitle = "eXp Realty Madrid | Únete a Nuestra Red Inmobiliaria | Goza Madrid";
@@ -27,88 +40,11 @@ export default function ExpRealtyPage() {
         <meta name="twitter:description" content={pageDescription} />
         <meta name="twitter:image" content="https://realestategozamadrid.com/img/exp-realty-header.jpg" />
 
-        {/* Schema.org Organization */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Organization",
-            "name": "eXp Realty Madrid",
-            "description": pageDescription,
-            "url": "https://realestategozamadrid.com/exp-realty",
-            "logo": "https://realestategozamadrid.com/logo.png",
-            "sameAs": [
-              "https://www.facebook.com/gozamadrid",
-              "https://www.instagram.com/gozamadrid",
-              "https://www.linkedin.com/company/exp-realty"
-            ],
-            "memberOf": {
-              "@type": "Organization",
-              "name": "eXp World Holdings",
-              "url": "https://expworldholdings.com"
-            },
-            "offers": {
-              "@type": "Offer",
-              "description": "Oportunidades para agentes inmobiliarios en eXp Realty Madrid",
-              "category": "Real Estate Career"
-            }
-          })}
-        </script>
-
-        {/* Schema.org JobPosting */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "JobPosting",
-            "title": "Agente Inmobiliario - eXp Realty Madrid",
-            "description": "Únete a la red inmobiliaria más innovadora. Ofrecemos tecnología de vanguardia, formación continua y un modelo de comisiones competitivo.",
-            "datePosted": new Date().toISOString(),
-            "validThrough": new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
-            "employmentType": "CONTRACTOR",
-            "hiringOrganization": {
-              "@type": "Organization",
-              "name": "eXp Realty Madrid",
-              "sameAs": "https://realestategozamadrid.com/exp-realty"
-            },
-            "jobLocation": {
-              "@type": "Place",
-              "address": {
-                "@type": "PostalAddress",
-                "addressLocality": "Madrid",
-                "addressRegion": "Madrid",
-                "addressCountry": "ES"
-              }
-            },
-            "baseSalary": {
-              "@type": "MonetaryAmount",
-              "currency": "EUR",
-              "description": "Comisiones competitivas y múltiples fuentes de ingresos"
-            },
-            "qualifications": "Licencia de agente inmobiliario, experiencia en ventas, habilidades de comunicación",
-            "skills": "Ventas inmobiliarias, negociación, marketing digital, gestión de clientes"
-          })}
-        </script>
-
-        {/* Schema.org BreadcrumbList */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-              {
-                "@type": "ListItem",
-                "position": 1,
-                "name": "Inicio",
-                "item": "https://realestategozamadrid.com"
-              },
-              {
-                "@type": "ListItem",
-                "position": 2,
-                "name": "eXp Realty",
-                "item": "https://realestategozamadrid.com/exp-realty"
-              }
-            ]
-          })}
-        </script>
+        {/* Datos estructurados - Usando JSON-LD directo sin entidades HTML */}
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: cleanOrgData }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: cleanJobData }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: cleanVideoData }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: cleanBreadcrumbData }} />
 
         {/* Metadatos adicionales */}
         <meta name="keywords" content="exp realty madrid, agente inmobiliario madrid, carrera inmobiliaria, oportunidades inmobiliarias, comisiones inmobiliarias" />

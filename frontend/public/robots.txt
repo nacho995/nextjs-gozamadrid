@@ -1,16 +1,18 @@
-# Permitir a todos los robots rastrear el sitio
+# *
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /_next/
+Disallow: /404
+Disallow: /500
+Disallow: /admin
+Disallow: /test
+Disallow: /diagnostico*
+Disallow: /diagnostic*
 
-# Sitemap
-Sitemap: https://realestategozamadrid.com/sitemap.xml
+# Host
+Host: https://www.realestategozamadrid.com
 
-# Recursos estáticos
-Allow: /img/
-Allow: /video/
-Allow: /logo.png
-Allow: /favicon.ico
-Allow: /_next/static/
-
-# Evitar rastreo de API
-Disallow: /api/ 
+# Sitemaps
+Sitemap: https://www.realestategozamadrid.com/sitemap.xml
+Sitemap: https://www.realestategozamadrid.com/server-sitemap.xml
