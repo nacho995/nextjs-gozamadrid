@@ -109,15 +109,12 @@ export const testEmail = async (req, res) => {
 
 // --- Función Principal sendContactEmail (Actualizada para SendGrid) ---
 export const sendContactEmail = async (req, res) => {
-  let adminSendSuccess = false; // Para rastrear el resultado del envío al admin
+  let adminSendSuccess = false;
   const { nombre, email, asunto, telefono, prefix, mensaje } = req.body;
-
-  // **¡IMPORTANTE! Define tu remitente verificado en SendGrid**
-  const verifiedSender = process.env.SENDGRID_VERIFIED_SENDER; 
+  const verifiedSender = process.env.SENDGRID_VERIFIED_SENDER;
   if (!verifiedSender) {
-      console.error("Error: Falta la variable de entorno SENDGRID_VERIFIED_SENDER.");
-      // No podemos enviar sin un remitente verificado
-      return res.status(500).json({ success: false, message: 'Error de configuración del servidor (email).', });
+    console.error("Error: Falta SENDGRID_VERIFIED_SENDER.");
+    return res.status(500).json({ success: false, message: 'Error de configuración del servidor (email).', });
   }
 
   try {
@@ -135,40 +132,73 @@ export const sendContactEmail = async (req, res) => {
         message: 'Faltan datos requeridos: nombre y email son obligatorios'
       });
     }
-
     const telefonoCompleto = telefono ? `${prefix || '+34'} ${telefono}` : 'No proporcionado';
 
     // --- Notificación ADMIN --- 
-    const destinatarioPrincipal = process.env.EMAIL_RECIPIENT || 'ignaciodalesio1995@gmail.com,marta@gozamadrid.com';
-    // SendGrid maneja múltiples destinatarios en el campo 'to' como un array o string separado por comas.
-    // No necesita CC explícito si todos son destinatarios principales.
-    const adminRecipients = destinatarioPrincipal.split(',').map(e => e.trim()).filter(e => e);
-     if (!adminRecipients.includes('ignaciodalesio1995@gmail.com')) {
-         adminRecipients.push('ignaciodalesiolopez@gmail.com'); // Asegurar que Nacho reciba
-     }
+    const adminRecipients = (process.env.EMAIL_RECIPIENT || 'ignaciodalesio1995@gmail.com,marta@gozamadrid.com').split(',').map(e => e.trim()).filter(e => e);
+    if (!adminRecipients.includes('ignaciodalesiolopez@gmail.com')) { adminRecipients.push('ignaciodalesiolopez@gmail.com'); }
+
+    const adminHtml = `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nuevo Contacto Recibido</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f0f0f0; font-family: Georgia, 'Times New Roman', Times, serif;">
+<center style="width: 100%; table-layout: fixed; background-color: #f0f0f0; padding-bottom: 60px;">
+  <table style="background-color: #ffffff; margin: 0 auto; width: 100%; max-width: 650px; border-spacing: 0; font-size: 16px; color: #1a1a1a; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1);" width="100%">
+    <!-- Header -->
+    <tr>
+      <td style="background-color: #1a1a1a; padding: 30px 20px; text-align: center;">
+        <h1 style="font-size: 28px; color: #C7A336; margin: 0; font-weight: bold; letter-spacing: 1px;">GOZA MADRID</h1>
+        <p style="color: #ffffff; font-size: 14px; margin: 5px 0 0 0;">Notificación de Nuevo Contacto</p>
+      </td>
+    </tr>
+    <!-- Contenido -->
+    <tr>
+      <td style="padding: 40px 50px;">
+        <h2 style="font-size: 22px; color: #1a1a1a; margin-top: 0; margin-bottom: 25px; font-weight: bold; border-bottom: 3px solid #C7A336; padding-bottom: 10px;">Información del Contacto</h2>
+        <table style="width: 100%; border-spacing: 0;" width="100%">
+          <tr>
+            <td style="padding: 0 0 18px 0; color: #555555; font-weight: bold; width: 120px; padding-right: 15px; vertical-align: top;">Nombre:</td>
+            <td style="padding: 0 0 18px 0; vertical-align: top;">${nombre}</td>
+          </tr>
+          <tr>
+            <td style="padding: 0 0 18px 0; color: #555555; font-weight: bold; width: 120px; padding-right: 15px; vertical-align: top;">Email:</td>
+            <td style="padding: 0 0 18px 0; vertical-align: top;"><a href="mailto:${email}" style="color: #C7A336; text-decoration: none; font-weight: bold;">${email}</a></td>
+          </tr>
+          <tr>
+            <td style="padding: 0 0 18px 0; color: #555555; font-weight: bold; width: 120px; padding-right: 15px; vertical-align: top;">Teléfono:</td>
+            <td style="padding: 0 0 18px 0; vertical-align: top;">${telefonoCompleto}</td>
+          </tr>
+        </table>
+        <br>
+        <h2 style="font-size: 22px; color: #1a1a1a; margin-top: 0; margin-bottom: 25px; font-weight: bold; border-bottom: 3px solid #C7A336; padding-bottom: 10px;">Mensaje Enviado</h2>
+        <div style="background-color: #f8f8f8; border: 1px solid #e0e0e0; border-left: 6px solid #C7A336; padding: 25px; margin-top: 15px; border-radius: 6px; white-space: pre-wrap; font-size: 15px; line-height: 1.7;">
+          ${mensaje || asunto || 'No proporcionado'}
+        </div>
+      </td>
+    </tr>
+    <!-- Footer -->
+    <tr>
+      <td style="background-color: #333333; padding: 20px; text-align: center; font-size: 13px; color: #aaaaaa;">
+        Recibido: ${new Date().toLocaleString('es-ES', { dateStyle: 'full', timeStyle: 'short' })}
+      </td>
+    </tr>
+  </table>
+</center>
+</body>
+</html>
+    `;
 
     const adminMsg = {
       to: adminRecipients, 
-      from: { 
-          email: verifiedSender, 
-          name: "Goza Madrid Web" 
-      },
+      from: { email: verifiedSender, name: "Goza Madrid Web" },
       subject: `Nuevo mensaje de contacto de ${nombre}`,
-      text: `
-Nuevo mensaje de contacto
-
-Nombre: ${nombre}
-Email: ${email}
-Teléfono: ${telefonoCompleto}
-Mensaje: ${mensaje || asunto || 'No proporcionado'}
-      `,
-      html: `
-        <h1>Nuevo mensaje de contacto</h1>
-        <p><strong>Nombre:</strong> ${nombre}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Teléfono:</strong> ${telefonoCompleto}</p>
-        <p><strong>Mensaje:</strong> ${mensaje || asunto || 'No proporcionado'}</p>
-      `
+      text: `Nuevo mensaje de contacto\n\nNombre: ${nombre}\nEmail: ${email}\nTeléfono: ${telefonoCompleto}\nMensaje: ${mensaje || asunto || 'No proporcionado'}`,
+      html: adminHtml
     };
 
     console.log('Preparando correo ADMIN SendGrid:', { to: adminMsg.to, from: adminMsg.from, subject: adminMsg.subject });
@@ -190,27 +220,65 @@ Mensaje: ${mensaje || asunto || 'No proporcionado'}
 
     // --- Confirmación CLIENTE --- 
     if (email && /\S+@\S+\.\S+/.test(email)) {
+      const clientHtml = `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Confirmación de Contacto - Goza Madrid</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #ffffff; font-family: Georgia, 'Times New Roman', Times, serif;">
+<center style="width: 100%; table-layout: fixed; background-color: #ffffff; padding-bottom: 40px;">
+  <table style="background-color: #ffffff; margin: 0 auto; width: 100%; max-width: 680px; border-spacing: 0; font-size: 17px; color: #1a1a1a;" width="100%">
+    <!-- Borde Dorado Superior -->
+    <tr>
+      <td style="height: 10px; background-color: #C7A336;"></td>
+    </tr>
+    <!-- Header -->
+    <tr>
+      <td style="padding: 40px 0 30px 0; text-align: center;">
+        <!-- <img src="URL_LOGO_NEGRO_O_DORADO" alt="Goza Madrid" width="200" style="border:0;"> -->
+        <h1 style="font-size: 36px; color: #C7A336; margin: 0; font-weight: bold; letter-spacing: 1px;">Goza Madrid</h1>
+      </td>
+    </tr>
+    <!-- Contenido - Cuerpo de la Carta -->
+    <tr>
+      <td style="padding: 10px 60px 30px 60px; line-height: 1.7;">
+        <p style="margin: 0 0 20px 0;">Estimado/a ${nombre},</p>
+        <p style="margin: 0 0 20px 0;">Es un placer confirmar que hemos recibido su mensaje a través de nuestro formulario de contacto. Valoramos sinceramente su interés en Goza Madrid.</p>
+        <p style="margin: 0 0 20px 0;">Nuestro equipo de expertos está revisando su consulta y se pondrá en contacto con usted a la mayor brevedad posible para ofrecerle la atención personalizada que merece.</p>
+        <div style="border-left: 4px solid #e0e0e0; padding-left: 20px; margin: 30px 0; font-style: italic; color: #555555; font-size: 16px;">
+          <p style="margin: 0 0 10px 0;"><em>Para su referencia, el mensaje que nos envió indicaba:</em></p>
+          <p style="margin: 0; white-space: pre-wrap;">"${mensaje || asunto || 'No proporcionado'}"</p>
+        </div>
+        <p style="margin: 0 0 20px 0;">Mientras tanto, le invitamos a explorar más sobre nuestros servicios y propiedades exclusivas en nuestro sitio web.</p>
+        <p style="margin: 40px 0 20px 0;">
+          Atentamente,<br><br>
+          <strong>El Equipo de Goza Madrid</strong><br>
+          <a href="https://www.realestategozamadrid.com" style="color: #C7A336; text-decoration: none;">www.realestategozamadrid.com</a>
+        </p>
+      </td>
+    </tr>
+    <!-- Footer -->
+    <tr>
+      <td style="background-color: #1a1a1a; padding: 25px; text-align: center; font-size: 13px; color: #aaaaaa;">
+        Este mensaje se ha enviado automáticamente. Por favor, no responda a este correo.<br>
+        &copy; ${new Date().getFullYear()} Goza Madrid. Todos los derechos reservados.
+      </td>
+    </tr>
+  </table>
+</center>
+</body>
+</html>
+      `;
+
       const clientMsg = {
         to: email,
-        from: { 
-            email: verifiedSender, 
-            name: "Goza Madrid" 
-        },
+        from: { email: verifiedSender, name: "Goza Madrid" },
         subject: `Hemos recibido tu mensaje - Goza Madrid`,
-        text: `Hola ${nombre},\n\nHemos recibido tu mensaje y nos pondremos en contacto contigo lo antes posible.\n\nGracias por contactar con Goza Madrid.\n\nTu mensaje:\n${mensaje || asunto || 'No proporcionado'}`, 
-        html: `
-          <div style="font-family: sans-serif; line-height: 1.6;">
-            <h2>Hola ${nombre},</h2>
-            <p>Hemos recibido tu mensaje y nuestro equipo se pondrá en contacto contigo lo antes posible.</p>
-            <p><strong>Tu mensaje fue:</strong></p>
-            <blockquote style="border-left: 4px solid #ccc; padding-left: 1em; margin-left: 0;">
-              <p>${mensaje || asunto || 'No proporcionado'}</p>
-            </blockquote>
-            <p>Gracias por contactar con <strong>Goza Madrid</strong>.</p>
-            <hr>
-            <p><small>Este es un mensaje automático, por favor no respondas directamente a este email.</small></p>
-          </div>
-        `
+        text: `Estimado/a ${nombre},\n\nEs un placer confirmar que hemos recibido su mensaje. Valoramos sinceramente su interés en Goza Madrid.\n\nNuestro equipo está revisando su consulta y se pondrá en contacto con usted a la mayor brevedad posible.\n\nSu mensaje: "${mensaje || asunto || 'No proporcionado'}"\n\nAtentamente,\nEl Equipo de Goza Madrid\nwww.realestategozamadrid.com\n\n(Este es un mensaje automático, por favor no responda).`,
+        html: clientHtml
       };
       
       console.log('Preparando correo CLIENTE SendGrid:', { to: clientMsg.to, from: clientMsg.from, subject: clientMsg.subject });
