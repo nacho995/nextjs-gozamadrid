@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // Cargar configuración de correo (debe estar después de dotenv.config y antes de otros imports)
-import './config/emailSetup.js';
 
 import cors from 'cors';
 import express from 'express';
