@@ -27,18 +27,28 @@ const logDebug = (message, ...args) => {
 
 // Extraer datos de características de la propiedad
 const extractPropertyData = (property) => {
+  // <<< LOG AÑADIDO PARA VER EL OBJETO RAW >>>
+  console.log('[extractPropertyData] Recibido objeto property:', JSON.stringify(property, null, 2)); // Usar JSON.stringify para ver todo
+  
+  let result = {
+    livingArea: 0,
+    bedrooms: 0,
+    bathrooms: 0,
+    floor: 0
+  };
+
   if (!property) {
-    return {
-      livingArea: 0,
-      bedrooms: 0,
-      bathrooms: 0,
-      floor: 0
-    };
+    console.log('[extractPropertyData] Propiedad nula, devolviendo valores por defecto.');
+    return result;
   }
 
   try {
+    // Determinar la fuente: si existe explícitamente, usarla. Si no, pero tiene _id, asumir MongoDB.
+    const source = property.source || (property._id ? 'mongodb' : null);
+    console.log(`[extractPropertyData] Fuente determinada: ${source}`);
+
     // Para propiedades de WordPress (WooCommerce)
-    if (property.source === 'woocommerce' || (!property.source && property.meta_data)) {
+    if (source === 'woocommerce') { // Usar la fuente determinada
       let livingArea = 0;
       let bedrooms = 0;
       let bathrooms = 0;
@@ -95,7 +105,7 @@ const extractPropertyData = (property) => {
         bathrooms = parseInt(property.features.bathrooms, 10) || 0;
       }
       
-      return {
+      result = {
         livingArea,
         bedrooms,
         bathrooms,
@@ -103,7 +113,7 @@ const extractPropertyData = (property) => {
       };
     } 
     // Para propiedades de MongoDB
-    else if (property.source === 'mongodb') {
+    else if (source === 'mongodb') { // Usar la fuente determinada
       // Extraer área de varias propiedades posibles
       let livingArea = 0;
       if (property.m2) livingArea = parseInt(property.m2, 10) || 0;
@@ -117,30 +127,35 @@ const extractPropertyData = (property) => {
       if (property.bathrooms) bathrooms = parseInt(property.bathrooms, 10) || 0;
       else if (property.features && property.features.bathrooms) bathrooms = parseInt(property.features.bathrooms, 10) || 0;
       
-      return {
-        livingArea,
-        bedrooms: property.bedrooms || (property.features && property.features.bedrooms) || 0,
-        bathrooms,
-        floor: property.piso || property.floor || (property.features && property.features.floor) || 0
+      // Extraer dormitorios y piso, asegurando que sean números
+      const bedrooms = parseInt(property.bedrooms, 10) || (property.features && parseInt(property.features.bedrooms, 10)) || 0;
+      const floor = parseInt(property.piso, 10) || parseInt(property.floor, 10) || (property.features && parseInt(property.features.floor, 10)) || 0;
+
+      result = {
+        livingArea, // Ya es número
+        bedrooms,   // Ahora es número
+        bathrooms,  // Ya es número
+        floor       // Ahora es número
       };
     } 
     // Fallback general
     else {
-      return {
-        livingArea: property.living_area || property.size || 0,
-        bedrooms: property.bedrooms || 0,
-        bathrooms: property.bathrooms || property.baños || 0,
-        floor: property.floor || property.Planta || 0
+      result = {
+        livingArea: parseInt(property.living_area, 10) || parseInt(property.size, 10) || 0,
+        bedrooms: parseInt(property.bedrooms, 10) || 0,
+        bathrooms: parseInt(property.bathrooms, 10) || parseInt(property.baños, 10) || 0,
+        floor: parseInt(property.floor, 10) || parseInt(property.Planta, 10) || 0
       };
     }
   } catch (error) {
-    return {
-      livingArea: 0,
-      bedrooms: 0,
-      bathrooms: 0,
-      floor: 0
-    };
+    console.error('[extractPropertyData] Error extrayendo datos:', error);
+    // Devolver valores por defecto en caso de error
+    result = { livingArea: 0, bedrooms: 0, bathrooms: 0, floor: 0 };
   }
+  
+  // <<< LOG AÑADIDO >>>
+  console.log('[extractPropertyData] Datos extraídos:', result);
+  return result;
 };
 
 // Función para obtener la URL de la imagen a través del proxy - optimizada
@@ -520,14 +535,16 @@ export default function DefaultPropertyContent({ property }) {
 
   // Efecto para pre-cargar las imágenes adyacentes
   useEffect(() => {
-    if (propertyImages.length <= 1) return;
+    // Asegurarse de que se ejecuta solo en el cliente
+    if (typeof window === 'undefined' || propertyImages.length <= 1) return;
     
     const nextIndex = (current + 1) % propertyImages.length;
     const prevIndex = (current - 1 + propertyImages.length) % propertyImages.length;
     
     // Pre-cargar la siguiente imagen
     if (propertyImages[nextIndex] && !loadedImages[nextIndex]) {
-      const nextImg = new Image();
+      // Usar window.Image explícitamente
+      const nextImg = new window.Image(); 
       nextImg.src = propertyImages[nextIndex].src;
       nextImg.onload = () => {
         setLoadedImages(prev => ({
@@ -535,17 +552,30 @@ export default function DefaultPropertyContent({ property }) {
           [nextIndex]: true
         }));
       };
+      // Manejar posible error de carga
+      nextImg.onerror = () => {
+        console.warn(`[PropertyContent] Error pre-loading image: ${propertyImages[nextIndex].src}`);
+        // Marcar como cargada igualmente para no reintentar infinitamente
+        setLoadedImages(prev => ({ ...prev, [nextIndex]: true })); 
+      };
     }
     
     // Pre-cargar la imagen anterior
     if (propertyImages[prevIndex] && !loadedImages[prevIndex]) {
-      const prevImg = new Image();
+       // Usar window.Image explícitamente
+      const prevImg = new window.Image();
       prevImg.src = propertyImages[prevIndex].src;
       prevImg.onload = () => {
         setLoadedImages(prev => ({
           ...prev,
           [prevIndex]: true
         }));
+      };
+       // Manejar posible error de carga
+      prevImg.onerror = () => {
+        console.warn(`[PropertyContent] Error pre-loading image: ${propertyImages[prevIndex].src}`);
+        // Marcar como cargada igualmente para no reintentar infinitamente
+        setLoadedImages(prev => ({ ...prev, [prevIndex]: true }));
       };
     }
   }, [current, propertyImages, loadedImages]);
@@ -1019,6 +1049,9 @@ export default function DefaultPropertyContent({ property }) {
     
   }, [propertyState]);
 
+  // <<< LOG AÑADIDO >>>
+  console.log('[PropertyContent Render] Estado propertyData:', propertyData);
+
   if (!propertyState) {
     // console.log("Renderizando estado de propiedad no disponible");
     return (
@@ -1378,6 +1411,7 @@ export default function DefaultPropertyContent({ property }) {
                   </div>
                 </div>
               )}
+                          
             </div>
           </div>
 
@@ -1624,8 +1658,8 @@ export default function DefaultPropertyContent({ property }) {
                           
                           // console.log('Enviando datos de visita:', visitData);
                           
-                          // Usar el proxy local para evitar problemas de mixed content
-                          const response = await fetch(`/api/api-proxy?path=api/property-visit/create`, {
+                          // Usar la ruta directa al backend
+                          const response = await fetch(`/api/property-visit/create`, {
                             method: 'POST',
                             headers: { 
                               'Content-Type': 'application/json'
@@ -1791,8 +1825,8 @@ export default function DefaultPropertyContent({ property }) {
                         
                         // console.log('Enviando datos de oferta:', offerData);
                         
-                        // Usar el proxy local para evitar problemas de mixed content
-                        const response = await fetch(`/api/api-proxy?path=api/property-offer/create`, {
+                        // Usar la ruta directa al backend
+                        const response = await fetch(`/api/property-offer/create`, {
                           method: 'POST',
                           headers: { 
                             'Content-Type': 'application/json'

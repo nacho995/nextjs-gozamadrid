@@ -51,9 +51,12 @@ const userController = {
                 profileImageUrl: profileImageUrl
             });
 
-            // Responder con el usuario completo incluyendo la URL de la imagen
+            // Responder con el usuario completo incluyendo la URL de la imagen y el id
             res.json({
-                ...user.toObject(),
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
                 profileImage: profileImageUrl,
                 profilePic: profileImageUrl
             });
@@ -109,16 +112,16 @@ const userController = {
                 { expiresIn: '1h' }
             );
             
-            // Devolver token y datos de usuario, incluyendo la URL de la imagen
+            // Devolver token y datos de usuario, incluyendo la URL de la imagen y el id
             res.json({ 
                 token,
                 user: {
-                    _id: user._id,
+                    id: user._id,
                     name: user.name,
                     email: user.email,
+                    role: user.role,
                     profileImage: profileImageUrl,
-                    profilePic: profileImageUrl,
-                    role: user.role
+                    profilePic: profileImageUrl
                 }
             });
         } catch (error) {

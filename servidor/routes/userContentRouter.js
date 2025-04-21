@@ -33,7 +33,7 @@ const profileImageStorage = new CloudinaryStorage({
   cloudinary: cloudinary.v2,
   params: {
     folder: 'user-profiles',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'avif'],
     transformation: [
       { width: 400, height: 400, crop: 'fill', gravity: 'face' }, // Recorte inteligente enfocado en rostros
       { quality: 'auto' }

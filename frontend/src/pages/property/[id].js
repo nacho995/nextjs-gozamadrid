@@ -305,9 +305,8 @@ export async function getServerSideProps(context) {
             console.error('[getServerSideProps] Falta variable de entorno para API MongoDB (MONGO_PROPERTY_API_URL o NEXT_PUBLIC_API_URL)');
             return { props: { propertyData: null, error: 'Error de configuración del servidor (MongoDB)', source } };
        }
-      // Asumiendo una estructura de API como /api/properties/sources/mongodb/{id}
-      // Si tu API de MongoDB está en otro lugar, ajusta esta URL
-      apiUrl = `${MONGO_API_URL}/sources/mongodb/${id}`;
+      // La ruta correcta para obtener una propiedad por ID (sea cual sea la fuente) es /api/properties/:id
+      apiUrl = `${MONGO_API_URL}/api/properties/${id}`;
       // Añadir headers de autenticación si son necesarios para tu API MongoDB
       // headers['Authorization'] = `Bearer ${process.env.MONGO_API_TOKEN}`;
   } else {

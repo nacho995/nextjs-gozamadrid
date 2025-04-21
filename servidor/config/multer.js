@@ -62,7 +62,7 @@ const upload = multer({
     storage: cloudinaryStorage,
     fileFilter: fileFilter,
     limits: {
-        fileSize: 5 * 1024 * 1024 // Límite de 5MB
+        fileSize: 250 * 1024 * 1024 // Límite aumentado a 250MB
     }
 });
 
@@ -71,7 +71,7 @@ export const diskUpload = multer({
     storage: diskStorage,
     fileFilter: fileFilter,
     limits: {
-        fileSize: 5 * 1024 * 1024
+        fileSize: 250 * 1024 * 1024 // Límite aumentado a 250MB
     }
 });
 

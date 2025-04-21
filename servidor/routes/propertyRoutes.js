@@ -13,8 +13,8 @@ router.get('/:id', propertyController.getPropertyById);
 router.get('/sources/mongodb', propertyController.getAllProperties);
 
 // Rutas protegidas (requieren autenticación)
-router.post('/', verifyToken, isAdmin, upload.array('images', 10), propertyController.createProperty);
-router.put('/:id', verifyToken, isAdmin, upload.array('images', 10), propertyController.updateProperty);
+router.post('/', verifyToken, isAdmin, propertyController.createProperty);
+router.put('/:id', verifyToken, isAdmin, propertyController.updateProperty);
 router.delete('/:id', verifyToken, isAdmin, propertyController.deleteProperty);
 
 // Ruta específica para subir imágenes
