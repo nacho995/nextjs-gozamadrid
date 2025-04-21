@@ -1,3 +1,5 @@
+import { env } from "process";
+
 // next.config.mjs - Restaurado desde backup (sin srcDir)
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -34,7 +36,7 @@ const nextConfig = {
     NEXT_PUBLIC_WC_API_URL: process.env.NEXT_PUBLIC_WC_API_URL || 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3',
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://realestategozamadrid.com'),
     MONGODB_URL: process.env.MONGODB_URL || '',
-    API_BASE_URL: process.env.API_BASE_URL || ''
+    API_BASE_URL: process.env.API_BASE_URL || '' // Esta parece no usarse, usamos NEXT_PUBLIC_API_URL
   },
   distDir: '.next',
   eslint: {
@@ -43,16 +45,32 @@ const nextConfig = {
   pageExtensions: ['js', 'jsx', 'mdx'],
 
   async rewrites() {
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'; // URL de tu backend
+
     return [
-      { source: '/api/properties/sources/:source', destination: '/api/properties/sources/:source' },
-      { source: '/api/properties/sources/:source/:id', destination: '/api/properties/sources/:source/:id' },
-      { source: '/api/woocommerce/:path*', destination: `https://wordpress.realestategozamadrid.com/wp-json/wc/v3/:path*?consumer_key=${process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY}&consumer_secret=${process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET}` },
-      { source: '/api/properties', destination: '/api/properties' },
-      { source: '/api/properties/:id', destination: '/api/properties/:id' },
-      { source: '/api/properties/:path*', destination: '/api/properties/:path*' },
-      { source: '/api/proxy/woocommerce/:path*', destination: `https://wordpress.realestategozamadrid.com/wp-json/wc/v3/:path*?consumer_key=${process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY}&consumer_secret=${process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET}` },
-      { source: '/api/:path*', destination: '/api/:path*' }
-    ];
+      // Reenvía TODAS las peticiones /api/... al backend real
+      {
+        source: '/api/:path*',
+        destination: `${backendUrl}/api/:path*`,
+      },
+      // Puedes mantener las reglas específicas de proxy de WooCommerce si las necesitas
+      // y si no chocan con las rutas de tu backend.
+      // Asegúrate de que estas rutas NO existan también en tu backend real.
+      {
+        source: '/api/woocommerce/:path*',
+        destination: `https://wordpress.realestategozamadrid.com/wp-json/wc/v3/:path*?consumer_key=${process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY}&consumer_secret=${process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET}`
+      },
+      {
+        source: '/api/proxy/woocommerce/:path*',
+        destination: `https://wordpress.realestategozamadrid.com/wp-json/wc/v3/:path*?consumer_key=${process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY}&consumer_secret=${process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET}`
+      },
+       // Proxy para imágenes si lo necesitas (Asegúrate de que el backend tenga esta ruta)
+      // Si no existe en el backend, coméntala o elimínala.
+      // {
+      //   source: '/api/proxy-image',
+      //   destination: `${backendUrl}/api/proxy-image`,
+      // },
+    ].filter(Boolean); // Filtrar posibles nulos si comentas rutas
   },
 
   async headers() {

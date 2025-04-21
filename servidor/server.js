@@ -29,6 +29,7 @@ import userRouter from "./routes/userContentRouter.js";
 import propertyRoutes from './routes/propertyRoutes.js';
 import propertyOfferRoutes from './routes/propertyOfferRoutes.js';
 import healthRoutes from './routes/healthRoutes.js';
+import cloudinaryRouter from './routes/cloudinaryRouter.js';
 import { sendContactEmail, testEmail } from './controller/contactController.js';
 
 const app = express();
@@ -44,6 +45,7 @@ const allowedOrigins = process.env.CORS_ORIGIN
       'http://www.realestategozamadrid.com',
       'https://blog.realestategozamadrid.com',
       'http://blog.realestategozamadrid.com',
+      'https://subir.realestategozamadrid.com',
       'https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com',
       'http://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com',
       'https://gozamadrid.pages.dev',
@@ -82,6 +84,12 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With']
 }));
 
+// <<< LOG INICIAL >>>
+app.use((req, res, next) => {
+  console.log(`[SERVER ENTRY] ${req.method} ${req.url}`);
+  next();
+});
+
 // Middleware para parsear JSON
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
@@ -116,7 +124,18 @@ const storage = new CloudinaryStorage({
 });
 
 // Crear el middleware de multer
-const upload = multer({ storage: storage });
+const upload = multer({ 
+  storage: storage,
+  limits: { fileSize: 50 * 1024 * 1024 }
+});
+
+// <<< LOG ANTES DE ROUTER >>>
+app.use((req, res, next) => {
+  if (req.url.startsWith('/api/properties')) {
+    console.log(`[BEFORE PROPERTY ROUTER] ${req.method} ${req.url}`);
+  }
+  next();
+});
 
 // Rutas
 app.use('/api/properties', propertyRoutes);
@@ -124,6 +143,7 @@ app.use('/api', notificationRouter);
 app.use("/prefix", prefixRouter);
 app.use("/api/blogs", blogRouter);
 app.use("/user", userRouter);
+app.use('/api/cloudinary', cloudinaryRouter);
 
 // Rutas específicas para ofertas y visitas de propiedades
 app.use('/api/property-visit', propertyVisitRoutes);

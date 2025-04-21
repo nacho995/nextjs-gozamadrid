@@ -14,17 +14,25 @@ export const COOKIE_KEYS = {
 };
 
 // Función para establecer una cookie
-export function setCookie(name, value, days = 7) {
+export function setCookie(name, value, options = {}) {
+  console.log(`[utils/cookies] setCookie called with:`, { name, value, options });
   try {
-    const options = {
-      expires: days,
-      path: '/',
+    // Extraer 'days' de las opciones o usar 7 por defecto
+    const days = options.expires !== undefined ? options.expires : 7;
+    console.log(`[utils/cookies] Calculated expiration days:`, days);
+
+    const cookieOptions = {
+      ...options, // Incluir otras opciones como path, domain, secure, etc.
+      expires: days, // Establecer la expiración en días
+      path: options.path || '/', // Asegurar que path siempre esté definido
     };
     
+    console.log(`[utils/cookies] Final cookieOptions being passed to Cookies.set:`, cookieOptions);
+
     if (typeof value === 'object') {
-      Cookies.set(name, JSON.stringify(value), options);
+      Cookies.set(name, JSON.stringify(value), cookieOptions);
     } else {
-      Cookies.set(name, value, options);
+      Cookies.set(name, value, cookieOptions);
     }
   } catch (error) {
     console.error('Error setting cookie:', error);
