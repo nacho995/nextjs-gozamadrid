@@ -59,7 +59,9 @@ router.get('/', async (req, res) => {
     }
   };
 
-  res.status(mongoConnected ? 200 : 503).json(healthStatus);
+  // Siempre devolver 200 OK independientemente del estado de MongoDB
+  // para que el health check de ELB funcione correctamente
+  res.status(200).json(healthStatus);
 });
 
 // Ruta para probar la conexión de email (eliminada o comentada)

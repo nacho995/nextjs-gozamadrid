@@ -2,7 +2,7 @@
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { FaUser, FaEnvelope, FaPhone, FaComments, FaSpinner } from 'react-icons/fa';
-import { toast } from 'sonner';
+import { toast } from 'react-hot-toast';
 import Head from 'next/head';
 import CountryPrefix from "./CountryPrefix";
 import AnimatedOnScroll from "./AnimatedScroll";
