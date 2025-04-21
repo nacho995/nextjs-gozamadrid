@@ -282,7 +282,11 @@ export async function getServerSideProps(context) {
   const WC_API_URL = process.env.WC_API_URL || process.env.NEXT_PUBLIC_WC_API_URL;
   const WC_KEY = process.env.WC_CONSUMER_KEY;
   const WC_SECRET = process.env.WC_CONSUMER_SECRET;
-  const MONGO_API_URL = process.env.MONGO_PROPERTY_API_URL || process.env.NEXT_PUBLIC_API_URL; // Ajusta el nombre de la variable si es diferente
+  // Construir la URL base para MongoDB usando todas las variables posibles en Vercel
+  const MONGO_API_URL =
+    process.env.MONGO_PROPERTY_API_URL ||
+    process.env.NEXT_PUBLIC_API_PROPERTIES_URL ||
+    process.env.NEXT_PUBLIC_API_URL;
   const TIMEOUT = parseInt(process.env.API_TIMEOUT || process.env.NEXT_PUBLIC_API_TIMEOUT || '15000');
 
 
