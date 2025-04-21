@@ -306,11 +306,17 @@ export async function getServerSideProps(context) {
       };
   } else if (source === 'mongodb') {
        if (!MONGO_API_URL) {
-            console.error('[getServerSideProps] Falta variable de entorno para API MongoDB (MONGO_PROPERTY_API_URL o NEXT_PUBLIC_API_URL)');
+            console.error('[getServerSideProps] Falta variable de entorno para API MongoDB (MONGO_PROPERTY_API_URL, NEXT_PUBLIC_API_PROPERTIES_URL o NEXT_PUBLIC_API_URL)');
             return { props: { propertyData: null, error: 'Error de configuración del servidor (MongoDB)', source } };
        }
+       // Log qué variable se está usando finalmente
+       if (process.env.MONGO_PROPERTY_API_URL) console.log('[getServerSideProps] Usando MONGO_PROPERTY_API_URL');
+       else if (process.env.NEXT_PUBLIC_API_PROPERTIES_URL) console.log('[getServerSideProps] Usando NEXT_PUBLIC_API_PROPERTIES_URL');
+       else console.log('[getServerSideProps] Usando NEXT_PUBLIC_API_URL como fallback final');
+
       // La ruta correcta para obtener una propiedad por ID (sea cual sea la fuente) es /api/properties/:id
       apiUrl = `${MONGO_API_URL}/api/properties/${id}`;
+      console.log(`[getServerSideProps] Intentando fetch a MongoDB API: ${apiUrl}`); // Log de la URL final
       // Añadir headers de autenticación si son necesarios para tu API MongoDB
       // headers['Authorization'] = `Bearer ${process.env.MONGO_API_TOKEN}`;
   } else {
