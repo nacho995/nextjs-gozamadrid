@@ -166,7 +166,16 @@ async function loadConfig() {
       apiUrl: '/api/properties',
       debug: process.env.NODE_ENV === 'development'
     };
-    
+
+    // ***** FORZAR USO DE ENDPOINTS DIRECTOS PARA MONGODB *****
+    if (window.appConfig.endpoints && window.appConfig.endpoints.mongodb) {
+      window.appConfig.endpoints.mongodb.useProxy = false;
+      console.log('[_app.js] Forzando uso de endpoint directo para MongoDB');
+    }
+    // También asegurarse de que la propiedad global useProxyForMongoDB sea false
+    window.appConfig.useProxyForMongoDB = false;
+    console.log('[_app.js] Forzando useProxyForMongoDB a false globalmente');
+
     console.log('[_app.js] Configuración cargada exitosamente:', window.appConfig);
     return true;
   } catch (error) {
