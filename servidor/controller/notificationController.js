@@ -1,154 +1,73 @@
+import dotenv from 'dotenv';
+import sgMail from '@sendgrid/mail';
 import { ContactForm } from '../models/emailSchema.js';
-import emailConfig from '../config/emailConfig.js';
+import { getSystemInfo } from '../utils/systemInfo.js';
+
+dotenv.config();
+
+// Configurar SendGrid (si no está ya hecho globalmente)
+if (process.env.SENDGRID_API_KEY) {
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+} else {
+    console.error('❌ [notificationController] SENDGRID_API_KEY no configurada.');
+}
 
 export const sendNotification = async (req, res) => {
-    try {
-        console.log('🧐 DIAGNÓSTICO DETALLADO:');
-        console.log('- Body recibido:', req.body);
-        console.log('- Keys en body:', Object.keys(req.body));
-        
-        const { nombre, email, telefono, prefix, asunto } = req.body;
-        
-        // Validación básica
-        if (!nombre || !email) {
-            return res.status(400).json({
-                success: false,
-                message: 'Faltan datos de contacto requeridos (nombre y email)'
-            });
-        }
-        
-        // IMPORTANTE: Responder inmediatamente al cliente
-        res.status(200).json({
-            success: true,
-            message: 'Formulario recibido correctamente',
-            received: { nombre, email }
-        });
-        
-        // A partir de aquí, todo se ejecuta después de enviar la respuesta
-        
-        // Procesamiento en segundo plano...
-        try {
-            // Guardar en base de datos
-            let contactData;
-            try {
-                contactData = await ContactForm.create(req.body);
-                console.log('✅ Contacto guardado en base de datos:', contactData._id);
-            } catch (dbError) {
-                console.error('❌ Error al guardar contacto en base de datos:', dbError);
-            }
-            
-            // Validar variables de entorno
-            if (!process.env.EMAIL_TO) {
-                console.error('❌ Variable de entorno EMAIL_TO no configurada');
-                return; // El cliente ya recibió respuesta
-            }
-            
-            // Preparar el email
-            const fullPhone = `${prefix || ''}${telefono || ''}`;
-            const emailContent = `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                    <h2 style="color: #333;">Nuevo mensaje de contacto</h2>
-                    <div style="background-color: #f5f5f5; padding: 20px; border-radius: 5px;">
-                        <p><strong>Nombre:</strong> ${nombre}</p>
-                        <p><strong>Email:</strong> ${email}</p>
-                        <p><strong>Teléfono:</strong> ${fullPhone || 'No proporcionado'}</p>
-                        <p><strong>Mensaje:</strong></p>
-                        <p style="background-color: #fff; padding: 10px; border-left: 3px solid #C7A336;">${asunto || 'Sin mensaje'}</p>
-                    </div>
-                </div>
-            `;
-            
-            const emailSubject = `Nuevo contacto de ${nombre}`;
-            
-            // Obtener los destinatarios
-            const emailList = process.env.EMAIL_TO.split(',').map(email => email.trim());
-            console.log('📧 Enviando contacto a:', emailList);
-            
-            // Verificamos si EMAIL_TO está configurado
-            if (!process.env.EMAIL_TO || emailList.length === 0) {
-                console.error('❌ No hay destinatarios configurados');
-                return;
-            }
-            
-            // Comprobar que tenemos la configuración de correo
-            console.log('📧 Configuración de correo:', {
-                host: process.env.EMAIL_HOST,
-                port: process.env.EMAIL_PORT,
-                user: process.env.EMAIL_USER ? 'Configurado' : 'No configurado',
-                EMAIL_PASSWORD: process.env.EMAIL_PASSWORD ? 'Configurado' : 'No configurado',
-                EMAIL_TO: process.env.EMAIL_TO
-            });
-            
-            let successCount = 0;
-            let errorMessages = [];
-            
-            // Probamos a enviar el email de la misma forma que en propertyNotificationController
-            for (const emailTo of emailList) {
-                try {
-                    // Método 1: El que usa notificationController
-                    await emailConfig.sendEmail({
-                        to: emailTo,
-                        subject: emailSubject,
-                        html: emailContent
-                    });
-                    
-                    console.log(`✅ Método 1: Email enviado a ${emailTo}`);
-                    successCount++;
-                } catch (error1) {
-                    console.error(`❌ Método 1 falló: ${error1.message}`);
-                    
-                    try {
-                        // Método 2: El que podría estar usando propertyNotificationController
-                        // Intenta acceder directamente al transporter
-                        if (emailConfig.transporter) {
-                            await emailConfig.transporter.sendMail({
-                                from: process.env.EMAIL_FROM || 'info@gozamadrid.com',
-                                to: emailTo,
-                                subject: emailSubject,
-                                html: emailContent
-                            });
-                            console.log(`✅ Método 2: Email enviado a ${emailTo}`);
-                            successCount++;
-                        } else {
-                            throw new Error('No hay transporter disponible');
-                        }
-                    } catch (error2) {
-                        console.error(`❌ Método 2 falló: ${error2.message}`);
-                        errorMessages.push(`Error al enviar a ${emailTo}: ${error1.message} / ${error2.message}`);
-                    }
-                }
-            }
-            
-            // Actualizar en base de datos si es necesario
-            if (contactData) {
-                try {
-                    await ContactForm.findByIdAndUpdate(contactData._id, {
-                        'emailSent.success': successCount > 0,
-                        'emailSent.error': errorMessages.join('; '),
-                        'emailSent.attempts': 1,
-                        'emailSent.lastAttempt': new Date()
-                    });
-                } catch (updateError) {
-                    console.error('❌ Error al actualizar estado del contacto:', updateError);
-                }
-            }
-            
-            console.log(`📊 Resultado del envío: ${successCount} de ${emailList.length} emails enviados`);
-            
-        } catch (processingError) {
-            console.error('❌ Error en el procesamiento en segundo plano:', processingError);
-        }
-        
-    } catch (error) {
-        console.error('❌ Error general en notificationController:', error);
-        // Solo enviamos respuesta si no se ha enviado ya
-        if (!res.headersSent) {
-            return res.status(500).json({
-                success: false,
-                message: 'Error al procesar el formulario',
-                error: error.message
-            });
-        }
+    const { subject, message, htmlContent } = req.body;
+    const verifiedSender = process.env.SENDGRID_VERIFIED_SENDER;
+    const adminRecipients = process.env.EMAIL_RECIPIENT ? process.env.EMAIL_RECIPIENT.split(',').map(email => email.trim()) : [];
+
+    if (!subject || (!message && !htmlContent)) {
+        return res.status(400).json({ success: false, message: 'Faltan datos: subject y message/htmlContent son requeridos.' });
     }
+
+    if (!verifiedSender) {
+        console.error('❌ [notificationController] SENDGRID_VERIFIED_SENDER no configurado.');
+        return res.status(500).json({ success: false, message: 'Error de configuración del servidor (email sender).', });
+    }
+    
+    if (adminRecipients.length === 0) {
+        console.error('❌ [notificationController] EMAIL_RECIPIENT no configurado o vacío.');
+        return res.status(500).json({ success: false, message: 'Error de configuración del servidor (email recipient).', });
+    }
+
+    const msg = {
+        to: adminRecipients,
+        from: { email: verifiedSender, name: "Goza Madrid Notificación" },
+        subject: subject,
+        text: message || 'Ver el contenido HTML.', // Texto plano de fallback
+        html: htmlContent || `<p>${message}</p>`, // Usar HTML si existe, si no, el mensaje
+    };
+
+    try {
+        console.log(`📧 [notificationController] Intentando enviar notificación SendGrid a: ${adminRecipients.join(', ')}`);
+        const response = await sgMail.send(msg);
+        console.log('✅ [notificationController] Notificación SendGrid enviada:', response[0].statusCode);
+        res.status(200).json({ success: true, message: 'Notificación enviada correctamente.' });
+    } catch (error) {
+        console.error('❌ [notificationController] Error enviando notificación SendGrid:', error);
+        if (error.response) {
+            console.error('Body del error de SendGrid:', error.response.body);
+        }
+        res.status(500).json({ success: false, message: 'Error al enviar la notificación.', error: error.message });
+    }
+};
+
+export const getNotificationStatus = (req, res) => {
+    const systemInfo = getSystemInfo();
+    const sendgridConfigured = process.env.SENDGRID_API_KEY && process.env.SENDGRID_VERIFIED_SENDER;
+    const recipientsConfigured = process.env.EMAIL_RECIPIENT && process.env.EMAIL_RECIPIENT.length > 0;
+
+    res.status(200).json({
+        message: "Estado del servicio de notificaciones (SendGrid)",
+        sendgridConfigured: sendgridConfigured,
+        recipientsConfigured: recipientsConfigured,
+        adminRecipients: process.env.EMAIL_RECIPIENT || "No configurado",
+        systemInfo: {
+            nodeVersion: systemInfo.nodeVersion,
+            platform: systemInfo.platform,
+            uptime: systemInfo.uptime
+        }
+    });
 };
 

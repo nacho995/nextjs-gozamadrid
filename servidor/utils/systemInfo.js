@@ -56,19 +56,52 @@ const getEnvironmentVariables = () => {
 };
 
 // Función para obtener información del sistema
-const getSystemInfo = () => {
+export const getSystemInfo = () => {
+  const mongoConnected = mongoose.connection.readyState === 1;
+  const uptime = process.uptime();
+
+  // Información de variables de entorno relevantes
+  const envInfo = {
+    NODE_ENV: process.env.NODE_ENV || 'No configurado',
+    PORT: process.env.PORT || 'No configurado',
+    MONGODB_URI: process.env.MONGODB_URI ? 'Configurado' : 'No configurado',
+    JWT_SECRET: process.env.JWT_SECRET ? 'Configurado' : 'No configurado',
+    CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME ? 'Configurado' : 'No configurado',
+    API_KEY: process.env.API_KEY ? 'Configurado (Cloudinary)' : 'No configurado',
+    API_SECRET: process.env.API_SECRET ? 'Configurado (Cloudinary)' : 'No configurado',
+    // SENDGRID
+    SENDGRID_API_KEY: process.env.SENDGRID_API_KEY ? 'Configurado' : 'No configurado',
+    SENDGRID_VERIFIED_SENDER: process.env.SENDGRID_VERIFIED_SENDER || 'No configurado',
+    EMAIL_RECIPIENT: process.env.EMAIL_RECIPIENT || 'No configurado (Admin)',
+    // CORS
+    CORS_ORIGIN: process.env.CORS_ORIGIN || 'No configurado',
+    // Opcionales / Debug
+    LOG_LEVEL: process.env.LOG_LEVEL || 'info',
+    NODE_OPTIONS: process.env.NODE_OPTIONS || 'Default',
+    NPM_USE_PRODUCTION: process.env.NPM_USE_PRODUCTION || 'Default',
+  };
+
   return {
-    platform: os.platform(),
-    release: os.release(),
-    type: os.type(),
-    arch: os.arch(),
-    uptime: Math.floor(os.uptime() / 60) + ' minutos',
-    totalMem: Math.round(os.totalmem() / (1024 * 1024 * 1024) * 100) / 100 + ' GB',
-    freeMem: Math.round(os.freemem() / (1024 * 1024 * 1024) * 100) / 100 + ' GB',
-    cpus: os.cpus().length,
+    status: mongoConnected ? 'OK' : 'ERROR',
+    timestamp: new Date().toISOString(),
     hostname: os.hostname(),
+    platform: os.platform(),
+    arch: os.arch(),
     nodeVersion: process.version,
-    v8Version: process.versions.v8,
+    uptime: `${Math.floor(uptime / 60 / 60)}h ${Math.floor((uptime / 60) % 60)}m ${Math.floor(uptime % 60)}s`,
+    cpuCount: os.cpus().length,
+    memory: {
+      total: `${(os.totalmem() / 1024 / 1024 / 1024).toFixed(2)} GB`,
+      free: `${(os.freemem() / 1024 / 1024 / 1024).toFixed(2)} GB`,
+      process_rss: `${(process.memoryUsage().rss / 1024 / 1024).toFixed(2)} MB`,
+      process_heapTotal: `${(process.memoryUsage().heapTotal / 1024 / 1024).toFixed(2)} MB`,
+      process_heapUsed: `${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB`,
+    },
+    database: {
+      status: mongoConnected ? 'OK' : 'ERROR',
+      connectionState: mongoConnected ? 'Conectado' : 'Desconectado'
+    },
+    environmentVariables: envInfo
   };
 };
 

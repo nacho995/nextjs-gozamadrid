@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
-import nodemailer from 'nodemailer';
+import sgMail from '@sendgrid/mail';
+import chalk from 'chalk';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -9,115 +10,109 @@ dotenv.config();
  * Uso: node testEmailFromConsole.js [destinatario]
  */
 
-// Función auxiliar para imprimir en consola con formato
-const log = (message, type = 'info') => {
-  const types = {
-    info: '\x1b[36m%s\x1b[0m', // Cyan
-    success: '\x1b[32m%s\x1b[0m', // Verde
-    error: '\x1b[31m%s\x1b[0m', // Rojo
-    warning: '\x1b[33m%s\x1b[0m', // Amarillo
-  };
-
-  console.log(types[type] || types.info, message);
+// Colores para logs
+const colors = {
+  info: chalk.blue,
+  success: chalk.green,
+  warning: chalk.yellow,
+  error: chalk.red,
+  debug: chalk.magenta
 };
 
-// Función principal
-const testEmail = async () => {
+const log = (message, level = 'info') => {
+  const colorFunc = colors[level] || colors.info;
+  console.log(colorFunc(message));
+};
+
+log('\n--- Script de Prueba de Email (SendGrid) ---');
+
+// --- Verificación de Configuración SendGrid ---
+
+const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
+const SENDGRID_VERIFIED_SENDER = process.env.SENDGRID_VERIFIED_SENDER;
+const EMAIL_RECIPIENT_ADMIN = process.env.EMAIL_RECIPIENT;
+
+let configOk = true;
+
+log('\nVerificando configuración de SendGrid:');
+if (SENDGRID_API_KEY) {
+  log('- SENDGRID_API_KEY: Configurada', 'success');
+  sgMail.setApiKey(SENDGRID_API_KEY);
+} else {
+  log('- SENDGRID_API_KEY: ¡NO CONFIGURADA!', 'error');
+  configOk = false;
+}
+
+if (SENDGRID_VERIFIED_SENDER) {
+  log(`- SENDGRID_VERIFIED_SENDER: ${SENDGRID_VERIFIED_SENDER}`, 'success');
+} else {
+  log('- SENDGRID_VERIFIED_SENDER: ¡NO CONFIGURADO!', 'error');
+  configOk = false;
+}
+
+const recipient = process.argv[2] || EMAIL_RECIPIENT_ADMIN || 'marta@gozamadrid.com';
+log(`- Destinatario de prueba: ${recipient}`);
+
+if (!configOk) {
+  log('\nError: Faltan variables de entorno esenciales para SendGrid.', 'error');
+  process.exit(1);
+}
+
+// --- Función de Envío --- 
+
+const sendTestEmail = async () => {
+  log('\nPreparando mensaje de prueba...');
+  const subject = `Correo de Prueba SendGrid - ${new Date().toISOString()}`;
+  const text = `Este es un correo de prueba enviado desde el script testEmailFromConsole.js usando SendGrid.\nFecha: ${new Date().toLocaleString()}`;
+  const html = `
+    <h1>Correo de Prueba SendGrid</h1>
+    <p>Este script verifica la configuración y envío a través de SendGrid.</p>
+    <p><strong>Remitente Verificado:</strong> ${SENDGRID_VERIFIED_SENDER}</p>
+    <p><strong>Destinatario:</strong> ${recipient}</p>
+    <p><strong>Fecha de envío:</strong> ${new Date().toLocaleString()}</p>
+    <hr>
+    <p><em>Goza Madrid - Script de Prueba</em></p>
+  `;
+
+  const msg = {
+    to: recipient.split(',').map(e => e.trim()), // Permite múltiples destinatarios separados por coma
+    from: {
+      email: SENDGRID_VERIFIED_SENDER,
+      name: "Goza Madrid (Test Script)"
+    },
+    subject: subject,
+    text: text,
+    html: html,
+  };
+
+  log(`Enviando a: ${msg.to.join(', ')}`);
+  log(`Desde: ${msg.from.email} (${msg.from.name})`);
+  log(`Asunto: ${msg.subject}`);
+
   try {
-    log('======= Test de envío de correo electrónico =======');
-    
-    // Recuperar el destinatario de los argumentos
-    const recipient = process.argv[2] || process.env.EMAIL_RECIPIENT || process.env.EMAIL_TO || 'marta@gozamadrid.com';
-    
-    // Mostrar variables de entorno
-    log('Configuración:');
-    log(`- EMAIL_HOST: ${process.env.EMAIL_HOST || 'smtp.gmail.com'}`);
-    log(`- EMAIL_PORT: ${process.env.EMAIL_PORT || '587'}`);
-    log(`- EMAIL_SECURE: ${process.env.EMAIL_SECURE || 'false'}`);
-    log(`- EMAIL_USER: ${process.env.EMAIL_USER || 'No configurado'}`, process.env.EMAIL_USER ? 'info' : 'warning');
-    log(`- EMAIL_PASS/EMAIL_PASSWORD: ${process.env.EMAIL_PASS || process.env.EMAIL_PASSWORD ? 'Configurado' : 'No configurado'}`, 
-        (process.env.EMAIL_PASS || process.env.EMAIL_PASSWORD) ? 'info' : 'warning');
-    log(`- Destinatario: ${recipient}`);
-    
-    // Crear configuración del transportador
-    const emailConfig = {
-      host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-      port: parseInt(process.env.EMAIL_PORT || '587'),
-      secure: process.env.EMAIL_SECURE === 'true',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS || process.env.EMAIL_PASSWORD
-      }
-    };
-    
-    // Verificar si tenemos usuario y contraseña
-    if (!emailConfig.auth.user || !emailConfig.auth.pass) {
-      log('ERROR: No se ha configurado usuario y/o contraseña de correo electrónico', 'error');
-      log('Por favor, configure las variables de entorno EMAIL_USER y EMAIL_PASS', 'error');
-      process.exit(1);
-    }
-    
-    log('Creando transportador de correo...', 'info');
-    
-    // Crear transportador
-    const transporter = nodemailer.createTransport(emailConfig);
-    
-    log('Verificando conexión con el servidor de correo...', 'info');
-    
-    // Verificar conexión
-    const verifyResult = await transporter.verify();
-    log(`Conexión verificada: ${verifyResult ? 'Exitosa' : 'Fallida'}`, verifyResult ? 'success' : 'error');
-    
-    // Configurar el correo
-    const mailOptions = {
-      from: `"Goza Madrid Test" <${process.env.EMAIL_USER || 'notificaciones@gozamadrid.com'}>`,
-      to: recipient,
-      subject: `Test de correo desde AWS Beanstalk - ${new Date().toLocaleString('es-ES')}`,
-      html: `
-        <h1>Prueba de envío de correo</h1>
-        <p>Este es un correo de prueba enviado desde el servidor AWS Beanstalk.</p>
-        <p><strong>Fecha y hora:</strong> ${new Date().toLocaleString('es-ES')}</p>
-        <p><strong>Entorno:</strong> ${process.env.NODE_ENV || 'No especificado'}</p>
-        <p><strong>Hostname:</strong> ${process.env.HOSTNAME || 'No disponible'}</p>
-        <hr>
-        <p>Si recibiste este correo, la configuración de correo electrónico está funcionando correctamente.</p>
-      `
-    };
-    
-    log('Enviando correo de prueba...', 'info');
-    
-    // Enviar el correo
-    const info = await transporter.sendMail(mailOptions);
-    
-    log('¡Correo enviado correctamente!', 'success');
-    log(`ID del mensaje: ${info.messageId}`, 'success');
-    log(`Aceptado por: ${info.accepted.join(', ')}`, 'success');
-    
-    log('======= Test finalizado =======', 'success');
-    return true;
+    const response = await sgMail.send(msg);
+    log('\n¡Correo de prueba enviado con éxito!', 'success');
+    log(`Status Code: ${response[0].statusCode}`);
+    log(`Headers: ${JSON.stringify(response[0].headers)}`);
   } catch (error) {
-    log('Error al enviar el correo:', 'error');
-    log(error.message, 'error');
-    
-    if (error.code === 'EAUTH') {
-      log('Error de autenticación. Verifique usuario y contraseña.', 'error');
-    } else if (error.code === 'ESOCKET') {
-      log('Error de conexión. Verifique la configuración del servidor y el puerto.', 'error');
-    }
-    
-    log('Información detallada del error:', 'error');
+    log('\nError al enviar el correo de prueba:', 'error');
     console.error(error);
-    
-    log('======= Test fallido =======', 'error');
-    return false;
+    if (error.response) {
+      log('SendGrid Error Body:', 'error');
+      console.error(error.response.body)
+    }
+    process.exit(1);
   }
 };
 
-// Ejecutar el test
-testEmail()
-  .then((result) => {
-    process.exit(result ? 0 : 1);
-  })
-  .catch(() => {
-    process.exit(1);
-  }); 
+// --- Ejecución --- 
+
+sendTestEmail();
+
+/* Código anterior de Nodemailer comentado
+import nodemailer from 'nodemailer';
+...
+const transporter = nodemailer.createTransport({...});
+...
+transporter.sendMail({...});
+*/ 

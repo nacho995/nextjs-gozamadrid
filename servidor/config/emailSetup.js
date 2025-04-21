@@ -4,6 +4,33 @@
  * directamente desde el código, sin depender de la configuración de AWS Beanstalk.
  */
 
+// Este archivo configuraba Nodemailer y definía valores por defecto.
+// Ya no es necesario ya que usamos SendGrid y las variables se definen
+// directamente en el entorno (o vía .ebextensions).
+
+// La configuración de SendGrid (sgMail.setApiKey) se realiza directamente
+// en los controladores que lo necesitan (contactController, propertyNotificationController, etc.)
+// o podría centralizarse aquí si se prefiere, pero por ahora la eliminamos
+// para evitar duplicados o conflictos.
+
+// import dotenv from 'dotenv';
+// dotenv.config();
+
+// console.log('[emailSetup.js] Archivo cargado. Lógica de configuración de Nodemailer eliminada.');
+
+// // Función para obtener credenciales (ya no necesaria)
+// const getCredentials = () => { ... };
+
+// // Establecer variables por defecto (ya no necesario)
+// const setEnvironmentDefaults = (credentials) => { ... };
+
+// // Lógica principal (ya no necesaria)
+// const credentials = getCredentials();
+// setEnvironmentDefaults(credentials);
+
+// // Log final (ya no necesario)
+// console.log('[emailSetup.js] Configuración de email (Nodemailer) procesada y eliminada.');
+
 // Importar el archivo de credenciales
 import fs from 'fs';
 import path from 'path';

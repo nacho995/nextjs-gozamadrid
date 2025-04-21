@@ -11,20 +11,14 @@ dotenv.config();
 // Configurar SendGrid API Key
 if (process.env.SENDGRID_API_KEY) {
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-  console.log('SendGrid API Key configurada.');
+  console.log('[ContactController] SendGrid API Key configurada.');
 } else {
-  console.error('¡ERROR CRÍTICO! Falta la variable de entorno SENDGRID_API_KEY.');
+  console.error('[ContactController] ¡ERROR CRÍTICO! Falta la variable de entorno SENDGRID_API_KEY.');
   // Considera lanzar un error o manejar esto de forma más robusta
 }
 
 // Para obtener la ruta absoluta
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-// Log adicional para saber qué valores estamos usando
-console.log('EMAIL_USER:', process.env.EMAIL_USER);
-console.log('EMAIL_RECIPIENT:', process.env.EMAIL_RECIPIENT);
-console.log('EMAIL_HOST:', process.env.EMAIL_HOST);
-console.log('EMAIL_PORT:', process.env.EMAIL_PORT);
 
 // Loguear destinatario configurado (si aún es relevante)
 console.log('EMAIL_RECIPIENT (Admin notification): ', process.env.EMAIL_RECIPIENT);

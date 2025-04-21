@@ -1,41 +1,45 @@
-import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+// import nodemailer from 'nodemailer'; // Eliminado
 
-export const sendEmail = async (options) => {
-  try {
-    // Crear un transporter con la configuración correcta para Gmail
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',  // Usar 'gmail' en lugar de host/port manual
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD
-      },
-      secure: true,  // Para conexión segura
-      debug: true    // Para ver logs detallados
-    });
+dotenv.config();
 
-    // Obtener los emails de administrador de la variable de entorno
-    const adminEmails = process.env.EMAIL_TO ? process.env.EMAIL_TO.split(',') : [];
-    
-    // Definir las opciones del email
-    const mailOptions = {
-      from: `"GozaMadrid" <${process.env.EMAIL_FROM}>`,
-      to: options.email,
-      bcc: options.sendCopyToAdmin ? adminEmails : [], // Agregar copia oculta a admins si se solicita
-      subject: options.subject,
-      html: options.html
-    };
+/* Eliminado: Configuración del transporter de Nodemailer
+const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com', 
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+        user: process.env.EMAIL_USER, // generated ethereal user
+        pass: process.env.EMAIL_PASSWORD, // generated ethereal password
+    },
+});
+*/
 
-    console.log('Intentando enviar email a:', options.email);
-    if (options.sendCopyToAdmin && adminEmails.length > 0) {
-      console.log('Con copia oculta (BCC) a:', adminEmails.join(', '));
+/* Eliminado: Función sendEmail que usaba Nodemailer
+export const sendEmail = async (subject, text, html) => {
+    try {
+        const adminEmails = process.env.EMAIL_TO ? process.env.EMAIL_TO.split(',') : [];
+        if (adminEmails.length === 0) {
+            console.error('No admin email configured in EMAIL_TO');
+            return;
+        }
+        let info = await transporter.sendMail({
+            from: `"GozaMadrid" <${process.env.EMAIL_FROM}>`, // sender address
+            to: adminEmails.join(', '), // list of receivers
+            subject: subject, // Subject line
+            text: text, // plain text body
+            html: html, // html body
+        });
+        console.log('Message sent: %s', info.messageId);
+    } catch (error) {
+        console.error('Error sending email:', error);
     }
-    
-    // Enviar el email y capturar información de envío
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Email enviado correctamente:', info.response);
-    return info;
-  } catch (error) {
-    console.error('Error al enviar email:', error);
-    throw error;
-  }
-}; 
+};
+*/
+
+// Si hubiera otras funciones de utilidad no relacionadas con el envío directo
+// de Nodemailer, se mantendrían aquí. Por ahora, el archivo queda vacío 
+// o con comentarios indicando que su funcionalidad fue migrada a SendGrid
+// en los controladores respectivos.
+
+console.log('[utils/email.js] Lógica de Nodemailer eliminada. Usar SendGrid desde los controladores.'); 
