@@ -265,3 +265,11 @@ app.use((err, req, res, next) => {
     stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
   });
 });
+
+// <<< LOG PERIÓDICO DE VIDA >>>
+setInterval(() => {
+  console.log('<<<<< SERVER HEARTBEAT >>>>> - ', new Date().toISOString());
+}, 5000); // Loguea cada 5 segundos
+
+console.log('<<<<< END OF server.js SCRIPT EXECUTION >>>>>');
+// <<< FIN LOG PERIÓDICO >>>
