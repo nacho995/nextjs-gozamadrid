@@ -15,6 +15,7 @@ import cloudinary from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import multer from 'multer';
 import { notificationRouter } from './routes/notificationRoutes.js';
+import process from 'process'; // Asegúrate de importar process
 
 // Para usar __dirname en ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -30,6 +31,25 @@ import propertyOfferRoutes from './routes/propertyOfferRoutes.js';
 import healthRoutes from './routes/healthRoutes.js';
 import cloudinaryRouter from './routes/cloudinaryRouter.js';
 import { sendContactEmail, testEmail } from './controller/contactController.js';
+
+// <<< MANEJADORES GLOBALES DE ERRORES >>>
+process.on('uncaughtException', (err, origin) => {
+  console.error('<<<<< UNCAUGHT EXCEPTION >>>>>');
+  console.error('Error:', err);
+  console.error('Origin:', origin);
+  console.error('Stack:', err.stack);
+  // Considera cerrar el proceso limpiamente aquí si es necesario,
+  // pero para depuración, solo loguearlo puede ser suficiente inicialmente.
+  // process.exit(1); 
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('<<<<< UNHANDLED REJECTION >>>>>');
+  console.error('Reason:', reason);
+  console.error('Promise:', promise);
+  // Es común loguear el error y quizás cerrar, dependiendo de la criticidad.
+});
+// <<< FIN MANEJADORES GLOBALES DE ERRORES >>>
 
 const app = express();
 const PORT = process.env.PORT || 8081;
