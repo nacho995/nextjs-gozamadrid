@@ -176,11 +176,4 @@ const getInfo = async () => {
 };
 
 // Ejecutar el informe
-getInfo()
-  .then(() => {
-    process.exit(0);
-  })
-  .catch((error) => {
-    console.error('Error al generar el informe:', error);
-    process.exit(1);
-  }); 
+getInfo() 
