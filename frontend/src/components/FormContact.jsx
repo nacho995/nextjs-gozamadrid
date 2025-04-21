@@ -52,7 +52,7 @@ const FormContact = () => {
           email: email,
           prefix: prefix,
           telefono: phone,
-          asunto: message
+          mensaje: message
         })
       });
 

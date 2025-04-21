@@ -311,10 +311,12 @@ app.use((err, req, res, next) => {
   });
 });
 
-// <<< LOG PERIÓDICO DE VIDA >>>
+// <<< LOG PERIÓDICO DE VIDA (COMENTADO) >>>
+/*
 setInterval(() => {
   console.log('<<<<< SERVER HEARTBEAT >>>>> - ', new Date().toISOString());
 }, 5000); // Loguea cada 5 segundos
+*/
 
 console.log('<<<<< END OF server.js SCRIPT EXECUTION >>>>>');
 // <<< FIN LOG PERIÓDICO >>>
