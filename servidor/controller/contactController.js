@@ -134,7 +134,7 @@ export const sendContactEmail = async (req, res) => {
     }
     const telefonoCompleto = telefono ? `${prefix || '+34'} ${telefono}` : 'No proporcionado';
 
-    // --- Notificación ADMIN --- 
+    // --- Notificación ADMIN (Estilo Documento Confidencial) --- 
     const adminRecipients = (process.env.EMAIL_RECIPIENT || 'ignaciodalesio1995@gmail.com,marta@gozamadrid.com').split(',').map(e => e.trim()).filter(e => e);
     if (!adminRecipients.includes('ignaciodalesiolopez@gmail.com')) { adminRecipients.push('ignaciodalesiolopez@gmail.com'); }
 
@@ -144,51 +144,69 @@ export const sendContactEmail = async (req, res) => {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nuevo Contacto Recibido</title>
+<title>ALERTA: Nuevo Prospecto Recibido - Goza Madrid</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f0f0f0; font-family: Georgia, 'Times New Roman', Times, serif;">
-<center style="width: 100%; table-layout: fixed; background-color: #f0f0f0; padding-bottom: 60px;">
-  <table style="background-color: #ffffff; margin: 0 auto; width: 100%; max-width: 650px; border-spacing: 0; font-size: 16px; color: #1a1a1a; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1);" width="100%">
-    <!-- Header -->
+<body style="margin: 0 !important; padding: 0 !important; background-color: #e9e9e9; font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif; height: 100% !important; width: 100% !important;">
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse !important;">
     <tr>
-      <td style="background-color: #1a1a1a; padding: 30px 20px; text-align: center;">
-        <h1 style="font-size: 28px; color: #C7A336; margin: 0; font-weight: bold; letter-spacing: 1px;">GOZA MADRID</h1>
-        <p style="color: #ffffff; font-size: 14px; margin: 5px 0 0 0;">Notificación de Nuevo Contacto</p>
-      </td>
-    </tr>
-    <!-- Contenido -->
-    <tr>
-      <td style="padding: 40px 50px;">
-        <h2 style="font-size: 22px; color: #1a1a1a; margin-top: 0; margin-bottom: 25px; font-weight: bold; border-bottom: 3px solid #C7A336; padding-bottom: 10px;">Información del Contacto</h2>
-        <table style="width: 100%; border-spacing: 0;" width="100%">
+      <td align="center" style="padding: 40px 0 !important;">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse !important; max-width: 680px;">
+          <!-- HEADER NEGRO CON DETALLE DORADO -->
           <tr>
-            <td style="padding: 0 0 18px 0; color: #555555; font-weight: bold; width: 120px; padding-right: 15px; vertical-align: top;">Nombre:</td>
-            <td style="padding: 0 0 18px 0; vertical-align: top;">${nombre}</td>
+            <td align="center" style="background-color: #1a1a1a; padding: 30px 20px; border-top-left-radius: 12px; border-top-right-radius: 12px; border-bottom: 5px solid #C7A336;">
+              <h1 style="font-size: 32px; font-weight: bold; color: #ffffff; margin: 0; letter-spacing: 1px; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">GOZA MADRID</h1>
+              <p style="font-size: 16px; color: #cccccc; margin: 5px 0 0 0; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">Informe de Nuevo Contacto Web</p>
+            </td>
           </tr>
+          <!-- CUERPO PRINCIPAL - EFECTO PAPEL -->
           <tr>
-            <td style="padding: 0 0 18px 0; color: #555555; font-weight: bold; width: 120px; padding-right: 15px; vertical-align: top;">Email:</td>
-            <td style="padding: 0 0 18px 0; vertical-align: top;"><a href="mailto:${email}" style="color: #C7A336; text-decoration: none; font-weight: bold;">${email}</a></td>
+            <td align="center" style="background-color: #ffffff; padding: 40px 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse !important;">
+                <!-- SECCIÓN: DETALLES DEL REMITENTE -->
+                <tr>
+                  <td align="left" style="padding: 0 0 30px 0;">
+                    <h2 style="font-size: 20px; font-weight: bold; color: #1a1a1a; margin: 0 0 20px 0; border-bottom: 1px solid #dddddd; padding: 0 0 10px 0; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">DETALLES DEL REMITENTE</h2>
+                    <table border="0" cellpadding="5" cellspacing="0" width="100%" style="border-collapse: collapse !important; font-size: 15px; color: #333333;">
+                      <tr>
+                        <td width="100" style="padding: 0 0 18px 0; font-weight: bold; color: #555; padding-right: 15px; vertical-align: top;">Nombre:</td>
+                        <td style="padding: 0 0 18px 0; vertical-align: top;">${nombre}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 0 0 18px 0; font-weight: bold; color: #555; padding-right: 15px; vertical-align: top;">Email:</td>
+                        <td style="padding: 0 0 18px 0; vertical-align: top;"><a href="mailto:${email}" style="color: #C7A336; text-decoration: none; font-weight: bold; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">${email}</a></td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 0 0 18px 0; font-weight: bold; color: #555; padding-right: 15px; vertical-align: top;">Teléfono:</td>
+                        <td style="padding: 0 0 18px 0; vertical-align: top;">${telefonoCompleto}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <!-- SECCIÓN: MENSAJE -->
+                <tr>
+                  <td align="left" style="padding: 0;">
+                    <h2 style="font-size: 20px; font-weight: bold; color: #1a1a1a; margin: 0 0 20px 0; border-bottom: 1px solid #dddddd; padding: 0 0 10px 0; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">MENSAJE</h2>
+                    <div style="background-color: #f9f9f9; border: 1px solid #eeeeee; border-left: 4px solid #C7A336; padding: 20px; border-radius: 5px; font-size: 15px; line-height: 1.7; white-space: pre-wrap;">
+                      ${mensaje || asunto || 'No proporcionado'}
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
           </tr>
+          <!-- FOOTER -->
           <tr>
-            <td style="padding: 0 0 18px 0; color: #555555; font-weight: bold; width: 120px; padding-right: 15px; vertical-align: top;">Teléfono:</td>
-            <td style="padding: 0 0 18px 0; vertical-align: top;">${telefonoCompleto}</td>
+            <td align="center" style="background-color: #333333; padding: 20px 30px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
+              <p style="margin: 0; color: #aaaaaa; font-size: 12px; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
+                Fecha de Recepción: ${new Date().toLocaleString('es-ES', { dateStyle: 'full', timeStyle: 'short' })}<br>
+                Este es un email interno generado automáticamente.
+              </p>
+            </td>
           </tr>
         </table>
-        <br>
-        <h2 style="font-size: 22px; color: #1a1a1a; margin-top: 0; margin-bottom: 25px; font-weight: bold; border-bottom: 3px solid #C7A336; padding-bottom: 10px;">Mensaje Enviado</h2>
-        <div style="background-color: #f8f8f8; border: 1px solid #e0e0e0; border-left: 6px solid #C7A336; padding: 25px; margin-top: 15px; border-radius: 6px; white-space: pre-wrap; font-size: 15px; line-height: 1.7;">
-          ${mensaje || asunto || 'No proporcionado'}
-        </div>
-      </td>
-    </tr>
-    <!-- Footer -->
-    <tr>
-      <td style="background-color: #333333; padding: 20px; text-align: center; font-size: 13px; color: #aaaaaa;">
-        Recibido: ${new Date().toLocaleString('es-ES', { dateStyle: 'full', timeStyle: 'short' })}
       </td>
     </tr>
   </table>
-</center>
 </body>
 </html>
     `;
@@ -197,7 +215,7 @@ export const sendContactEmail = async (req, res) => {
       to: adminRecipients, 
       from: { email: verifiedSender, name: "Goza Madrid Web" },
       subject: `Nuevo mensaje de contacto de ${nombre}`,
-      text: `Nuevo mensaje de contacto\n\nNombre: ${nombre}\nEmail: ${email}\nTeléfono: ${telefonoCompleto}\nMensaje: ${mensaje || asunto || 'No proporcionado'}`,
+      text: `Nuevo mensaje de contacto\n\nNombre: ${nombre}\nEmail: ${email}\nTeléfono: ${telefonoCompleto}\nMensaje: ${mensaje || asunto || 'No proporcionado'}`, 
       html: adminHtml
     };
 
@@ -218,7 +236,7 @@ export const sendContactEmail = async (req, res) => {
       // Continuar para intentar enviar confirmación al cliente
     }
 
-    // --- Confirmación CLIENTE --- 
+    // --- Confirmación CLIENTE (Estilo Carta Formal) --- 
     if (email && /\S+@\S+\.\S+/.test(email)) {
       const clientHtml = `
 <!DOCTYPE html>
@@ -226,108 +244,100 @@ export const sendContactEmail = async (req, res) => {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Confirmación de Contacto - Goza Madrid</title>
+<title>Hemos Recibido su Mensaje - Goza Madrid</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #ffffff; font-family: Georgia, 'Times New Roman', Times, serif;">
-<center style="width: 100%; table-layout: fixed; background-color: #ffffff; padding-bottom: 40px;">
-  <table style="background-color: #ffffff; margin: 0 auto; width: 100%; max-width: 680px; border-spacing: 0; font-size: 17px; color: #1a1a1a;" width="100%">
-    <!-- Borde Dorado Superior -->
+<body style="margin: 0 !important; padding: 0 !important; background-color: #f5f5f5; font-family: 'Garamond', 'Times New Roman', Times, serif; height: 100% !important; width: 100% !important; color: #333333;">
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse !important;">
     <tr>
-      <td style="height: 10px; background-color: #C7A336;"></td>
-    </tr>
-    <!-- Header -->
-    <tr>
-      <td style="padding: 40px 0 30px 0; text-align: center;">
-        <!-- <img src="URL_LOGO_NEGRO_O_DORADO" alt="Goza Madrid" width="200" style="border:0;"> -->
-        <h1 style="font-size: 36px; color: #C7A336; margin: 0; font-weight: bold; letter-spacing: 1px;">Goza Madrid</h1>
-      </td>
-    </tr>
-    <!-- Contenido - Cuerpo de la Carta -->
-    <tr>
-      <td style="padding: 10px 60px 30px 60px; line-height: 1.7;">
-        <p style="margin: 0 0 20px 0;">Estimado/a ${nombre},</p>
-        <p style="margin: 0 0 20px 0;">Es un placer confirmar que hemos recibido su mensaje a través de nuestro formulario de contacto. Valoramos sinceramente su interés en Goza Madrid.</p>
-        <p style="margin: 0 0 20px 0;">Nuestro equipo de expertos está revisando su consulta y se pondrá en contacto con usted a la mayor brevedad posible para ofrecerle la atención personalizada que merece.</p>
-        <div style="border-left: 4px solid #e0e0e0; padding-left: 20px; margin: 30px 0; font-style: italic; color: #555555; font-size: 16px;">
-          <p style="margin: 0 0 10px 0;"><em>Para su referencia, el mensaje que nos envió indicaba:</em></p>
-          <p style="margin: 0; white-space: pre-wrap;">"${mensaje || asunto || 'No proporcionado'}"</p>
-        </div>
-        <p style="margin: 0 0 20px 0;">Mientras tanto, le invitamos a explorar más sobre nuestros servicios y propiedades exclusivas en nuestro sitio web.</p>
-        <p style="margin: 40px 0 20px 0;">
-          Atentamente,<br><br>
-          <strong>El Equipo de Goza Madrid</strong><br>
-          <a href="https://www.realestategozamadrid.com" style="color: #C7A336; text-decoration: none;">www.realestategozamadrid.com</a>
-        </p>
-      </td>
-    </tr>
-    <!-- Footer -->
-    <tr>
-      <td style="background-color: #1a1a1a; padding: 25px; text-align: center; font-size: 13px; color: #aaaaaa;">
-        Este mensaje se ha enviado automáticamente. Por favor, no responda a este correo.<br>
-        &copy; ${new Date().getFullYear()} Goza Madrid. Todos los derechos reservados.
+      <td align="center" style="padding: 30px 10px !important;">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse !important; max-width: 650px; background-color: #ffffff; border: 1px solid #dddddd; box-shadow: 0 3px 10px rgba(0,0,0,0.05);">
+          <!-- HEADER LOGO Y TÍTULO -->
+          <tr>
+            <td align="center" style="padding: 40px 20px 20px 20px; border-bottom: 1px solid #eeeeee;">
+              <!-- Si tienes un logo URL, puedes ponerlo aquí -->
+              <!-- <img src="URL_DEL_LOGO" alt="Goza Madrid Logo" width="150" style="display: block; border: 0; margin-bottom: 20px;"> -->
+              <h1 style="font-size: 28px; font-weight: normal; color: #1a1a1a; margin: 0; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">Goza Madrid</h1>
+              <p style="font-size: 16px; color: #888888; margin: 5px 0 0 0; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">Confirmación de Contacto</p>
+            </td>
+          </tr>
+          <!-- CUERPO DEL MENSAJE -->
+          <tr>
+            <td align="left" style="padding: 35px 40px; font-size: 16px; line-height: 1.8;">
+              <p style="margin: 0 0 25px 0;">Estimado/a ${nombre},</p>
+              <p style="margin: 0 0 25px 0;">Hemos recibido correctamente su mensaje y le agradecemos sinceramente por ponerse en contacto con Goza Madrid.</p>
+              <p style="margin: 0 0 25px 0;">Nuestro equipo revisará su consulta a la brevedad posible y nos comunicaremos con usted utilizando los datos proporcionados:</p>
+              <blockquote style="margin: 0 0 25px 20px; padding: 15px; border-left: 3px solid #C7A336; background-color: #f9f9f9; font-size: 15px; color: #555;">
+                <strong>Email:</strong> ${email}<br>
+                <strong>Teléfono:</strong> ${telefonoCompleto}
+              </blockquote>
+              <p style="margin: 0 0 25px 0;">Si su consulta requiere una respuesta urgente, no dude en contactarnos directamente por teléfono.</p>
+              <p style="margin: 0;">Agradecemos su interés y confianza.</p>
+            </td>
+          </tr>
+          <!-- SECCIÓN DE DESPEDIDA -->
+          <tr>
+            <td align="left" style="padding: 0px 40px 40px 40px; font-size: 16px; line-height: 1.8;">
+              <p style="margin: 0;">Atentamente,</p>
+              <p style="margin: 5px 0 0 0; font-weight: bold; color: #1a1a1a;">El Equipo de Goza Madrid</p>
+            </td>
+          </tr>
+          <!-- FOOTER -->
+          <tr>
+            <td align="center" style="background-color: #eeeeee; padding: 20px 30px; border-top: 1px solid #dddddd;">
+              <p style="margin: 0; color: #888888; font-size: 12px; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
+                Este es un mensaje automático. Por favor, no responda directamente a este correo.<br>
+                Goza Madrid | <a href="https://www.realestategozamadrid.com" target="_blank" style="color: #888888; text-decoration: underline;">www.realestategozamadrid.com</a>
+                <!-- Añadir dirección física si se desea -->
+              </p>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
   </table>
-</center>
 </body>
 </html>
       `;
 
       const clientMsg = {
         to: email,
-        from: { email: verifiedSender, name: "Goza Madrid" },
-        subject: `Hemos recibido tu mensaje - Goza Madrid`,
-        text: `Estimado/a ${nombre},\n\nEs un placer confirmar que hemos recibido su mensaje. Valoramos sinceramente su interés en Goza Madrid.\n\nNuestro equipo está revisando su consulta y se pondrá en contacto con usted a la mayor brevedad posible.\n\nSu mensaje: "${mensaje || asunto || 'No proporcionado'}"\n\nAtentamente,\nEl Equipo de Goza Madrid\nwww.realestategozamadrid.com\n\n(Este es un mensaje automático, por favor no responda).`,
+        from: { email: verifiedSender, name: "Goza Madrid" }, // Usar un nombre más genérico
+        subject: 'Confirmación: Hemos recibido tu mensaje - Goza Madrid',
+        text: `Estimado/a ${nombre},\\n\\nGracias por contactar con Goza Madrid. Hemos recibido tu mensaje y te responderemos pronto.\\n\\nSaludos,\\nEl equipo de Goza Madrid`,
         html: clientHtml
       };
-      
-      console.log('Preparando correo CLIENTE SendGrid:', { to: clientMsg.to, from: clientMsg.from, subject: clientMsg.subject });
-      logToFile('Opciones correo CLIENTE SendGrid', clientMsg);
 
       try {
-        const response = await sgMail.send(clientMsg);
-        console.log('Correo CLIENTE SendGrid enviado:', response[0].statusCode, response[0].headers);
-        logToFile('Correo CLIENTE SendGrid enviado', { response });
+        console.log('Preparando correo confirmación CLIENTE SendGrid:', { to: clientMsg.to, from: clientMsg.from, subject: clientMsg.subject });
+        logToFile('Opciones correo CLIENTE SendGrid', clientMsg);
+        const clientResponse = await sgMail.send(clientMsg);
+        console.log('Correo confirmación CLIENTE SendGrid enviado:', clientResponse[0].statusCode);
+        logToFile('Correo CLIENTE SendGrid enviado', { response: clientResponse });
       } catch (clientError) {
-        console.error('Error al enviar correo CLIENTE SendGrid:', clientError);
+        console.error('Error al enviar correo confirmación CLIENTE SendGrid:', clientError);
          if (clientError.response) {
-            console.error('SendGrid Error Body:', clientError.response.body);
+           console.error('SendGrid Error Body (Cliente):', clientError.response.body);
          }
-        logToFile('Error correo CLIENTE SendGrid', { to: email, error: clientError.message, responseBody: clientError.response?.body });
+        logToFile('Error correo CLIENTE SendGrid', { error: clientError.message, responseBody: clientError.response?.body });
+        // No consideramos esto un fallo crítico para la respuesta principal
       }
     } else {
-      console.warn('No se envió correo de confirmación: email de cliente no válido o no proporcionado.');
-      logToFile('Correo CLIENTE no enviado', { reason: 'Email inválido o no proporcionado', clientEmail: email });
+      console.warn('No se envió confirmación al cliente: Email inválido o no proporcionado.');
+      logToFile('Confirmación cliente omitida', { reason: 'Email inválido o no proporcionado', email });
     }
 
-    // --- Respuesta final al Frontend --- 
-    if (!adminSendSuccess) { // Si el envío al admin falló
-      return res.status(500).json({
-        success: false,
-        message: 'Error interno al procesar el formulario. Por favor, inténtalo más tarde.',
-        error: process.env.NODE_ENV === 'development' ? 'Failed to send admin notification' : undefined
-      });
-    }
-    // Si el envío al admin tuvo éxito (SendGrid devolvió 2xx)
-    return res.status(200).json({
-      success: true,
-      message: 'Mensaje enviado correctamente',
-      data: { 
-         adminMessageId: response[0].headers['x-message-id']
-      }
+    // Respuesta final al frontend (basada en el éxito del envío ADMIN)
+    return res.status(adminSendSuccess ? 200 : 500).json({
+      success: adminSendSuccess,
+      message: adminSendSuccess ? 'Mensaje enviado correctamente' : 'Error al procesar el mensaje',
     });
 
   } catch (error) {
-    // Este catch ahora solo cubriría errores MUY tempranos (ej. JSON mal formado)
-    console.error('Error MUY TEMPRANO al procesar solicitud de contacto:', error);
-    logToFile('Error MUY TEMPRANO en /api/contact', {
-      error: error.message,
-      stack: error.stack
-    });
+    console.error('Error GENERAL en sendContactEmail:', error);
+    logToFile('Error GENERAL sendContactEmail', { error: error.message, stack: error.stack });
     return res.status(500).json({
       success: false,
-      message: 'Error interno del servidor.',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      message: 'Error interno del servidor al procesar el mensaje.'
     });
   }
 }; 
