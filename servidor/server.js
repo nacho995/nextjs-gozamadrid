@@ -232,28 +232,73 @@ app.get('/', (req, res) => {
 });
 
 // Conexión a MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log('Conectado a MongoDB');
-    console.log('URI de conexión:', process.env.MONGODB_URI.replace(/mongodb\+srv:\/\/([^:]+):[^@]+@/, 'mongodb+srv://$1:****@')); // Oculta la contraseña
+const connectDB = async () => {
+  const mongoUri = process.env.MONGODB_URI;
+  if (!mongoUri) {
+    console.error('Error: MONGODB_URI no está definida en las variables de entorno.');
+    process.exit(1);
+  }
+
+  // Opciones de conexión actualizadas para Mongoose 8.x
+  const options = {
+    serverSelectionTimeoutMS: 5000, // Timeout si no se puede seleccionar servidor
+    socketTimeoutMS: 45000, // Cerrar sockets después de 45 segundos de inactividad
+    // keepAlive y keepAliveInitialDelay ya no son compatibles con Mongoose 8.x
+  };
+
+  // Manejadores de eventos de conexión de Mongoose
+  mongoose.connection.on('connected', () => {
+    console.log('Mongoose conectado a la DB');
+    // Imprimir información sobre la conexión
+    console.log(`MongoDB conectado a: ${mongoose.connection.host}`);
+  });
+
+  mongoose.connection.on('error', (err) => {
+    console.error('Error de conexión de Mongoose:', err);
+  });
+
+  mongoose.connection.on('disconnected', () => {
+    console.log('Mongoose desconectado');
+    // Intentar reconectar automáticamente después de una desconexión
+    console.log('Intentando reconectar a MongoDB...');
     
-    // Modificar para escuchar en todas las interfaces
+    // Evitar múltiples intentos de reconexión simultáneos
+    if (!mongoose.connection.readyState) {
+      setTimeout(async () => {
+        try {
+          await mongoose.connect(mongoUri, options);
+          console.log('Reconexión a MongoDB exitosa');
+        } catch (err) {
+          console.error('Error al intentar reconectar a MongoDB:', err);
+        }
+      }, 5000); // Intentar reconectar después de 5 segundos
+    }
+  });
+  
+  mongoose.connection.on('close', () => {
+     console.log('Conexión de Mongoose cerrada');
+  });
+
+  try {
+    console.log('Intentando conectar a MongoDB...');
+    await mongoose.connect(mongoUri, options);
+    // La conexión fue exitosa si llegamos aquí (el evento 'connected' también se disparará)
+    
+    // Iniciar el servidor solo después de conectar a la base de datos
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`Servidor corriendo en puerto ${PORT} en todas las interfaces`);
     });
 
-    // Añadir un log para verificar la conexión a MongoDB
-    mongoose.connection.on('connected', () => {
-      console.log('Conectado a MongoDB');
-    });
+  } catch (err) {
+    console.error('Error inicial al conectar a MongoDB:', err);
+    // Salir del proceso si la conexión inicial falla
+    // Damos un pequeño margen antes de salir por si es un error temporal
+    setTimeout(() => process.exit(1), 1000);
+  }
+};
 
-    mongoose.connection.on('error', (err) => {
-      console.error('Error de conexión a MongoDB:', err);
-    });
-  })
-  .catch(err => {
-    console.error('Error al conectar a MongoDB:', err);
-  });
+// Llamar a la función para conectar a la base de datos e iniciar el servidor
+connectDB();
 
 // Middleware para logging de errores
 app.use((err, req, res, next) => {

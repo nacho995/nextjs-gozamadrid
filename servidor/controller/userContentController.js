@@ -2,6 +2,7 @@ import User from '../models/userSchema.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
+import mongoose from 'mongoose';
 
 const userController = {
     getUser: async (req, res) => {
@@ -17,14 +18,14 @@ const userController = {
         try {
             if (!req.user || !req.user.id) {
                 console.error("req.user no está disponible o no tiene id:", req.user);
-                return res.status(401).json({ 
+                return res.status(401).json({
                     message: "No autenticado correctamente",
                     debug: { headers: req.headers }
                 });
             }
 
             const user = await User.findById(req.user.id).select('-password');
-            
+
             if (!user) {
                 console.error("Usuario no encontrado con ID:", req.user.id);
                 return res.status(404).json({ message: "Usuario no encontrado" });
@@ -32,7 +33,7 @@ const userController = {
 
             // Obtener la URL de la imagen de perfil
             let profileImageUrl = null;
-            
+
             // Primero intentar obtener de profileImage
             if (user.profileImage && user.profileImage.url) {
                 profileImageUrl = user.profileImage.url;
@@ -62,9 +63,9 @@ const userController = {
             });
         } catch (error) {
             console.error("Error en getMe:", error);
-            res.status(500).json({ 
+            res.status(500).json({
                 message: error.message,
-                stack: process.env.NODE_ENV === 'development' ? error.stack : undefined 
+                stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
             });
         }
     },
@@ -82,9 +83,32 @@ const userController = {
     },
 
     loginUser: async (req, res) => {
+        // <<< Log inicial para confirmar entrada a la función
+        console.log("[loginUser] Entrando a la función loginUser");
+        // >>> Fin log inicial
+
+        if (mongoose.connection.readyState !== 1) {
+            console.error('MongoDB no está conectado al inicio de loginUser. Estado:', mongoose.connection.readyState);
+            return res.status(503).json({ message: "Servicio no disponible temporalmente (DB)" });
+        }
+
         try {
             const { email, password } = req.body;
+
+            // <<< Log para verificar estado ANTES de la consulta
+            console.log(`[loginUser] Estado de conexión ANTES de User.findOne: ${mongoose.connection.readyState}`);
+            if (mongoose.connection.readyState !== 1) {
+                 console.error('¡MongoDB se desconectó justo antes de la consulta!');
+                 return res.status(503).json({ message: "Error de conexión intermitente con la base de datos." });
+            }
+            // >>> Fin log ANTES de consulta
+
             const user = await User.findOne({ email });
+
+            // <<< Log DESPUÉS de la consulta
+            console.log(`[loginUser] Resultado de User.findOne: ${user ? 'Usuario encontrado' : 'Usuario NO encontrado'}`);
+            // >>> Fin log DESPUÉS de consulta
+
             if (!user) {
                 return res.status(400).json({ message: "Usuario no encontrado" });
             }
@@ -92,10 +116,10 @@ const userController = {
             if (!validPassword) {
                 return res.status(400).json({ message: "Contraseña incorrecta" });
             }
-            
+
             // Obtener la URL de la imagen de perfil
             let profileImageUrl = null;
-            
+
             // Primero intentar obtener de profileImage
             if (user.profileImage && user.profileImage.url) {
                 profileImageUrl = user.profileImage.url;
@@ -104,16 +128,16 @@ const userController = {
             else if (user.profilePic && user.profilePic.src) {
                 profileImageUrl = user.profilePic.src;
             }
-            
+
             // Crear token con expiración de 1 hora (3600 segundos)
             const token = jwt.sign(
-                { id: user._id, role: user.role }, 
+                { id: user._id, role: user.role },
                 process.env.JWT_SECRET,
                 { expiresIn: '1h' }
             );
-            
+
             // Devolver token y datos de usuario, incluyendo la URL de la imagen y el id
-            res.json({ 
+            res.json({
                 token,
                 user: {
                     id: user._id,
@@ -126,6 +150,9 @@ const userController = {
             });
         } catch (error) {
             console.error("Error en login:", error);
+            if (error.message.includes('Client must be connected')) {
+                 return res.status(503).json({ message: "Error de conexión con la base de datos durante el login." });
+            }
             res.status(500).json({ message: error.message });
         }
     },
@@ -187,44 +214,44 @@ const userController = {
         try {
             // Verificar si el usuario está autenticado
             if (!req.user || !req.user.id) {
-                return res.status(401).json({ 
-                    success: false, 
-                    message: 'Usuario no autenticado' 
+                return res.status(401).json({
+                    success: false,
+                    message: 'Usuario no autenticado'
                 });
             }
-            
+
             // Si es una petición GET, devolver la imagen actual
             if (req.method === 'GET') {
                 const user = await User.findById(req.user.id);
-                
+
                 if (!user) {
-                    return res.status(404).json({ 
-                        success: false, 
-                        message: 'Usuario no encontrado' 
+                    return res.status(404).json({
+                        success: false,
+                        message: 'Usuario no encontrado'
                     });
                 }
-                
+
                 // Buscar imagen en diferentes campos según esté disponible
                 let profileImage = null;
-                
+
                 if (user.profilePic) {
-                    profileImage = typeof user.profilePic === 'string' ? 
-                                  user.profilePic : 
+                    profileImage = typeof user.profilePic === 'string' ?
+                                  user.profilePic :
                                   (user.profilePic.url || user.profilePic.src);
                 } else if (user.profileImage) {
-                    profileImage = typeof user.profileImage === 'string' ? 
-                                  user.profileImage : 
+                    profileImage = typeof user.profileImage === 'string' ?
+                                  user.profileImage :
                                   (user.profileImage.url || user.profileImage.src);
                 }
-                
+
                 // Si no hay imagen, devolver error
                 if (!profileImage) {
-                    return res.status(404).json({ 
-                        success: false, 
-                        message: 'No hay imagen de perfil disponible' 
+                    return res.status(404).json({
+                        success: false,
+                        message: 'No hay imagen de perfil disponible'
                     });
                 }
-                
+
                 // Devolver la imagen
                 return res.status(200).json({
                     success: true,
@@ -233,24 +260,24 @@ const userController = {
                     timestamp: new Date()
                 });
             }
-            
+
             // Si es una petición POST, actualizar la imagen
             else if (req.method === 'POST') {
                 // Verificar si se proporcionó una imagen
                 if (!req.body.profilePic && !req.body.profilePicUrl) {
-                    return res.status(400).json({ 
-                        success: false, 
-                        message: 'No se proporcionó imagen de perfil' 
+                    return res.status(400).json({
+                        success: false,
+                        message: 'No se proporcionó imagen de perfil'
                     });
                 }
-                
+
                 // Determinar qué imagen usar
                 const profileImage = req.body.profilePic || req.body.profilePicUrl;
-                
+
                 // Actualizar el usuario
                 const updatedUser = await User.findByIdAndUpdate(
                     req.user.id,
-                    { 
+                    {
                         profilePic: profileImage,
                         // También actualizamos profileImage para asegurar compatibilidad
                         profileImage: {
@@ -259,14 +286,14 @@ const userController = {
                     },
                     { new: true }
                 );
-                
+
                 if (!updatedUser) {
-                    return res.status(404).json({ 
-                        success: false, 
-                        message: 'Usuario no encontrado' 
+                    return res.status(404).json({
+                        success: false,
+                        message: 'Usuario no encontrado'
                     });
                 }
-                
+
                 // Devolver confirmación
                 return res.status(200).json({
                     success: true,
@@ -275,12 +302,12 @@ const userController = {
                     timestamp: new Date()
                 });
             }
-            
+
             // Si es otro método, devolver error
             else {
-                return res.status(405).json({ 
-                    success: false, 
-                    message: 'Método no permitido' 
+                return res.status(405).json({
+                    success: false,
+                    message: 'Método no permitido'
                 });
             }
         } catch (error) {
@@ -300,15 +327,15 @@ const userController = {
             console.log("Body:", req.body);
             console.log("File:", req.file);
             console.log("Token decodificado:", req.decodedToken);
-            
+
             // Obtén el id del usuario del token
             const userId = req.userId || (req.decodedToken && req.decodedToken.id);
-            
+
             if (!userId) {
                 console.error("No se proporcionó ID de usuario");
                 return res.status(400).json({ message: 'User id not provided' });
             }
-            
+
             console.log("ID de usuario:", userId);
 
             const updates = {};
@@ -321,29 +348,29 @@ const userController = {
                 // Crear una URL sin espacios
                 const filename = req.file.filename.replace(/\s+/g, '-');
                 const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${filename}`;
-                
+
                 // Actualizar ambos campos de imagen
                 updates.profilePic = {
                     src: fileUrl,
                     alt: req.body.name || 'Foto de perfil',
                 };
-                
+
                 // También actualizar el campo profileImage para compatibilidad
                 updates.profileImage = {
                     url: fileUrl,
                     publicId: filename
                 };
             }
-            
+
             console.log("Actualizaciones a aplicar:", updates);
 
             const updatedUser = await User.findByIdAndUpdate(userId, updates, { new: true });
-            
+
             if (!updatedUser) {
                 console.error("Usuario no encontrado:", userId);
                 return res.status(404).json({ message: 'Usuario no encontrado' });
             }
-            
+
             console.log("Usuario actualizado correctamente");
 
             res.json({
@@ -407,21 +434,21 @@ const userController = {
     getUserProfile: async (req, res) => {
         try {
             const userId = req.userId;
-            
+
             if (!userId) {
                 return res.status(400).json({ message: 'User id not provided' });
             }
-            
+
             // Buscar el usuario en la base de datos
             const user = await User.findById(userId).select('name profilePic profileImage email');
-            
+
             if (!user) {
                 return res.status(404).json({ message: 'Usuario no encontrado' });
             }
-            
+
             // Obtener la URL de la imagen de perfil
             let profileImageUrl = null;
-            
+
             // Primero intentar obtener de profileImage
             if (user.profileImage && user.profileImage.url) {
                 profileImageUrl = user.profileImage.url;
@@ -430,7 +457,7 @@ const userController = {
             else if (user.profilePic && user.profilePic.src) {
                 profileImageUrl = user.profilePic.src;
             }
-            
+
             // Devolver los datos del usuario con la URL de la imagen
             res.status(200).json({
                 name: user.name,
