@@ -1,11 +1,21 @@
 import dotenv from 'dotenv';
-import nodemailer from 'nodemailer';
-import smtpTransport from 'nodemailer-smtp-transport';
+// import nodemailer from 'nodemailer';
+// import smtpTransport from 'nodemailer-smtp-transport';
+import sgMail from '@sendgrid/mail'; // Importar SendGrid
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 dotenv.config();
+
+// Configurar SendGrid API Key
+if (process.env.SENDGRID_API_KEY) {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  console.log('SendGrid API Key configurada.');
+} else {
+  console.error('¡ERROR CRÍTICO! Falta la variable de entorno SENDGRID_API_KEY.');
+  // Considera lanzar un error o manejar esto de forma más robusta
+}
 
 // Para obtener la ruta absoluta
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -15,6 +25,9 @@ console.log('EMAIL_USER:', process.env.EMAIL_USER);
 console.log('EMAIL_RECIPIENT:', process.env.EMAIL_RECIPIENT);
 console.log('EMAIL_HOST:', process.env.EMAIL_HOST);
 console.log('EMAIL_PORT:', process.env.EMAIL_PORT);
+
+// Loguear destinatario configurado (si aún es relevante)
+console.log('EMAIL_RECIPIENT (Admin notification): ', process.env.EMAIL_RECIPIENT);
 
 // Función para escribir logs
 const logToFile = (message, data) => {
@@ -37,270 +50,109 @@ const logToFile = (message, data) => {
   }
 };
 
-// Configuración del transporte de correo
+// --- Funciones de Nodemailer y Fallbacks Comentadas ---
+/*
 const createTransporter = () => {
-  // Usar el usuario y contraseña configurados
-  const user = process.env.EMAIL_USER || 'ignaciodalesiolopez@gmail.com';
-  const pass = process.env.EMAIL_PASS || process.env.EMAIL_PASSWORD || 'tjlt deip zhwe mkzm';
-  
-  const options = {
-    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.EMAIL_PORT || '587'),
-    secure: false, // true para 465, false para otros puertos
-    auth: {
-      user: user,
-      pass: pass
-    },
-    debug: true,
-    logger: true,
-    tls: {
-      rejectUnauthorized: false // Para evitar errores de certificado
-    }
-  };
-  
-  console.log('Configuración de transporte de correo:', {
-    host: options.host,
-    port: options.port,
-    secure: options.secure,
-    auth: {
-      user: options.auth.user,
-      pass: '******' // No mostrar contraseña en logs
-    }
-  });
-  
-  // Probar configuración directa primero
-  try {
-    const directTransporter = nodemailer.createTransport(options);
-    console.log('Usando configuración de transporte directa');
-    return directTransporter;
-  } catch (error) {
-    console.error('Error al crear transporte directo, probando con smtpTransport:', error);
-    
-    // Si falla, intentar con el módulo smtpTransport
-    try {
-      const smtp = smtpTransport(options);
-      console.log('Usando configuración con smtpTransport');
-      return nodemailer.createTransport(smtp);
-    } catch (smtpError) {
-      console.error('Error al crear transporte SMTP:', smtpError);
-      
-      // Como último recurso, usar servicio de Gmail directamente
-      console.log('Usando configuración de Gmail directamente');
-      return nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: user,
-          pass: pass
-        },
-        debug: true
-      });
-    }
-  }
+  // ... (código de Nodemailer) ...
 };
 
-// Función alternativa para enviar correos usando SMTP2GO (se pueden enviar hasta 1000 correos al mes de forma gratuita)
 const sendEmailViaSMTP2GO = async (mailOptions) => {
-  try {
-    console.log('Intentando enviar mediante SMTP2GO');
-    
-    const transport = nodemailer.createTransport({
-      host: 'mail.smtp2go.com',
-      port: 2525, // o 8025, 587, 80 - todos funcionan
-      secure: false, // true para 465, false para otros puertos
-      auth: {
-        user: 'gozamadrid', // cuenta gratuita, reemplazar con tu cuenta real
-        pass: 'Gozamadrid123' // contraseña demo, reemplazar con tu contraseña real
-      }
-    });
-    
-    const info = await transport.sendMail(mailOptions);
-    return info;
-  } catch (error) {
-    console.error('Error enviando mediante SMTP2GO:', error);
-    throw error;
-  }
+  // ... (código SMTP2GO) ...
 };
 
-// Función alternativa para enviar correos mediante webhook a servicio externo
-// Esta función simula el envío de correo haciendo una petición a un servicio externo
 const sendEmailViaExternalService = async (mailOptions) => {
-  try {
-    console.log('Intentando enviar mediante servicio externo (FormSubmit)');
-    
-    // Preparar los datos para el servicio externo
-    const formattedData = {
-      name: mailOptions.html.includes('Nombre:') ? mailOptions.html.split('Nombre:</strong>')[1].split('</p>')[0].trim() : 'Cliente',
-      email: mailOptions.html.includes('Email:') ? mailOptions.html.split('Email:</strong>')[1].split('</p>')[0].trim() : 'correo@ejemplo.com',
-      _subject: mailOptions.subject,
-      message: mailOptions.text,
-      _template: 'box'
-    };
-    
-    // Enviar los datos a un servicio como FormSubmit
-    const response = await fetch('https://formsubmit.co/ajax/ignaciodalesio1995@gmail.com', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(formattedData)
-    });
-    
-    if (response.ok) {
-      const data = await response.json();
-      return {
-        messageId: `formsubmit-${Date.now()}`,
-        response: JSON.stringify(data)
-      };
-    } else {
-      throw new Error(`Error ${response.status}: ${await response.text()}`);
-    }
-  } catch (error) {
-    console.error('Error enviando mediante servicio externo:', error);
-    throw error;
-  }
+  // ... (código FormSubmit) ...
 };
 
-// Función principal mejorada para enviar correo con múltiples alternativas
 const sendEmailWithFallbacks = async (mailOptions) => {
-  try {
-    // Primer intento: Nodemailer directo
-    console.log('Intento 1: Envío mediante Nodemailer');
-    const transporter = createTransporter();
-    return await transporter.sendMail(mailOptions);
-  } catch (error1) {
-    console.error('Error en primer intento de envío:', error1);
-    logToFile('Falló primer intento de envío', { error: error1.message });
-    
-    try {
-      // Segundo intento: SMTP2GO
-      console.log('Intento 2: Envío mediante SMTP2GO');
-      return await sendEmailViaSMTP2GO(mailOptions);
-    } catch (error2) {
-      console.error('Error en segundo intento de envío:', error2);
-      logToFile('Falló segundo intento de envío', { error: error2.message });
-      
-      try {
-        // Tercer intento: Servicio externo
-        console.log('Intento 3: Envío mediante servicio externo');
-        return await sendEmailViaExternalService(mailOptions);
-      } catch (error3) {
-        console.error('Error en tercer intento de envío:', error3);
-        logToFile('Falló tercer intento de envío', { error: error3.message });
-        
-        // Si todos los intentos fallan, intentar guardar en un archivo al menos
-        try {
-          const emailDir = path.join(__dirname, '..', 'emails_fallidos');
-          if (!fs.existsSync(emailDir)) {
-            fs.mkdirSync(emailDir, { recursive: true });
-          }
-          
-          const emailFile = path.join(emailDir, `email_${Date.now()}.json`);
-          fs.writeFileSync(emailFile, JSON.stringify(mailOptions, null, 2));
-          
-          console.log(`Email guardado en archivo ${emailFile} para procesamiento posterior`);
-          return {
-            messageId: `stored-${Date.now()}`,
-            response: 'Stored for later processing'
-          };
-        } catch (storageError) {
-          console.error('Error al almacenar email:', storageError);
-          throw error3; // Propagar el error del tercer intento
-        }
-      }
-    }
-  }
+  // ... (código de fallbacks) ...
 };
+*/
 
-// Función para enviar correo de prueba directamente
+// Función para enviar correo de prueba (actualizar para usar SendGrid)
 export const testEmail = async (req, res) => {
   try {
-    // Configurar correo de prueba
-    const mailOptions = {
-      from: `"Test Goza Madrid" <ignaciodalesiolopez@gmail.com>`,
-      to: 'ignaciodalesio1995@gmail.com',
-      subject: 'Correo de prueba - ' + new Date().toISOString(),
-      text: 'Este es un correo de prueba enviado desde la API de Goza Madrid.',
-      html: `
-        <h1>Correo de prueba</h1>
-        <p>Este es un correo de prueba enviado desde la API de Goza Madrid.</p>
-        <p>Fecha: ${new Date().toLocaleString()}</p>
-      `
+    const msg = {
+      to: 'ignaciodalesio1995@gmail.com', // Cambiar si es necesario
+      // ¡Importante! SendGrid requiere un remitente verificado.
+      // Usa un email de un dominio que hayas verificado en SendGrid.
+      from: process.env.SENDGRID_VERIFIED_SENDER || 'test@yourverifieddomain.com', 
+      subject: 'Correo de prueba SendGrid - ' + new Date().toISOString(),
+      text: 'Este es un correo de prueba enviado desde la API de Goza Madrid usando SendGrid.',
+      html: `<h1>Correo de prueba SendGrid</h1><p>Fecha: ${new Date().toLocaleString()}</p>`,
     };
-    
-    // Enviar correo usando la función con múltiples alternativas
-    const info = await sendEmailWithFallbacks(mailOptions);
-    
-    console.log('Correo de prueba enviado:', info.messageId);
-    
+
+    console.log('Enviando correo de prueba SendGrid:', msg.subject);
+    const response = await sgMail.send(msg);
+    console.log('Correo de prueba SendGrid enviado:', response[0].statusCode, response[0].headers);
+    logToFile('Correo prueba SendGrid enviado', { response });
+
     return res.status(200).json({
       success: true,
-      message: 'Correo de prueba enviado correctamente',
-      data: {
-        messageId: info.messageId,
-        response: info.response
-      }
+      message: 'Correo de prueba SendGrid enviado correctamente',
+      data: { statusCode: response[0].statusCode }
     });
+
   } catch (error) {
-    console.error('Error al enviar correo de prueba:', error);
-    
+    console.error('Error al enviar correo de prueba SendGrid:', error);
+    if (error.response) {
+      console.error('SendGrid Error Body:', error.response.body)
+    }
+    logToFile('Error prueba SendGrid', { error: error.message, responseBody: error.response?.body });
     return res.status(500).json({
       success: false,
-      message: 'Error al enviar correo de prueba',
-      error: error.message,
-      stack: error.stack
+      message: 'Error al enviar correo de prueba SendGrid',
+      error: error.message
     });
   }
 };
 
-// Función para enviar correo de contacto
+// --- Función Principal sendContactEmail (Actualizada para SendGrid) ---
 export const sendContactEmail = async (req, res) => {
+  let adminSendSuccess = false; // Para rastrear el resultado del envío al admin
+  const { nombre, email, asunto, telefono, prefix, mensaje } = req.body;
+
+  // **¡IMPORTANTE! Define tu remitente verificado en SendGrid**
+  const verifiedSender = process.env.SENDGRID_VERIFIED_SENDER; 
+  if (!verifiedSender) {
+      console.error("Error: Falta la variable de entorno SENDGRID_VERIFIED_SENDER.");
+      // No podemos enviar sin un remitente verificado
+      return res.status(500).json({ success: false, message: 'Error de configuración del servidor (email).', });
+  }
+
   try {
     console.log('Recibida solicitud de contacto:', req.body);
-    console.log('Tipo de datos recibidos:', typeof req.body, Array.isArray(req.body));
-    console.log('Cabeceras de la solicitud:', req.headers);
-    
     logToFile('Recibida solicitud de contacto', {
       body: req.body,
       headers: req.headers,
       method: req.method,
       url: req.url
     });
-    
-    // Validar datos requeridos
-    const { nombre, email, asunto, telefono, prefix, ccEmail, mensaje } = req.body;
-    
+
     if (!nombre || !email) {
       return res.status(400).json({
         success: false,
         message: 'Faltan datos requeridos: nombre y email son obligatorios'
       });
     }
-    
-    // Formatear el teléfono con el prefijo
+
     const telefonoCompleto = telefono ? `${prefix || '+34'} ${telefono}` : 'No proporcionado';
-    
-    // Destinatario principal - usuario original y cualquier destinatario adicional
+
+    // --- Notificación ADMIN --- 
     const destinatarioPrincipal = process.env.EMAIL_RECIPIENT || 'ignaciodalesio1995@gmail.com,marta@gozamadrid.com';
-    
-    // Si se proporcionó un ccEmail, añadirlo como CC
-    let cc = [];
-    if (ccEmail) {
-      cc.push(ccEmail);
-      console.log('Añadiendo destinatario CC:', ccEmail);
-    }
-    
-    // También agregar ignaciodalesio1995@gmail.com si no está ya incluido
-    if (!destinatarioPrincipal.includes('ignaciodalesio1995@gmail.com') && !cc.includes('ignaciodalesio1995@gmail.com')) {
-      cc.push('ignaciodalesio1995@gmail.com');
-      console.log('Añadiendo destinatario CC adicional: ignaciodalesio1995@gmail.com');
-    }
-    
-    // Configurar el correo
-    const mailOptions = {
-      from: `"Goza Madrid Web" <${process.env.EMAIL_USER || 'ignaciodalesiolopez@gmail.com'}>`,
-      to: destinatarioPrincipal,
-      cc: cc.length > 0 ? cc.join(',') : undefined,
+    // SendGrid maneja múltiples destinatarios en el campo 'to' como un array o string separado por comas.
+    // No necesita CC explícito si todos son destinatarios principales.
+    const adminRecipients = destinatarioPrincipal.split(',').map(e => e.trim()).filter(e => e);
+     if (!adminRecipients.includes('ignaciodalesio1995@gmail.com')) {
+         adminRecipients.push('ignaciodalesiolopez@gmail.com'); // Asegurar que Nacho reciba
+     }
+
+    const adminMsg = {
+      to: adminRecipients, 
+      from: { 
+          email: verifiedSender, 
+          name: "Goza Madrid Web" 
+      },
       subject: `Nuevo mensaje de contacto de ${nombre}`,
       text: `
 Nuevo mensaje de contacto
@@ -318,54 +170,96 @@ Mensaje: ${mensaje || asunto || 'No proporcionado'}
         <p><strong>Mensaje:</strong> ${mensaje || asunto || 'No proporcionado'}</p>
       `
     };
-    
-    // Log detallado de las opciones de correo
-    console.log('Enviando correo con opciones:', {
-      from: mailOptions.from,
-      to: mailOptions.to,
-      cc: mailOptions.cc,
-      subject: mailOptions.subject
-    });
-    logToFile('Opciones de correo configuradas', mailOptions);
-    
-    // Enviar correo usando la función con múltiples alternativas
-    const info = await sendEmailWithFallbacks(mailOptions);
-    
-    console.log('Correo enviado con éxito:', info.messageId);
-    logToFile('Correo enviado con éxito', {
-      messageId: info.messageId,
-      response: info.response
-    });
-    
-    // Responder al cliente
+
+    console.log('Preparando correo ADMIN SendGrid:', { to: adminMsg.to, from: adminMsg.from, subject: adminMsg.subject });
+    logToFile('Opciones correo ADMIN SendGrid', adminMsg);
+
+    try {
+      const response = await sgMail.send(adminMsg);
+      console.log('Correo ADMIN SendGrid enviado:', response[0].statusCode, response[0].headers);
+      logToFile('Correo ADMIN SendGrid enviado', { response });
+      adminSendSuccess = true;
+    } catch (adminError) {
+      console.error('Error CRÍTICO al enviar correo ADMIN SendGrid:', adminError);
+      if (adminError.response) {
+        console.error('SendGrid Error Body:', adminError.response.body);
+      }
+      logToFile('Error CRÍTICO correo ADMIN SendGrid', { error: adminError.message, responseBody: adminError.response?.body });
+      // Continuar para intentar enviar confirmación al cliente
+    }
+
+    // --- Confirmación CLIENTE --- 
+    if (email && /\S+@\S+\.\S+/.test(email)) {
+      const clientMsg = {
+        to: email,
+        from: { 
+            email: verifiedSender, 
+            name: "Goza Madrid" 
+        },
+        subject: `Hemos recibido tu mensaje - Goza Madrid`,
+        text: `Hola ${nombre},\n\nHemos recibido tu mensaje y nos pondremos en contacto contigo lo antes posible.\n\nGracias por contactar con Goza Madrid.\n\nTu mensaje:\n${mensaje || asunto || 'No proporcionado'}`, 
+        html: `
+          <div style="font-family: sans-serif; line-height: 1.6;">
+            <h2>Hola ${nombre},</h2>
+            <p>Hemos recibido tu mensaje y nuestro equipo se pondrá en contacto contigo lo antes posible.</p>
+            <p><strong>Tu mensaje fue:</strong></p>
+            <blockquote style="border-left: 4px solid #ccc; padding-left: 1em; margin-left: 0;">
+              <p>${mensaje || asunto || 'No proporcionado'}</p>
+            </blockquote>
+            <p>Gracias por contactar con <strong>Goza Madrid</strong>.</p>
+            <hr>
+            <p><small>Este es un mensaje automático, por favor no respondas directamente a este email.</small></p>
+          </div>
+        `
+      };
+      
+      console.log('Preparando correo CLIENTE SendGrid:', { to: clientMsg.to, from: clientMsg.from, subject: clientMsg.subject });
+      logToFile('Opciones correo CLIENTE SendGrid', clientMsg);
+
+      try {
+        const response = await sgMail.send(clientMsg);
+        console.log('Correo CLIENTE SendGrid enviado:', response[0].statusCode, response[0].headers);
+        logToFile('Correo CLIENTE SendGrid enviado', { response });
+      } catch (clientError) {
+        console.error('Error al enviar correo CLIENTE SendGrid:', clientError);
+         if (clientError.response) {
+            console.error('SendGrid Error Body:', clientError.response.body);
+         }
+        logToFile('Error correo CLIENTE SendGrid', { to: email, error: clientError.message, responseBody: clientError.response?.body });
+      }
+    } else {
+      console.warn('No se envió correo de confirmación: email de cliente no válido o no proporcionado.');
+      logToFile('Correo CLIENTE no enviado', { reason: 'Email inválido o no proporcionado', clientEmail: email });
+    }
+
+    // --- Respuesta final al Frontend --- 
+    if (!adminSendSuccess) { // Si el envío al admin falló
+      return res.status(500).json({
+        success: false,
+        message: 'Error interno al procesar el formulario. Por favor, inténtalo más tarde.',
+        error: process.env.NODE_ENV === 'development' ? 'Failed to send admin notification' : undefined
+      });
+    }
+    // Si el envío al admin tuvo éxito (SendGrid devolvió 2xx)
     return res.status(200).json({
       success: true,
       message: 'Mensaje enviado correctamente',
       data: { 
-        messageId: info.messageId,
-        recipients: {
-          to: destinatarioPrincipal,
-          cc: cc
-        }
+         adminMessageId: response[0].headers['x-message-id']
       }
     });
-    
+
   } catch (error) {
-    console.error('Error al enviar correo de contacto:', error);
-    logToFile('Error al enviar correo', {
+    // Este catch ahora solo cubriría errores MUY tempranos (ej. JSON mal formado)
+    console.error('Error MUY TEMPRANO al procesar solicitud de contacto:', error);
+    logToFile('Error MUY TEMPRANO en /api/contact', {
       error: error.message,
       stack: error.stack
     });
-    
-    // A pesar del error, devolvemos éxito al cliente
-    // para evitar una mala experiencia de usuario
-    return res.status(200).json({
-      success: true,
-      message: 'Formulario recibido correctamente',
-      received: {
-        nombre: req.body.nombre,
-        email: req.body.email
-      }
+    return res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor.',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 }; 
