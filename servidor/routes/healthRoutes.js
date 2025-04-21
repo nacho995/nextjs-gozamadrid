@@ -1,101 +1,87 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 import os from 'os';
-import nodemailer from 'nodemailer';
-import { testEmail } from '../controller/contactController.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+// import nodemailer from 'nodemailer'; // Ya no se usa
+
+dotenv.config();
 
 const router = express.Router();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// Endpoint para verificar el estado del servidor
+// Función auxiliar para verificar si un servicio está "configurado"
+// Ahora verifica las variables clave de SendGrid
+const checkEmailConfig = () => {
+  return {
+    sendgridApiKey: process.env.SENDGRID_API_KEY ? true : false,
+    sendgridVerifiedSender: process.env.SENDGRID_VERIFIED_SENDER ? true : false,
+    recipient: process.env.EMAIL_RECIPIENT ? true : false, // Mantenemos EMAIL_RECIPIENT
+  };
+};
+
+// Ruta principal de health check
 router.get('/', async (req, res) => {
-  try {
-    // Información del sistema
-    const systemInfo = {
-      uptime: Math.floor(process.uptime()),
-      memory: {
-        total: Math.round(os.totalmem() / (1024 * 1024 * 1024) * 100) / 100 + ' GB',
-        free: Math.round(os.freemem() / (1024 * 1024 * 1024) * 100) / 100 + ' GB',
-        usage: Math.round((1 - os.freemem() / os.totalmem()) * 10000) / 100 + '%'
+  const mongoConnected = mongoose.connection.readyState === 1;
+  const emailConfig = checkEmailConfig();
+  const memoryUsage = process.memoryUsage();
+  const uptime = process.uptime();
+  const loadAvg = os.loadavg();
+
+  const healthStatus = {
+    status: mongoConnected ? 'OK' : 'ERROR',
+    timestamp: new Date().toISOString(),
+    dependencies: {
+      mongodb: {
+        status: mongoConnected ? 'OK' : 'ERROR',
+        connectionState: mongoose.connection.readyState,
+        message: mongoConnected ? 'Conectado' : 'Desconectado'
       },
-      cpu: os.cpus().length,
+      emailService: {
+        provider: 'SendGrid',
+        status: emailConfig.sendgridApiKey && emailConfig.sendgridVerifiedSender && emailConfig.recipient ? 'CONFIGURED' : 'NOT_CONFIGURED',
+        details: emailConfig
+      }
+    },
+    system: {
+      uptime: `${Math.floor(uptime / 60 / 60)}h ${Math.floor((uptime / 60) % 60)}m ${Math.floor(uptime % 60)}s`,
+      memory: {
+        rss: `${(memoryUsage.rss / 1024 / 1024).toFixed(2)} MB`,
+        heapTotal: `${(memoryUsage.heapTotal / 1024 / 1024).toFixed(2)} MB`,
+        heapUsed: `${(memoryUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`,
+        external: `${(memoryUsage.external / 1024 / 1024).toFixed(2)} MB`,
+      },
+      cpuLoad: loadAvg,
       hostname: os.hostname(),
       platform: os.platform(),
-      nodeVersion: process.version
-    };
+      arch: os.arch()
+    }
+  };
 
-    // Estado de MongoDB
-    const dbStatus = mongoose.connection.readyState;
-    const dbReady = dbStatus === 1;
-    const dbStatusText = ['Desconectado', 'Conectado', 'Conectando', 'Desconectando'][dbStatus] || 'Desconocido';
-
-    // Variables de entorno para correo electrónico
-    const emailConfig = {
-      host: process.env.EMAIL_HOST ? true : false,
-      port: process.env.EMAIL_PORT ? true : false,
-      user: process.env.EMAIL_USER ? true : false,
-      pass: (process.env.EMAIL_PASS || process.env.EMAIL_PASSWORD) ? true : false,
-      recipient: (process.env.EMAIL_RECIPIENT || process.env.EMAIL_TO) ? true : false
-    };
-
-    // Estado general
-    const status = {
-      server: "OK",
-      database: dbReady ? "OK" : "ERROR",
-      email: (emailConfig.host && emailConfig.port && emailConfig.user && emailConfig.pass) ? "OK" : "CONFIGURACIÓN INCOMPLETA"
-    };
-
-    // Determinar el estado general del sistema
-    const overallStatus = !dbReady ? "ERROR" : 
-                         (status.email !== "OK" ? "ADVERTENCIA" : "OK");
-
-    return res.status(200).json({
-      status: overallStatus,
-      timestamp: new Date().toISOString(),
-      uptime: systemInfo.uptime,
-      components: {
-        server: {
-          status: status.server,
-          info: systemInfo
-        },
-        database: {
-          status: status.database,
-          connection: dbStatusText,
-          collections: Object.keys(mongoose.connection.collections).length
-        },
-        email: {
-          status: status.email,
-          config: emailConfig
-        }
-      }
-    });
-  } catch (error) {
-    console.error('Error en el health check:', error);
-    return res.status(500).json({
-      status: "ERROR",
-      timestamp: new Date().toISOString(),
-      error: error.message
-    });
-  }
+  res.status(mongoConnected ? 200 : 503).json(healthStatus);
 });
 
-// Endpoint para verificar conexión al servidor de correo
-router.get('/email', async (req, res) => {
-  try {
-    // Verificar si tenemos la configuración necesaria
-    if (!process.env.EMAIL_HOST || !process.env.EMAIL_USER || 
-        !(process.env.EMAIL_PASS || process.env.EMAIL_PASSWORD)) {
-      return res.status(400).json({
-        status: "ERROR",
-        message: "Configuración de correo incompleta",
-        missingConfig: {
+// Ruta para probar la conexión de email (eliminada o comentada)
+/*
+router.get('/test-email-connection', async (req, res) => {
+  console.log('[Health Check] Iniciando prueba de conexión de email...');
+
+  if (!process.env.EMAIL_HOST || !process.env.EMAIL_USER || 
+      !(process.env.EMAIL_PASS || process.env.EMAIL_PASSWORD)) {
+    console.warn('[Health Check] Faltan variables de entorno para prueba de email.');
+    return res.status(400).json({
+      success: false,
+      message: 'Faltan variables de entorno de email para la prueba.',
+      missing: {
           host: !process.env.EMAIL_HOST,
           user: !process.env.EMAIL_USER,
           pass: !(process.env.EMAIL_PASS || process.env.EMAIL_PASSWORD)
-        }
-      });
-    }
+      }
+    });
+  }
 
-    // Crear transportador
+  try {
     const transporter = nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
       port: parseInt(process.env.EMAIL_PORT || '587'),
@@ -103,59 +89,30 @@ router.get('/email', async (req, res) => {
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS || process.env.EMAIL_PASSWORD
-      }
+      },
+      connectionTimeout: 5000 // 5 segundos de timeout
     });
 
-    // Verificar conexión
-    const verifyResult = await transporter.verify();
-
-    return res.status(200).json({
-      status: verifyResult ? "OK" : "ERROR",
-      message: verifyResult ? "Conexión al servidor de correo verificada" : "No se pudo verificar la conexión",
-      config: {
+    console.log('[Health Check] Verificando conexión con servidor SMTP...', { 
         host: process.env.EMAIL_HOST,
         port: process.env.EMAIL_PORT || '587',
         secure: process.env.EMAIL_SECURE === 'true',
         user: process.env.EMAIL_USER ? 'Configurado' : 'No configurado',
-        pass: (process.env.EMAIL_PASS || process.env.EMAIL_PASSWORD) ? 'Configurado' : 'No configurado'
-      }
+        pass: (process.env.EMAIL_PASS || process.env.EMAIL_PASSWORD) ? 'Configurado' : 'No configurado' 
     });
+    await transporter.verify();
+    console.log('[Health Check] Conexión SMTP verificada correctamente.');
+    res.status(200).json({ success: true, message: 'Conexión con servidor SMTP verificada.' });
   } catch (error) {
-    console.error('Error en la verificación de correo:', error);
-    return res.status(500).json({
-      status: "ERROR",
-      message: "Error al verificar conexión de correo",
-      error: error.message
+    console.error('[Health Check] Error al verificar conexión SMTP:', error);
+    res.status(500).json({ 
+        success: false, 
+        message: 'Error al verificar la conexión con el servidor SMTP.', 
+        error: error.message,
+        code: error.code
     });
   }
 });
-
-// Endpoint para verificar conexión a MongoDB
-router.get('/mongodb', async (req, res) => {
-  try {
-    // Verificar estado de la conexión
-    const dbStatus = mongoose.connection.readyState;
-    const dbReady = dbStatus === 1;
-    const dbStatusText = ['Desconectado', 'Conectado', 'Conectando', 'Desconectando'][dbStatus] || 'Desconocido';
-
-    return res.status(200).json({
-      status: dbReady ? "OK" : "ERROR",
-      connection: dbStatusText,
-      collections: Object.keys(mongoose.connection.collections).length,
-      databaseName: mongoose.connection.name || 'No disponible'
-    });
-  } catch (error) {
-    console.error('Error en la verificación de MongoDB:', error);
-    return res.status(500).json({
-      status: "ERROR",
-      message: "Error al verificar conexión a MongoDB",
-      error: error.message
-    });
-  }
-});
-
-// Ruta para prueba de email
-router.get('/email', testEmail);
-router.post('/email', testEmail);
+*/
 
 export default router; 
