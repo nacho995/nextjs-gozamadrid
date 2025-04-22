@@ -171,6 +171,18 @@ app.use('/api/property-offer', propertyOfferRoutes);
 // Rutas para health check y monitoreo
 app.use('/api/health', healthRoutes);
 
+// Ruta de prueba para el formulario de contacto
+app.post('/api/test-contact', (req, res) => {
+  console.log('[TEST-CONTACT] Recibida petición de prueba');
+  console.log('[TEST-CONTACT] Headers:', JSON.stringify(req.headers));
+  console.log('[TEST-CONTACT] Body:', JSON.stringify(req.body));
+  return res.status(200).json({
+    success: true,
+    message: 'Prueba exitosa',
+    receivedBody: req.body
+  });
+});
+
 // Ruta especial para el formulario de contacto
 app.post('/api/contact', sendContactEmail);
 // Añadir la misma ruta con barra final para manejar ambos casos
