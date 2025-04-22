@@ -17,6 +17,7 @@ const FormContact = () => {
   // Estado para el prefijo y el estado de envío
   const [prefix, setPrefix] = useState('+34');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [debugMode, setDebugMode] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,9 +43,27 @@ const FormContact = () => {
     const loadingToast = toast.loading('Enviando mensaje...');
 
     try {
+      // Obtener la URL base de la API
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
       
-      const response = await fetch(`${API_URL}/api/contact`, {
+      // En modo debug, usar la ruta de prueba en lugar de la normal
+      const endpoint = debugMode ? '/api/test-contact' : '/api/contact';
+      
+      // Construir la URL completa, asegurando que no haya duplicidad de /api
+      const apiUrl = API_URL.endsWith('/api') ? 
+        `${API_URL}${endpoint.replace('/api', '')}` : 
+        `${API_URL}${endpoint}`;
+      
+      console.log('Enviando datos a:', apiUrl);
+      console.log('Datos enviados:', {
+        nombre: name,
+        email: email,
+        prefix: prefix,
+        telefono: phone,
+        mensaje: message
+      });
+      
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -52,9 +71,15 @@ const FormContact = () => {
           email: email,
           prefix: prefix,
           telefono: phone,
-          mensaje: message
+          mensaje: message,
+          // Campos adicionales requeridos por el servidor
+          subject: 'Nuevo mensaje de contacto desde el formulario web',
+          htmlContent: message
         })
       });
+
+      const data = await response.json();
+      console.log('Respuesta del servidor:', data);
 
       if (!response.ok) throw new Error('Error en el envío');
       
@@ -73,6 +98,12 @@ const FormContact = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Toggle para el modo debug
+  const toggleDebugMode = () => {
+    setDebugMode(!debugMode);
+    toast.info(debugMode ? 'Modo normal activado' : 'Modo diagnóstico activado');
   };
 
   // Componente de datos estructurados
@@ -310,6 +341,18 @@ const FormContact = () => {
                         )}
                       </span>
                     </button>
+
+                    {/* Botón de modo diagnóstico (oculto para usuarios normales) */}
+                    <div className="mt-2 text-right">
+                      <button
+                        type="button"
+                        onClick={toggleDebugMode}
+                        className="text-xs text-gray-400 hover:text-gray-600"
+                        style={{ fontSize: '0.65rem' }}
+                      >
+                        {debugMode ? 'Modo normal' : 'Modo diagnóstico'}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </form>
