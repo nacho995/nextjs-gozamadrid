@@ -40,6 +40,13 @@ const PropiedadesLujo = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isPopupMinimized]);
   
+  // Asegurarse de que el popup minimizado siempre sea visible
+  useEffect(() => {
+    if (!isPopupMinimized && !showPopup) {
+      setIsPopupMinimized(true);
+    }
+  }, [isPopupMinimized, showPopup]);
+  
   // Función para minimizar el popup
   const minimizePopup = () => {
     setIsPopupMinimized(true);
@@ -308,8 +315,8 @@ const PropiedadesLujo = () => {
             </motion.div>
           )}
           
-          {/* Botón para maximizar popup cuando está minimizado */}
-          {isPopupMinimized && (
+          {/* Botón para maximizar popup - siempre visible cuando no se muestra el popup */}
+          {!showPopup && (
             <motion.button
               onClick={maximizePopup}
               className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 bg-gradient-to-r from-yellow-500 to-yellow-700 text-black px-4 py-2 rounded-full shadow-lg flex items-center space-x-2 border border-yellow-400/30"
