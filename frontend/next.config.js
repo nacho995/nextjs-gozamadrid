@@ -59,6 +59,22 @@ const nextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      {
+        source: '/logonuevo.png',
+        destination: '/api/images/logonuevo.png',
+      },
+      {
+        source: '/logo.png',
+        destination: '/api/images/logo.png',
+      },
+      {
+        source: '/favicon.ico',
+        destination: '/api/images/favicon.ico',
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;

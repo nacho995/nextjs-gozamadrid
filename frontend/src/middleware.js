@@ -159,6 +159,15 @@ export async function middleware(request) {
     return response;
   }
   
+  // Redirigir imágenes críticas a la API
+  const criticalImages = ['/logonuevo.png', '/logo.png', '/favicon.ico'];
+  
+  if (criticalImages.includes(pathname)) {
+    const url = request.nextUrl.clone();
+    url.pathname = `/api/images${pathname}`;
+    return NextResponse.rewrite(url);
+  }
+  
   // Manejar archivos estáticos (imágenes)
   if (pathname.match(/\.(png|jpg|jpeg|gif|svg|ico|webp)$/)) {
     const response = NextResponse.next();

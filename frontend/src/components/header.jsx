@@ -262,7 +262,7 @@ export default function ControlMenu() {
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-amarillo/20 rounded-3xl"></div>
             <Link href="/" aria-label="Ir a la página principal">
               <Image 
-                src="/logonuevo.png" 
+                src="/api/images/logonuevo.png" 
                 alt="Logo de Goza Madrid" 
                 width={120} 
                 height={120} 
@@ -497,7 +497,7 @@ export default function ControlMenu() {
             <div className="flex justify-between items-center">
               <div className="mb-8 text-center">
                 <Link href="/" className="inline-block" aria-label="Ir a la página principal">
-                  <Image src="/logonuevo.png" alt="Logo de Goza Madrid" width={80} height={80} layout="intrinsic" />
+                  <Image src="/api/images/logonuevo.png" alt="Logo de Goza Madrid" width={80} height={80} layout="intrinsic" />
                 </Link>
               </div>
               <button 
