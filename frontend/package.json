@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "pwd && next dev",
-    "prebuild": "node scripts/verify-images.js",
+    "prebuild": "node build-config.js",
     "build": "next build",
-    "postbuild": "node scripts/copy-static-files.js && next-sitemap",
+    "postbuild": "next-sitemap",
     "start": "next start",
     "lint": "next lint",
     "deploy:aws": "npm run build && eb deploy",
