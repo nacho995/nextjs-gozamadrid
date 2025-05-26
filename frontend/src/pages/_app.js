@@ -263,6 +263,11 @@ function MyApp({ Component, pageProps }) {
     setHideControlMenu(shouldHide);
   }, [router.pathname]);
 
+  // Verificar si la página tiene su propio layout personalizado
+  const getLayout = Component.getLayout || ((page) => (
+    <Layout hideControlMenu={hideControlMenu}>{page}</Layout>
+  ));
+
   return (
     <CookieProvider>
       <UserProvider>
@@ -320,9 +325,9 @@ function MyApp({ Component, pageProps }) {
 
             {/* Global Loading Screen */}
             {loading && <LoadingScreen />}
-            <Layout hideControlMenu={hideControlMenu}>
-              <Component {...pageProps} />
-            </Layout>
+            
+            {/* Aplicar el layout personalizado o el predeterminado */}
+            {getLayout(<Component {...pageProps} />)}
           </>
         </NavbarProvider>
       </UserProvider>
