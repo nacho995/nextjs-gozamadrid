@@ -4,6 +4,7 @@ import Head from 'next/head';
 import ControlMenu from './header';
 import Footer3 from './footer';
 import CookieConsent from './CookieConsent';
+import { useRouter } from 'next/router';
 
 // Schema.org para la estructura del sitio
 const getWebsiteSchema = () => ({
@@ -34,7 +35,14 @@ const getOrganizationSchema = () => ({
   }
 });
 
-const Layout = ({ children }) => (
+const Layout = ({ children }) => {
+  // Usar el router para detectar la página actual
+  const router = useRouter();
+  
+  // Verificar si estamos en la página de propiedades-lujo
+  const isLuxuryPropertiesPage = router.pathname === '/propiedades-lujo';
+  
+  return (
   <>
     <Head>
       <meta charSet="utf-8" />
@@ -67,21 +75,27 @@ const Layout = ({ children }) => (
     </Head>
 
     <div className="flex flex-col min-h-screen bg-transparent">
-      <header className="relative z-50">
-        <ControlMenu/>
-      </header>
+      {/* Solo mostrar el Header y Footer en páginas diferentes a propiedades-lujo */}
+      {!isLuxuryPropertiesPage && (
+        <header className="relative z-50">
+          <ControlMenu/>
+        </header>
+      )}
 
       <main className="flex-grow" role="main" id="main-content">
         {children}
       </main>
 
-      <footer className="relative z-40">
-        <Footer3 />
-      </footer>
+      {!isLuxuryPropertiesPage && (
+        <footer className="relative z-40">
+          <Footer3 />
+        </footer>
+      )}
 
       <CookieConsent />
     </div>
   </>
 );
+};
 
 export default Layout;
