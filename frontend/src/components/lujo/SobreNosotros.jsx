@@ -1,5 +1,5 @@
 import React from 'react';
-import Image from 'next/image';
+// import Image from "next/legacy/image";
 import { motion } from 'framer-motion';
 import { FaCertificate, FaAward, FaHandshake } from 'react-icons/fa';
 
@@ -10,7 +10,7 @@ function SobreNosotros() {
         <div className="grid items-center gap-12 md:grid-cols-2">
           {/* Columna de imagen */}
           <div className="relative h-[500px] overflow-hidden rounded-lg shadow-xl">
-            <Image
+            <img
               src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80"
               alt="Equipo de realestategozamadrid.com"
               layout="fill"

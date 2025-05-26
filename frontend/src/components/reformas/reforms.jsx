@@ -7,7 +7,7 @@ import {
     FaWrench, FaTint, FaLeaf, FaDoorOpen, FaLightbulb,
     FaHammer, FaClock, FaCheck, FaPalette, FaWindowMaximize
 } from 'react-icons/fa';
-import Image from 'next/image';
+import Image from "next/legacy/image";
 import Link from 'next/link';
 import FadeInView from '../animations/FadeInView';
 import FadeIn from '../animations/FadeIn';

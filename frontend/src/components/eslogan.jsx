@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import Link from "next/link";
 import FadeInView from './animations/FadeInView';
 import ScaleInView from './animations/ScaleInView';
@@ -212,14 +212,12 @@ const Eslogan = () => {
                                 <Image
                                     src="/gzmdinero.png"
                                     alt="Inversiones inmobiliarias en Madrid - Imagen representativa de nuestros servicios"
-                                    fill
-                                    className="object-contain lg:object-cover object-center scale-100 lg:scale-100 transition-transform duration-700 hover:scale-[1.01]"
+                                    layout="fill" 
+                                    objectFit="cover" 
+                                    className="object-center scale-100 lg:scale-100 transition-transform duration-700 hover:scale-[1.01]"
                                     priority
                                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 65vw"
-                                    style={{ 
-                                        objectPosition: '50% 50%',
-                                        objectFit: 'cover'
-                                    }}
+                                    style={{ objectPosition: '50% 50%' }}
                                     quality={100}
                                 />
                             </figure>

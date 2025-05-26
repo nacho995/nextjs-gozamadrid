@@ -1,5 +1,5 @@
 import React from 'react';
-import Image from 'next/image';
+import Image from "next/legacy/image";
 
 /**
  * Componente optimizado para el logo del footer
@@ -9,25 +9,21 @@ const LogoFooter = ({ src, alt, url }) => {
   return (
     <div className="flex items-center justify-start">
       <div 
-        className="w-36 h-14 relative overflow-hidden"
+        className="w-24 h-24 relative overflow-hidden"
         style={{ 
-          maxWidth: '150px', 
-          maxHeight: '60px',
-          width: '9rem',
-          height: '3.5rem'
+          maxWidth: '100px', 
+          maxHeight: '100px',
+          width: '6rem',
+          height: '6rem'
         }}
       >
         <Image
-          src={src || "/logo.png"}
+          src={src || "/logonuevo.png"}
           alt={alt || "Goza Madrid - Agencia Inmobiliaria"}
-          fill
+          layout="fill"
+          objectFit="contain"
+          objectPosition="left center"
           sizes="150px"
-          style={{
-            objectFit: 'contain',
-            objectPosition: 'left center',
-            maxWidth: '100%',
-            maxHeight: '100%'
-          }}
           priority
         />
       </div>

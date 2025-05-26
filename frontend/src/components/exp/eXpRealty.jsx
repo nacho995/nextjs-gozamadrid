@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import AnimatedOnScroll from "../AnimatedScroll";
 import Head from "next/head";
 import { getCleanJsonLd } from "@/utils/structuredDataHelper";

@@ -1,23 +1,23 @@
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import Image from "next/legacy/image";
 import { motion } from 'framer-motion';
 
 const HeaderLanding = () => {
   return (
     <header className="w-full">
       {/* Barra superior con logo y teléfono */}
-      <div className="bg-gradient-to-r from-white via-yellow-600/50 to-gray-900 backdrop-blur-md py-3 px-4 shadow-xl border-b border-yellow-600/30">
+      <div className="bg-gradient-to-r from-black via-black to-amarillo backdrop-blur-md py-3 px-4 shadow-xl border-b border-yellow-600/30">
         <div className="container mx-auto flex justify-between items-center">
           {/* Logo */}
           <Link href="/" className="relative z-10">
-            <div className="flex items-center">
+            <div className="flex items-center" style={{ maxHeight: '8rem' }}> 
               <Image 
-                src="/logo.png" 
+                src="/logonuevo.png" 
                 alt="Real Estate Goza Madrid" 
-                width={280} 
-                height={100}
-                className="h-auto w-auto object-contain max-h-20"
+                width={150} 
+                height={200}
+                layout="intrinsic"
                 priority
               />
             </div>

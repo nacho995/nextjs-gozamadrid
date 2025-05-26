@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import Image from "next/legacy/image";
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import Head from 'next/head';
 

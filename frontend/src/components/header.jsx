@@ -1,6 +1,6 @@
 "use client";
 import { usePathname } from 'next/navigation';
-import Image from "next/image";
+import Image from "next/legacy/image";
 import Link from "next/link";
 import Head from 'next/head';
 import { useState, useRef, useEffect, useCallback } from "react";
@@ -262,10 +262,11 @@ export default function ControlMenu() {
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-amarillo/20 rounded-3xl"></div>
             <Link href="/" aria-label="Ir a la página principal">
               <Image 
-                src="/logo.png" 
+                src="/logonuevo.png" 
                 alt="Logo de Goza Madrid" 
-                width={150} 
-                height={30} 
+                width={120} 
+                height={120} 
+                layout="intrinsic"
                 className="relative z-10 m-0"
                 priority
               />
@@ -494,7 +495,11 @@ export default function ControlMenu() {
             }`}
           >
             <div className="flex justify-between items-center">
-              <Image src="/logo.png" alt="Logo de Goza Madrid" width={100} height={20} />
+              <div className="mb-8 text-center">
+                <Link href="/" className="inline-block" aria-label="Ir a la página principal">
+                  <Image src="/logonuevo.png" alt="Logo de Goza Madrid" width={80} height={80} layout="intrinsic" />
+                </Link>
+              </div>
               <button 
                 onClick={handleMenuToggle} 
                 className="text-white hover:text-amarillo bg-black/20 backdrop-blur-sm p-2 rounded-full transition-all duration-300"

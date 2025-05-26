@@ -728,9 +728,7 @@ export default function BlogPage() {
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(blogListingSchema) }}
                 />
             </Head>
-
             {loading && <LoadingScreen />}
-
             <main className="relative mt-[-30vh] py-8">
                 <AnimatedOnScroll>
                     <div className="relative container mx-auto px-4">
@@ -752,7 +750,7 @@ export default function BlogPage() {
                             </div>
                         ) : (
                             /* Lista de blogs con semántica mejorada */
-                            <section aria-label="Listado de artículos del blog">
+                            (<section aria-label="Listado de artículos del blog">
                                 {blogs && Array.isArray(blogs) && blogs.length > 0 ? (
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                                         {blogs.map((blog) => {
@@ -858,11 +856,11 @@ export default function BlogPage() {
                                          </button>
                                      </div>
                                  )}
-                             </section>
+                            </section>)
                          )}
                      </div>
                  </AnimatedOnScroll>
              </main>
-         </>
-     );
+        </>
+    );
 }

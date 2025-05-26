@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
-import Image from 'next/image';
+// import Image from "next/legacy/image";
 
 function FormularioContacto() {
   // Estado para el wizard
@@ -140,7 +140,7 @@ function FormularioContacto() {
             </div>
             
             <div className="relative rounded-full overflow-hidden border-4 border-yellow-500/30 shadow-xl">
-              <Image 
+              <img 
                 src="/marta.jpeg" 
                 alt="Marta Goza - Asesora Inmobiliaria Premium" 
                 width={180} 
@@ -459,7 +459,7 @@ function FormularioContacto() {
                     </p>
                     
                     <div className="flex items-center justify-center space-x-4 mt-8">
-                      <Image 
+                      <img 
                         src="/marta.jpeg" 
                         alt="Marta Goza - Asesora Inmobiliaria Premium" 
                         width={80} 

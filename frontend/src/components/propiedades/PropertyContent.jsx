@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { sendPropertyEmail } from '@/services/api';
 import Head from "next/head";
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
-import Image from 'next/image';
+import Image from "next/legacy/image";
 import CountryPrefix from "../CountryPrefix";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://goza-madrid.onrender.com';
@@ -1197,7 +1197,6 @@ export default function DefaultPropertyContent({ property }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
       </Head>
-    
       <div className="container mx-auto px-4 py-8">
         <article className="relative" itemScope itemType="https://schema.org/RealEstateListing">
           {/* Enhanced SEO metadata */}
@@ -1879,7 +1878,6 @@ export default function DefaultPropertyContent({ property }) {
           </div>
         )}
       </div>
-      
       <style jsx global>{`
         @keyframes fadeIn {
           from { opacity: 0; }
