@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import AnimatedOnScroll from "./AnimatedScroll";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import Head from "next/head";
 import Link from "next/link";
 import { getCleanJsonLd } from "../utils/structuredDataHelper";
@@ -141,8 +141,8 @@ function DesktopCards({ card, index }) {
                                     <Image
                                         src="/fondoamarillo.jpg" 
                                         alt="Fondo decorativo"
-                                        fill
-                                        className="object-cover"
+                                        layout="fill"
+                                        objectFit="cover"
                                         style={{ objectPosition: 'center' }}
                                         priority={index < 2}
                                     />
@@ -180,8 +180,8 @@ function DesktopCards({ card, index }) {
                             <Image
                                 src="/fondonegro.jpg"
                                 alt="Background"
-                                fill
-                                className="object-cover"
+                                layout="fill"
+                                objectFit="cover"
                                 quality={100}
                             />
                             <div className="absolute inset-0 flex flex-col items-center justify-center p-4 sm:p-6">
@@ -246,9 +246,8 @@ function MobileCard({ card, index }) {
                                 <Image
                                     src="/fondoamarillo.jpg" 
                                     alt="Fondo"
-                                    fill
-                                    className="object-cover"
-                                    style={{ objectPosition: 'center' }}
+                                    layout="fill"
+                                    objectFit="cover"
                                 />
                                 <div className="absolute inset-0 bg-black/30 rounded-xl"></div>
                             </div>
@@ -288,8 +287,8 @@ function MobileCard({ card, index }) {
                         <Image
                             src="/fondonegro.jpg"
                             alt="Background"
-                            fill
-                            className="object-cover"
+                            layout="fill"
+                            objectFit="cover"
                             quality={100}
                         />
                         <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center p-8">
@@ -344,9 +343,8 @@ function TabletCard({ card, index }) {
                             <Image
                                 src="/fondoamarillo.jpg" 
                                 alt="Fondo"
-                                fill
-                                className="object-cover"
-                                style={{ objectPosition: 'center' }}
+                                layout="fill"
+                                objectFit="cover"
                             />
                             <div className="absolute inset-0 bg-black/30 rounded-xl"></div>
                         </div>
@@ -388,8 +386,8 @@ function TabletCard({ card, index }) {
                     <Image
                         src="/fondonegro.jpg"
                         alt="Background"
-                        fill
-                        className="object-cover"
+                        layout="fill"
+                        objectFit="cover"
                         quality={100}
                     />
                     <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center p-6">

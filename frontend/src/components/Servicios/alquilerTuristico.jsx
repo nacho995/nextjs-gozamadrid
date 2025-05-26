@@ -1,6 +1,6 @@
 "use client";
 
-import Image from 'next/image';
+import Image from "next/legacy/image";
 import { motion } from 'framer-motion';
 import { FaCalendarAlt, FaEuroSign, FaChartLine, FaHandshake, FaMapMarkerAlt, FaUsers, FaCamera } from 'react-icons/fa';
 import { useState } from 'react';
@@ -318,9 +318,9 @@ export default function AlquilerTuristico() {
                                                 <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl">
                                                     <Image
                                                         src="/fondoamarillo.jpg"
-                                                        alt={`Ventaja de alquiler turístico: ${card.title}`}
-                                                        fill
-                                                        className="object-cover"
+                                                        alt="Servicio integral y personalizado para alquileres turísticos"
+                                                        layout="fill"
+                                                        className="object-cover rounded-xl"
                                                     />
                                                     <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
                                                         <h3 
@@ -345,8 +345,8 @@ export default function AlquilerTuristico() {
                                                     <Image
                                                         src="/fondonegro.jpg"
                                                         alt="Fondo informativo"
-                                                        fill
-                                                        className="object-cover"
+                                                        layout="fill"
+                                                        objectFit="cover"
                                                         quality={100}
                                                     />
                                                     <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center p-8">

@@ -2,7 +2,7 @@ import React from 'react';
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import AnimatedOnScroll from "./AnimatedScroll";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { motion } from 'framer-motion';
 
 const Video = () => {

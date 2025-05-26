@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import Image from "next/legacy/image";
 import { motion } from 'framer-motion';
 
 const FooterLanding = () => {
@@ -24,11 +24,12 @@ const FooterLanding = () => {
               viewport={{ once: true }}
             >
               <Image 
-                src="/logo.png" 
+                src="/logonuevo.png" 
                 alt="Real Estate Goza Madrid" 
-                width={280} 
-                height={100}
-                className="h-auto w-auto mx-auto md:mx-0 mb-4 max-h-20"
+                width={120} 
+                height={120}
+                layout="intrinsic"
+                className="h-auto w-auto mx-auto md:mx-0 mb-4"
               />
             </motion.div>
             <p className="text-sm text-black max-w-md leading-relaxed">

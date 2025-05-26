@@ -2,7 +2,7 @@
 
 import React from "react";
 import AnimatedOnScroll from "../AnimatedScroll";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import Link from "next/link";
 import Head from "next/head";
 

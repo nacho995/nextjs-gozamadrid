@@ -18,22 +18,21 @@ export default function LoadingFallback({
         <title>{isError ? 'Error al cargar propiedades' : 'Cargando propiedades'} | Goza Madrid</title>
         <meta name="robots" content="noindex,follow" />
       </Head>
-      
       <div className="container mx-auto py-12 flex justify-center items-center min-h-[60vh]">
         <div className="bg-white/10 backdrop-blur-sm p-8 rounded-xl shadow-lg text-center max-w-lg">
           <div className="flex flex-col items-center">
             {isError ? (
               // Mostrar mensaje de error
-              <>
+              (<>
                 <div className="text-red-500 text-6xl mb-4">
                   <i className="mdi mdi-alert-circle"></i>
                 </div>
                 <h3 className="text-xl text-white font-semibold mb-2">Algo salió mal</h3>
                 <p className="text-gray-300 mb-6">{error}</p>
-              </>
+              </>)
             ) : (
               // Mostrar animación de carga
-              <>
+              (<>
                 <svg className="w-16 h-16 mb-4" viewBox="0 0 24 24">
                   <path
                     d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
@@ -55,7 +54,7 @@ export default function LoadingFallback({
                 </svg>
                 <p className="text-lg text-white font-medium mb-2 text-shadow-sm">Cargando propiedades...</p>
                 <p className="text-sm text-gray-300">Esto puede tardar unos segundos</p>
-              </>
+              </>)
             )}
             
             {isError && (

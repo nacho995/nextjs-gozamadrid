@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import AnimatedOnScroll from "./AnimatedScroll";
 import PropTypes from 'prop-types';
 
@@ -129,7 +129,7 @@ const ImageSlider = ({ autoPlayInterval = 8000 }) => {
                 <Image
                   src={slide.src}
                   alt={slide.alt}
-                  fill
+                  layout="fill"
                   className="object-cover"
                   priority={index === 0}
                   sizes="100vw"

@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import Link from "next/link";
 import Head from "next/head";
 import { 
@@ -68,10 +68,10 @@ const Footer = () => {
   const footerData = {
     logo: {
       url: "/",
-      src: "/logo.png",
+      src: "/logonuevo.png",
       alt: "Goza Madrid - Agencia Inmobiliaria en Madrid",
-      width: 150,
-      height: 65
+      width: 100,
+      height: 100
     },
     contact: {
       address: {

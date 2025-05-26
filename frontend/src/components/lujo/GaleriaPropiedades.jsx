@@ -1,5 +1,5 @@
 import React from 'react';
-import Image from 'next/image';
+import Image from "next/image";
 import { motion } from 'framer-motion';
 
 function GaleriaPropiedades() {
@@ -65,9 +65,10 @@ function GaleriaPropiedades() {
                 <Image
                   src={propiedad.imagen}
                   alt={propiedad.titulo}
-                  layout="fill"
-                  objectFit="cover"
+                  fill
+                  style={{ objectFit: "cover" }}
                   className="transition-transform duration-500 group-hover:scale-110"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4 text-white opacity-90">
                   <span className="inline-block rounded-md bg-yellow-500 px-3 py-1 text-sm font-semibold uppercase tracking-wide text-black">
