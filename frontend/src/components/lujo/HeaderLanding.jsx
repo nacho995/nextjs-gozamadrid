@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from "next/legacy/image";
 import { motion } from 'framer-motion';
+import OptimizedImage from '../ui/OptimizedImage';
 
 const HeaderLanding = () => {
   return (
@@ -12,13 +13,13 @@ const HeaderLanding = () => {
           {/* Logo */}
           <Link href="/" className="relative z-10">
             <div className="flex items-center" style={{ maxHeight: '8rem' }}> 
-              <Image 
-                src="/logonuevo.png" 
+              <img 
+                src="/api/images/logonuevo.png" 
                 alt="Real Estate Goza Madrid" 
                 width={150} 
                 height={200}
-                layout="intrinsic"
-                priority
+                style={{ maxHeight: '200px', width: 'auto' }}
+                loading="eager"
               />
             </div>
           </Link>

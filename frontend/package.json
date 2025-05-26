@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "pwd && next dev",
-    "prebuild": "node build-config.js",
+    "prebuild": "node verify-critical-images.js",
     "build": "next build",
     "postbuild": "next-sitemap",
     "start": "next start",

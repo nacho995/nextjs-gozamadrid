@@ -64,15 +64,19 @@
   "rewrites": [
     {
       "source": "/logonuevo.png",
-      "destination": "/logonuevo.png"
+      "destination": "/api/images/logonuevo.png"
     },
     {
       "source": "/logo.png", 
-      "destination": "/logo.png"
+      "destination": "/api/images/logo.png"
     },
     {
       "source": "/manifest.json",
-      "destination": "/manifest.json"
+      "destination": "/api/images/manifest.json"
+    },
+    {
+      "source": "/favicon.ico",
+      "destination": "/api/images/favicon.ico"
     }
   ]
 }

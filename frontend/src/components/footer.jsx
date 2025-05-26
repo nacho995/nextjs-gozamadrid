@@ -68,7 +68,7 @@ const Footer = () => {
   const footerData = {
     logo: {
       url: "/",
-      src: "/logonuevo.png",
+      src: "/api/images/logonuevo.png",
       alt: "Goza Madrid - Agencia Inmobiliaria en Madrid",
       width: 100,
       height: 100

@@ -24,7 +24,7 @@ const FooterLanding = () => {
               viewport={{ once: true }}
             >
               <Image 
-                src="/logonuevo.png" 
+                src="/api/images/logonuevo.png" 
                 alt="Real Estate Goza Madrid" 
                 width={120} 
                 height={120}

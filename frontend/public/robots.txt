@@ -11,8 +11,8 @@ Disallow: /diagnostico*
 Disallow: /diagnostic*
 
 # Host
-Host: https://www.realestategozamadrid.com
+Host: https://realestategozamadrid.com
 
 # Sitemaps
-Sitemap: https://www.realestategozamadrid.com/sitemap.xml
-Sitemap: https://www.realestategozamadrid.com/server-sitemap.xml
+Sitemap: https://realestategozamadrid.com/sitemap.xml
+Sitemap: https://realestategozamadrid.com/server-sitemap.xml
