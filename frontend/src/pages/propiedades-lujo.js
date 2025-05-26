@@ -75,11 +75,13 @@ const PropiedadesLujo = () => {
   return (
     <>
       <SEOMetadata 
-        title="Venda su Propiedad de Lujo en Madrid | Expertos en Real Estate Premium"
-        description="Maximice el valor de su propiedad de lujo en Madrid con realestategozamadrid.com. Valoración gratuita y estrategia de venta personalizada. ¡Contáctenos!"
-        keywords="venta pisos lujo Madrid, inmobiliaria lujo Madrid, vender casa exclusiva Madrid"
-        url="https://realestategozamadrid.com/propiedades-lujo"
-        imageUrl="https://realestategozamadrid.com/img/propiedades-lujo-madrid.jpg"
+        title="Venda su Propiedad de Lujo en Madrid | Marta Goza - Expertos en Real Estate Premium"
+        description="Maximice el valor de su propiedad de lujo en Madrid con Marta Goza. Valoración gratuita y estrategia de venta personalizada por expertos en el mercado inmobiliario de lujo."
+        keywords="venta pisos lujo Madrid, inmobiliaria lujo Madrid, vender casa exclusiva Madrid, Marta Goza, propiedades exclusivas"
+        ogType="website"
+        ogImage="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80"
+        ogImageAlt="Propiedades de lujo en Madrid - Marta Goza Real Estate"
+        author="Marta Goza"
       />
       
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white relative">
