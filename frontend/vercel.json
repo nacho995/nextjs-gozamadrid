@@ -2,6 +2,7 @@
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
+  "public": true,
   "env": {
     "NEXT_PUBLIC_WP_API_URL": "https://wordpress.realestategozamadrid.com/wp-json/wp/v2",
     "NEXT_PUBLIC_WC_API_URL": "https://wordpress.realestategozamadrid.com/wp-json/wc/v3",
@@ -20,22 +21,57 @@
   ],
   "headers": [
     {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
-        }
-      ]
-    },
-    {
       "source": "/(.*)\\.(png|jpg|jpeg|gif|svg|ico|webp)",
       "headers": [
         {
           "key": "Cache-Control",
           "value": "public, max-age=31536000, immutable"
+        },
+        {
+          "key": "Content-Type",
+          "value": "image/*"
         }
       ]
+    },
+    {
+      "source": "/logonuevo.png",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        },
+        {
+          "key": "Content-Type",
+          "value": "image/png"
+        }
+      ]
+    },
+    {
+      "source": "/manifest.json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/manifest+json"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/logonuevo.png",
+      "destination": "/logonuevo.png"
+    },
+    {
+      "source": "/logo.png", 
+      "destination": "/logo.png"
+    },
+    {
+      "source": "/manifest.json",
+      "destination": "/manifest.json"
     }
   ]
 }

@@ -6,20 +6,12 @@ const nextConfig = {
     domains: ['images.unsplash.com', 'realestategozamadrid.com', 'www.realestategozamadrid.com'],
     loader: 'default',
     path: '/',
+    formats: ['image/webp', 'image/avif'],
   },
   trailingSlash: false,
-  assetPrefix: '',
-  async rewrites() {
-    return [
-      {
-        source: '/logonuevo.png',
-        destination: '/logonuevo.png',
-      },
-      {
-        source: '/logo.png',
-        destination: '/logo.png',
-      },
-    ];
+  assetPrefix: process.env.NODE_ENV === 'production' ? '' : '',
+  experimental: {
+    optimizePackageImports: ['framer-motion'],
   },
   async headers() {
     return [
