@@ -159,6 +159,38 @@ export async function middleware(request) {
     return response;
   }
   
+  // Manejar archivos estáticos (imágenes)
+  if (pathname.match(/\.(png|jpg|jpeg|gif|svg|ico|webp)$/)) {
+    const response = NextResponse.next();
+    
+    // Agregar headers para archivos estáticos
+    response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+    response.headers.set('Access-Control-Allow-Origin', '*');
+    
+    // Asegurar el tipo MIME correcto
+    if (pathname.endsWith('.png')) {
+      response.headers.set('Content-Type', 'image/png');
+    } else if (pathname.endsWith('.jpg') || pathname.endsWith('.jpeg')) {
+      response.headers.set('Content-Type', 'image/jpeg');
+    } else if (pathname.endsWith('.gif')) {
+      response.headers.set('Content-Type', 'image/gif');
+    } else if (pathname.endsWith('.svg')) {
+      response.headers.set('Content-Type', 'image/svg+xml');
+    } else if (pathname.endsWith('.webp')) {
+      response.headers.set('Content-Type', 'image/webp');
+    }
+    
+    return response;
+  }
+  
+  // Manejar manifest.json
+  if (pathname === '/manifest.json') {
+    const response = NextResponse.next();
+    response.headers.set('Content-Type', 'application/manifest+json');
+    response.headers.set('Cache-Control', 'public, max-age=86400');
+    return response;
+  }
+  
   return NextResponse.next();
 }
 
@@ -172,6 +204,14 @@ export const config = {
     '/wordpress-proxy',
     '/diagnostics',
     '/api/:path*',
-    '/property/:path*'
+    '/property/:path*',
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 }; 

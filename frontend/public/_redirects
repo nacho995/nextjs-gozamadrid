@@ -1,0 +1,11 @@
+# Redirects para archivos estáticos
+/logonuevo.png /logonuevo.png 200
+/logo.png /logo.png 200
+/manifest.json /manifest.json 200
+/*.png /:splat 200
+/*.jpg /:splat 200
+/*.jpeg /:splat 200
+/*.gif /:splat 200
+/*.svg /:splat 200
+/*.ico /:splat 200
+/*.webp /:splat 200 
