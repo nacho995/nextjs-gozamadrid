@@ -4,6 +4,22 @@ const nextConfig = {
   images: {
     unoptimized: true,
     domains: ['images.unsplash.com', 'realestategozamadrid.com', 'www.realestategozamadrid.com'],
+    loader: 'default',
+    path: '/',
+  },
+  trailingSlash: false,
+  assetPrefix: '',
+  async rewrites() {
+    return [
+      {
+        source: '/logonuevo.png',
+        destination: '/logonuevo.png',
+      },
+      {
+        source: '/logo.png',
+        destination: '/logo.png',
+      },
+    ];
   },
   async headers() {
     return [
@@ -18,6 +34,42 @@ const nextConfig = {
       },
       {
         source: '/logo.png',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/logonuevo.png',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/*.png',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/*.jpg',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/*.jpeg',
         headers: [
           {
             key: 'Cache-Control',
