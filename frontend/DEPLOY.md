@@ -37,8 +37,14 @@
 ### 🚀 Proceso de Deploy:
 
 1. **Prebuild**: Verificación automática de archivos críticos
-2. **Build**: Compilación de Next.js con configuración optimizada
+2. **Build**: Compilación de Next.js con configuración optimizada y corregida
 3. **Postbuild**: Generación de sitemap
+
+### 🔧 Problemas Resueltos en el Build:
+
+- ✅ **Error de patrones de rutas**: Corregidos patrones `/*.png` por `/(.*)\\.png`
+- ✅ **Headers simplificados**: Solo archivos críticos específicos
+- ✅ **Configuración validada**: Script de verificación automática
 
 ### 🔍 Verificación Post-Deploy:
 
