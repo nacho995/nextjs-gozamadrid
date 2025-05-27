@@ -47,8 +47,8 @@ const ENTERPRISE_CONFIG = {
     backoffFactor: 1.5
   },
   
-  // Timeouts OPTIMIZADOS
-  timeouts: [3000, 5000, 8000, 10000, 12000, 15000], // Progresivos
+  // Timeouts AUMENTADOS para servidor lento
+  timeouts: [8000, 12000, 15000, 18000, 20000, 25000], // Progresivos más generosos
   
   // Circuit breaker MUY PERMISIVO
   circuitBreaker: {
@@ -387,17 +387,17 @@ export const loadFromWooCommerce = async (page = 1, limit = 20) => {
       
              // ESTRATEGIA 1: Probar primero las VARIABLES DE ENTORNO para 33 propiedades
        const priorityAttempts = [
-         // VARIABLES DE ENTORNO - MÁXIMA PRIORIDAD
-         { endpoint: 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3', creds: ENTERPRISE_CONFIG.credentialSets[0], timeout: 8000 },
-         { endpoint: 'https://realestategozamadrid.com/wp-json/wc/v3', creds: ENTERPRISE_CONFIG.credentialSets[0], timeout: 8000 },
+         // VARIABLES DE ENTORNO - MÁXIMA PRIORIDAD (TIMEOUTS AUMENTADOS)
+         { endpoint: 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3', creds: ENTERPRISE_CONFIG.credentialSets[0], timeout: 15000 },
+         { endpoint: 'https://realestategozamadrid.com/wp-json/wc/v3', creds: ENTERPRISE_CONFIG.credentialSets[0], timeout: 15000 },
          
-         // Credenciales fallback de entorno
-         { endpoint: 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3', creds: ENTERPRISE_CONFIG.credentialSets[1], timeout: 5000 },
-         { endpoint: 'https://realestategozamadrid.com/wp-json/wc/v3', creds: ENTERPRISE_CONFIG.credentialSets[1], timeout: 5000 },
+         // Credenciales fallback de entorno (TIMEOUTS AUMENTADOS)
+         { endpoint: 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3', creds: ENTERPRISE_CONFIG.credentialSets[1], timeout: 12000 },
+         { endpoint: 'https://realestategozamadrid.com/wp-json/wc/v3', creds: ENTERPRISE_CONFIG.credentialSets[1], timeout: 12000 },
          
          // Sin credenciales como último recurso
-         { endpoint: 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3', creds: { name: 'public', key: null, secret: null }, timeout: 3000 },
-         { endpoint: 'https://realestategozamadrid.com/wp-json/wc/v3', creds: { name: 'public', key: null, secret: null }, timeout: 3000 }
+         { endpoint: 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3', creds: { name: 'public', key: null, secret: null }, timeout: 8000 },
+         { endpoint: 'https://realestategozamadrid.com/wp-json/wc/v3', creds: { name: 'public', key: null, secret: null }, timeout: 8000 }
        ];
       
       // Probar las combinaciones prioritarias secuencialmente
