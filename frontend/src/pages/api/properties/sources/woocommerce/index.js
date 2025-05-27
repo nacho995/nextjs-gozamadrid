@@ -10,7 +10,7 @@ const REAL_ESTATE_CONFIG = {
     secret: process.env.WC_CONSUMER_SECRET
   },
   connection: {
-    timeout: 5000, // 5 segundos - muy corto para evitar timeouts
+    timeout: 8000, // 8 segundos - aumentado para WooCommerce
     maxRetries: 1, // Solo 1 intento
     retryDelay: 500 // Delay mínimo
   }
