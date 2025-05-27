@@ -13,17 +13,12 @@ const ENTERPRISE_CONFIG = {
   // Múltiples combinaciones de credenciales
   credentialSets: [
     {
-      name: 'real_credentials',
-      key: 'ck_75c5940bfae6a9dd63f1489da71e43b576999633',
-      secret: 'cs_f194d11b41ca92cdd356145705fede711cd233e5'
-    },
-    {
-      name: 'primary',
+      name: 'primary_env',
       key: process.env.WC_CONSUMER_KEY,
       secret: process.env.WC_CONSUMER_SECRET
     },
     {
-      name: 'fallback',
+      name: 'fallback_env',
       key: process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY,
       secret: process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET
     },
@@ -390,13 +385,13 @@ export const loadFromWooCommerce = async (page = 1, limit = 20) => {
     return await persistentCircuitBreaker.execute(async () => {
       console.log(`🚀 BÚSQUEDA RÁPIDA DE 33 PROPIEDADES REALES`);
       
-             // ESTRATEGIA 1: Probar primero las CREDENCIALES REALES para 33 propiedades
+             // ESTRATEGIA 1: Probar primero las VARIABLES DE ENTORNO para 33 propiedades
        const priorityAttempts = [
-         // CREDENCIALES REALES - MÁXIMA PRIORIDAD
+         // VARIABLES DE ENTORNO - MÁXIMA PRIORIDAD
          { endpoint: 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3', creds: ENTERPRISE_CONFIG.credentialSets[0], timeout: 8000 },
          { endpoint: 'https://realestategozamadrid.com/wp-json/wc/v3', creds: ENTERPRISE_CONFIG.credentialSets[0], timeout: 8000 },
          
-         // Credenciales de entorno como backup
+         // Credenciales fallback de entorno
          { endpoint: 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3', creds: ENTERPRISE_CONFIG.credentialSets[1], timeout: 5000 },
          { endpoint: 'https://realestategozamadrid.com/wp-json/wc/v3', creds: ENTERPRISE_CONFIG.credentialSets[1], timeout: 5000 },
          
