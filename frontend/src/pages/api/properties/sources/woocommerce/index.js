@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { kv } from '@vercel/kv'; // Importar Vercel KV
 
 // 🏠 CONFIGURACIÓN SOLO PARA PROPIEDADES REALES - SIN FALLBACKS
 const REAL_ESTATE_CONFIG = {
@@ -22,32 +21,28 @@ const REAL_ESTATE_CONFIG = {
   }
 };
 
-// 🔄 Configuración del Caché de Vercel KV
-const KV_CACHE_TTL_SECONDS = 1800; // 30 minutos
+// 🔄 Caché en memoria simple (temporal hasta configurar Vercel KV)
+const memoryCache = new Map();
+const CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutos
 
-// Nueva función para obtener datos del caché de Vercel KV
-async function getPropertiesFromKVCache(key) {
-  try {
-    const cachedData = await kv.get(key);
-    if (cachedData) {
-      console.log(`🚀 Vercel KV Cache HIT para la clave: ${key}`);
-      return cachedData;
-    }
-  } catch (error) {
-    console.error(`❌ Error leyendo de Vercel KV para ${key}:`, error.message);
+// Función para obtener datos del caché en memoria
+function getFromMemoryCache(key) {
+  const cached = memoryCache.get(key);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+    console.log(`🚀 Memory Cache HIT para la clave: ${key}`);
+    return cached.data;
   }
-  console.log(`💨 Vercel KV Cache MISS para la clave: ${key}`);
+  console.log(`💨 Memory Cache MISS para la clave: ${key}`);
   return null;
 }
 
-// Nueva función para guardar datos en el caché de Vercel KV
-async function savePropertiesToKVCache(key, data) {
-  try {
-    await kv.set(key, data, { ex: KV_CACHE_TTL_SECONDS });
-    console.log(`✅ Datos cacheados en Vercel KV para la clave: ${key} con TTL: ${KV_CACHE_TTL_SECONDS}s`);
-  } catch (error) {
-    console.error(`❌ Error escribiendo en Vercel KV para ${key}:`, error.message);
-  }
+// Función para guardar datos en el caché en memoria
+function saveToMemoryCache(key, data) {
+  memoryCache.set(key, {
+    data,
+    timestamp: Date.now()
+  });
+  console.log(`✅ Datos cacheados en memoria para la clave: ${key}`);
 }
 
 // 🔧 Transformador para propiedades reales
@@ -155,17 +150,17 @@ const transformRealProperty = (property) => {
   }
 };
 
-// 🚀 Función para cargar SOLO propiedades reales, ahora con Vercel KV
+// 🚀 Función para cargar SOLO propiedades reales, ahora con caché en memoria
 export const loadRealProperties = async (page = 1, limit = 50) => {
   const cacheKey = `woo_props_page_${page}_limit_${limit}`;
   
-  // 1. Verificar Vercel KV Cache
-  const cachedProperties = await getPropertiesFromKVCache(cacheKey);
+  // 1. Verificar caché en memoria
+  const cachedProperties = getFromMemoryCache(cacheKey);
   if (cachedProperties) {
     return cachedProperties;
   }
 
-  console.log(`🏠 Vercel KV MISS. Cargando propiedades REALES desde API externa - Página: ${page}, Límite: ${limit}`);
+  console.log(`🏠 Memory Cache MISS. Cargando propiedades REALES desde API externa - Página: ${page}, Límite: ${limit}`);
   
   const endpointToTry = REAL_ESTATE_CONFIG.endpoints[0];
   const strategyToUse = {
@@ -205,10 +200,8 @@ export const loadRealProperties = async (page = 1, limit = 50) => {
         
         console.log(`✅ API Externa ÉXITO: ${realProperties.length} propiedades reales cargadas de ${response.data.length} productos totales`);
         
-        // Guardar en Vercel KV Cache (no bloqueante)
-        savePropertiesToKVCache(cacheKey, realProperties).catch(err => 
-          console.error('⚠️ Error guardando en KV cache:', err.message)
-        );
+        // Guardar en caché en memoria
+        saveToMemoryCache(cacheKey, realProperties);
         
         return realProperties;
       } else {
@@ -257,7 +250,7 @@ export default async function handler(req, res) {
   const startTime = Date.now();
   const { limit = 50, page = 1 } = req.query;
 
-  console.log(`🏠 API Handler (WooCommerce con Vercel KV) iniciada - Página: ${page}, Límite: ${limit}`);
+  console.log(`🏠 API Handler (WooCommerce con Memory Cache) iniciada - Página: ${page}, Límite: ${limit}`);
   
   // Verificar credenciales con más detalle
   const hasKey = !!REAL_ESTATE_CONFIG.credentials.key;
@@ -289,9 +282,10 @@ export default async function handler(req, res) {
   try {
     const realProperties = await loadRealProperties(parseInt(page), parseInt(limit));
     const duration = Date.now() - startTime;
-    console.log(`🎉 ÉXITO API Handler: ${realProperties.length} propiedades REALES servidas en ${duration}ms (desde KV o API externa)`);
+    console.log(`🎉 ÉXITO API Handler: ${realProperties.length} propiedades REALES servidas en ${duration}ms (desde Memory Cache o API externa)`);
     res.setHeader('X-WooCommerce-Status', 'success');
     res.setHeader('X-Response-Time', `${duration}ms`);
+    res.setHeader('X-Cache-Type', 'memory');
     return res.status(200).json(realProperties);
   } catch (error) {
     const duration = Date.now() - startTime;
@@ -308,14 +302,6 @@ export default async function handler(req, res) {
     
     // Para otros errores, devolver información más detallada pero con status 200
     console.error(`💥 Stack trace:`, error.stack);
-    
-    const errorInfo = {
-      properties: [], // Array vacío de propiedades
-      status: 'error',
-      message: 'WooCommerce temporalmente no disponible',
-      timestamp: new Date().toISOString(),
-      duration: `${duration}ms`
-    };
     
     res.setHeader('X-WooCommerce-Status', 'error');
     res.setHeader('X-Response-Time', `${duration}ms`);
