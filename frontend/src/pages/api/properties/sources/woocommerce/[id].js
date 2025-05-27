@@ -15,11 +15,11 @@ const REAL_ESTATE_CONFIG = {
     secret: process.env.WC_CONSUMER_SECRET
   },
   
-  // Configuración agresiva para superar bloqueos
+  // Configuración optimizada para respuesta rápida
   connection: {
-    timeout: 30000, // 30 segundos
-    maxRetries: 3,
-    retryDelay: 2000
+    timeout: 8000, // 8 segundos para ser más rápido
+    maxRetries: 2, // Solo 2 intentos
+    retryDelay: 1000 // 1 segundo entre intentos
   }
 };
 
@@ -136,37 +136,36 @@ const loadRealPropertyById = async (id) => {
     }
   ];
 
-  // Probar cada combinación de endpoint + estrategia
-  for (const endpoint of REAL_ESTATE_CONFIG.endpoints) {
-    for (const strategy of strategies) {
-      for (let retry = 0; retry < REAL_ESTATE_CONFIG.connection.maxRetries; retry++) {
-        try {
-          console.log(`🔄 Intento ${retry + 1}: ${endpoint} con estrategia ${strategy.name} para ID ${id}`);
-          
-          const response = await axios.get(`${endpoint}/products/${id}`, {
-            params: {
-              consumer_key: REAL_ESTATE_CONFIG.credentials.key,
-              consumer_secret: REAL_ESTATE_CONFIG.credentials.secret
-            },
-            timeout: REAL_ESTATE_CONFIG.connection.timeout,
-            headers: strategy.headers
-          });
+  // Probar solo el primer endpoint con la primera estrategia para ser más rápido
+  const endpoint = REAL_ESTATE_CONFIG.endpoints[0]; // Solo el principal
+  const strategy = strategies[0]; // Solo estrategia estándar
+  
+  for (let retry = 0; retry < REAL_ESTATE_CONFIG.connection.maxRetries; retry++) {
+    try {
+      console.log(`🔄 Intento ${retry + 1}: ${endpoint} con estrategia ${strategy.name} para ID ${id}`);
+      
+      const response = await axios.get(`${endpoint}/products/${id}`, {
+        params: {
+          consumer_key: REAL_ESTATE_CONFIG.credentials.key,
+          consumer_secret: REAL_ESTATE_CONFIG.credentials.secret
+        },
+        timeout: REAL_ESTATE_CONFIG.connection.timeout,
+        headers: strategy.headers
+      });
 
-          if (response.status === 200 && response.data) {
-            const realProperty = transformRealProperty(response.data);
+      if (response.status === 200 && response.data) {
+        const realProperty = transformRealProperty(response.data);
 
-            if (realProperty) {
-              console.log(`✅ ¡ÉXITO! Propiedad REAL ${id} cargada desde ${endpoint} (${strategy.name})`);
-              return realProperty;
-            }
-          }
-        } catch (error) {
-          console.log(`❌ ${endpoint} + ${strategy.name} (intento ${retry + 1}) para ID ${id}: ${error.message}`);
-          
-          if (retry < REAL_ESTATE_CONFIG.connection.maxRetries - 1) {
-            await new Promise(resolve => setTimeout(resolve, REAL_ESTATE_CONFIG.connection.retryDelay));
-          }
+        if (realProperty) {
+          console.log(`✅ ¡ÉXITO! Propiedad REAL ${id} cargada desde ${endpoint} (${strategy.name})`);
+          return realProperty;
         }
+      }
+    } catch (error) {
+      console.log(`❌ ${endpoint} + ${strategy.name} (intento ${retry + 1}) para ID ${id}: ${error.message}`);
+      
+      if (retry < REAL_ESTATE_CONFIG.connection.maxRetries - 1) {
+        await new Promise(resolve => setTimeout(resolve, REAL_ESTATE_CONFIG.connection.retryDelay));
       }
     }
   }
