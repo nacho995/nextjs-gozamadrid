@@ -749,9 +749,22 @@ const Video = () => {
                                                                     {property.size}m²
                                                                 </span>
                                                             </div>
-                                                            <p className="text-2xl font-light text-amarillo">
-                                                                €{property.price}
-                                                            </p>
+                                                            <div className="flex items-center justify-between">
+                                                                <p className="text-2xl font-light text-amarillo">
+                                                                    €{property.price}
+                                                                </p>
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation(); // Evitar que se active selectProperty
+                                                                        window.open(`/propiedades/${property.id}`, '_blank');
+                                                                    }}
+                                                                    className="bg-amarillo hover:bg-amarillo/90 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                                                                    title={`Ver detalles de ${property.title}`}
+                                                                >
+                                                                    <FaEye className="text-xs" />
+                                                                    Ver detalles
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </motion.div>
