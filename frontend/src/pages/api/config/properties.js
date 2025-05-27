@@ -12,7 +12,7 @@
 // import fetch from 'node-fetch';
 
 // Función para verificar la disponibilidad de un endpoint
-async function checkEndpointAvailability(url, params = {}, timeout = 5000) {
+async function checkEndpointAvailability(url, params = {}, timeout = 3000) {
   try {
     console.log(`[API Config] Verificando disponibilidad de: ${url}`);
     
@@ -33,7 +33,7 @@ async function checkEndpointAvailability(url, params = {}, timeout = 5000) {
     console.log(`[API Config] Respuesta de ${url}: ${response.status}`);
     return response.ok;
   } catch (error) {
-    console.error(`[API Config] Error verificando ${url}:`, error);
+    console.warn(`[API Config] Error verificando ${url}:`, error.message);
     return true; // Asumimos disponible en caso de error para intentar la petición real
   }
 }
@@ -67,13 +67,13 @@ export default async function handler(req, res) {
           params: {}
         },
         mongodb: {
-          url: '/api/proxy/mongodb/properties', // Forzar el uso del proxy para MongoDB
+          url: '/api/properties/sources/mongodb', // Usar endpoint directo para MongoDB
           available: true,
           params: {}
         }
       },
-      // Indicar que debe usar el proxy para MongoDB
-      useProxyForMongoDB: true
+      // Usar endpoints directos para ambos
+      useProxyForMongoDB: false
     };
 
     // Verificar disponibilidad de endpoints
