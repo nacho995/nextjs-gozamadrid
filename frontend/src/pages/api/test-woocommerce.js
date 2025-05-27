@@ -1,173 +1,64 @@
 import axios from 'axios';
 
 export default async function handler(req, res) {
-  console.log('🧪 TEST WOOCOMMERCE - Probando múltiples métodos de conexión');
+  const startTime = Date.now();
   
-  // Credenciales - SOLO desde variables de entorno por seguridad
-  const credentials = {
-    key: process.env.WC_CONSUMER_KEY,
-    secret: process.env.WC_CONSUMER_SECRET
-  };
-  
-  // Verificar que las credenciales estén disponibles
-  if (!credentials.key || !credentials.secret) {
-    return res.status(500).json({
-      error: 'Credenciales de WooCommerce no configuradas',
-      message: 'Las variables de entorno WC_CONSUMER_KEY y WC_CONSUMER_SECRET son requeridas'
-    });
-  }
-  
-  console.log(`🔑 Usando credenciales: ${credentials.key.substring(0, 10)}...`);
-  
-  const results = {};
-  
-  // Lista de endpoints alternativos
-  const endpoints = [
-    'https://wordpress.realestategozamadrid.com/wp-json/wc/v3/products',
-    'https://realestategozamadrid.com/wp-json/wc/v3/products',
-    'https://www.realestategozamadrid.com/wp-json/wc/v3/products'
-  ];
-  
-  // Método 1: Query parameters (actual)
-  for (let i = 0; i < endpoints.length; i++) {
-    const endpoint = endpoints[i];
-    try {
-      console.log(`🧪 Probando endpoint ${i + 1}: ${endpoint} (query params)`);
-      const response = await axios.get(endpoint, {
-        params: {
-          consumer_key: credentials.key,
-          consumer_secret: credentials.secret,
-          per_page: 10
-        },
-        timeout: 20000,
-        headers: {
-          'User-Agent': 'Goza Madrid Real Estate/1.0',
-          'Accept': 'application/json'
-        }
-      });
-      
-      results[`endpoint_${i + 1}_query`] = {
-        endpoint,
-        method: 'query_params',
-        status: response.status,
-        count: response.data.length,
-        firstId: response.data[0]?.id,
-        success: true
-      };
-      console.log(`✅ Endpoint ${i + 1} query: ${response.data.length} propiedades`);
-      
-      // Si encontramos uno que funciona, no necesitamos probar más
-      if (response.data.length > 0) {
-        console.log(`🎉 ¡ÉXITO! Encontrado endpoint funcional: ${endpoint}`);
-        break;
-      }
-    } catch (error) {
-      results[`endpoint_${i + 1}_query`] = {
-        endpoint,
-        method: 'query_params',
-        error: error.message,
-        status: error.response?.status,
-        success: false
-      };
-      console.log(`❌ Endpoint ${i + 1} query: ${error.message} (${error.response?.status})`);
-    }
-  }
-  
-  // Método 2: Basic Auth (alternativo)
-  for (let i = 0; i < endpoints.length; i++) {
-    const endpoint = endpoints[i];
-    try {
-      console.log(`🧪 Probando endpoint ${i + 1}: ${endpoint} (basic auth)`);
-      const response = await axios.get(endpoint, {
-        params: {
-          per_page: 10
-        },
-        auth: {
-          username: credentials.key,
-          password: credentials.secret
-        },
-        timeout: 20000,
-        headers: {
-          'User-Agent': 'Goza Madrid Real Estate/1.0',
-          'Accept': 'application/json'
-        }
-      });
-      
-      results[`endpoint_${i + 1}_auth`] = {
-        endpoint,
-        method: 'basic_auth',
-        status: response.status,
-        count: response.data.length,
-        firstId: response.data[0]?.id,
-        success: true
-      };
-      console.log(`✅ Endpoint ${i + 1} auth: ${response.data.length} propiedades`);
-      
-      if (response.data.length > 0) {
-        console.log(`🎉 ¡ÉXITO AUTH! Encontrado endpoint funcional: ${endpoint}`);
-        break;
-      }
-    } catch (error) {
-      results[`endpoint_${i + 1}_auth`] = {
-        endpoint,
-        method: 'basic_auth',
-        error: error.message,
-        status: error.response?.status,
-        success: false
-      };
-      console.log(`❌ Endpoint ${i + 1} auth: ${error.message} (${error.response?.status})`);
-    }
-  }
-  
-  // Método 3: Headers personalizados
   try {
-    console.log('🧪 Probando con headers personalizados');
+    console.log('🔍 Probando conexión directa a WooCommerce...');
+    
     const response = await axios.get('https://wordpress.realestategozamadrid.com/wp-json/wc/v3/products', {
       params: {
-        consumer_key: credentials.key,
-        consumer_secret: credentials.secret,
-        per_page: 10
+        consumer_key: process.env.WC_CONSUMER_KEY,
+        consumer_secret: process.env.WC_CONSUMER_SECRET,
+        per_page: 2,
+        status: 'publish'
       },
-      timeout: 25000,
+      timeout: 10000,
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; GozaMadridBot/1.0)',
-        'Accept': 'application/json',
-        'Accept-Encoding': 'gzip, deflate',
-        'Connection': 'keep-alive',
-        'Cache-Control': 'no-cache'
+        'Accept': 'application/json'
       }
     });
+
+    const duration = Date.now() - startTime;
     
-    results.custom_headers = {
-      method: 'custom_headers',
+    console.log(`✅ WooCommerce respondió en ${duration}ms con ${response.data.length} productos`);
+    
+    res.status(200).json({
+      success: true,
+      duration: `${duration}ms`,
       status: response.status,
-      count: response.data.length,
-      firstId: response.data[0]?.id,
-      success: true
-    };
-    console.log(`✅ Headers personalizados: ${response.data.length} propiedades`);
+      productCount: response.data.length,
+      firstProduct: response.data[0] ? {
+        id: response.data[0].id,
+        name: response.data[0].name,
+        price: response.data[0].price,
+        hasImages: !!response.data[0].images?.length,
+        hasMetaData: !!response.data[0].meta_data?.length
+      } : null,
+      credentials: {
+        hasKey: !!process.env.WC_CONSUMER_KEY,
+        hasSecret: !!process.env.WC_CONSUMER_SECRET,
+        keyLength: process.env.WC_CONSUMER_KEY?.length || 0,
+        secretLength: process.env.WC_CONSUMER_SECRET?.length || 0
+      }
+    });
   } catch (error) {
-    results.custom_headers = {
-      method: 'custom_headers',
+    const duration = Date.now() - startTime;
+    
+    console.error(`❌ Error en WooCommerce después de ${duration}ms:`, error.message);
+    
+    res.status(200).json({
+      success: false,
+      duration: `${duration}ms`,
       error: error.message,
-      status: error.response?.status,
-      success: false
-    };
-    console.log(`❌ Headers personalizados: ${error.message} (${error.response?.status})`);
+      errorCode: error.code,
+      errorStatus: error.response?.status,
+      credentials: {
+        hasKey: !!process.env.WC_CONSUMER_KEY,
+        hasSecret: !!process.env.WC_CONSUMER_SECRET,
+        keyLength: process.env.WC_CONSUMER_KEY?.length || 0,
+        secretLength: process.env.WC_CONSUMER_SECRET?.length || 0
+      }
+    });
   }
-  
-  console.log('🎯 RESULTADOS FINALES:', results);
-  
-  // Encontrar el primer método exitoso
-  const successfulMethod = Object.values(results).find(r => r.success && r.count > 0);
-  
-  res.status(200).json({
-    message: 'Test WooCommerce completado',
-    summary: {
-      totalTests: Object.keys(results).length,
-      successfulTests: Object.values(results).filter(r => r.success).length,
-      bestMethod: successfulMethod || null
-    },
-    results
-  });
 } 
