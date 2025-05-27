@@ -249,10 +249,10 @@ export default function ControlMenu() {
             <Link href="https://www.instagram.com/Gozamadrid54" target="_blank" rel="noopener noreferrer" aria-label="Visitar nuestro Instagram">
               <FaInstagram size={25} className="hover:text-gray-300 text-pink-600" />
             </Link>
-            <a href="tel:+34919012103" className="flex items-center space-x-2" aria-label="Llamar a nuestro teléfono">
+            <a href="tel:+34608136529" className="flex items-center space-x-2" aria-label="Llamar a nuestro teléfono">
               <FaPhone size={25} className={`hover:text-gray-300 ${isExpRealty ? 'text-white' : 'text-white'}`} />
               <span className={`hover:text-gray-300 ${isExpRealty ? 'text-white' : 'text-white'} text-2xl`}>
-                +34 919 012 103
+                +34 608 136 529
               </span>
             </a>
           </div>
