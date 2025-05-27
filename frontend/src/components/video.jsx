@@ -64,7 +64,7 @@ const Video = () => {
     const [showMap, setShowMap] = useState(false);
     const [mapLoading, setMapLoading] = useState(false);
     
-    // Hook optimizado para propiedades con cache y retry
+    // Hook optimizado para propiedades REALES con cache y retry
     const { 
         properties: allProperties, 
         loading: propertiesLoading, 
@@ -76,6 +76,19 @@ const Video = () => {
         autoLoad: true,
         enableCache: true
     });
+
+    // Estado para manejar cuando no hay propiedades reales
+    const [showNoPropertiesMessage, setShowNoPropertiesMessage] = useState(false);
+
+    // Verificar si hay propiedades reales disponibles
+    useEffect(() => {
+        if (!propertiesLoading && allProperties.length === 0 && propertiesError) {
+            console.log('🏠 No hay propiedades reales disponibles');
+            setShowNoPropertiesMessage(true);
+        } else if (allProperties.length > 0) {
+            setShowNoPropertiesMessage(false);
+        }
+    }, [allProperties, propertiesLoading, propertiesError]);
 
     // Cargar script de diagnóstico en producción
     useEffect(() => {
@@ -645,16 +658,29 @@ const Video = () => {
                                                     <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-amarillo"></div>
                                                     <span className="ml-3 text-gray-600 font-light">Conectando con el servidor...</span>
                                                 </div>
-                                            ) : propertiesError ? (
+                                            ) : propertiesError || showNoPropertiesMessage ? (
                                                 <div className="text-center py-16 text-red-600">
                                                     <FaTimes className="text-5xl text-red-400 mx-auto mb-6" />
-                                                    <h3 className="font-serif text-2xl font-light mb-4">No se pueden cargar las propiedades</h3>
-                                                    <p className="text-sm mb-2 text-gray-600">{propertiesError}</p>
+                                                    <h3 className="font-serif text-2xl font-light mb-4">
+                                                        {showNoPropertiesMessage ? 'Propiedades reales no disponibles' : 'No se pueden cargar las propiedades'}
+                                                    </h3>
+                                                    <p className="text-sm mb-2 text-gray-600">
+                                                        {showNoPropertiesMessage 
+                                                            ? 'Las propiedades reales del inventario no están disponibles en este momento.'
+                                                            : propertiesError
+                                                        }
+                                                    </p>
                                                     <p className="text-xs text-gray-500 mb-6">
-                                                        Asegúrate de que el servidor backend esté corriendo en el puerto 8081
+                                                        {showNoPropertiesMessage 
+                                                            ? 'Estamos trabajando para conectar con nuestro inventario de propiedades reales. Inténtelo de nuevo en unos minutos.'
+                                                            : 'Asegúrate de que el servidor backend esté corriendo en el puerto 8081'
+                                                        }
                                                     </p>
                                                     <button 
-                                                        onClick={() => window.location.reload()} 
+                                                        onClick={() => {
+                                                            setShowNoPropertiesMessage(false);
+                                                            refreshProperties();
+                                                        }} 
                                                         className="bg-amarillo text-white px-6 py-3 rounded-xl hover:bg-amarillo/90 transition-colors font-medium"
                                                     >
                                                         🔄 Reintentar conexión
