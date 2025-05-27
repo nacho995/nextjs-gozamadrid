@@ -13,9 +13,7 @@ function SobreNosotros() {
             <img
               src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=80"
               alt="Equipo de realestategozamadrid.com"
-              layout="fill"
-              objectFit="cover"
-              className="transition-transform duration-500 hover:scale-105"
+              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
           </div>
           
