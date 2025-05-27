@@ -9,6 +9,7 @@ import { FaSearch, FaMapMarkerAlt, FaBed, FaBath, FaRuler, FaEuroSign, FaFilter,
 import { normalizeProperty, filterProperties } from '../utils/properties';
 import ControlMenu from './header';
 import { useProperties } from '../hooks/useProperties';
+import SmartLocationSearch from './smart-location-search';
 
 const Video = () => {
     const pathname = usePathname();
@@ -299,7 +300,7 @@ const Video = () => {
         }
     }, [showMap]);
 
-    // Función para generar URL del mapa con múltiples ubicaciones
+    // Función para generar URL del mapa con múltiples ubicaciones inteligente
     const getMultipleLocationsMapUrl = () => {
         try {
             const filteredProps = getFilteredProperties();
@@ -310,8 +311,26 @@ const Video = () => {
                 return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1sen!2ses!4v1234567890123';
             }
             
+            // Si hay filtro de ubicación, priorizar propiedades cercanas a esa ubicación
+            let sortedProperties = [...filteredProps];
+            if (searchFilters.location && searchFilters.location.trim()) {
+                const searchLocation = searchFilters.location.toLowerCase();
+                
+                // Ordenar por relevancia de ubicación
+                sortedProperties.sort((a, b) => {
+                    const aLocationMatch = (a.location?.toLowerCase().includes(searchLocation) ? 2 : 0) +
+                                         (a.title?.toLowerCase().includes(searchLocation) ? 1 : 0);
+                    const bLocationMatch = (b.location?.toLowerCase().includes(searchLocation) ? 2 : 0) +
+                                         (b.title?.toLowerCase().includes(searchLocation) ? 1 : 0);
+                    return bLocationMatch - aLocationMatch;
+                });
+                
+                console.log('🎯 Propiedades ordenadas por relevancia de ubicación:', searchLocation);
+            }
+            
             // Crear una consulta con múltiples ubicaciones para Google Maps
-            const locations = filteredProps
+            const locations = sortedProperties
+                .slice(0, 10) // Tomar las 10 más relevantes
                 .map(property => {
                     try {
                         // Usar coordenadas si están disponibles, sino usar la dirección
@@ -330,19 +349,28 @@ const Video = () => {
                         return encodeURIComponent('Madrid, España');
                     }
                 })
-                .filter(location => location) // Filtrar ubicaciones vacías
-                .slice(0, 10); // Limitar a 10 ubicaciones para evitar URLs muy largas
+                .filter(location => location); // Filtrar ubicaciones vacías
             
-            console.log('📍 Ubicaciones para el mapa:', locations);
+            console.log('📍 Ubicaciones para el mapa (ordenadas por relevancia):', locations);
             
-            // Crear URL base centrada en Madrid con zoom apropiado
-            const baseUrl = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1';
+            // Si hay filtro de ubicación específico, centrar el mapa en esa área
+            let baseUrl = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1';
             
-            // Agregar las ubicaciones como parámetro de búsqueda
-            const finalUrl = `${baseUrl}&q=${locations.join('|')}`;
-            console.log('🔗 URL final del mapa:', finalUrl);
+            if (searchFilters.location && searchFilters.location.trim()) {
+                // Usar la ubicación de búsqueda como centro del mapa
+                const searchLocation = encodeURIComponent(`${searchFilters.location}, Madrid, España`);
+                baseUrl = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12149.5!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1&q=${searchLocation}`;
+                console.log('🎯 Mapa centrado en:', searchFilters.location);
+            }
             
-            return finalUrl;
+            // Agregar las ubicaciones como parámetros adicionales
+            if (locations.length > 0) {
+                const finalUrl = `${baseUrl}&markers=${locations.join('|')}`;
+                console.log('🔗 URL final del mapa:', finalUrl);
+                return finalUrl;
+            }
+            
+            return baseUrl;
         } catch (error) {
             console.error('❌ Error generando URL del mapa:', error);
             // Devolver mapa de Madrid por defecto en caso de error
@@ -491,11 +519,11 @@ const Video = () => {
                                             <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
                                                 {/* Ubicación */}
                                                 <div className="lg:col-span-2 relative">
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Ubicación (ej. Malasaña, Salamanca...)"
+                                                    <SmartLocationSearch
                                                         value={searchFilters.location}
-                                                        onChange={(e) => handleFilterChange('location', e.target.value)}
+                                                        onChange={(value) => handleFilterChange('location', value)}
+                                                        properties={allProperties}
+                                                        placeholder="Ubicación (ej. Malasaña, Salamanca...)"
                                                         className="w-full px-4 py-4 border border-white/30 rounded-xl focus:ring-2 focus:ring-amarillo focus:border-amarillo text-white placeholder-white/70 bg-white/10 backdrop-blur-sm"
                                                     />
                                                 </div>
@@ -573,11 +601,11 @@ const Video = () => {
 
                                             {/* Filtros adicionales */}
                                             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
-                                                                                            <select
-                                                value={searchFilters.bedrooms}
-                                                onChange={(e) => handleFilterChange('bedrooms', e.target.value)}
-                                                className="px-4 py-3 border border-white/30 rounded-xl focus:ring-2 focus:ring-amarillo focus:border-amarillo appearance-none bg-white/10 backdrop-blur-sm text-white text-sm"
-                                            >
+                                                <select
+                                                    value={searchFilters.bedrooms}
+                                                    onChange={(e) => handleFilterChange('bedrooms', e.target.value)}
+                                                    className="px-4 py-3 border border-white/30 rounded-xl focus:ring-2 focus:ring-amarillo focus:border-amarillo appearance-none bg-white/10 backdrop-blur-sm text-white text-sm"
+                                                >
                                                     <option value="">Habitaciones</option>
                                                     <option value="1">1+ habitación</option>
                                                     <option value="2">2+ habitaciones</option>
@@ -585,11 +613,11 @@ const Video = () => {
                                                     <option value="4">4+ habitaciones</option>
                                                 </select>
 
-                                                                                            <select
-                                                value={searchFilters.bathrooms}
-                                                onChange={(e) => handleFilterChange('bathrooms', e.target.value)}
-                                                className="px-4 py-3 border border-white/30 rounded-xl focus:ring-2 focus:ring-amarillo focus:border-amarillo appearance-none bg-white/10 backdrop-blur-sm text-white text-sm"
-                                            >
+                                                <select
+                                                    value={searchFilters.bathrooms}
+                                                    onChange={(e) => handleFilterChange('bathrooms', e.target.value)}
+                                                    className="px-4 py-3 border border-white/30 rounded-xl focus:ring-2 focus:ring-amarillo focus:border-amarillo appearance-none bg-white/10 backdrop-blur-sm text-white text-sm"
+                                                >
                                                     <option value="">Baños</option>
                                                     <option value="1">1+ baño</option>
                                                     <option value="2">2+ baños</option>

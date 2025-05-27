@@ -239,6 +239,39 @@ export const normalizeProperty = (property) => {
   };
 };
 
+// Función para calcular similitud entre ubicaciones
+const calculateLocationSimilarity = (propertyLocation, searchLocation) => {
+  if (!propertyLocation || !searchLocation) return 0;
+  
+  const propLoc = propertyLocation.toLowerCase().trim();
+  const searchLoc = searchLocation.toLowerCase().trim();
+  
+  // Coincidencia exacta
+  if (propLoc === searchLoc) return 1;
+  
+  // Contiene la búsqueda
+  if (propLoc.includes(searchLoc) || searchLoc.includes(propLoc)) return 0.9;
+  
+  // Dividir en palabras y buscar coincidencias
+  const propWords = propLoc.split(/[,\s]+/).filter(w => w.length > 2);
+  const searchWords = searchLoc.split(/[,\s]+/).filter(w => w.length > 2);
+  
+  let matchCount = 0;
+  searchWords.forEach(searchWord => {
+    propWords.forEach(propWord => {
+      if (propWord.includes(searchWord) || searchWord.includes(propWord)) {
+        matchCount++;
+      }
+    });
+  });
+  
+  if (matchCount > 0) {
+    return 0.7 * (matchCount / Math.max(propWords.length, searchWords.length));
+  }
+  
+  return 0;
+};
+
 // Función para filtrar propiedades según criterios de búsqueda
 export const filterProperties = (properties, filters) => {
   if (!Array.isArray(properties)) return [];
@@ -246,9 +279,21 @@ export const filterProperties = (properties, filters) => {
   return properties.filter(property => {
     const normalizedProperty = normalizeProperty(property);
     
-    // Filtro por ubicación
-    const matchesLocation = !filters.location || 
-      normalizedProperty.location.toLowerCase().includes(filters.location.toLowerCase());
+    // Filtro por ubicación inteligente
+    let matchesLocation = true;
+    if (filters.location && filters.location.trim()) {
+      const locationSimilarity = calculateLocationSimilarity(
+        normalizedProperty.location, 
+        filters.location
+      );
+      
+      // También buscar en el título
+      const titleSimilarity = normalizedProperty.title ? 
+        calculateLocationSimilarity(normalizedProperty.title, filters.location) : 0;
+      
+      // Considerar que coincide si la similitud es mayor a 0.3
+      matchesLocation = locationSimilarity > 0.3 || titleSimilarity > 0.3;
+    }
     
     // Filtro por precio mínimo
     const price = parseFloat(normalizedProperty.price.replace(/[^\d]/g, '')) || 0;
