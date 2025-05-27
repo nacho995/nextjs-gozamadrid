@@ -93,8 +93,8 @@ export const normalizeProperty = (property) => {
     if (prop.images && Array.isArray(prop.images) && prop.images.length > 0) {
       const firstImage = prop.images[0];
       if (typeof firstImage === 'string') return firstImage;
+      if (firstImage.url) return firstImage.url; // WooCommerce usa .url
       if (firstImage.src) return firstImage.src;
-      if (firstImage.url) return firstImage.url;
     }
     if (prop.featured_image) return prop.featured_image;
     if (prop.thumbnail) return prop.thumbnail;
@@ -125,6 +125,8 @@ export const normalizeProperty = (property) => {
 
   // Función auxiliar para obtener número de habitaciones
   const getBedrooms = (prop) => {
+    // Priorizar datos de features (WooCommerce)
+    if (prop.features && prop.features.bedrooms) return parseInt(prop.features.bedrooms);
     if (prop.bedrooms) return parseInt(prop.bedrooms);
     if (prop.rooms) return parseInt(prop.rooms);
     if (prop.meta && prop.meta.bedrooms) return parseInt(prop.meta.bedrooms);
@@ -135,6 +137,8 @@ export const normalizeProperty = (property) => {
 
   // Función auxiliar para obtener número de baños
   const getBathrooms = (prop) => {
+    // Priorizar datos de features (WooCommerce)
+    if (prop.features && prop.features.bathrooms) return parseInt(prop.features.bathrooms);
     if (prop.bathrooms) return parseInt(prop.bathrooms);
     if (prop.baths) return parseInt(prop.baths);
     if (prop.meta && prop.meta.bathrooms) return parseInt(prop.meta.bathrooms);
@@ -145,6 +149,8 @@ export const normalizeProperty = (property) => {
 
   // Función auxiliar para obtener superficie
   const getSize = (prop) => {
+    // Priorizar datos de features (WooCommerce)
+    if (prop.features && prop.features.area) return parseInt(prop.features.area);
     if (prop.size) return parseInt(prop.size);
     if (prop.area) return parseInt(prop.area);
     if (prop.surface) return parseInt(prop.surface);
