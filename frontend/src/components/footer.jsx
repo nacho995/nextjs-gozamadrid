@@ -166,7 +166,7 @@ const Footer = () => {
       </Head>
 
       <footer 
-        className="relative z-50 bg-gradient-to-r from-amarillo to-black dark:from-amarillo dark:to-black"
+        className="relative z-50 bg-gradient-to-r from-black to-amarillo dark:from-black dark:to-amarillo"
         aria-label="Pie de página"
       >
         <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
