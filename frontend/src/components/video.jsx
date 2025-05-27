@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaSearch, FaMapMarkerAlt, FaBed, FaBath, FaRuler, FaEuroSign, FaFilter, FaCalculator, FaTimes, FaHome, FaArrowRight } from 'react-icons/fa';
 import { normalizeProperty, filterProperties } from '../utils/properties';
 import ControlMenu from './header';
+import axios from 'axios';
 
 const Video = () => {
     const pathname = usePathname();
@@ -18,18 +19,20 @@ const Video = () => {
     const [videoError, setVideoError] = useState(false);
     // Detectar si estamos en producción y usar URLs apropiadas
     const getVideoSources = () => {
-        const isProduction = typeof window !== 'undefined' && window.location.hostname === 'www.realestategozamadrid.com';
+        const isProduction = typeof window !== 'undefined' && (
+            window.location.hostname === 'www.realestategozamadrid.com' ||
+            window.location.hostname === 'realestategozamadrid.com'
+        );
         
         if (isProduction) {
             return [
-                // Intentar primero con URLs relativas
+                // Videos comprimidos optimizados para web (4MB y 5.7MB)
                 "/video.mp4",
                 "/videoExpIngles.mp4",
-                // Luego con URLs absolutas del mismo dominio
-                "https://www.realestategozamadrid.com/video.mp4",
-                "https://www.realestategozamadrid.com/videoExpIngles.mp4",
-                // URLs de respaldo externas con videos de Madrid/inmobiliaria
-                "https://player.vimeo.com/external/434045526.hd.mp4?s=c27eecc69a27dbc4ff2b87d38afc35f1c9a91a8d&profile_id=174",
+                // URLs absolutas como respaldo
+                `${window.location.origin}/video.mp4`,
+                `${window.location.origin}/videoExpIngles.mp4`,
+                // Video de respaldo externo más pequeño
                 "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
             ];
         } else {
@@ -207,46 +210,25 @@ const Video = () => {
         }
     }, [videoSrc]);
 
-    // Cargar todas las propiedades reales desde las APIs (igual que PropertyPage)
+    // Cargar todas las propiedades reales desde la API combinada (como funcionaba antes)
     useEffect(() => {
         const loadAllProperties = async () => {
             setPropertiesLoading(true);
             setPropertiesError(null);
             
             try {
-                console.log('[Video] Cargando todas las propiedades desde las APIs...');
+                console.log('[Video] Cargando todas las propiedades desde la API combinada...');
                 
-                // Usar la misma lógica que PropertyPage - llamadas directas a las APIs del backend
-                const [mongoResponse, wooResponse] = await Promise.allSettled([
-                    fetch('/api/properties/sources/mongodb').then(res => {
-                        if (!res.ok) throw new Error(`MongoDB API error: ${res.status}`);
-                        return res.json();
-                    }).catch(err => {
-                        console.error('[Video] Error API MongoDB:', err.message);
-                        return []; // Devolver array vacío en caso de error
-                    }),
-                    fetch('/api/properties/sources/woocommerce').then(res => {
-                        if (!res.ok) throw new Error(`WooCommerce API error: ${res.status}`);
-                        return res.json();
-                    }).catch(err => {
-                        console.error('[Video] Error API WooCommerce:', err.message);
-                        return []; // Devolver array vacío en caso de error
-                    })
-                ]);
+                // Usar la API combinada que funciona sin variables de entorno
+                const response = await axios.get('/api/properties', {
+                    timeout: 15000,
+                    params: {
+                        limit: 100 // Obtener más propiedades para el buscador
+                    }
+                });
 
-                const mongoProperties = mongoResponse.status === 'fulfilled' ? (mongoResponse.value || []) : [];
-                const wooCommerceProperties = wooResponse.status === 'fulfilled' ? (wooResponse.value || []) : [];
-                
-                // Asegurarse de que sean arrays
-                const safeMongoProps = Array.isArray(mongoProperties) ? mongoProperties : [];
-                const safeWooProps = Array.isArray(wooCommerceProperties) ? wooCommerceProperties : [];
-
-                // Marcar la fuente explícitamente
-                const taggedMongoProps = safeMongoProps.map(p => ({ ...p, source: p.source || 'mongodb' }));
-                const taggedWooProps = safeWooProps.map(p => ({ ...p, source: p.source || 'woocommerce' }));
-
-                const allPropertiesRaw = [...taggedMongoProps, ...taggedWooProps];
-                console.log('[Video] Propiedades obtenidas:', allPropertiesRaw.length, `(MongoDB: ${safeMongoProps.length}, WooCommerce: ${safeWooProps.length})`);
+                const allPropertiesRaw = response.data || [];
+                console.log('[Video] Propiedades obtenidas de API combinada:', allPropertiesRaw.length);
                 
                 if (allPropertiesRaw.length > 0) {
                     const normalizedProperties = allPropertiesRaw.map(normalizeProperty);
@@ -257,22 +239,16 @@ const Video = () => {
                     setSelectedProperty(normalizedProperties[0]);
                     console.log('[Video] Primera propiedad seleccionada:', normalizedProperties[0]?.title || 'Sin título');
                 } else {
-                    console.warn('[Video] No se encontraron propiedades en las APIs');
+                    console.warn('[Video] No se encontraron propiedades en la API combinada');
                     setAllProperties([]);
                     setSelectedProperty(null);
-                    
-                    // Mostrar error más específico basado en qué falló
-                    if (mongoResponse.status === 'rejected' && wooResponse.status === 'rejected') {
-                        setPropertiesError('Error de conexión con las APIs de propiedades');
-                    } else {
-                        setPropertiesError('No hay propiedades disponibles en este momento');
-                    }
+                    setPropertiesError('No hay propiedades disponibles en este momento');
                 }
             } catch (error) {
-                console.error('[Video] Error inesperado al cargar propiedades:', error);
+                console.error('[Video] Error al cargar propiedades desde API combinada:', error);
                 setAllProperties([]);
                 setSelectedProperty(null);
-                setPropertiesError(`Error al cargar propiedades: ${error.message}`);
+                setPropertiesError(`Error al cargar propiedades: ${error.response?.data?.error || error.message}`);
             } finally {
                 setPropertiesLoading(false);
             }

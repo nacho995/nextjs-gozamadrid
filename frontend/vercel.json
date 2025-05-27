@@ -1,6 +1,9 @@
 {
   "version": 2,
   "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
   "env": {
     "NEXT_PUBLIC_WP_API_URL": "https://wordpress.realestategozamadrid.com/wp-json/wp/v2",
     "NEXT_PUBLIC_WC_API_URL": "https://wordpress.realestategozamadrid.com/wp-json/wc/v3",
@@ -31,10 +34,6 @@
           "value": "video/mp4"
         },
         {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000"
-        },
-        {
           "key": "Accept-Ranges",
           "value": "bytes"
         }
@@ -48,38 +47,8 @@
           "value": "video/mp4"
         },
         {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000"
-        },
-        {
           "key": "Accept-Ranges",
           "value": "bytes"
-        }
-      ]
-    },
-    {
-      "source": "/(.*\\.(mp4|webm|ogg))",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "video/mp4"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000"
-        },
-        {
-          "key": "Accept-Ranges",
-          "value": "bytes"
-        }
-      ]
-    },
-    {
-      "source": "/(.*\\.(png|jpg|jpeg|gif|webp|svg|ico))",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
         }
       ]
     },
@@ -89,22 +58,8 @@
         {
           "key": "Content-Type",
           "value": "application/manifest+json"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=86400"
         }
       ]
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/video.mp4",
-      "destination": "/video.mp4"
-    },
-    {
-      "source": "/videoExpIngles.mp4", 
-      "destination": "/videoExpIngles.mp4"
     }
   ]
 }

@@ -174,41 +174,23 @@ export default async function handler(req, res) {
   let errors = [];
 
   try {
-    // Obtener propiedades de WooCommerce directamente
-    console.log('Intentando obtener propiedades de WooCommerce...', {
-      url: WOOCOMMERCE_URL,
-      hasKey: !!CONSUMER_KEY,
-      hasSecret: !!CONSUMER_SECRET
-    });
+    // Obtener propiedades de WooCommerce usando la API interna
+    console.log('Intentando obtener propiedades de WooCommerce vía API interna...');
     
-    const woocommerceUrl = `${WOOCOMMERCE_URL}/wp-json/wc/v3/products`;
-    const woocommerceResponse = await axios.get(woocommerceUrl, {
+    const woocommerceResponse = await axios.get('/api/properties/sources/woocommerce', {
       ...axiosConfig,
-      params: {
-        consumer_key: CONSUMER_KEY,
-        consumer_secret: CONSUMER_SECRET,
-        per_page: 100,
-        status: 'publish'
-      }
+      baseURL: req.headers.host ? `http://${req.headers.host}` : 'http://localhost:3000'
     });
 
-    if (woocommerceResponse.data) {
-      const transformedWooCommerceProperties = woocommerceResponse.data
-        .map(transformWooCommerceProperty)
-        .filter(Boolean);
-      console.log(`Obtenidas ${transformedWooCommerceProperties.length} propiedades de WooCommerce`);
-      allProperties = [...allProperties, ...transformedWooCommerceProperties];
+    if (woocommerceResponse.data && Array.isArray(woocommerceResponse.data)) {
+      console.log(`Obtenidas ${woocommerceResponse.data.length} propiedades de WooCommerce vía API interna`);
+      allProperties = [...allProperties, ...woocommerceResponse.data];
     }
   } catch (error) {
-    console.error('Error obteniendo propiedades de WooCommerce:', {
+    console.error('Error obteniendo propiedades de WooCommerce vía API interna:', {
       message: error.message,
       status: error.response?.status,
-      data: error.response?.data,
-      config: {
-        url: error.config?.url,
-        method: error.config?.method,
-        timeout: error.config?.timeout
-      }
+      data: error.response?.data
     });
     errors.push({
       source: 'woocommerce',
@@ -218,34 +200,23 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Obtener propiedades de MongoDB
-    console.log('Intentando obtener propiedades de MongoDB...', { url: MONGODB_URL });
-    const mongodbUrl = `${MONGODB_URL}/api/properties`;
-    const mongodbResponse = await axios.get(mongodbUrl, {
+    // Obtener propiedades de MongoDB usando la API interna
+    console.log('Intentando obtener propiedades de MongoDB vía API interna...');
+    
+    const mongodbResponse = await axios.get('/api/properties/sources/mongodb', {
       ...axiosConfig,
-      headers: {
-        ...axiosConfig.headers,
-        'Origin': process.env.NEXT_PUBLIC_SITE_URL || 'https://realestategozamadrid.com'
-      }
+      baseURL: req.headers.host ? `http://${req.headers.host}` : 'http://localhost:3000'
     });
 
-    if (mongodbResponse.data) {
-      const transformedMongoDBProperties = mongodbResponse.data
-        .map(transformMongoDBProperty)
-        .filter(Boolean);
-      console.log(`Obtenidas ${transformedMongoDBProperties.length} propiedades de MongoDB`);
-      allProperties = [...allProperties, ...transformedMongoDBProperties];
+    if (mongodbResponse.data && Array.isArray(mongodbResponse.data)) {
+      console.log(`Obtenidas ${mongodbResponse.data.length} propiedades de MongoDB vía API interna`);
+      allProperties = [...allProperties, ...mongodbResponse.data];
     }
   } catch (error) {
-    console.error('Error obteniendo propiedades de MongoDB:', {
+    console.error('Error obteniendo propiedades de MongoDB vía API interna:', {
       message: error.message,
       status: error.response?.status,
-      data: error.response?.data,
-      config: {
-        url: error.config?.url,
-        method: error.config?.method,
-        timeout: error.config?.timeout
-      }
+      data: error.response?.data
     });
     errors.push({
       source: 'mongodb',
@@ -254,14 +225,10 @@ export default async function handler(req, res) {
     });
   }
 
-  // Si no hay propiedades y hay errores, devolver error
+  // Si no hay propiedades y hay errores, devolver array vacío (para compatibilidad)
   if (allProperties.length === 0 && errors.length > 0) {
-    return res.status(503).json({
-      error: 'No se pudieron obtener propiedades',
-      details: 'Error al obtener propiedades de todas las fuentes',
-      sources_checked: ['woocommerce', 'mongodb'],
-      errors
-    });
+    console.warn('No se pudieron obtener propiedades de ninguna fuente:', errors);
+    return res.status(200).json([]);
   }
 
   // Si no hay propiedades pero tampoco hay errores, devolver array vacío
@@ -269,21 +236,19 @@ export default async function handler(req, res) {
     return res.status(200).json([]);
   }
 
-  // Ordenar propiedades por fecha de creación
-  allProperties.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  // Ordenar propiedades por fecha de creación si tienen esa información
+  allProperties.sort((a, b) => {
+    const dateA = new Date(a.createdAt || a.date_created || 0);
+    const dateB = new Date(b.createdAt || b.date_created || 0);
+    return dateB - dateA;
+  });
 
   // Calcular paginación
   const startIndex = (pageNumber - 1) * limitNumber;
   const endIndex = startIndex + limitNumber;
   const paginatedProperties = allProperties.slice(startIndex, endIndex);
 
-  // Devolver respuesta completa
-  return res.status(200).json({
-    properties: paginatedProperties,
-    total: allProperties.length,
-    page: pageNumber,
-    limit: limitNumber,
-    totalPages: Math.ceil(allProperties.length / limitNumber),
-    errors: errors.length > 0 ? errors : undefined
-  });
+  // Devolver directamente el array de propiedades (como antes)
+  console.log(`Devolviendo ${paginatedProperties.length} propiedades de un total de ${allProperties.length}`);
+  return res.status(200).json(paginatedProperties);
 } 
