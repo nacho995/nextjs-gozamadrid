@@ -1,5 +1,8 @@
 import axios from 'axios';
 
+// Importar la función bulletproof de WooCommerce directamente
+import { loadFromWooCommerce as loadWooCommerceBulletproof } from './sources/woocommerce/index.js';
+
 // Cache en memoria para optimizar rendimiento
 const cache = new Map();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutos
@@ -127,7 +130,7 @@ const withRetry = async (fn, maxRetries = 2, baseDelay = 1000) => {
   }
 };
 
-// Cargador optimizado de WooCommerce usando API Enterprise Bulletproof
+// Cargador optimizado de WooCommerce usando función bulletproof directa
 const loadWooCommerceProperties = async (page = 1, limit = 20) => {
   const cacheKey = getCacheKey('woocommerce', page, limit);
   const cached = getFromCache(cacheKey);
@@ -137,31 +140,24 @@ const loadWooCommerceProperties = async (page = 1, limit = 20) => {
   }
 
   try {
-    console.log(`🚀 WooCommerce Enterprise: Cargando página ${page}, límite ${limit}`);
+    console.log(`🚀 WooCommerce Bulletproof Direct: Cargando página ${page}, límite ${limit}`);
     
-    // Usar la API enterprise que SIEMPRE funciona (con fallbacks incluidos)
-    const response = await axios.get('/api/properties/sources/woocommerce', {
-      params: { limit: Math.min(limit, 50), page },
-      timeout: 25000, // Timeout generoso para permitir todos los reintentos enterprise
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    });
+    // Usar la función bulletproof directamente (sin HTTP)
+    const properties = await loadWooCommerceBulletproof(page, Math.min(limit, 50));
 
-    if (response.data && Array.isArray(response.data)) {
-      // Los datos ya vienen transformados de la API enterprise
-      setCache(cacheKey, response.data);
-      console.log(`✅ WooCommerce Enterprise: ${response.data.length} propiedades cargadas`);
-      return response.data;
+    if (properties && Array.isArray(properties)) {
+      // Los datos ya vienen transformados de la función bulletproof
+      setCache(cacheKey, properties);
+      console.log(`✅ WooCommerce Bulletproof Direct: ${properties.length} propiedades cargadas`);
+      return properties;
     }
     
-    console.log('⚠️ WooCommerce Enterprise devolvió datos vacíos');
+    console.log('⚠️ WooCommerce Bulletproof devolvió datos vacíos');
     return [];
     
   } catch (error) {
-    console.error('❌ Error WooCommerce Enterprise:', error.message);
-    // La API enterprise siempre devuelve algo (incluso fallback), 
+    console.error('❌ Error WooCommerce Bulletproof Direct:', error.message);
+    // La función bulletproof siempre devuelve algo (incluso fallback), 
     // pero si falla completamente, devolvemos array vacío
     return [];
   }
