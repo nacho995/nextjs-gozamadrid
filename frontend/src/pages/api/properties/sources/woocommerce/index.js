@@ -43,6 +43,7 @@ const setCachedData = (key, data) => {
 // 🔧 Transformador para propiedades reales
 const transformRealProperty = (property) => {
   try {
+    // Extraer metadatos de meta_data si existen
     const metadata = {};
     if (property.meta_data?.length) {
       property.meta_data.forEach(meta => {
@@ -52,29 +53,59 @@ const transformRealProperty = (property) => {
       });
     }
 
-    let price = parseFloat(String(property.price).replace(/[^\d.-]/g, '')) || 0;
+    // Extraer información de la descripción HTML
+    const description = property.description || '';
+    let bedrooms = 0;
+    let bathrooms = 0;
+    let area = 0;
+    let floor = null;
 
-    const bedrooms = parseInt(metadata.bedrooms || metadata.habitaciones) || 0;
-    const bathrooms = parseInt(metadata.baños || metadata.bathrooms || metadata.banos) || 0;
-    const area = parseInt(metadata.living_area || metadata.area || metadata.m2 || metadata.superficie) || 0;
+    // Buscar habitaciones en la descripción
+    const bedroomMatch = description.match(/(\d+)\s*(?:habitacion|dormitorio|bedroom)/i);
+    if (bedroomMatch) bedrooms = parseInt(bedroomMatch[1]);
+
+    // Buscar baños en la descripción
+    const bathroomMatch = description.match(/(\d+)\s*(?:baño|bath|aseo)/i);
+    if (bathroomMatch) bathrooms = parseInt(bathroomMatch[1]);
+
+    // Buscar superficie/área en la descripción
+    const areaMatch = description.match(/(\d+)\s*m[²2]?/i);
+    if (areaMatch) area = parseInt(areaMatch[1]);
+
+    // Buscar planta en la descripción
+    const floorMatch = description.match(/(\d+)[ªº]?\s*(?:planta|piso)/i);
+    if (floorMatch) floor = floorMatch[1];
+
+    // Usar metadatos como fallback
+    bedrooms = bedrooms || parseInt(metadata.bedrooms || metadata.habitaciones) || 0;
+    bathrooms = bathrooms || parseInt(metadata.baños || metadata.bathrooms || metadata.banos) || 0;
+    area = area || parseInt(metadata.living_area || metadata.area || metadata.m2 || metadata.superficie) || 0;
+    floor = floor || metadata.Planta || metadata.planta || null;
+
+    // Si no encontramos datos, usar valores por defecto razonables
+    if (bedrooms === 0) bedrooms = 2; // Valor por defecto
+    if (bathrooms === 0) bathrooms = 1; // Valor por defecto
+    if (area === 0) area = 80; // Valor por defecto en m²
+
+    let price = parseFloat(String(property.price).replace(/[^\d.-]/g, '')) || 0;
 
     return {
       id: String(property.id),
-      title: property.name || `Propiedad ${property.id}`,
+      title: property.title || property.name || `Propiedad ${property.id}`,
       description: property.description || property.short_description || '',
       price,
       source: 'woocommerce_real',
       images: property.images?.map(img => ({
-        url: img.src,
-        alt: img.alt || property.name || 'Imagen de propiedad'
+        url: img.url || img.src,
+        alt: img.alt || property.title || property.name || 'Imagen de propiedad'
       })) || [],
       features: { 
         bedrooms,
         bathrooms,
         area,
-        floor: metadata.Planta || metadata.planta || null 
+        floor 
       },
-      location: property.name || metadata.address || metadata.direccion || 'Madrid',
+      location: property.title || property.name || metadata.address || metadata.direccion || 'Madrid',
       metadata,
       createdAt: property.date_created || new Date().toISOString(),
       updatedAt: property.date_modified || new Date().toISOString()
@@ -86,7 +117,7 @@ const transformRealProperty = (property) => {
 };
 
 // 🚀 Función para cargar SOLO propiedades reales
-export const loadRealProperties = async (page = 1, limit = 20) => {
+export const loadRealProperties = async (page = 1, limit = 50) => {
   const cacheKey = `real_properties_${page}_${limit}`;
   
   // Verificar cache
@@ -181,7 +212,7 @@ export const loadRealProperties = async (page = 1, limit = 20) => {
 // 🎯 HANDLER PRINCIPAL - SOLO PROPIEDADES REALES
 export default async function handler(req, res) {
   const startTime = Date.now();
-  const { limit = 20, page = 1 } = req.query;
+  const { limit = 50, page = 1 } = req.query;
 
   console.log(`🏠 API PROPIEDADES REALES iniciada - Página: ${page}, Límite: ${limit}`);
   console.log(`🔑 Credenciales configuradas: ${REAL_ESTATE_CONFIG.credentials.key ? 'SÍ' : 'NO'}`);

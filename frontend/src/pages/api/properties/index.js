@@ -145,7 +145,7 @@ const loadMongoDBProperties = async (limit = 20) => {
 };
 
 // 🛒 Cargar propiedades reales de WooCommerce
-const loadWooCommerceProperties = async (limit = 20) => {
+const loadWooCommerceProperties = async (limit = 50) => {
   console.log(`🛒 Cargando propiedades REALES de WooCommerce (límite: ${limit})`);
   
   try {
@@ -196,7 +196,7 @@ export default async function handler(req, res) {
     // Cargar en paralelo SOLO propiedades reales
     const [mongoProperties, wooProperties] = await Promise.allSettled([
       loadMongoDBProperties(Math.ceil(requestedLimit / 2)),
-      loadWooCommerceProperties(Math.ceil(requestedLimit / 2))
+      loadWooCommerceProperties(50) // Cargar todas las propiedades de WooCommerce
     ]);
 
     // Procesar resultados
