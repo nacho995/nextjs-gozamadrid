@@ -19,45 +19,6 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: '/logonuevo.png',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-          {
-            key: 'Content-Type',
-            value: 'image/png',
-          },
-        ],
-      },
-      {
-        source: '/logo.png',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-          {
-            key: 'Content-Type',
-            value: 'image/png',
-          },
-        ],
-      },
-      {
-        source: '/manifest.json',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'application/manifest+json',
-          },
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=86400',
-          },
-        ],
-      },
-      {
         source: '/video.mp4',
         headers: [
           {
@@ -91,21 +52,36 @@ const nextConfig = {
           },
         ],
       },
-    ];
-  },
-  async rewrites() {
-    return [
       {
-        source: '/logonuevo.png',
-        destination: '/api/images/logonuevo.png',
+        source: '/:path*.(png|jpg|jpeg|gif|webp|svg|ico)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
       },
       {
-        source: '/logo.png',
-        destination: '/api/images/logo.png',
+        source: '/manifest.json',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/manifest+json',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400',
+          },
+        ],
       },
       {
-        source: '/favicon.ico',
-        destination: '/api/images/favicon.ico',
+        source: '/:path*.(css|js)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
       },
     ];
   },

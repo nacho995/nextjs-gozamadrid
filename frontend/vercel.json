@@ -27,23 +27,23 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=31536000, immutable"
-        },
-        {
-          "key": "Content-Type",
-          "value": "image/*"
         }
       ]
     },
     {
-      "source": "/logonuevo.png",
+      "source": "/(.*)\\.(mp4|webm|ogg)",
       "headers": [
         {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
+          "key": "Content-Type",
+          "value": "video/mp4"
         },
         {
-          "key": "Content-Type",
-          "value": "image/png"
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000"
+        },
+        {
+          "key": "Accept-Ranges",
+          "value": "bytes"
         }
       ]
     },
@@ -59,24 +59,15 @@
           "value": "public, max-age=86400"
         }
       ]
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/logonuevo.png",
-      "destination": "/api/images/logonuevo.png"
     },
     {
-      "source": "/logo.png", 
-      "destination": "/api/images/logo.png"
-    },
-    {
-      "source": "/manifest.json",
-      "destination": "/api/images/manifest.json"
-    },
-    {
-      "source": "/favicon.ico",
-      "destination": "/api/images/favicon.ico"
+      "source": "/(.*)\\.(css|js)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     }
   ]
 }
