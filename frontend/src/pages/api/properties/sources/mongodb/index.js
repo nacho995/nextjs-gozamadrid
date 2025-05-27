@@ -67,19 +67,18 @@ export default async function handler(req, res) {
     if (error.response) {
       // Si el error viene del backend (8081 o producción)
       console.error(`[API Route MongoDB] Respuesta de error del backend (${BASE_URL}): ${error.response.status}`, error.response.data);
-      // Devolver el mismo estado y mensaje de error que dio el backend
-      return res.status(error.response.status).json({
-        error: `Error de Backend: ${error.response.data?.message || 'Error desconocido'}`,
-        status: error.response.status
-      });
+      // Devolver array vacío en lugar de error para evitar mostrar datos de ejemplo
+      return res.status(200).json([]);
     } else if (error.request) {
       // Si la petición se hizo pero no se recibió respuesta (ej. backend no disponible)
       console.error(`[API Route MongoDB] No se recibió respuesta del backend (${BASE_URL}). ¿Está corriendo?`);
-      return res.status(503).json({ error: `No se pudo conectar al backend en ${BASE_URL}` });
+      // Devolver array vacío en lugar de error 503
+      return res.status(200).json([]);
     } else {
       // Otro tipo de error (ej. configuración de axios)
       console.error('[API Route MongoDB] Error al configurar la petición:', error.message);
-      return res.status(500).json({ error: `Error interno en API Route: ${error.message}` });
+      // Devolver array vacío en lugar de error 500
+      return res.status(200).json([]);
     }
   }
 } 
