@@ -15,9 +15,9 @@ const REAL_ESTATE_CONFIG = {
   
   // Configuración agresiva para superar bloqueos
   connection: {
-    timeout: 15000, // 15 segundos - aumentado para evitar timeouts
-    maxRetries: 3, // Mantener 3 reintentos para el único endpoint/estrategia
-    retryDelay: 2000 // Aumentar el delay entre reintentos
+    timeout: 8000, // 8 segundos - reducido para evitar timeouts de Vercel
+    maxRetries: 2, // Reducir reintentos para ser más rápido
+    retryDelay: 1000 // Reducir delay entre reintentos
   }
 };
 
@@ -45,107 +45,53 @@ function saveToMemoryCache(key, data) {
   console.log(`✅ Datos cacheados en memoria para la clave: ${key}`);
 }
 
-// 🔧 Transformador para propiedades reales
+// 🔧 Transformador simplificado para propiedades reales (optimizado para velocidad)
 const transformRealProperty = (property) => {
   try {
-    // Extraer metadatos de meta_data si existen
-    const metadata = {};
-    let bedrooms = 0;
-    let bathrooms = 0;
-    let area = 0;
-    let floor = null;
-    let address = '';
+    // Extraer datos básicos rápidamente
+    let bedrooms = 2; // Valor por defecto
+    let bathrooms = 1; // Valor por defecto
+    let area = 80; // Valor por defecto
+    let address = property.name || property.title || '';
     
+    // Extraer metadatos solo si existen (optimizado)
     if (property.meta_data?.length) {
-      property.meta_data.forEach(meta => {
-        if (!meta.key.startsWith('_')) {
-          metadata[meta.key] = meta.value;
-          
-          // Extraer valores específicos de los metadatos
-          if (meta.key === 'bedrooms') {
-            bedrooms = parseInt(meta.value) || 0;
-          } else if (meta.key === 'baños' || meta.key === 'bathrooms') {
-            bathrooms = parseInt(meta.value) || 0;
-            // Si es -1, significa que no está especificado
-            if (bathrooms === -1) bathrooms = 0;
-          } else if (meta.key === 'living_area' || meta.key === 'area') {
-            area = parseInt(meta.value) || 0;
-          } else if (meta.key === 'Planta' || meta.key === 'planta') {
-            floor = meta.value;
-          } else if (meta.key === 'address' || meta.key === 'direccion') {
-            address = meta.value || '';
-          }
+      for (const meta of property.meta_data) {
+        if (meta.key === 'bedrooms') bedrooms = parseInt(meta.value) || bedrooms;
+        else if (meta.key === 'baños' || meta.key === 'bathrooms') {
+          const val = parseInt(meta.value);
+          if (val > 0) bathrooms = val; // Solo si es positivo
         }
-      });
+        else if (meta.key === 'living_area' || meta.key === 'area') {
+          const val = parseInt(meta.value);
+          if (val > 0) area = val; // Solo si es positivo
+        }
+        else if (meta.key === 'address' || meta.key === 'direccion') {
+          if (meta.value) address = meta.value;
+        }
+      }
     }
 
-    // Si no hay dirección en metadatos, usar el título
-    if (!address) {
-      address = property.name || property.title || '';
-    }
-
-    // Extraer información adicional de la descripción HTML si es necesario
-    const description = property.description || '';
-    
-    // Si no encontramos habitaciones en metadatos, buscar en la descripción
-    if (bedrooms === 0) {
-      const bedroomMatch = description.match(/(\d+)\s*(?:habitacion|dormitorio|bedroom)/i);
-      if (bedroomMatch) bedrooms = parseInt(bedroomMatch[1]);
-    }
-
-    // Si no encontramos baños en metadatos, buscar en la descripción
-    if (bathrooms === 0) {
-      const bathroomMatch = description.match(/(\d+)\s*(?:baño|bath|aseo)/i);
-      if (bathroomMatch) bathrooms = parseInt(bathroomMatch[1]);
-    }
-
-    // Si no encontramos área en metadatos, buscar en la descripción
-    if (area === 0) {
-      const areaMatch = description.match(/(\d+)\s*m[²2]?/i);
-      if (areaMatch) area = parseInt(areaMatch[1]);
-    }
-
-    // Si no encontramos planta en metadatos, buscar en la descripción
-    if (!floor) {
-      const floorMatch = description.match(/(\d+)[ªº]?\s*(?:planta|piso)/i);
-      if (floorMatch) floor = floorMatch[1];
-    }
-
-    // Si aún no tenemos valores, usar valores por defecto razonables
-    if (bedrooms === 0) bedrooms = 2; // Valor por defecto
-    if (bathrooms === 0) bathrooms = 1; // Valor por defecto
-    if (area === 0) area = 80; // Valor por defecto en m²
-
-    let price = parseFloat(String(property.price).replace(/[^\d.-]/g, '')) || 0;
+    const price = parseFloat(String(property.price).replace(/[^\d.-]/g, '')) || 0;
 
     return {
       id: String(property.id),
       title: property.name || property.title || `Propiedad ${property.id}`,
-      description: property.description || property.short_description || '',
+      description: property.short_description || property.description || '',
       price,
-      source: 'woocommerce_real_kv', // Indicar que viene de KV o fue cacheado por KV
-      images: property.images?.map(img => ({
+      source: 'woocommerce_real',
+      images: property.images?.slice(0, 3).map(img => ({
         url: img.url || img.src,
-        alt: img.alt || property.title || property.name || 'Imagen de propiedad'
+        alt: img.alt || property.name || 'Imagen de propiedad'
       })) || [],
-      features: { 
-        bedrooms,
-        bathrooms,
-        area,
-        floor 
-      },
-      location: address || property.name || property.title || 'Madrid',
-      address: address || property.name || property.title || '',
-      metadata: {
-        ...metadata,
-        categories: property.categories || [],
-        permalink: property.permalink || ''
-      },
+      features: { bedrooms, bathrooms, area },
+      location: address || 'Madrid',
+      address: address,
       createdAt: property.date_created || new Date().toISOString(),
       updatedAt: property.date_modified || new Date().toISOString()
     };
   } catch (error) {
-    console.error('❌ Error transformando propiedad real:', error.message);
+    console.error('❌ Error transformando propiedad:', error.message);
     return null;
   }
 };
