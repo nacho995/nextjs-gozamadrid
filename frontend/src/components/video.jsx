@@ -16,12 +16,32 @@ const Video = () => {
     const [videoSrc, setVideoSrc] = useState("/video.mp4");
     const [isVideoLoaded, setIsVideoLoaded] = useState(false);
     const [videoError, setVideoError] = useState(false);
-    const [videoSources] = useState([
-        "/video.mp4",
-        "/videoExpIngles.mp4",
-        "https://www.realestategozamadrid.com/video.mp4",
-        "https://www.realestategozamadrid.com/videoExpIngles.mp4"
-    ]);
+    // Detectar si estamos en producción y usar URLs apropiadas
+    const getVideoSources = () => {
+        const isProduction = typeof window !== 'undefined' && window.location.hostname === 'www.realestategozamadrid.com';
+        
+        if (isProduction) {
+            return [
+                // Intentar primero con URLs relativas
+                "/video.mp4",
+                "/videoExpIngles.mp4",
+                // Luego con URLs absolutas del mismo dominio
+                "https://www.realestategozamadrid.com/video.mp4",
+                "https://www.realestategozamadrid.com/videoExpIngles.mp4",
+                // URLs de respaldo externas con videos de Madrid/inmobiliaria
+                "https://player.vimeo.com/external/434045526.hd.mp4?s=c27eecc69a27dbc4ff2b87d38afc35f1c9a91a8d&profile_id=174",
+                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+            ];
+        } else {
+            return [
+                "/video.mp4",
+                "/videoExpIngles.mp4",
+                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+            ];
+        }
+    };
+    
+    const [videoSources] = useState(getVideoSources());
     const [currentSourceIndex, setCurrentSourceIndex] = useState(0);
 
     
@@ -39,9 +59,20 @@ const Video = () => {
     });
     const [selectedProperty, setSelectedProperty] = useState(null);
     const [showMap, setShowMap] = useState(false);
+    const [mapLoading, setMapLoading] = useState(false);
     const [allProperties, setAllProperties] = useState([]);
     const [propertiesLoading, setPropertiesLoading] = useState(true);
     const [propertiesError, setPropertiesError] = useState(null);
+
+    // Cargar script de diagnóstico en producción
+    useEffect(() => {
+        if (typeof window !== 'undefined' && window.location.hostname === 'www.realestategozamadrid.com') {
+            const script = document.createElement('script');
+            script.src = '/video-diagnostic.js';
+            script.async = true;
+            document.head.appendChild(script);
+        }
+    }, []);
 
     useEffect(() => {
         console.log('[Video] Iniciando configuración del video con src:', videoSrc);
@@ -61,6 +92,10 @@ const Video = () => {
                 console.error('[Video] ❌ Error al cargar el video:', error);
                 console.error('[Video] ❌ URL que falló:', videoSrc);
                 console.error('[Video] ❌ Detalles del error:', error.target?.error);
+                console.error('[Video] ❌ Código de error:', error.target?.error?.code);
+                console.error('[Video] ❌ Mensaje de error:', error.target?.error?.message);
+                console.error('[Video] ❌ Estado de red:', error.target?.networkState);
+                console.error('[Video] ❌ Estado de ready:', error.target?.readyState);
                 
                 // Intentar con la siguiente fuente de video
                 const nextIndex = currentSourceIndex + 1;
@@ -70,8 +105,17 @@ const Video = () => {
                     setVideoSrc(videoSources[nextIndex]);
                 } else {
                     console.error('[Video] ❌ Todas las fuentes de video fallaron');
+                    console.error('[Video] ❌ Fuentes intentadas:', videoSources);
                     setVideoError(true);
                     setIsVideoLoaded(false);
+                    
+                    // Intentar recuperación automática después de 10 segundos
+                    setTimeout(() => {
+                        console.log('[Video] 🔄 Intentando recuperación automática...');
+                        setCurrentSourceIndex(0);
+                        setVideoSrc(videoSources[0]);
+                        setVideoError(false);
+                    }, 10000);
                 }
             };
 
@@ -127,18 +171,40 @@ const Video = () => {
         const checkVideoExists = async () => {
             try {
                 console.log('[Video] 🔍 Verificando si el video existe en:', videoSrc);
-                const response = await fetch(videoSrc, { method: 'HEAD' });
+                console.log('[Video] 🔍 Hostname actual:', typeof window !== 'undefined' ? window.location.hostname : 'SSR');
+                console.log('[Video] 🔍 URL completa:', typeof window !== 'undefined' ? window.location.href : 'SSR');
+                
+                const response = await fetch(videoSrc, { 
+                    method: 'HEAD',
+                    cache: 'no-cache',
+                    headers: {
+                        'Accept': 'video/mp4,video/*,*/*'
+                    }
+                });
+                
+                console.log('[Video] 📊 Response status:', response.status);
+                console.log('[Video] 📊 Response headers:', Object.fromEntries(response.headers.entries()));
+                
                 if (response.ok) {
-                    console.log('[Video] ✅ Video encontrado, tamaño:', response.headers.get('content-length'), 'bytes');
+                    const contentLength = response.headers.get('content-length');
+                    const contentType = response.headers.get('content-type');
+                    console.log('[Video] ✅ Video encontrado');
+                    console.log('[Video] ✅ Tamaño:', contentLength ? `${Math.round(contentLength / 1024 / 1024)}MB` : 'Desconocido');
+                    console.log('[Video] ✅ Tipo:', contentType);
                 } else {
                     console.error('[Video] ❌ Video no encontrado, status:', response.status);
+                    console.error('[Video] ❌ Status text:', response.statusText);
                 }
             } catch (error) {
                 console.error('[Video] ❌ Error verificando video:', error);
+                console.error('[Video] ❌ Error name:', error.name);
+                console.error('[Video] ❌ Error message:', error.message);
             }
         };
         
-        checkVideoExists();
+        if (typeof window !== 'undefined') {
+            checkVideoExists();
+        }
     }, [videoSrc]);
 
     // Cargar todas las propiedades reales desde las APIs (igual que PropertyPage)
@@ -222,15 +288,55 @@ const Video = () => {
 
     // Función para seleccionar una propiedad y actualizar el mapa
     const selectProperty = (property) => {
+        setMapLoading(true);
         setSelectedProperty(property);
+        // Simular tiempo de carga del mapa
+        setTimeout(() => setMapLoading(false), 1000);
     };
 
     // Función para manejar cambios en filtros
     const handleFilterChange = (field, value) => {
+        setMapLoading(true);
         setSearchFilters(prev => ({
             ...prev,
             [field]: value
         }));
+        // Limpiar selección cuando cambien los filtros para mostrar todas las propiedades filtradas
+        setSelectedProperty(null);
+        // Simular tiempo de actualización del mapa
+        setTimeout(() => setMapLoading(false), 800);
+    };
+
+    // Efecto para actualizar el mapa cuando se abra el modal
+    useEffect(() => {
+        if (showMap && getFilteredProperties().length > 0) {
+            // Limpiar selección para mostrar todas las propiedades al abrir
+            setSelectedProperty(null);
+        }
+    }, [showMap]);
+
+    // Función para generar URL del mapa con múltiples ubicaciones
+    const getMultipleLocationsMapUrl = () => {
+        const filteredProps = getFilteredProperties();
+        if (filteredProps.length === 0) return '';
+        
+        // Crear una consulta con múltiples ubicaciones para Google Maps
+        const locations = filteredProps
+            .map(property => {
+                // Usar coordenadas si están disponibles, sino usar la dirección
+                if (property.coordinates && property.coordinates.lat && property.coordinates.lng) {
+                    return `${property.coordinates.lat},${property.coordinates.lng}`;
+                } else {
+                    return encodeURIComponent(property.location || property.title || 'Madrid, España');
+                }
+            })
+            .slice(0, 10); // Limitar a 10 ubicaciones para evitar URLs muy largas
+        
+        // Crear URL base centrada en Madrid con zoom apropiado
+        const baseUrl = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12150!2d-3.7037!3d40.4167!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1';
+        
+        // Agregar las ubicaciones como parámetro de búsqueda
+        return `${baseUrl}&q=${locations.join('|')}`;
     };
 
     // Generar URL del mapa embebido de Google Maps
@@ -408,9 +514,9 @@ const Video = () => {
                                                             </div>
                                                         ) : (
                                                             <div className="flex items-center justify-center gap-2">
-                                                                <FaSearch className="text-sm" />
-                                                                <span className="hidden sm:inline">Buscar Propiedades</span>
-                                                                <span className="sm:hidden">Buscar</span>
+                                                                <FaMapMarkerAlt className="text-sm" />
+                                                                <span className="hidden sm:inline">Ver en Mapa</span>
+                                                                <span className="sm:hidden">Mapa</span>
                                                             </div>
                                                         )}
                                                     </button>
@@ -472,9 +578,14 @@ const Video = () => {
                                                     ) : (
                                                         <span className="text-amarillo font-medium">
                                                             {allProperties.length} propiedades disponibles
-                                                            {getFilteredProperties().length !== allProperties.length && 
-                                                                ` • ${getFilteredProperties().length} coinciden`
-                                                            }
+                                                            {getFilteredProperties().length !== allProperties.length && (
+                                                                <span className="text-white/90">
+                                                                    {` • `}
+                                                                    <span className="bg-amarillo/20 px-2 py-1 rounded-full text-amarillo text-xs font-semibold">
+                                                                        {getFilteredProperties().length} coinciden
+                                                                    </span>
+                                                                </span>
+                                                            )}
                                                         </span>
                                                     )}
                                                 </div>
@@ -559,10 +670,15 @@ const Video = () => {
                                     onClick={(e) => e.stopPropagation()}
                                 >
                                     <div className="flex justify-between items-center p-8 border-b border-gray-100">
-                                        <h2 className="font-serif text-3xl font-light text-gray-900">
-                                            Propiedades Encontradas
-                                            <span className="text-amarillo font-normal ml-2">({getFilteredProperties().length})</span>
-                                        </h2>
+                                        <div>
+                                            <h2 className="font-serif text-3xl font-light text-gray-900">
+                                                Propiedades Encontradas
+                                                <span className="text-amarillo font-normal ml-2">({getFilteredProperties().length})</span>
+                                            </h2>
+                                            <p className="text-gray-600 text-sm mt-2 font-light">
+                                                Haz clic en cualquier propiedad para ver su ubicación exacta en el mapa
+                                            </p>
+                                        </div>
                                         <button
                                             onClick={() => setShowMap(false)}
                                             className="text-gray-400 hover:text-gray-600 text-2xl p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -669,38 +785,114 @@ const Video = () => {
                                         
                                         {/* Google Maps con diseño premium */}
                                         <div className="relative bg-gray-50">
-                                            {selectedProperty ? (
+                                            {getFilteredProperties().length > 0 ? (
                                                 <div className="h-full flex flex-col">
                                                     <div className="p-6 bg-white border-b border-gray-100">
                                                         <h3 className="font-serif text-xl font-light text-gray-900 mb-2">
-                                                            {selectedProperty.title}
+                                                            {selectedProperty ? selectedProperty.title : `${getFilteredProperties().length} Propiedades en el Mapa`}
                                                         </h3>
                                                         <p className="text-gray-600 flex items-center gap-2 font-light">
                                                             <FaMapMarkerAlt className="text-amarillo" />
-                                                            {selectedProperty.location}
+                                                            {selectedProperty ? selectedProperty.location : 'Madrid, España'}
                                                         </p>
+                                                        {!selectedProperty && (
+                                                            <p className="text-sm text-gray-500 mt-2">
+                                                                Haz clic en una propiedad para centrar el mapa en su ubicación
+                                                            </p>
+                                                        )}
                                                     </div>
                                                     
-                                                    <div className="flex-1">
-                                                        <iframe
-                                                            src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3037.5!2d${selectedProperty.coordinates.lng}!3d${selectedProperty.coordinates.lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDDCsDI1JzUyLjMiTiAzwrA0MScwMi4wIlc!5e0!3m2!1ses!2ses!4v1234567890123`}
-                                                            width="100%"
-                                                            height="100%"
-                                                            style={{ border: 0 }}
-                                                            allowFullScreen=""
-                                                            loading="lazy"
-                                                            referrerPolicy="no-referrer-when-downgrade"
-                                                            title={`Mapa de ${selectedProperty.title}`}
-                                                            className="w-full h-full"
-                                                        ></iframe>
+                                                    <div className="flex-1 relative">
+                                                        {mapLoading && (
+                                                            <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-amarillo"></div>
+                                                                    <span className="text-gray-700 font-medium">Actualizando mapa...</span>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        
+                                                        {selectedProperty ? (
+                                                            // Mapa centrado en propiedad seleccionada
+                                                            <iframe
+                                                                src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3037.5!2d${selectedProperty.coordinates.lng}!3d${selectedProperty.coordinates.lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDDCsDI1JzUyLjMiTiAzwrA0MScwMi4wIlc!5e0!3m2!1ses!2ses!4v1234567890123`}
+                                                                width="100%"
+                                                                height="100%"
+                                                                style={{ border: 0 }}
+                                                                allowFullScreen=""
+                                                                loading="lazy"
+                                                                referrerPolicy="no-referrer-when-downgrade"
+                                                                title={`Mapa de ${selectedProperty.title}`}
+                                                                className="w-full h-full"
+                                                            ></iframe>
+                                                        ) : (
+                                                            // Mapa con todas las propiedades filtradas
+                                                            <iframe
+                                                                key={`map-${getFilteredProperties().length}-${JSON.stringify(searchFilters)}`}
+                                                                src={getMultipleLocationsMapUrl()}
+                                                                width="100%"
+                                                                height="100%"
+                                                                style={{ border: 0 }}
+                                                                allowFullScreen=""
+                                                                loading="lazy"
+                                                                referrerPolicy="no-referrer-when-downgrade"
+                                                                title={`Mapa con ${getFilteredProperties().length} propiedades disponibles`}
+                                                                className="w-full h-full"
+                                                            ></iframe>
+                                                        )}
+                                                    </div>
+                                                    
+                                                    {/* Controles del mapa */}
+                                                    <div className="p-4 bg-white border-t border-gray-100">
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="flex items-center gap-4">
+                                                                <button
+                                                                    onClick={() => setSelectedProperty(null)}
+                                                                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                                                        !selectedProperty 
+                                                                            ? 'bg-amarillo text-white' 
+                                                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                                                    }`}
+                                                                >
+                                                                    Ver Todas
+                                                                </button>
+                                                                <span className="text-sm text-gray-500">
+                                                                    {getFilteredProperties().length} propiedades
+                                                                </span>
+                                                            </div>
+                                                            
+                                                                                                                         <div className="flex items-center gap-2">
+                                                                 {selectedProperty ? (
+                                                                     <a
+                                                                         href={`https://www.google.com/maps/dir/?api=1&destination=${selectedProperty.coordinates.lat},${selectedProperty.coordinates.lng}`}
+                                                                         target="_blank"
+                                                                         rel="noopener noreferrer"
+                                                                         className="flex items-center gap-2 bg-amarillo text-white px-4 py-2 rounded-lg hover:bg-amarillo/90 transition-colors text-sm font-medium"
+                                                                     >
+                                                                         <FaMapMarkerAlt />
+                                                                         Cómo llegar
+                                                                     </a>
+                                                                 ) : (
+                                                                     <a
+                                                                         href="https://www.google.com/maps/place/Madrid,+Spain"
+                                                                         target="_blank"
+                                                                         rel="noopener noreferrer"
+                                                                         className="flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium"
+                                                                     >
+                                                                         <FaMapMarkerAlt />
+                                                                         Ver Madrid
+                                                                     </a>
+                                                                 )}
+                                                             </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             ) : (
                                                 <div className="h-full flex items-center justify-center">
                                                     <div className="text-center text-gray-600">
                                                         <FaMapMarkerAlt className="text-6xl text-amarillo mx-auto mb-6" />
-                                                        <h3 className="font-serif text-2xl font-light mb-4">Selecciona una propiedad</h3>
-                                                        <p className="font-light">Haz clic en cualquier propiedad para ver su ubicación</p>
+                                                        <h3 className="font-serif text-2xl font-light mb-4">No hay propiedades para mostrar</h3>
+                                                        <p className="font-light">Ajusta los filtros de búsqueda para ver propiedades en el mapa</p>
                                                     </div>
                                                 </div>
                                             )}
