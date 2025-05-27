@@ -78,73 +78,41 @@ const transformRealProperty = (property) => {
   }
 };
 
-// 🚀 Función con Vercel KV
+// 🚀 Función que SOLO usa caché (no llama a WooCommerce directamente)
 export const loadRealProperties = async (page = 1, limit = 5) => {
   const cacheKey = `woo_props_page_${page}_limit_${limit}`;
   
-  // 1. Verificar Vercel KV Cache
-  const cachedProperties = await getPropertiesFromKVCache(cacheKey);
+  console.log(`🏠 Cargando propiedades SOLO desde caché - Página: ${page}, Límite: ${limit}`);
+  
+  // 1. Intentar caché específico
+  let cachedProperties = await getPropertiesFromKVCache(cacheKey);
   if (cachedProperties) {
+    console.log(`✅ Cache HIT específico: ${cachedProperties.length} propiedades`);
     return cachedProperties;
   }
 
-  console.log(`🏠 Vercel KV MISS. Cargando propiedades desde WooCommerce - Página: ${page}, Límite: ${limit}`);
-  
-  const endpointToTry = REAL_ESTATE_CONFIG.endpoints[0];
-  
-  try {
-    console.log(`🔄 Intento único: ${endpointToTry}`);
+  // 2. Intentar caché general y filtrar
+  const allProperties = await getPropertiesFromKVCache('woo_props_all');
+  if (allProperties && Array.isArray(allProperties)) {
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const filteredProperties = allProperties.slice(startIndex, endIndex);
     
-    const response = await axios.get(`${endpointToTry}/products`, {
-      params: {
-        consumer_key: REAL_ESTATE_CONFIG.credentials.key,
-        consumer_secret: REAL_ESTATE_CONFIG.credentials.secret,
-        per_page: Math.min(limit, 10), // Máximo 10
-        page,
-        status: 'publish'
-      },
-      timeout: REAL_ESTATE_CONFIG.connection.timeout,
-      headers: {
-        'Accept': 'application/json'
-      }
-    });
-
-    if (response.status === 200 && Array.isArray(response.data)) {
-      console.log(`📊 Datos recibidos: ${response.data.length} productos`);
-      console.log(`📊 Primer producto:`, JSON.stringify(response.data[0], null, 2));
-      
-      const realProperties = response.data
-        .map(transformRealProperty)
-        .filter(Boolean);
-      
-      console.log(`✅ ÉXITO: ${realProperties.length} propiedades cargadas de ${response.data.length} productos`);
-      
-      // Guardar en Vercel KV Cache (no bloqueante)
-      savePropertiesToKVCache(cacheKey, realProperties).catch(err => 
-        console.error('⚠️ Error guardando en KV cache:', err.message)
+    console.log(`✅ Cache HIT general: ${filteredProperties.length} propiedades (de ${allProperties.length} totales)`);
+    
+    // Guardar en caché específico para próximas veces
+    if (filteredProperties.length > 0) {
+      savePropertiesToKVCache(cacheKey, filteredProperties).catch(err => 
+        console.error('⚠️ Error guardando caché específico:', err.message)
       );
-      
-      return realProperties;
-    } else {
-      console.error(`❌ Respuesta inválida: Status ${response.status}`);
-      return [];
-    }
-  } catch (error) {
-    console.error(`❌ Error cargando propiedades:`, error.message);
-    
-    // Si hay error, intentar devolver datos del caché aunque sean viejos
-    try {
-      const staleData = await kv.get(`${cacheKey}_stale`);
-      if (staleData) {
-        console.log(`🔄 Devolviendo datos stale del caché`);
-        return staleData;
-      }
-    } catch (staleError) {
-      console.error(`❌ Error obteniendo datos stale:`, staleError.message);
     }
     
-    return [];
+    return filteredProperties;
   }
+
+  // 3. Si no hay caché, devolver array vacío (el cron job llenará el caché)
+  console.log(`💨 Sin datos en caché. El cron job precargará los datos pronto.`);
+  return [];
 };
 
 // 🎯 HANDLER CON VERCEL KV

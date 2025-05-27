@@ -14,6 +14,10 @@
     {
       "path": "/api/enviar-emails-diarios",
       "schedule": "0 10 * * *"
+    },
+    {
+      "path": "/api/cron/cache-woocommerce",
+      "schedule": "*/30 * * * *"
     }
   ],
   "functions": {
