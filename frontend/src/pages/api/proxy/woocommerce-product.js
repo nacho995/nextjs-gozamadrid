@@ -16,8 +16,8 @@ export default async function handler(req, res) {
 
   try {
     // Credenciales hardcodeadas (usar las correctas)
-    const wcKey = 'ck_d69e61427264a7beea70ca9ee543b45dd00cae85';
-    const wcSecret = 'cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e';
+    const wcKey = process.env.WC_CONSUMER_KEY;
+const wcSecret = process.env.WC_CONSUMER_SECRET;
     const wcBaseUrl = 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3';
     
     // Obtener el ID del producto desde los parámetros

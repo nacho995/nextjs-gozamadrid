@@ -3,11 +3,19 @@ import axios from 'axios';
 export default async function handler(req, res) {
   console.log('🧪 TEST WOOCOMMERCE - Probando múltiples métodos de conexión');
   
-  // Credenciales
+  // Credenciales - SOLO desde variables de entorno por seguridad
   const credentials = {
-    key: process.env.WC_CONSUMER_KEY || 'ck_75c5940bfae6a9dd63f1489da71e43b576999633',
-    secret: process.env.WC_CONSUMER_SECRET || 'cs_f194d11b41ca92cdd356145705fede711cd233e5'
+    key: process.env.WC_CONSUMER_KEY,
+    secret: process.env.WC_CONSUMER_SECRET
   };
+  
+  // Verificar que las credenciales estén disponibles
+  if (!credentials.key || !credentials.secret) {
+    return res.status(500).json({
+      error: 'Credenciales de WooCommerce no configuradas',
+      message: 'Las variables de entorno WC_CONSUMER_KEY y WC_CONSUMER_SECRET son requeridas'
+    });
+  }
   
   console.log(`🔑 Usando credenciales: ${credentials.key.substring(0, 10)}...`);
   

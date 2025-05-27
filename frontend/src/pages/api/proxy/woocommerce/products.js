@@ -2,8 +2,8 @@ import axios from 'axios';
 import config from '@/config/config';
 
 const WC_API_URL = process.env.NEXT_PUBLIC_WOO_COMMERCE_URL || 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3';
-const WC_KEY = process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY || 'ck_d69e61427264a7beea70ca9ee543b45dd00cae85';
-const WC_SECRET = process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET || 'cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e';
+const WC_KEY = process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY;
+const WC_SECRET = process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET;
 
 // Función para limpiar el contenido de WordPress
 const cleanWordPressContent = (content) => {
