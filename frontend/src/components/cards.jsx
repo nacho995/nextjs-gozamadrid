@@ -276,17 +276,12 @@ export function FloatingValoradorButton() {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             animate={{ 
-              y: [0, -10, 0],
-              boxShadow: [
-                "0 10px 30px rgba(199, 163, 54, 0.3)",
-                "0 20px 40px rgba(199, 163, 54, 0.5)",
-                "0 10px 30px rgba(199, 163, 54, 0.3)"
-              ]
+              y: [0, -10, 0]
             }}
             transition={{ 
-              y: { duration: 2, repeat: Infinity, ease: "easeInOut" },
-              boxShadow: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+              y: { duration: 2, repeat: Infinity, ease: "easeInOut" }
             }}
+            className="rounded-full"
             style={{
               zIndex: '2147483647',
               pointerEvents: 'auto',
@@ -325,24 +320,6 @@ export function FloatingValoradorButton() {
               </button>
             </a>
           </motion.div>
-          
-          {/* Pulso de fondo */}
-          <motion.div
-            className="absolute inset-0 bg-amarillo rounded-full -z-10"
-            style={{
-              zIndex: -1,
-              pointerEvents: 'none'
-            }}
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.3, 0.1, 0.3]
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
         </motion.div>
       )}
     </AnimatePresence>
