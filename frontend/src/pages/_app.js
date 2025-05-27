@@ -99,13 +99,11 @@ if (typeof window !== 'undefined') {
   const BASE_URL = typeof window !== 'undefined' ? window.location.origin : 'https://www.realestategozamadrid.com';
 
   Promise.all([
-    checkEndpointAvailability(`${BASE_URL}/api/proxy/woocommerce/products`),
-    checkEndpointAvailability(`${BASE_URL}/api/proxy/wordpress/posts`),
     checkEndpointAvailability(`${BASE_URL}/api/properties/sources/woocommerce`),
+    checkEndpointAvailability(`${BASE_URL}/api/proxy/wordpress/posts`),
     checkEndpointAvailability(`${BASE_URL}/api/properties/sources/mongodb`)
-  ]).then(([wooCommerceProxyAvailable, wordPressProxyAvailable, wooCommerceApiAvailable, mongodbApiAvailable]) => {
+  ]).then(([wooCommerceApiAvailable, wordPressProxyAvailable, mongodbApiAvailable]) => {
     console.log('[_app.js] Estado de endpoints:', {
-      'proxy/woocommerce': wooCommerceProxyAvailable,
       'proxy/wordpress': wordPressProxyAvailable,
       'properties/woocommerce': wooCommerceApiAvailable,
       'properties/mongodb': mongodbApiAvailable
@@ -113,7 +111,7 @@ if (typeof window !== 'undefined') {
     
     // Determinar qué ruta usar basado en la disponibilidad
     const useProxyRoute = !wooCommerceApiAvailable && !mongodbApiAvailable;
-    const useWooCommerceProxy = wooCommerceProxyAvailable && !wooCommerceApiAvailable;
+    const useWooCommerceProxy = false; // Ya no usamos proxy de WooCommerce
     
     window.__USE_PROXY_ROUTE = useProxyRoute;
     window.__USE_WOOCOMMERCE_PROXY = useWooCommerceProxy;
