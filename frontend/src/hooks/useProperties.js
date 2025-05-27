@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { wooCommerceCache } from '@/services/woocommerce-cache';
 
 // Cache global para propiedades
 const propertiesCache = new Map();
@@ -6,11 +7,11 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutos
 
 // Configuración optimizada
 const CONFIG = {
-  defaultLimit: 50,
-  maxLimit: 100,
+  defaultLimit: 20,
+  maxLimit: 50, // Permitir hasta 50 propiedades por petición
   retryAttempts: 3,
   retryDelay: 1000,
-  timeout: 20000
+  timeout: 30000
 };
 
 // Utilidades de cache
@@ -61,6 +62,7 @@ export const useProperties = (options = {}) => {
 
   // Función de carga con retry y optimizaciones
   const loadProperties = useCallback(async (pageNum = page, limitNum = limit, sourceType = source, options = {}) => {
+    console.log(`[useProperties] loadProperties called. Page: ${pageNum}, Limit: ${limitNum}, Source: ${sourceType}`);
     const { append = false, useCache = enableCache } = options;
     
     // Cancelar petición anterior si existe
@@ -114,15 +116,121 @@ export const useProperties = (options = {}) => {
 
         console.log(`🔄 Cargando propiedades: página=${pageNum}, límite=${limitNum}, fuente=${sourceType}, intento=${attempt}`);
 
-        // Usar directamente WooCommerce que sabemos que funciona
-        const response = await fetch(`/api/properties/sources/woocommerce?page=${pageNum}&limit=${Math.min(limitNum, CONFIG.maxLimit)}`, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          signal: abortControllerRef.current.signal
-        });
+        let response;
+        
+        if (sourceType === 'all') {
+          // Cargar de ambas fuentes y combinar
+          console.log('🔄 Cargando de ambas fuentes: MongoDB y WooCommerce');
+          
+          // Función para obtener propiedades de WooCommerce usando el caché
+          const fetchWooCommerceWithCache = async () => {
+            try {
+              console.log('🔄 Obteniendo propiedades de WooCommerce del caché...');
+              const wooData = await wooCommerceCache.getProperties();
+              
+              if (wooData && wooData.length > 0) {
+                console.log(`✅ WooCommerce caché: ${wooData.length} propiedades`);
+                return { 
+                  status: 'fulfilled', 
+                  value: { 
+                    ok: true, 
+                    json: async () => wooData 
+                  } 
+                };
+              }
+              
+              // Si no hay datos en caché, intentar forzar refresh
+              console.log('⚠️ Sin datos en caché, intentando refresh...');
+              const refreshedData = await wooCommerceCache.getProperties(true);
+              
+              return { 
+                status: 'fulfilled', 
+                value: { 
+                  ok: true, 
+                  json: async () => refreshedData || [] 
+                } 
+              };
+            } catch (error) {
+              console.error('❌ Error obteniendo WooCommerce del caché:', error.message);
+              return { status: 'rejected', reason: error };
+            }
+          };
+
+          const [mongoResponse, wooResponse] = await Promise.allSettled([
+            fetch(`/api/properties/sources/mongodb?page=${pageNum}&limit=${Math.min(limitNum, CONFIG.maxLimit)}`, {
+              method: 'GET',
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              signal: abortControllerRef.current.signal
+            }),
+            fetchWooCommerceWithCache()
+          ]);
+          
+          const allProperties = [];
+          
+          // Procesar MongoDB
+          if (mongoResponse.status === 'fulfilled' && mongoResponse.value.ok) {
+            try {
+              const mongoData = await mongoResponse.value.json();
+              if (Array.isArray(mongoData)) {
+                console.log(`✅ MongoDB: ${mongoData.length} propiedades`);
+                allProperties.push(...mongoData);
+              }
+            } catch (error) {
+              console.warn('⚠️ Error procesando datos de MongoDB:', error);
+            }
+          } else {
+            console.warn('⚠️ MongoDB no disponible:', mongoResponse.reason?.message || 'Error desconocido');
+          }
+          
+          // Procesar WooCommerce
+          if (wooResponse.status === 'fulfilled' && wooResponse.value.ok) {
+            try {
+              const wooData = await wooResponse.value.json();
+              if (Array.isArray(wooData)) {
+                console.log(`✅ WooCommerce: ${wooData.length} propiedades`);
+                allProperties.push(...wooData);
+              }
+            } catch (error) {
+              console.warn('⚠️ Error procesando datos de WooCommerce:', error);
+            }
+          } else {
+            console.warn('⚠️ WooCommerce no disponible:', wooResponse.reason?.message || 'Error desconocido');
+          }
+          
+          // Si no hay propiedades de ninguna fuente, lanzar error
+          if (allProperties.length === 0) {
+            throw new Error('No se pudieron cargar propiedades de ninguna fuente');
+          }
+          
+          // Crear una respuesta simulada con los datos combinados
+          response = {
+            ok: true,
+            json: async () => allProperties
+          };
+          
+        } else if (sourceType === 'mongodb') {
+          response = await fetch(`/api/properties/sources/mongodb?page=${pageNum}&limit=${Math.min(limitNum, CONFIG.maxLimit)}`, {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            signal: abortControllerRef.current.signal
+          });
+        } else {
+          // WooCommerce por defecto
+          response = await fetch(`/api/properties/sources/woocommerce?page=${pageNum}&limit=${Math.min(limitNum, CONFIG.maxLimit)}`, {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            signal: abortControllerRef.current.signal
+          });
+        }
 
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -239,7 +347,9 @@ export const useProperties = (options = {}) => {
 
   // Efecto para carga automática
   useEffect(() => {
+    console.log('[useProperties] useEffect for autoLoad triggered. autoLoad:', autoLoad);
     if (autoLoad) {
+      console.log('[useProperties] Calling loadProperties from useEffect');
       loadProperties();
     }
 

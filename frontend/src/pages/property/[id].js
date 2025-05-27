@@ -58,12 +58,38 @@ const normalizeWooCommerceData = (wooProduct) => {
     });
   }
   
-  // Verificar la existencia de los campos en meta_data para evitar undefined
-  const livingArea = metaData['living_area'] || '0';
-  const bedrooms = metaData['bedrooms'] || '0';
-  const bathrooms = metaData['baños'] || '0';
-  const floor = metaData['Planta'] || '0';
-  const address = metaData['address'] || '';
+  // PRIORIDAD 1: Buscar en features (estructura nueva que funciona)
+  let livingArea = '0';
+  let bedrooms = '0';
+  let bathrooms = '0';
+  let floor = '0';
+  let address = '';
+  
+  if (wooProduct.features) {
+    livingArea = String(wooProduct.features.area || '0');
+    bedrooms = String(wooProduct.features.bedrooms || '0');
+    bathrooms = String(wooProduct.features.bathrooms || '0');
+    floor = String(wooProduct.features.floor || '0');
+  }
+  
+  // PRIORIDAD 2: Si no hay features, buscar en propiedades directas
+  if (livingArea === '0') {
+    livingArea = String(wooProduct.area || wooProduct.size || wooProduct.m2 || '0');
+  }
+  if (bedrooms === '0') {
+    bedrooms = String(wooProduct.bedrooms || wooProduct.rooms || '0');
+  }
+  if (bathrooms === '0') {
+    bathrooms = String(wooProduct.bathrooms || wooProduct.banos || '0');
+  }
+  
+  // PRIORIDAD 3: Buscar en meta_data como último recurso
+  if (livingArea === '0') livingArea = metaData['living_area'] || metaData['superficie'] || metaData['area'] || '0';
+  if (bedrooms === '0') bedrooms = metaData['bedrooms'] || metaData['habitaciones'] || '0';
+  if (bathrooms === '0') bathrooms = metaData['baños'] || metaData['bathrooms'] || '0';
+  if (floor === '0') floor = metaData['Planta'] || metaData['floor'] || '0';
+  
+  address = wooProduct.location || metaData['address'] || '';
   
   console.log('[normalizeWooCommerceData] Meta data extraído:', {
     livingArea,

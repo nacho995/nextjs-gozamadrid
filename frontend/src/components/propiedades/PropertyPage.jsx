@@ -9,6 +9,8 @@ import LoadingFallback from './LoadingFallback';
 import Head from 'next/head';
 import config from '@/config/config';
 import axios from 'axios';
+import { wooCommerceCache } from '@/services/woocommerce-cache';
+import { useProperties } from '@/hooks/useProperties';
 
 // Estilos consistentes con el resto de la web
 const textShadowStyle = { textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' };
@@ -483,234 +485,153 @@ axiosInstance.interceptors.response.use(
 // Función para obtener propiedades usando endpoints directos (sin proxy obsoleto)
 const fetchPropertiesFromAPI = async () => {
   try {
-    // Usar endpoint directo de MongoDB - más confiable y sin proxy obsoleto
-    const response = await axios.get('/api/properties/sources/mongodb', {
-      params: {
-        limit: ITEMS_PER_PAGE
-      },
-      timeout: 30000
-    });
-    
-    if (response.data && (Array.isArray(response.data) || response.data.properties)) {
-      let properties = [];
-      
-      // Manejar diferentes formatos de respuesta
-      if (Array.isArray(response.data)) {
-        properties = response.data;
-      } else if (response.data.properties && Array.isArray(response.data.properties)) {
-        properties = response.data.properties;
-      } else if (response.data.data && Array.isArray(response.data.data)) {
-        properties = response.data.data;
-      }
-      
-      console.log(`[PropertyPage] Se obtuvieron ${properties.length} propiedades de MongoDB`);
-      
-      // Añadir indicador de fuente si no lo tienen ya
-      return properties.map(property => ({
-        ...property,
-        source: property.source || 'mongodb'
-      }));
-    }
-    
+    console.log('[PropertyPage] Usando useProperties hook para cargar de ambas fuentes');
+    // Esta función ya no es necesaria, usaremos el hook useProperties
     return [];
   } catch (error) {
-    console.error('[PropertyPage] Error al obtener propiedades de MongoDB:', error.message);
-    
-    // Intentar con el endpoint combinado como respaldo
-    try {
-      const fallbackResponse = await axios.get('/api/properties', {
-        timeout: 30000
-      });
-      
-      if (fallbackResponse.data && Array.isArray(fallbackResponse.data)) {
-        // Filtrar solo propiedades de MongoDB
-        const mongoProperties = fallbackResponse.data.filter(property => property.source === 'mongodb');
-        console.log(`[PropertyPage] Se obtuvieron ${mongoProperties.length} propiedades de MongoDB (fallback)`);
-        return mongoProperties;
-      }
-    } catch (fallbackError) {
-      console.error('[PropertyPage] Error en endpoint fallback combinado:', fallbackError.message);
-    }
-    
+    console.error('[PropertyPage] Error al obtener propiedades:', error);
     return [];
   }
 };
 
 export default function PropertyPage() {
   const router = useRouter();
-  const [properties, setProperties] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [isClient, setIsClient] = useState(false);
   const [currentPage, setCurrentPage] = useState(DEFAULT_PAGE);
-  const [totalPages, setTotalPages] = useState(1);
+  const [selectedLocation, setSelectedLocation] = useState('Todas');
+  const [selectedType, setSelectedType] = useState('Todos');
+  const [priceRange, setPriceRange] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');
-  const [propertyTypes, setPropertyTypes] = useState([]);
-  const [locations, setLocations] = useState([]);
-  const [selectedType, setSelectedType] = useState('');
-  const [selectedLocation, setSelectedLocation] = useState('');
-  const [configLoaded, setConfigLoaded] = useState(false);
-  const renderCountRef = useRef(0);
-  const abortControllerRef = useRef(null);
-  const [showDebugPanel, setShowDebugPanel] = useState(false);
-  
-  // DEBUG: Imprimir información de la API y configuración
+  const [showFilters, setShowFilters] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [locations, setLocations] = useState(['Todas']);
+  const [propertyTypes, setPropertyTypes] = useState(['Todos']);
+  const [priceRanges] = useState(['Todos', '0-500k', '500k-1M', '1M-2M', '2M+']);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [selectedPropertyImages, setSelectedPropertyImages] = useState([]);
+  const [selectedPropertyTitle, setSelectedPropertyTitle] = useState('');
+  const [isConfigLoaded, setIsConfigLoaded] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const MAX_RETRIES = 3;
+
+  // Usar el hook useProperties para cargar de ambas fuentes
+  const { 
+    properties: allProperties, 
+    loading: propertiesLoading, 
+    error: propertiesError,
+    meta,
+    refresh: refreshProperties
+  } = useProperties({
+    page: currentPage,
+    limit: ITEMS_PER_PAGE,
+    source: 'all', // Cargar de ambas fuentes: MongoDB y WooCommerce
+    autoLoad: true,
+    enableCache: true
+  });
+
+  // Actualizar el efecto para usar las propiedades del hook
   useEffect(() => {
-    // // console.log('API URL configurada:', API_URL);
-    // // console.log('BASE URL configurada:', BASE_URL);
-    // // console.log('Configuración window.appConfig:', window.appConfig);
-    
-    // Verificar conectividad con las APIs directas (sin proxy obsoleto)
-    try {
-      // Verificar endpoint directo de MongoDB
-      axios.head('/api/properties/sources/mongodb', {
-        timeout: 5000
-      })
-      .then(response => {
-        // // console.log('Verificación de conectividad con API MongoDB exitosa', response.status);
-      })
-      .catch(error => {
-        // // console.log('Verificación de conectividad con API MongoDB falló, es normal en algunos navegadores', error.message);
-      });
-    } catch (err) {
-      // // console.log('Error al intentar verificar conectividad con API', err.message);
+    if (!propertiesLoading && allProperties.length > 0) {
+      console.log(`[PropertyPage] Propiedades cargadas: ${allProperties.length} total`);
+      console.log(`[PropertyPage] Fuentes: MongoDB: ${meta?.sources?.mongodb || 0}, WooCommerce: ${meta?.sources?.woocommerce || 0}`);
+      
+      // Extraer ubicaciones y tipos de las propiedades cargadas
+      const extractedLocations = extractLocations(allProperties);
+      const extractedTypes = extractPropertyTypes(allProperties);
+      
+      setLocations(extractedLocations);
+      setPropertyTypes(['Todos', ...extractedTypes]);
+      setIsLoading(false);
+      setError(null);
+    } else if (!propertiesLoading && propertiesError) {
+      console.error('[PropertyPage] Error cargando propiedades:', propertiesError);
+      setError(propertiesError);
+      setIsLoading(false);
     }
-  }, []);
+  }, [allProperties, propertiesLoading, propertiesError, meta]);
 
+  // Actualizar el efecto para no llamar a fetchAllProperties
   useEffect(() => {
-    let timeoutId;
-    let attempts = 0;
-    const maxAttempts = 10;
-
-    const checkConfig = () => {
-      if (window.appConfig) {
-        // // console.log('[PropertyPage] Configuración detectada:', window.appConfig);
-        if (!window.appConfig.isConfigLoaded) {
-          // // console.log('[PropertyPage] Esperando configuración completa...');
-          if (attempts < maxAttempts) {
-            attempts++;
-            timeoutId = setTimeout(checkConfig, 1000);
-            return;
-          }
-        }
-        setConfigLoaded(true);
-      } else {
-        if (attempts < maxAttempts) {
-          attempts++;
-          // // console.log(`[PropertyPage] Esperando configuración... Intento ${attempts}`);
-          timeoutId = setTimeout(checkConfig, 1000);
-        } else {
-          // // console.log('[PropertyPage] No se pudo cargar la configuración después de varios intentos');
-          setConfigLoaded(true); // Continuar de todos modos
-        }
-      }
-    };
-    
+    setIsClient(true);
     checkConfig();
-    
-    return () => {
-      if (timeoutId) clearTimeout(timeoutId);
-    };
   }, []);
 
-  // Efecto para manejar cambios en la URL
+  // Actualizar el efecto de cambio de página
   useEffect(() => {
-    if (!router.isReady) return;
-    
-    const page = parseInt(router.query.page) || DEFAULT_PAGE;
-    if (page !== currentPage) {
-      setCurrentPage(page);
+    const pageFromQuery = parseInt(router.query.page) || DEFAULT_PAGE;
+    if (pageFromQuery !== currentPage) {
+      setCurrentPage(pageFromQuery);
     }
-  }, [router.isReady, router.query.page]);
+  }, [router.query.page]);
 
-  // Efecto para cargar propiedades
-  useEffect(() => {
-    if (!router.isReady || !configLoaded) {
-      return;
-    }
-
-    const fetchAllProperties = async () => {
-      setLoading(true);
-      setError(null); // Resetear error al inicio
-
-      try {
-        // SOLO LLAMAR A LAS RUTAS API DEL BACKEND
-        // El backend se encargará de llamar a MongoDB y WooCommerce
-        const [mongoResponse, wooResponse] = await Promise.allSettled([
-          axios.get('/api/properties/sources/mongodb', { timeout: 30000 }).catch(err => {
-             console.error('[PropertyPage] Error API MongoDB:', err.response?.data || err.message);
-             return { data: [] }; // Devolver array vacío en caso de error
-          }),
-          axios.get('/api/properties/sources/woocommerce', { timeout: 30000 }).catch(err => {
-             console.error('[PropertyPage] Error API WooCommerce:', err.response?.data || err.message);
-             // Guardar el error para mostrarlo si es necesario
-             setError(`Error al cargar datos de WooCommerce: ${err.response?.data?.error || err.message}`); 
-             return { data: [] }; // Devolver array vacío en caso de error
-          })
-        ]);
-
-        const mongoProperties = mongoResponse.status === 'fulfilled' ? (mongoResponse.value?.data || []) : [];
-        const wooCommerceProperties = wooResponse.status === 'fulfilled' ? (wooResponse.value?.data || []) : [];
-        
-        // Asegurarse de que sean arrays
-        const safeMongoProps = Array.isArray(mongoProperties) ? mongoProperties : [];
-        const safeWooProps = Array.isArray(wooCommerceProperties) ? wooCommerceProperties : [];
-
-        // Marcar la fuente explícitamente si no viene de la API
-        const taggedMongoProps = safeMongoProps.map(p => ({ ...p, source: p.source || 'mongodb' }));
-        const taggedWooProps = safeWooProps.map(p => ({ ...p, source: p.source || 'woocommerce' }));
-
-        const allProperties = [...taggedMongoProps, ...taggedWooProps];
-
-        if (allProperties.length > 0) {
-            setProperties(allProperties);
-            setTotalPages(Math.ceil(allProperties.length / ITEMS_PER_PAGE) || 1);
-            // No limpiar el error aquí si hubo uno parcial (ej. WooCommerce falló pero Mongo no)
-            // setError(null); 
-        } else if (!error) { // Si no hubo error previo pero no hay propiedades
-            console.warn('[PropertyPage] No se encontraron propiedades en ninguna fuente.');
-            setError('No se encontraron propiedades.');
-        }
-        
-      } catch (fetchError) {
-          console.error('[PropertyPage] Error inesperado en fetchAllProperties:', fetchError);
-          setError('Error general al cargar propiedades.');
-          setProperties([]);
-      } finally {
-          setLoading(false);
-      }
-    };
-
-    fetchAllProperties();
-  }, [router.isReady, configLoaded]); // Dependencias correctas
-
-  // Usar useMemo para almacenar propiedades filtradas
+  // Filtrar propiedades basándose en los filtros seleccionados
   const filteredProperties = useMemo(() => {
-    if (!Array.isArray(properties) || properties.length === 0) {
-      return [];
-    }
+    if (!allProperties || allProperties.length === 0) return [];
 
-    return properties.filter(property => {
-      // Filtrar por término de búsqueda
-      const searchMatch = !searchTerm || (
-        (property.title && property.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (property.name && property.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (property.description && property.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (property.location && property.location.toLowerCase().includes(searchTerm.toLowerCase()))
-      );
+    return allProperties.filter(property => {
+      // Filtro por ubicación
+      if (selectedLocation !== 'Todas') {
+        const propertyLocation = getCorrectLocation(property).toLowerCase();
+        if (!propertyLocation.includes(selectedLocation.toLowerCase())) {
+          return false;
+        }
+      }
 
-      // Filtrar por tipo
-      const typeMatch = !selectedType || selectedType === 'Todos' || (
-        property.propertyType && property.propertyType.toLowerCase().includes(selectedType.toLowerCase())
-      );
+      // Filtro por tipo
+      if (selectedType !== 'Todos') {
+        const propertyType = property.typeProperty || property.type || '';
+        if (propertyType.toLowerCase() !== selectedType.toLowerCase()) {
+          return false;
+        }
+      }
 
-      // Filtrar por ubicación
-      const locationMatch = !selectedLocation || selectedLocation === 'Todas' || (
-        property.location && property.location.toLowerCase().includes(selectedLocation.toLowerCase())
-      );
+      // Filtro por rango de precio
+      if (priceRange !== 'Todos') {
+        const price = parseFloat(property.price) || 0;
+        switch (priceRange) {
+          case '0-500k':
+            if (price >= 500000) return false;
+            break;
+          case '500k-1M':
+            if (price < 500000 || price >= 1000000) return false;
+            break;
+          case '1M-2M':
+            if (price < 1000000 || price >= 2000000) return false;
+            break;
+          case '2M+':
+            if (price < 2000000) return false;
+            break;
+        }
+      }
 
-      return searchMatch && typeMatch && locationMatch;
+      // Filtro por término de búsqueda
+      if (searchTerm) {
+        const searchLower = searchTerm.toLowerCase();
+        const title = (property.title || property.name || '').toLowerCase();
+        const location = getCorrectLocation(property).toLowerCase();
+        const description = (property.description || '').toLowerCase();
+        
+        if (!title.includes(searchLower) && 
+            !location.includes(searchLower) && 
+            !description.includes(searchLower)) {
+          return false;
+        }
+      }
+
+      return true;
     });
-  }, [properties, searchTerm, selectedType, selectedLocation]);
+  }, [allProperties, selectedLocation, selectedType, priceRange, searchTerm]);
+
+  // Calcular propiedades paginadas
+  const paginatedProperties = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredProperties.slice(startIndex, endIndex);
+  }, [filteredProperties, currentPage]);
+
+  const totalPages = Math.ceil(filteredProperties.length / ITEMS_PER_PAGE);
 
   // Callback para cambio de página
   const handlePageChange = useCallback((page) => {
@@ -726,6 +647,7 @@ export default function PropertyPage() {
   const [pageDescription, setPageDescription] = useState('Descubra nuestra selección de propiedades inmobiliarias en Madrid. Apartamentos, casas, chalets y locales comerciales disponibles para compra y alquiler.');
 
   // Aumentar contador de renderizaciones
+  const renderCountRef = useRef(0);
   useEffect(() => {
     renderCountRef.current += 1;
     // // console.log(`[RENDERIZACIONES] PropertyPage renderizada ${renderCountRef.current} veces`);
@@ -740,6 +662,7 @@ export default function PropertyPage() {
   }, []);
 
   // Efecto para mostrar el panel de depuración solo en el cliente tras hidratación
+  const [showDebugPanel, setShowDebugPanel] = useState(false);
   useEffect(() => {
     if (window.appConfig?.debug || process.env.NODE_ENV === 'development') {
       setShowDebugPanel(true);
@@ -749,19 +672,19 @@ export default function PropertyPage() {
   // Preparar el Schema.org para la lista de propiedades
   const generatePropertyListSchema = () => {
     // Solo generar si tenemos propiedades
-    if (!Array.isArray(properties) || properties.length === 0) {
+    if (!Array.isArray(allProperties) || allProperties.length === 0) {
       return null;
     }
 
     // Extraer tipos de propiedades y ubicaciones para mejorar el SEO
-    const propertyTypes = extractPropertyTypes(properties);
-    const locations = extractLocations(properties);
+    const propertyTypes = extractPropertyTypes(allProperties);
+    const locations = extractLocations(allProperties);
 
     // Generar schema.org para la lista de propiedades
     return {
       "@context": "https://schema.org",
       "@type": "ItemList",
-      "itemListElement": properties.map((property, index) => {
+      "itemListElement": allProperties.map((property, index) => {
         // Determinar si es una propiedad de WordPress o de MongoDB
         const isWordPressProperty = 
           property.source === 'woocommerce' || 
@@ -924,7 +847,7 @@ export default function PropertyPage() {
   }, []);
 
   const renderProperties = () => {
-    if (loading) {
+    if (isLoading) {
       return (
         <div className="flex justify-center items-center py-20">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
@@ -941,7 +864,7 @@ export default function PropertyPage() {
       );
     }
 
-    if (!properties || properties.length === 0) {
+    if (!paginatedProperties || paginatedProperties.length === 0) {
       return (
         <div className="flex flex-col justify-center items-center py-20">
           <h3 className="text-xl font-semibold text-gray-700">No se encontraron propiedades</h3>
@@ -951,7 +874,7 @@ export default function PropertyPage() {
     }
 
     // Mostrar todas las propiedades disponibles
-    const currentProperties = filteredProperties;
+    const currentProperties = paginatedProperties;
 
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -968,7 +891,7 @@ export default function PropertyPage() {
           // Extraer título
           const title = isMongoDBProperty 
             ? (property.title || 'Propiedad sin título') 
-            : (property.name || 'Propiedad sin título');
+            : (property.title || property.name || 'Propiedad sin título');
           
           // Obtener precio formateado
           let formattedPrice = 'Consultar';
@@ -1038,30 +961,35 @@ export default function PropertyPage() {
             area = property.area || property.m2 || '?';
             location = property.location || property.address || '';
           } else {
-            // Si es WooCommerce, extraer de meta_data
-            if (property.meta_data && Array.isArray(property.meta_data)) {
-              // Extraer dormitorios
-              const bedroomMeta = property.meta_data.find(meta => 
-                meta.key === 'bedrooms' || meta.key === 'habitaciones' || meta.key === 'dormitorios'
-              );
-              bedrooms = bedroomMeta ? bedroomMeta.value : 
-                         property.bedrooms || property.rooms || '?';
-              
-              // Extraer baños
-              const bathroomMeta = property.meta_data.find(meta => 
-                meta.key === 'ba\u00f1os' || meta.key === 'banos' || meta.key === 'bathrooms' || meta.key === 'wc'
-              );
-              bathrooms = bathroomMeta ? bathroomMeta.value : 
-                          property.bathrooms || property.ba_os || property.wc || '?';
-              
-              // Extraer metros cuadrados
-              const areaMeta = property.meta_data.find(meta => 
-                meta.key === 'living_area' || meta.key === 'area' || meta.key === 'm2' || meta.key === 'metros'
-              );
-              area = areaMeta ? areaMeta.value : 
-                     property.area || property.m2 || property.metros || '?';
-              
-              // Extraer dirección
+            // Si es WooCommerce, priorizar datos de features
+            if (property.features) {
+              bedrooms = property.features.bedrooms || property.bedrooms || property.rooms || '?';
+              bathrooms = property.features.bathrooms || property.bathrooms || property.wc || '?';
+              area = property.features.area || property.area || property.m2 || '?';
+            } else {
+              // Fallback a campos directos
+              bedrooms = property.bedrooms || property.rooms || '?';
+              bathrooms = property.bathrooms || property.wc || '?';
+              area = property.area || property.m2 || '?';
+            }
+            
+            // Para la ubicación, usar el campo location directamente
+            location = property.location || property.address || '';
+            
+            // Si no hay ubicación, intentar extraerla del título
+            if (!location && (property.title || property.name)) {
+              const title = property.title || property.name;
+              // Si el título es una dirección (contiene "Calle", etc.)
+              if (title.includes("Calle") || 
+                  title.includes("Avenida") || 
+                  title.includes("Plaza") || 
+                  /^(Calle|C\/|Avda\.|Av\.|Pza\.|Plaza)\s+[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+\d*/.test(title)) {
+                location = title;
+              }
+            }
+            
+            // Si aún no hay ubicación, buscar en meta_data como fallback
+            if (!location && property.meta_data && Array.isArray(property.meta_data)) {
               const addressMeta = property.meta_data.find(meta => 
                 meta.key === 'address' || meta.key === 'direccion' || meta.key === 'ubicacion' || meta.key === 'Ubicación'
               );
@@ -1070,22 +998,11 @@ export default function PropertyPage() {
                 if (typeof addressMeta.value === 'string') {
                   location = addressMeta.value;
                 } else if (typeof addressMeta.value === 'object') {
-                  // Si es un objeto, intentar extraer la dirección
                   location = addressMeta.value.address || 
                            addressMeta.value.name || 
                            (addressMeta.value.street_number && addressMeta.value.street_name ? 
                              `${addressMeta.value.street_number} ${addressMeta.value.street_name}, ${addressMeta.value.city}` : 
                              '');
-                }
-              }
-              
-              // Si no hay dirección en meta_data, intentar extraerla del nombre
-              if (!location && property.name) {
-                if (property.name.includes("Calle") || 
-                    property.name.includes("Avenida") || 
-                    property.name.includes("Plaza") || 
-                    /^(Calle|C\/|Avda\.|Av\.|Pza\.|Plaza)\s+[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+\d*/.test(property.name)) {
-                  location = property.name;
                 }
               }
             }
@@ -1254,18 +1171,29 @@ export default function PropertyPage() {
   // Generar Schema.org JSON-LD
   const propertyListSchema = generatePropertyListSchema();
 
+  // Evitar problemas de hidratación - no renderizar hasta que estemos en el cliente
+  if (!isClient) {
+    return (
+      <div className="relative min-h-screen py-12">
+        <div className="flex justify-center items-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <Head>
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
-        <link rel="canonical" href={currentUrl} />
+        {isClient && <link rel="canonical" href={currentUrl} />}
         
         {/* Open Graph tags */}
         <meta property="og:type" content="website" />
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={pageDescription} />
-        <meta property="og:url" content={currentUrl} />
+        {isClient && <meta property="og:url" content={currentUrl} />}
         <meta property="og:image" content="https://www.realestategozamadrid.com/og-image-properties.jpg" />
         <meta property="og:site_name" content="Goza Madrid" />
         
@@ -1288,19 +1216,19 @@ export default function PropertyPage() {
       {showDebugPanel && (
         <div className="fixed top-20 right-4 z-50 bg-black/80 text-white p-4 rounded-lg shadow-lg text-xs font-mono max-w-xs overflow-auto max-h-80">
           <h4 className="font-bold text-amber-400 mb-2">DEBUG</h4>
-          <p>Properties: {properties.length}</p>
+          <p>Properties: {allProperties.length}</p>
           <p>Filtered: {filteredProperties.length}</p>
           <p>Current Page: {currentPage}</p>
           <p>Total Pages: {totalPages}</p>
-          <p>MongoDB: {properties.filter(p => p.source === 'mongodb').length}</p>
-          <p>WooCommerce: {properties.filter(p => p.source === 'woocommerce').length}</p>
-          <p>Loading: {loading ? 'true' : 'false'}</p>
+          <p>MongoDB: {allProperties.filter(p => p.source === 'mongodb').length}</p>
+          <p>WooCommerce: {allProperties.filter(p => p.source === 'woocommerce').length}</p>
+          <p>Loading: {isLoading ? 'true' : 'false'}</p>
           <p>Initialized: {renderCountRef.current > 0 ? 'true' : 'false'}</p>
           <hr className="my-2 border-gray-600" />
           <button
             onClick={() => {
               console.log('Estado completo:', {
-                properties,
+                allProperties,
                 filteredProperties,
                 currentProperties: filteredProperties
               });
@@ -1364,3 +1292,14 @@ export default function PropertyPage() {
     </>
   );
 }
+
+// Función para verificar la configuración
+const checkConfig = () => {
+  if (typeof window !== 'undefined' && window.appConfig) {
+    console.log('[PropertyPage] Configuración detectada:', window.appConfig);
+    setIsConfigLoaded(true);
+  } else {
+    console.log('[PropertyPage] Configuración no disponible, continuando sin ella');
+    setIsConfigLoaded(true);
+  }
+};

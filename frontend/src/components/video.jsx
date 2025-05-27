@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import AnimatedOnScroll from "./AnimatedScroll";
 import Image from "next/legacy/image";
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaSearch, FaMapMarkerAlt, FaBed, FaBath, FaRuler, FaEuroSign, FaFilter, FaCalculator, FaTimes, FaHome, FaArrowRight } from 'react-icons/fa';
+import { FaSearch, FaMapMarkerAlt, FaBed, FaBath, FaRuler, FaEuroSign, FaFilter, FaCalculator, FaTimes, FaHome, FaArrowRight, FaEye } from 'react-icons/fa';
 import { normalizeProperty, filterProperties } from '../utils/properties';
 import ControlMenu from './header';
 import { useProperties } from '../hooks/useProperties';
@@ -14,40 +14,53 @@ const Video = () => {
     const pathname = usePathname();
     const isHomePage = pathname === '/';
     const videoRef = useRef(null);
-    const [videoSrc, setVideoSrc] = useState("/video.mp4");
+
+    // Estado inicial consistente para SSR
+    const [videoSrc, setVideoSrc] = useState("/video.mp4"); // Fuente base por defecto
+    const [videoSources, setVideoSources] = useState(["/video.mp4", "/videoExpIngles.mp4"]); // Fuentes base
+    const [currentSourceIndex, setCurrentSourceIndex] = useState(0);
+    const [isClientHydrated, setIsClientHydrated] = useState(false); // Para controlar post-hidratación
+
     const [isVideoLoaded, setIsVideoLoaded] = useState(false);
     const [videoError, setVideoError] = useState(false);
-    // Detectar si estamos en producción y usar URLs apropiadas
-    const getVideoSources = () => {
-        const isProduction = typeof window !== 'undefined' && (
-            window.location.hostname === 'www.realestategozamadrid.com' ||
-            window.location.hostname === 'realestategozamadrid.com'
-        );
-        
-        if (isProduction) {
-            return [
-                // Videos comprimidos optimizados para web (4MB y 5.7MB)
-                "/video.mp4",
-                "/videoExpIngles.mp4",
-                // URLs absolutas como respaldo
-                `${window.location.origin}/video.mp4`,
-                `${window.location.origin}/videoExpIngles.mp4`,
-                // Video de respaldo externo más pequeño
-                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-            ];
-        } else {
-            return [
-                "/video.mp4",
-                "/videoExpIngles.mp4",
-                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-            ];
-        }
-    };
-    
-    const [videoSources] = useState(getVideoSources());
-    const [currentSourceIndex, setCurrentSourceIndex] = useState(0);
 
-    
+    useEffect(() => {
+        // Este efecto se ejecuta solo en el cliente, después de la hidratación
+        setIsClientHydrated(true);
+
+        const determineVideoSources = () => {
+            const isProduction = 
+                window.location.hostname === 'www.realestategozamadrid.com' ||
+                window.location.hostname === 'realestategozamadrid.com';
+            
+            let newSources = [];
+            if (isProduction) {
+                newSources = [
+                    "/video.mp4",
+                    "/videoExpIngles.mp4",
+                    `${window.location.origin}/video.mp4`,
+                    `${window.location.origin}/videoExpIngles.mp4`,
+                    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+                ];
+            } else {
+                newSources = [
+                    "/video.mp4",
+                    "/videoExpIngles.mp4",
+                    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+                ];
+            }
+            setVideoSources(newSources);
+            // Asegurarse de que videoSrc también se actualice si el índice actual es válido para las nuevas fuentes
+            // O simplemente reiniciar al primer video de las fuentes determinadas.
+            if (newSources.length > 0) {
+                setVideoSrc(newSources[0]);
+                setCurrentSourceIndex(0);
+            }
+        };
+
+        determineVideoSources();
+    }, []); // El array vacío asegura que solo se ejecuta una vez post-montaje
+
     // Estados para el buscador de propiedades
     const [searchFilters, setSearchFilters] = useState({
         location: '',
@@ -72,7 +85,8 @@ const Video = () => {
         meta,
         refresh: refreshProperties
     } = useProperties({
-        limit: 100, // Cargar más propiedades para el buscador
+        limit: 33, // Cargar todas las propiedades disponibles
+        source: 'all', // Cargar de ambas fuentes: MongoDB y WooCommerce
         autoLoad: true,
         enableCache: true
     });
@@ -101,7 +115,9 @@ const Video = () => {
     }, []);
 
     useEffect(() => {
-        console.log('[Video] Iniciando configuración del video con src:', videoSrc);
+        if (!isClientHydrated) return; // Esperar a que el cliente esté hidratado y las fuentes correctas seteadas
+
+        console.log('[Video] (Cliente Hidratado) Iniciando configuración del video con src:', videoSrc);
         const videoElement = videoRef.current;
         if (videoElement) {
             console.log('[Video] Elemento video encontrado, configurando...');
@@ -190,10 +206,12 @@ const Video = () => {
         } else {
             console.log('[Video] ⚠️ Elemento video no encontrado en el DOM');
         }
-    }, [videoSrc, currentSourceIndex, videoSources]);
+    }, [videoSrc, currentSourceIndex, videoSources, isClientHydrated]);
 
     // Verificar si el video existe
     useEffect(() => {
+        if (!isClientHydrated || typeof window === 'undefined') return; // Esperar y asegurar que window exista
+
         const checkVideoExists = async () => {
             try {
                 console.log('[Video] 🔍 Verificando si el video existe en:', videoSrc);
@@ -228,10 +246,8 @@ const Video = () => {
             }
         };
         
-        if (typeof window !== 'undefined') {
-            checkVideoExists();
-        }
-    }, [videoSrc]);
+        checkVideoExists();
+    }, [videoSrc, isClientHydrated]);
 
     // Efecto para seleccionar la primera propiedad cuando se cargan
     useEffect(() => {
@@ -251,10 +267,15 @@ const Video = () => {
 
     // Función para seleccionar una propiedad y actualizar el mapa
     const selectProperty = (property) => {
+        console.log('🏠 Seleccionando propiedad:', property.title);
         setMapLoading(true);
         setSelectedProperty(property);
-        // Simular tiempo de carga del mapa
-        setTimeout(() => setMapLoading(false), 1000);
+        
+        // Actualizar el mapa inmediatamente con la nueva propiedad
+        setTimeout(() => {
+            setMapLoading(false);
+            console.log('✅ Mapa actualizado para:', property.title);
+        }, 500); // Reducido el tiempo para una experiencia más fluida
     };
 
     // Función para manejar cambios en filtros
@@ -280,33 +301,84 @@ const Video = () => {
 
     // Función para generar URL del mapa con múltiples ubicaciones
     const getMultipleLocationsMapUrl = () => {
-        const filteredProps = getFilteredProperties();
-        if (filteredProps.length === 0) return '';
-        
-        // Crear una consulta con múltiples ubicaciones para Google Maps
-        const locations = filteredProps
-            .map(property => {
-                // Usar coordenadas si están disponibles, sino usar la dirección
-                if (property.coordinates && property.coordinates.lat && property.coordinates.lng) {
-                    return `${property.coordinates.lat},${property.coordinates.lng}`;
-                } else {
-                    return encodeURIComponent(property.location || property.title || 'Madrid, España');
-                }
-            })
-            .slice(0, 10); // Limitar a 10 ubicaciones para evitar URLs muy largas
-        
-        // Crear URL base centrada en Madrid con zoom apropiado
-        const baseUrl = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12150!2d-3.7037!3d40.4167!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1';
-        
-        // Agregar las ubicaciones como parámetro de búsqueda
-        return `${baseUrl}&q=${locations.join('|')}`;
+        try {
+            const filteredProps = getFilteredProperties();
+            console.log('🗺️ Propiedades filtradas para el mapa:', filteredProps.length);
+            
+            if (filteredProps.length === 0) {
+                console.log('⚠️ No hay propiedades filtradas, usando mapa de Madrid por defecto');
+                return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1sen!2ses!4v1234567890123';
+            }
+            
+            // Crear una consulta con múltiples ubicaciones para Google Maps
+            const locations = filteredProps
+                .map(property => {
+                    try {
+                        // Usar coordenadas si están disponibles, sino usar la dirección
+                        if (property.coordinates && 
+                            property.coordinates.lat && 
+                            property.coordinates.lng &&
+                            !isNaN(property.coordinates.lat) &&
+                            !isNaN(property.coordinates.lng)) {
+                            return `${property.coordinates.lat},${property.coordinates.lng}`;
+                        } else {
+                            const location = property.location || property.title || 'Madrid, España';
+                            return encodeURIComponent(location);
+                        }
+                    } catch (error) {
+                        console.error('❌ Error procesando propiedad para mapa:', error);
+                        return encodeURIComponent('Madrid, España');
+                    }
+                })
+                .filter(location => location) // Filtrar ubicaciones vacías
+                .slice(0, 10); // Limitar a 10 ubicaciones para evitar URLs muy largas
+            
+            console.log('📍 Ubicaciones para el mapa:', locations);
+            
+            // Crear URL base centrada en Madrid con zoom apropiado
+            const baseUrl = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1';
+            
+            // Agregar las ubicaciones como parámetro de búsqueda
+            const finalUrl = `${baseUrl}&q=${locations.join('|')}`;
+            console.log('🔗 URL final del mapa:', finalUrl);
+            
+            return finalUrl;
+        } catch (error) {
+            console.error('❌ Error generando URL del mapa:', error);
+            // Devolver mapa de Madrid por defecto en caso de error
+            return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1sen!2ses!4v1234567890123';
+        }
     };
 
     // Generar URL del mapa embebido de Google Maps
     const getMapEmbedUrl = (property) => {
-        if (!property) return '';
-        const { lat, lng } = property.coordinates;
-        return `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dOWTgHz-y-2b8s&q=${lat},${lng}&zoom=16&maptype=roadmap`;
+        try {
+            if (!property) {
+                console.log('⚠️ No hay propiedad seleccionada para el mapa');
+                return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1sen!2ses!4v1234567890123';
+            }
+            
+            console.log('🗺️ Generando mapa para propiedad:', property.title);
+            
+            if (property.coordinates && 
+                property.coordinates.lat && 
+                property.coordinates.lng &&
+                !isNaN(property.coordinates.lat) &&
+                !isNaN(property.coordinates.lng)) {
+                const { lat, lng } = property.coordinates;
+                console.log(`📍 Usando coordenadas: ${lat}, ${lng}`);
+                // Zoom más cercano para propiedades individuales (zoom 16)
+                return `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1518.75!2d${lng}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z${lat},${lng}!5e0!3m2!1ses!2ses!4v${Date.now()}`;
+            } else {
+                console.log('📍 Usando ubicación por texto:', property.location || property.title);
+                const location = encodeURIComponent(property.location || property.title || 'Madrid, España');
+                // Zoom medio para búsquedas por texto (zoom 15)
+                return `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3037.5!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1&q=${location}&zoom=15&v=${Date.now()}`;
+            }
+        } catch (error) {
+            console.error('❌ Error generando URL del mapa individual:', error);
+            return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1sen!2ses!4v1234567890123';
+        }
     };
 
     return (
@@ -362,9 +434,11 @@ const Video = () => {
                                 muted
                                 playsInline
                                 ref={videoRef}
+                                // Asegurar que el src del video solo se establece después de la hidratación y determinación de fuentes
+                                src={isClientHydrated ? videoSrc : undefined} 
                                 aria-label="Video promocional de Goza Madrid"
                             >
-                                <source src={videoSrc} type="video/mp4" />
+                                {isClientHydrated && <source src={videoSrc} type="video/mp4" />}
                                 <p>Tu navegador no soporta la reproducción de video. 
                                    <a href={videoSrc} download>Descarga el video aquí</a>
                                 </p>
@@ -466,8 +540,19 @@ const Video = () => {
                                                 {/* Botón de búsqueda */}
                                                 <div>
                                                     <button
-                                                        onClick={() => setShowMap(true)}
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            console.log('🗺️ Botón Ver Mapa clickeado');
+                                                            try {
+                                                                setShowMap(true);
+                                                                console.log('✅ Modal del mapa activado');
+                                                            } catch (error) {
+                                                                console.error('❌ Error al abrir el mapa:', error);
+                                                            }
+                                                        }}
                                                         disabled={propertiesLoading}
+                                                        type="button"
                                                         className="w-full bg-amarillo hover:bg-amarillo/90 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium px-6 py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02] disabled:transform-none"
                                                     >
                                                         {propertiesLoading ? (
@@ -709,7 +794,10 @@ const Video = () => {
                                                             ? 'border-amarillo bg-amarillo/10' 
                                                             : 'border-gray-100 hover:border-amarillo/30'
                                                     }`}
-                                                    onClick={() => selectProperty(property)}
+                                                    onClick={() => {
+                                                        console.log('🖱️ Click en propiedad:', property.title);
+                                                        selectProperty(property);
+                                                    }}
                                                     title={`Ver ${property.title} en el mapa`}
                                                 >
                                                     <div className="flex gap-6">
@@ -756,7 +844,13 @@ const Video = () => {
                                                                 <button
                                                                     onClick={(e) => {
                                                                         e.stopPropagation(); // Evitar que se active selectProperty
-                                                                        window.open(`/propiedades/${property.id}`, '_blank');
+                                                                        
+                                                                        // Determinar el ID correcto según el tipo de propiedad
+                                                                        const propertyId = property._id || property.id;
+                                                                        console.log('🔗 Navegando a propiedad:', property.title, 'ID:', propertyId);
+                                                                        
+                                                                        // Usar la URL correcta
+                                                                        window.open(`/property/${propertyId}`, '_blank');
                                                                     }}
                                                                     className="bg-amarillo hover:bg-amarillo/90 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
                                                                     title={`Ver detalles de ${property.title}`}
@@ -804,15 +898,23 @@ const Video = () => {
                                                         {selectedProperty ? (
                                                             // Mapa centrado en propiedad seleccionada
                                                             <iframe
-                                                                src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3037.5!2d${selectedProperty.coordinates.lng}!3d${selectedProperty.coordinates.lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDDCsDI1JzUyLjMiTiAzwrA0MScwMi4wIlc!5e0!3m2!1ses!2ses!4v1234567890123`}
+                                                                key={`property-map-${selectedProperty.id}-${Date.now()}`}
+                                                                src={getMapEmbedUrl(selectedProperty)}
                                                                 width="100%"
                                                                 height="100%"
                                                                 style={{ border: 0 }}
                                                                 allowFullScreen=""
                                                                 loading="lazy"
                                                                 referrerPolicy="no-referrer-when-downgrade"
-                                                                title={`Mapa de ${selectedProperty.title}`}
-                                                                className="w-full h-full"
+                                                                title={`Mapa de ${selectedProperty.title || 'Propiedad'}`}
+                                                                className="w-full h-full transition-opacity duration-300"
+                                                                onLoad={() => {
+                                                                    console.log('✅ Mapa individual cargado para:', selectedProperty.title);
+                                                                }}
+                                                                onError={(e) => {
+                                                                    console.error('❌ Error cargando iframe del mapa individual:', e);
+                                                                    e.target.src = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1sen!2ses!4v1234567890123';
+                                                                }}
                                                             ></iframe>
                                                         ) : (
                                                             // Mapa con todas las propiedades filtradas
@@ -827,6 +929,10 @@ const Video = () => {
                                                                 referrerPolicy="no-referrer-when-downgrade"
                                                                 title={`Mapa con ${getFilteredProperties().length} propiedades disponibles`}
                                                                 className="w-full h-full"
+                                                                onError={(e) => {
+                                                                    console.error('❌ Error cargando iframe del mapa múltiple:', e);
+                                                                    e.target.src = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1sen!2ses!4v1234567890123';
+                                                                }}
                                                             ></iframe>
                                                         )}
                                                     </div>

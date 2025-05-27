@@ -120,6 +120,29 @@ export const normalizeProperty = (property) => {
     if (prop.meta && prop.meta.location) return prop.meta.location;
     if (prop.meta && prop.meta.address) return prop.meta.address;
     
+    // Buscar en meta_data de WooCommerce
+    if (prop.meta_data && Array.isArray(prop.meta_data)) {
+      const addressMeta = prop.meta_data.find(meta => 
+        meta.key === 'address' || meta.key === 'direccion' || meta.key === 'ubicacion' || meta.key === 'Ubicación'
+      );
+      if (addressMeta && addressMeta.value) {
+        if (typeof addressMeta.value === 'string') {
+          return addressMeta.value;
+        } else if (typeof addressMeta.value === 'object' && addressMeta.value.address) {
+          return addressMeta.value.address;
+        }
+      }
+    }
+    
+    // Extraer ubicación del título si contiene "en"
+    if (prop.title || prop.name) {
+      const title = prop.title || prop.name;
+      const locationMatch = title.match(/en\s+([A-Za-zÀ-ÖØ-öø-ÿ\s]+)/i);
+      if (locationMatch && locationMatch[1]) {
+        return `${locationMatch[1]}, Madrid, España`;
+      }
+    }
+    
     return "Madrid, España";
   };
 
@@ -131,6 +154,20 @@ export const normalizeProperty = (property) => {
     if (prop.rooms) return parseInt(prop.rooms);
     if (prop.meta && prop.meta.bedrooms) return parseInt(prop.meta.bedrooms);
     if (prop.meta && prop.meta.rooms) return parseInt(prop.meta.rooms);
+    
+    // Buscar en meta_data de WooCommerce
+    if (prop.meta_data && Array.isArray(prop.meta_data)) {
+      const bedroomMeta = prop.meta_data.find(meta => 
+        meta.key === 'bedrooms' || meta.key === 'habitaciones' || meta.key === 'dormitorios'
+      );
+      if (bedroomMeta && bedroomMeta.value) return parseInt(bedroomMeta.value);
+    }
+    
+    // Buscar en la descripción
+    if (prop.description) {
+      const bedroomMatch = prop.description.match(/(\d+)\s*(?:habitacion|dormitorio|bedroom)/i);
+      if (bedroomMatch) return parseInt(bedroomMatch[1]);
+    }
     
     return 2; // Por defecto
   };
@@ -144,6 +181,20 @@ export const normalizeProperty = (property) => {
     if (prop.meta && prop.meta.bathrooms) return parseInt(prop.meta.bathrooms);
     if (prop.meta && prop.meta.baths) return parseInt(prop.meta.baths);
     
+    // Buscar en meta_data de WooCommerce
+    if (prop.meta_data && Array.isArray(prop.meta_data)) {
+      const bathroomMeta = prop.meta_data.find(meta => 
+        meta.key === 'baños' || meta.key === 'banos' || meta.key === 'bathrooms' || meta.key === 'wc'
+      );
+      if (bathroomMeta && bathroomMeta.value) return parseInt(bathroomMeta.value);
+    }
+    
+    // Buscar en la descripción
+    if (prop.description) {
+      const bathroomMatch = prop.description.match(/(\d+)\s*(?:baño|bath|aseo)/i);
+      if (bathroomMatch) return parseInt(bathroomMatch[1]);
+    }
+    
     return 1; // Por defecto
   };
 
@@ -156,6 +207,20 @@ export const normalizeProperty = (property) => {
     if (prop.surface) return parseInt(prop.surface);
     if (prop.meta && prop.meta.size) return parseInt(prop.meta.size);
     if (prop.meta && prop.meta.area) return parseInt(prop.meta.area);
+    
+    // Buscar en meta_data de WooCommerce
+    if (prop.meta_data && Array.isArray(prop.meta_data)) {
+      const areaMeta = prop.meta_data.find(meta => 
+        meta.key === 'living_area' || meta.key === 'area' || meta.key === 'm2' || meta.key === 'metros' || meta.key === 'superficie'
+      );
+      if (areaMeta && areaMeta.value) return parseInt(areaMeta.value);
+    }
+    
+    // Buscar en la descripción
+    if (prop.description) {
+      const areaMatch = prop.description.match(/(\d+)\s*m[²2]?/i);
+      if (areaMatch) return parseInt(areaMatch[1]);
+    }
     
     return 80; // Por defecto
   };

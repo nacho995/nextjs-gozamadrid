@@ -27,7 +27,8 @@
   ],
   "functions": {
     "frontend/src/pages/api/**": {
-      "maxDuration": 30
+      "maxDuration": 25,
+      "memory": 1024
     }
   },
   "rewrites": [
