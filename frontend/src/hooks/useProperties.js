@@ -114,7 +114,8 @@ export const useProperties = (options = {}) => {
 
         console.log(`🔄 Cargando propiedades: página=${pageNum}, límite=${limitNum}, fuente=${sourceType}, intento=${attempt}`);
 
-        const response = await fetch(`/api/properties?${params}`, {
+        // Usar directamente WooCommerce que sabemos que funciona
+        const response = await fetch(`/api/properties/sources/woocommerce?page=${pageNum}&limit=${Math.min(limitNum, CONFIG.maxLimit)}`, {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
