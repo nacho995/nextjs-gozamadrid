@@ -127,7 +127,7 @@ const withRetry = async (fn, maxRetries = 2, baseDelay = 1000) => {
   }
 };
 
-// Cargador optimizado de WooCommerce
+// Cargador optimizado de WooCommerce usando API Enterprise Bulletproof
 const loadWooCommerceProperties = async (page = 1, limit = 20) => {
   const cacheKey = getCacheKey('woocommerce', page, limit);
   const cached = getFromCache(cacheKey);
@@ -136,44 +136,35 @@ const loadWooCommerceProperties = async (page = 1, limit = 20) => {
     return cached;
   }
 
-  return withRetry(async () => {
-    const WC_API_URL = process.env.WC_API_URL || process.env.NEXT_PUBLIC_WC_API_URL;
-    const WC_KEY = process.env.WC_CONSUMER_KEY;
-    const WC_SECRET = process.env.WC_CONSUMER_SECRET;
-
-    if (!WC_API_URL || !WC_KEY || !WC_SECRET) {
-      console.log('⚠️ WooCommerce: Credenciales no disponibles');
-      return [];
-    }
-
-    console.log(`🔄 WooCommerce: Cargando página ${page}, límite ${limit}`);
+  try {
+    console.log(`🚀 WooCommerce Enterprise: Cargando página ${page}, límite ${limit}`);
     
-    const response = await axios.get(`${WC_API_URL}/products`, {
-      params: {
-        consumer_key: WC_KEY,
-        consumer_secret: WC_SECRET,
-        per_page: Math.min(limit, CONFIG.woocommerce.batchSize),
-        page
-      },
-      timeout: CONFIG.woocommerce.timeout,
+    // Usar la API enterprise que SIEMPRE funciona (con fallbacks incluidos)
+    const response = await axios.get('/api/properties/sources/woocommerce', {
+      params: { limit: Math.min(limit, 50), page },
+      timeout: 25000, // Timeout generoso para permitir todos los reintentos enterprise
       headers: {
-        'User-Agent': 'Goza Madrid Real Estate/2.0',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
       }
     });
 
-    if (!response.data || !Array.isArray(response.data)) {
-      throw new Error('Respuesta inválida de WooCommerce');
+    if (response.data && Array.isArray(response.data)) {
+      // Los datos ya vienen transformados de la API enterprise
+      setCache(cacheKey, response.data);
+      console.log(`✅ WooCommerce Enterprise: ${response.data.length} propiedades cargadas`);
+      return response.data;
     }
-
-    const transformed = response.data
-      .map(transformWooCommerceProperty)
-      .filter(Boolean);
-
-    setCache(cacheKey, transformed);
-    console.log(`✅ WooCommerce: ${transformed.length} propiedades cargadas`);
-    return transformed;
-  }, CONFIG.woocommerce.maxRetries);
+    
+    console.log('⚠️ WooCommerce Enterprise devolvió datos vacíos');
+    return [];
+    
+  } catch (error) {
+    console.error('❌ Error WooCommerce Enterprise:', error.message);
+    // La API enterprise siempre devuelve algo (incluso fallback), 
+    // pero si falla completamente, devolvemos array vacío
+    return [];
+  }
 };
 
 // Cargador optimizado de MongoDB
