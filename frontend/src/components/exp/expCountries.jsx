@@ -172,8 +172,8 @@ export default function ExpCountries() {
                                 <Image
                                     src={region.image}
                                     alt={region.alt}
-                                    className={commonImageStyles}
-                                    fill
+                                    layout="fill"
+                                    objectFit="cover"
                                     sizes="(max-width: 768px) 50vw, 25vw"
                                     itemProp="image"
                                     priority={index < 2} // Prioritize loading for first two images
@@ -200,8 +200,8 @@ export default function ExpCountries() {
                                 <Image
                                     src={country.image}
                                     alt={country.alt}
-                                    className={commonImageStyles}
-                                    fill
+                                    layout="fill"
+                                    objectFit="cover"
                                     sizes="(max-width: 768px) 50vw, 25vw"
                                     itemProp="image"
                                 />
