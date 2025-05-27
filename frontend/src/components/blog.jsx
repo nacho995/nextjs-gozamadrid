@@ -490,7 +490,7 @@ const BlogHome = (props) => {
   }, []);
 
   return (
-    <section className="bg-white py-8 lg:py-16 h-[100vh]">
+    <section className="bg-transparent py-8 lg:py-16">
       <Head>
         <title>Blog Inmobiliario Goza Madrid</title>
         <meta property="og:type" content="blog"/>
@@ -508,33 +508,29 @@ const BlogHome = (props) => {
       <AnimatedOnScroll>
         <section 
           id="blog-section" 
-          className="px-[5%] py-16 md:py-24 lg:py-28"
+          className="px-[5%] py-8 md:py-12 lg:py-16"
           aria-label="Últimas publicaciones del blog"
         >
           <div className="container mx-auto">
-            <header className="rb-12 mb-12 grid grid-cols-1 items-start justify-start gap-y-8 md:mb-18 md:grid-cols-[1fr_max-content] md:items-end md:justify-between md:gap-x-12 md:gap-y-4 lg:mb-20 lg:gap-x-20">
-              <div className="w-full max-w-lg">
-                <p className="mb-3 font-semibold md:mb-4">{tagline}</p>
-                <h1 className="mb-3 text-5xl font-bold md:mb-4 md:text-7xl lg:text-8xl">
-                  {heading}
-                </h1>
-                <p className="md:text-md">{description}</p>
-              </div>
-              <div className="hidden flex-wrap items-center justify-end md:block">
-                <Link
-                  href="/blog"
-                  className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-black/50 px-4 sm:px-6 lg:px-8 py-2 sm:py-2.5 lg:py-3 transition-all duration-300 hover:bg-black/70 backdrop-blur-sm max-w-[90%] sm:max-w-[80%] lg:max-w-none"
-                  title="Ver todos los artículos del blog"
-                  aria-label="Ver todos los artículos del blog"
-                >
-                  <span className="relative text-sm sm:text-base lg:text-lg font-semibold text-white whitespace-normal text-center">
-                    Ver todo
-                  </span>
-                  <span className="absolute bottom-0 left-0 h-1 w-full transform bg-gradient-to-r from-amarillo via-black to-amarillo transition-transform duration-300 group-hover:translate-x-full"></span>
-                </Link>
-              </div>
-            </header>
-
+            <div className="mb-8 md:mb-12 text-center">
+              <p className="mb-3 md:mb-4 font-semibold text-amarillo">{tagline}</p>
+              <h2 className="mb-5 text-3xl font-bold md:mb-6 md:text-5xl lg:text-6xl text-black">
+                {heading}
+              </h2>
+              <p className="md:text-md text-black">{description}</p>
+            </div>
+            
+            <div className="flex items-center justify-center mb-8">
+              <Button
+                variant="secondary"
+                size="lg"
+                className="bg-amarillo hover:bg-amarillo/80 text-black font-semibold px-6 py-3 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg"
+                asChild
+              >
+                <Link href="/blog">Ver todo</Link>
+              </Button>
+            </div>
+            
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {loading ? (
                 <LoadingScreen fullScreen={false} />

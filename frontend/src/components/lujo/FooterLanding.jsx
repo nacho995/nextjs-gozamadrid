@@ -1,6 +1,5 @@
 import React from 'react';
 import Link from 'next/link';
-import Image from "next/legacy/image";
 import { motion } from 'framer-motion';
 
 const FooterLanding = () => {
@@ -22,15 +21,20 @@ const FooterLanding = () => {
               whileInView={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
               viewport={{ once: true }}
+              className="mb-4"
             >
-              <Image 
-                src="/api/images/logonuevo.png" 
-                alt="Real Estate Goza Madrid" 
-                width={120} 
-                height={120}
-                layout="intrinsic"
-                className="h-auto w-auto mx-auto md:mx-0 mb-4"
-              />
+              <Link href="/" className="relative z-10">
+                <div className="flex items-center justify-center md:justify-start" style={{ maxHeight: '8rem' }}> 
+                  <img 
+                    src="/api/images/logonuevo.png" 
+                    alt="Real Estate Goza Madrid" 
+                    width={150} 
+                    height={200}
+                    style={{ maxHeight: '200px', width: 'auto' }}
+                    loading="lazy"
+                  />
+                </div>
+              </Link>
             </motion.div>
             <p className="text-sm text-white max-w-md leading-relaxed">
               Expertos en el mercado inmobiliario premium de Madrid. Asesoramiento personalizado para propiedades de lujo en las mejores zonas de la capital.
@@ -43,7 +47,7 @@ const FooterLanding = () => {
               href="https://valuation.lystos.com?clientId=cd55b10c-5ba6-4f65-854e-5c8adaf88a34"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block mb-6 bg-gradient-to-r from-yellow-500 to-yellow-700 text-white font-bold px-6 py-3 rounded-full hover:from-yellow-600 hover:to-yellow-800 transition-all duration-300 shadow-lg transform hover:scale-105"
+              className="inline-block mb-6 bg-gradient-to-r from-yellow-500 to-yellow-700 text-black font-bold px-6 py-3 rounded-full hover:from-yellow-600 hover:to-yellow-800 transition-all duration-300 shadow-lg transform hover:scale-105"
             >
               Solicitar Valoración Gratuita
             </a>
