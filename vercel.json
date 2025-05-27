@@ -20,7 +20,7 @@
     }
   ],
   "functions": {
-    "frontend/src/pages/api/**/*.js": {
+    "frontend/src/pages/api/**": {
       "maxDuration": 30
     }
   },
