@@ -22,21 +22,21 @@ const ENTERPRISE_CONFIG = {
     }
   },
   
-  // Configuración de retry ULTRA RÁPIDA para detección inmediata
+  // Configuración de retry MÁS PERSISTENTE para obtener datos reales
   retry: {
-    maxAttempts: 2, // Solo 2 intentos rápidos
-    baseDelay: 200, // 200ms entre intentos
-    maxDelay: 1000, // Máximo 1 segundo
+    maxAttempts: 4, // Más intentos para conectar con datos reales
+    baseDelay: 1000, // 1 segundo entre intentos
+    maxDelay: 8000, // Máximo 8 segundos
     backoffFactor: 2
   },
   
-  // Timeouts MUY AGRESIVOS para fallar rápido
-  timeouts: [2000, 3000], // Solo 2-3 segundos máximo
+  // Timeouts MÁS GENEROSOS para datos reales
+  timeouts: [5000, 8000, 12000, 15000], // Hasta 15 segundos para datos reales
   
-  // Circuit breaker más agresivo
+  // Circuit breaker menos agresivo para permitir conexión real
   circuitBreaker: {
-    failureThreshold: 1, // Fallar después de 1 intento
-    resetTimeout: 60000, // 1 minuto para reintentar
+    failureThreshold: 3, // Permitir más fallos antes de usar fallback
+    resetTimeout: 120000, // 2 minutos para reintentar
     monitoringPeriod: 60000
   }
 };
@@ -245,19 +245,22 @@ class EnterpriseCache {
   }
 }
 
-// 🔌 CIRCUIT BREAKER ULTRA RÁPIDO
-class FastCircuitBreaker {
+// 🔌 CIRCUIT BREAKER PERSISTENTE PARA DATOS REALES
+class PersistentCircuitBreaker {
   constructor() {
     this.state = 'CLOSED';
     this.failureCount = 0;
     this.lastFailureTime = null;
     this.consecutiveFailures = 0;
+    this.successCount = 0;
   }
 
   async execute(operation) {
-    // Si ha fallado recientemente, usar fallback inmediatamente
-    if (this.state === 'OPEN' && Date.now() - this.lastFailureTime < 30000) {
-      throw new Error('Circuit breaker OPEN - usando fallback');
+    // Solo usar fallback después de múltiples fallos recientes
+    if (this.state === 'OPEN' && Date.now() - this.lastFailureTime < 120000) {
+      console.log('🔄 Circuit breaker OPEN, pero intentando reconexión...');
+      // Intentar reconectar cada 2 minutos
+      this.state = 'HALF_OPEN';
     }
 
     try {
@@ -273,7 +276,9 @@ class FastCircuitBreaker {
   onSuccess() {
     this.failureCount = 0;
     this.consecutiveFailures = 0;
+    this.successCount++;
     this.state = 'CLOSED';
+    console.log('✅ Circuit Breaker: CLOSED - conexión exitosa');
   }
 
   onFailure() {
@@ -281,16 +286,26 @@ class FastCircuitBreaker {
     this.consecutiveFailures++;
     this.lastFailureTime = Date.now();
     
-    if (this.consecutiveFailures >= 1) {
+    // Solo abrir después de 3 fallos consecutivos
+    if (this.consecutiveFailures >= 3) {
       this.state = 'OPEN';
-      console.log('🚨 Circuit Breaker: OPEN - fallback activado');
+      console.log('🚨 Circuit Breaker: OPEN después de 3 fallos - usando fallback temporal');
     }
+  }
+
+  getState() {
+    return {
+      state: this.state,
+      failureCount: this.failureCount,
+      consecutiveFailures: this.consecutiveFailures,
+      successCount: this.successCount
+    };
   }
 }
 
 // Instancias globales
 const enterpriseCache = new EnterpriseCache();
-const fastCircuitBreaker = new FastCircuitBreaker();
+const persistentCircuitBreaker = new PersistentCircuitBreaker();
 
 // 🔧 TRANSFORMADOR OPTIMIZADO
 const transformWooCommerceProperty = (property) => {
@@ -338,7 +353,7 @@ const transformWooCommerceProperty = (property) => {
   }
 };
 
-// 🚀 FUNCIÓN DE CARGA ULTRA RÁPIDA CON FALLBACK INMEDIATO
+// 🚀 FUNCIÓN DE CARGA PERSISTENTE PARA DATOS REALES
 export const loadFromWooCommerce = async (page = 1, limit = 20) => {
   const cacheKey = `woocommerce_${page}_${limit}`;
   
@@ -348,80 +363,116 @@ export const loadFromWooCommerce = async (page = 1, limit = 20) => {
     return cached;
   }
 
-  // 2. Intentar con circuit breaker ultra rápido
+  // 2. Intentar con circuit breaker persistente
   try {
-    return await fastCircuitBreaker.execute(async () => {
-      // Solo 1 intento rápido con el primer endpoint
-      const endpoint = ENTERPRISE_CONFIG.endpoints[0];
-      const creds = ENTERPRISE_CONFIG.credentials.primary;
-      
-      if (!endpoint || !creds.key || !creds.secret) {
-        throw new Error('Credenciales no disponibles');
-      }
-
-      console.log(`⚡ WooCommerce intento rápido: ${endpoint}`);
-      
-      const response = await axios.get(`${endpoint}/products`, {
-        params: {
-          consumer_key: creds.key,
-          consumer_secret: creds.secret,
-          per_page: Math.min(limit, 20),
-          page,
-          status: 'publish'
-        },
-        timeout: 3000, // Solo 3 segundos
-        headers: {
-          'User-Agent': 'Goza Madrid Real Estate Fast/3.0',
-          'Accept': 'application/json'
+    return await persistentCircuitBreaker.execute(async () => {
+      // Intentar con múltiples endpoints y configuraciones
+      for (let attempt = 1; attempt <= ENTERPRISE_CONFIG.retry.maxAttempts; attempt++) {
+        const endpointIndex = (attempt - 1) % ENTERPRISE_CONFIG.endpoints.length;
+        const endpoint = ENTERPRISE_CONFIG.endpoints[endpointIndex];
+        const timeout = ENTERPRISE_CONFIG.timeouts[Math.min(attempt - 1, ENTERPRISE_CONFIG.timeouts.length - 1)];
+        
+        // Alternar entre credenciales
+        const creds = attempt <= 2 ? ENTERPRISE_CONFIG.credentials.primary : ENTERPRISE_CONFIG.credentials.fallback;
+        
+        if (!endpoint || !creds.key || !creds.secret) {
+          console.log(`⚠️ Intento ${attempt}: Credenciales no disponibles para ${endpoint}`);
+          continue;
         }
-      });
 
-      if (response.status !== 200 || !Array.isArray(response.data)) {
-        throw new Error('Respuesta inválida');
+        try {
+          console.log(`🔄 WooCommerce intento ${attempt}/${ENTERPRISE_CONFIG.retry.maxAttempts}: ${endpoint} (timeout: ${timeout}ms)`);
+          
+          const response = await axios.get(`${endpoint}/products`, {
+            params: {
+              consumer_key: creds.key,
+              consumer_secret: creds.secret,
+              per_page: Math.min(limit, 50), // Permitir hasta 50 propiedades
+              page,
+              status: 'publish',
+              orderby: 'date',
+              order: 'desc'
+            },
+            timeout,
+            headers: {
+              'User-Agent': 'Goza Madrid Real Estate Persistent/4.0',
+              'Accept': 'application/json',
+              'Cache-Control': 'no-cache'
+            }
+          });
+
+          if (response.status === 200 && Array.isArray(response.data) && response.data.length > 0) {
+            const transformed = response.data
+              .map(transformWooCommerceProperty)
+              .filter(Boolean);
+
+            enterpriseCache.set(cacheKey, transformed, 45 * 60 * 1000); // 45 minutos para datos reales
+            console.log(`✅ WooCommerce REAL exitoso desde ${endpoint}: ${transformed.length} propiedades`);
+            return transformed;
+          } else {
+            console.log(`⚠️ Respuesta vacía o inválida desde ${endpoint}`);
+          }
+        } catch (requestError) {
+          console.log(`❌ Intento ${attempt} falló: ${requestError.message}`);
+          
+          if (attempt < ENTERPRISE_CONFIG.retry.maxAttempts) {
+            const delay = Math.min(
+              ENTERPRISE_CONFIG.retry.baseDelay * Math.pow(ENTERPRISE_CONFIG.retry.backoffFactor, attempt - 1),
+              ENTERPRISE_CONFIG.retry.maxDelay
+            );
+            console.log(`⏳ Esperando ${delay}ms antes del siguiente intento...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+          }
+        }
       }
-
-      const transformed = response.data
-        .map(transformWooCommerceProperty)
-        .filter(Boolean);
-
-      enterpriseCache.set(cacheKey, transformed, 30 * 60 * 1000); // 30 minutos
-      console.log(`✅ WooCommerce rápido exitoso: ${transformed.length} propiedades`);
-      return transformed;
+      
+      throw new Error('Todos los intentos de conexión fallaron');
     });
   } catch (error) {
-    console.log(`⚡ WooCommerce falló rápidamente: ${error.message} - usando premium fallback`);
+    console.log(`💥 WooCommerce conexión falló después de todos los intentos: ${error.message}`);
+    console.log(`🎯 Circuit breaker estado:`, persistentCircuitBreaker.getState());
     
-    // FALLBACK INMEDIATO A DATOS PREMIUM
+    // FALLBACK A DATOS PREMIUM SOLO DESPUÉS DE INTENTOS EXHAUSTIVOS
     const premiumData = enterpriseCache.getPremiumData();
     
     // Aplicar paginación a los datos premium
     const startIndex = (page - 1) * limit;
     const paginatedData = premiumData.slice(startIndex, startIndex + limit);
     
-    // Guardar en cache para futuras peticiones
-    enterpriseCache.set(cacheKey, paginatedData, 60 * 60 * 1000); // 1 hora
+    // Guardar en cache por menos tiempo para reintentar pronto
+    enterpriseCache.set(cacheKey, paginatedData, 15 * 60 * 1000); // 15 minutos
     
-    console.log(`🎯 Fallback premium activado: ${paginatedData.length} propiedades`);
+    console.log(`🆘 Usando fallback premium: ${paginatedData.length} propiedades (reintentará en 15min)`);
     return paginatedData;
   }
 };
 
-// 🎯 HANDLER PRINCIPAL CON GARANTÍA ABSOLUTA
+// 🎯 HANDLER PRINCIPAL PERSISTENTE PARA DATOS REALES
 export default async function handler(req, res) {
   const startTime = Date.now();
   const { limit = 20, page = 1 } = req.query;
 
-  console.log(`🚀 WooCommerce BULLETPROOF iniciado - Página: ${page}, Límite: ${limit}`);
+  console.log(`🚀 WooCommerce PERSISTENTE iniciado - Página: ${page}, Límite: ${limit}`);
+  console.log(`🔧 Endpoints disponibles: ${ENTERPRISE_CONFIG.endpoints.length}`);
+  console.log(`🛡️ Circuit breaker estado:`, persistentCircuitBreaker.getState());
 
-  // Headers de respuesta optimizados
-  res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate=900'); // 30min cache
+  // Headers de respuesta optimizados para datos reales
+  res.setHeader('Cache-Control', 's-maxage=2700, stale-while-revalidate=1800'); // 45min cache para datos reales
   res.setHeader('Content-Type', 'application/json');
 
   try {
     const properties = await loadFromWooCommerce(parseInt(page), parseInt(limit));
     
     const duration = Date.now() - startTime;
-    console.log(`🎉 WooCommerce BULLETPROOF exitoso en ${duration}ms: ${properties.length} propiedades`);
+    const isRealData = properties.some(p => !p.id.startsWith('wc-premium-'));
+    
+    console.log(`🎉 WooCommerce ${isRealData ? 'REAL' : 'FALLBACK'} exitoso en ${duration}ms: ${properties.length} propiedades`);
+    
+    if (isRealData) {
+      console.log(`✨ ¡CONECTADO A DATOS REALES! Total: ${properties.length} propiedades de WooCommerce`);
+    } else {
+      console.log(`🎯 Usando datos premium de fallback (reintentará conexión real pronto)`);
+    }
     
     return res.status(200).json(properties);
     
