@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { NextResponse } from 'next/server';
 
 // Constantes y configuración base
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://realestategozamadrid.com';
@@ -173,57 +172,75 @@ export default async function handler(req, res) {
   let allProperties = [];
   let errors = [];
 
-  // Obtener propiedades de WooCommerce con timeout reducido y manejo de errores mejorado
+  // Obtener propiedades de WooCommerce directamente
   try {
-    console.log('Intentando obtener propiedades de WooCommerce vía API interna...');
+    console.log('Intentando obtener propiedades de WooCommerce directamente...');
     
-    const woocommerceResponse = await axios.get('/api/properties/sources/woocommerce', {
-      timeout: 10000, // Timeout reducido a 10 segundos
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      baseURL: req.headers.host ? `https://${req.headers.host}` : 'https://www.realestategozamadrid.com'
-    });
+    const WC_API_URL = process.env.WC_API_URL || process.env.NEXT_PUBLIC_WC_API_URL;
+    const WC_KEY = process.env.WC_CONSUMER_KEY;
+    const WC_SECRET = process.env.WC_CONSUMER_SECRET;
+    
+    if (WC_API_URL && WC_KEY && WC_SECRET) {
+      const woocommerceResponse = await axios.get(`${WC_API_URL}/products`, {
+        params: {
+          consumer_key: WC_KEY,
+          consumer_secret: WC_SECRET,
+          per_page: 100, // Aumentar a 100 para obtener más propiedades
+          page: 1
+        },
+        timeout: 15000, // Aumentar timeout para manejar más datos
+        headers: {
+          'User-Agent': 'Goza Madrid Real Estate/1.0',
+          'Accept': 'application/json'
+        }
+      });
 
-    if (woocommerceResponse.data && Array.isArray(woocommerceResponse.data)) {
-      console.log(`Obtenidas ${woocommerceResponse.data.length} propiedades de WooCommerce vía API interna`);
-      allProperties = [...allProperties, ...woocommerceResponse.data];
+      if (woocommerceResponse.data && Array.isArray(woocommerceResponse.data)) {
+        // Transformar propiedades de WooCommerce
+        const transformedWooCommerce = woocommerceResponse.data.map(transformWooCommerceProperty).filter(Boolean);
+        console.log(`Obtenidas ${transformedWooCommerce.length} propiedades de WooCommerce directamente`);
+        allProperties = [...allProperties, ...transformedWooCommerce];
+      }
+    } else {
+      console.log('Credenciales de WooCommerce no disponibles, saltando...');
     }
   } catch (error) {
-    console.error('Error obteniendo propiedades de WooCommerce vía API interna:', {
+    console.error('Error obteniendo propiedades de WooCommerce directamente:', {
       message: error.message,
-      status: error.response?.status,
-      data: error.response?.data
+      status: error.response?.status
     });
-    // No agregar error a la lista para que la API siga funcionando con solo MongoDB
     console.log('Continuando sin propiedades de WooCommerce...');
   }
 
-  // Obtener propiedades de MongoDB con timeout optimizado
+  // Obtener propiedades de MongoDB directamente
   try {
-    console.log('Intentando obtener propiedades de MongoDB vía API interna...');
+    console.log('Intentando obtener propiedades de MongoDB directamente...');
     
-    const mongodbResponse = await axios.get('/api/properties/sources/mongodb', {
-      timeout: 5000, // Timeout reducido a 5 segundos para MongoDB
+    const MONGODB_BASE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://api.realestategozamadrid.com';
+    
+    const mongodbResponse = await axios.get(`${MONGODB_BASE_URL}/api/properties`, {
+      params: {
+        limit: 100, // Solicitar hasta 100 propiedades
+        page: 1
+      },
+      timeout: 8000, // Aumentar timeout
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
-      },
-      baseURL: req.headers.host ? `https://${req.headers.host}` : 'https://www.realestategozamadrid.com'
+      }
     });
 
     if (mongodbResponse.data && Array.isArray(mongodbResponse.data)) {
-      console.log(`Obtenidas ${mongodbResponse.data.length} propiedades de MongoDB vía API interna`);
-      allProperties = [...allProperties, ...mongodbResponse.data];
+      // Transformar propiedades de MongoDB
+      const transformedMongoDB = mongodbResponse.data.map(transformMongoDBProperty).filter(Boolean);
+      console.log(`Obtenidas ${transformedMongoDB.length} propiedades de MongoDB directamente`);
+      allProperties = [...allProperties, ...transformedMongoDB];
     }
   } catch (error) {
-    console.error('Error obteniendo propiedades de MongoDB vía API interna:', {
+    console.error('Error obteniendo propiedades de MongoDB directamente:', {
       message: error.message,
-      status: error.response?.status,
-      data: error.response?.data
+      status: error.response?.status
     });
-    // No agregar error a la lista para que la API siga funcionando
     console.log('Continuando sin propiedades de MongoDB...');
   }
 
@@ -245,12 +262,7 @@ export default async function handler(req, res) {
     return dateB - dateA;
   });
 
-  // Calcular paginación
-  const startIndex = (pageNumber - 1) * limitNumber;
-  const endIndex = startIndex + limitNumber;
-  const paginatedProperties = allProperties.slice(startIndex, endIndex);
-
-  // Devolver directamente el array de propiedades (como antes)
-  console.log(`Devolviendo ${paginatedProperties.length} propiedades de un total de ${allProperties.length}`);
-  return res.status(200).json(paginatedProperties);
+  // Devolver todas las propiedades sin paginación
+  console.log(`Devolviendo todas las ${allProperties.length} propiedades encontradas`);
+  return res.status(200).json(allProperties);
 } 
