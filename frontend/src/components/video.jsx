@@ -98,7 +98,7 @@ const Video = () => {
                     role="complementary"
                     aria-label="Mensaje destacado"
                 >
-                    <div className="w-full h-12 lg:h-40 mt-[-10vh] sm:mt-[-1vh] md:mt-[-5vh] lg:mt-[-10vh] flex items-center justify-center">
+                    <div className="w-full h-12 lg:h-40 mt-[-5vh] sm:mt-[-2vh] md:mt-[-3vh] lg:mt-[-5vh] flex items-center justify-center">
                         <div
                             className="absolute w-full h-[10vh] lg:h-[20vh] md:h-[10vh] sm:h-[10vh] bg-gradient-to-t"
                             style={{

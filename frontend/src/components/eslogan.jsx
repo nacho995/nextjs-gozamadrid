@@ -57,7 +57,7 @@ const Eslogan = () => {
   ];
 
   return (
-    <section className="py-16 bg-transparent relative z-20 mb-24">
+    <section className="py-8 sm:py-12 lg:py-16 bg-transparent relative z-20 mb-16">
       <div className="container mx-auto px-4">
         {/* Header principal */}
         <motion.div 
@@ -66,7 +66,7 @@ const Eslogan = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
           style={{
-            paddingTop: '50px', // Padding top reducido
+            paddingTop: '20px', // Padding top mínimo
             transition: 'padding-top 0.5s ease-in-out'
           }}
         >

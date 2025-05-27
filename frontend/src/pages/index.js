@@ -148,33 +148,28 @@ export default function Home() {
         />
       </Head>
       
-      <div className="">
+      <div className="relative">
+        {/* Fondo fijo */}
         <div className="fixed inset-0 z-0 opacity-100 bg-cover bg-center" style={gradientStyle}></div>
 
-        <div className="absolute top-0 left-0 w-full z-1">
-          <Video />
-        </div>
+        {/* Contenido principal con flujo normal */}
+        <div className="relative z-10">
+          {/* Video section */}
+          <div className="w-full">
+            <Video />
+          </div>
 
-        <div className="relative z-1">
-          <div className="w-full 
-            mt-[130vh]                 /* móvil por defecto */
-            sm:mt-[130vh]              /* tablets pequeñas */
-            md:mt-[80vh]              /* tablets */
-            lg:mt-[100vh]             /* desktop */
-            sm:mb-[155vh] 
-            md:mb-[-60vh] 
-            lg:mb-[30vh] 
-            mb-[145vh]
-            h-[50vh] 
-            md:h-[100vh] 
-            flex justify-center items-center"
-          >
+          {/* Cards section */}
+          <div className="w-full">
             <Cards />
           </div>
 
-          <div className="w-full h[100vh] lg:mt-[10vh] md:mt-[120vh] mt-[20vh]">
+          {/* Eslogan section */}
+          <div className="w-full">
             <Eslogan />
           </div>
+
+          {/* Resto de componentes */}
           <div className="w-full mb-4">
             <ImageSlider />
           </div>
@@ -195,14 +190,15 @@ export default function Home() {
           <hr className="w-full border-t-1 border-b-1 border-amber-400 mb-4" />
           <hr className="w-full border-t-1 border-b-1 border-black mb-4" />
           
-          <div className="w-full p-4 max-w-full mt-[40vh] sm:mt-[40vh] md:mt-16 lg:mt-0">
+          <div className="w-full p-4 max-w-full">
             <RegisterForm />
           </div>
-        </div>
-      </div>
 
-      <div className="relative z-50 w-full min-h-[50vh]">
-        <Agreements />
+          {/* Agreements section */}
+          <div className="w-full min-h-[50vh]">
+            <Agreements />
+          </div>
+        </div>
       </div>
 
 
