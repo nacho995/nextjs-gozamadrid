@@ -370,7 +370,7 @@ const transformWooCommerceProperty = (property) => {
   }
 };
 
-// 🚀 FUNCIÓN DE CARGA PERSISTENTE PARA DATOS REALES
+// 🚀 FUNCIÓN DE CARGA OPTIMIZADA Y RÁPIDA PARA DATOS REALES
 export const loadFromWooCommerce = async (page = 1, limit = 20) => {
   const cacheKey = `woocommerce_${page}_${limit}`;
   
@@ -380,92 +380,136 @@ export const loadFromWooCommerce = async (page = 1, limit = 20) => {
     return cached;
   }
 
-  // 2. Intentar con circuit breaker persistente - ULTRA AGRESIVO
+  // 2. Estrategia RÁPIDA Y EFICIENTE
   try {
     return await persistentCircuitBreaker.execute(async () => {
-      console.log(`🚀 INICIANDO BÚSQUEDA ULTRA AGRESIVA DE 33 PROPIEDADES REALES`);
+      console.log(`🚀 BÚSQUEDA RÁPIDA DE 33 PROPIEDADES REALES`);
       
-      // Probar TODAS las combinaciones de endpoint + credenciales
-      for (const endpoint of ENTERPRISE_CONFIG.endpoints) {
-        for (const creds of ENTERPRISE_CONFIG.credentialSets) {
-          for (let attempt = 1; attempt <= 3; attempt++) { // 3 intentos por combinación
-            const timeout = ENTERPRISE_CONFIG.timeouts[Math.min(attempt - 1, ENTERPRISE_CONFIG.timeouts.length - 1)];
+      // ESTRATEGIA 1: Probar primero las combinaciones más probables
+      const priorityAttempts = [
+        // Sin credenciales (datos públicos) - MÁS PROBABLE
+        { endpoint: 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3', creds: { name: 'public', key: null, secret: null }, timeout: 3000 },
+        { endpoint: 'https://realestategozamadrid.com/wp-json/wc/v3', creds: { name: 'public', key: null, secret: null }, timeout: 3000 },
+        
+        // Con credenciales primarias
+        { endpoint: 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3', creds: ENTERPRISE_CONFIG.credentialSets[0], timeout: 5000 },
+        { endpoint: 'https://realestategozamadrid.com/wp-json/wc/v3', creds: ENTERPRISE_CONFIG.credentialSets[0], timeout: 5000 },
+        
+        // Con credenciales fallback
+        { endpoint: 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3', creds: ENTERPRISE_CONFIG.credentialSets[1], timeout: 5000 },
+        { endpoint: 'https://realestategozamadrid.com/wp-json/wc/v3', creds: ENTERPRISE_CONFIG.credentialSets[1], timeout: 5000 }
+      ];
+      
+      // Probar las combinaciones prioritarias secuencialmente
+      for (const attempt of priorityAttempts) {
+        try {
+          console.log(`🔄 Probando: ${attempt.endpoint} con ${attempt.creds.name} (${attempt.timeout}ms)`);
+          
+          const params = {
+            per_page: Math.min(limit, 100),
+            page,
+            status: 'publish',
+            orderby: 'date',
+            order: 'desc'
+          };
+          
+          // Solo agregar credenciales si están disponibles
+          if (attempt.creds.key && attempt.creds.secret) {
+            params.consumer_key = attempt.creds.key;
+            params.consumer_secret = attempt.creds.secret;
+          }
+          
+          const response = await axios.get(`${attempt.endpoint}/products`, {
+            params,
+            timeout: attempt.timeout,
+            headers: {
+              'User-Agent': 'Goza Madrid Real Estate Fast/6.0',
+              'Accept': 'application/json'
+            }
+          });
+
+          if (response.status === 200 && Array.isArray(response.data)) {
+            console.log(`📊 Respuesta: ${response.data.length} productos desde ${attempt.endpoint} (${attempt.creds.name})`);
             
-            try {
-              console.log(`🔄 Probando: ${endpoint} con ${creds.name} (intento ${attempt}/3, timeout: ${timeout}ms)`);
-              
-              // Construir parámetros según si tenemos credenciales o no
-              const params = {
-                per_page: Math.min(limit, 100), // Hasta 100 propiedades
-                page,
-                status: 'publish',
-                orderby: 'date',
-                order: 'desc'
-              };
-              
-              // Solo agregar credenciales si están disponibles
-              if (creds.key && creds.secret) {
-                params.consumer_key = creds.key;
-                params.consumer_secret = creds.secret;
-              }
-              
-              const response = await axios.get(`${endpoint}/products`, {
-                params,
-                timeout,
-                headers: {
-                  'User-Agent': 'Goza Madrid Real Estate Ultra/5.0',
-                  'Accept': 'application/json',
-                  'Cache-Control': 'no-cache'
-                }
-              });
+            if (response.data.length > 0) {
+              const transformed = response.data
+                .map(transformWooCommerceProperty)
+                .filter(Boolean);
 
-              if (response.status === 200 && Array.isArray(response.data)) {
-                console.log(`📊 Respuesta recibida: ${response.data.length} productos desde ${endpoint} (${creds.name})`);
-                
-                if (response.data.length > 0) {
-                  const transformed = response.data
-                    .map(transformWooCommerceProperty)
-                    .filter(Boolean);
-
-                  enterpriseCache.set(cacheKey, transformed, 60 * 60 * 1000); // 1 hora para datos reales
-                  console.log(`✅ ¡ÉXITO! WooCommerce REAL desde ${endpoint}: ${transformed.length} propiedades con ${creds.name}`);
-                  return transformed;
-                } else {
-                  console.log(`⚠️ Respuesta vacía desde ${endpoint} con ${creds.name}`);
-                }
-              } else {
-                console.log(`⚠️ Status ${response.status} desde ${endpoint} con ${creds.name}`);
-              }
-            } catch (requestError) {
-              console.log(`❌ Error ${endpoint} + ${creds.name} (intento ${attempt}): ${requestError.message}`);
-              
-              // Solo esperar si no es el último intento
-              if (attempt < 3) {
-                const delay = 200 * attempt; // Delay corto entre intentos
-                await new Promise(resolve => setTimeout(resolve, delay));
-              }
+              enterpriseCache.set(cacheKey, transformed, 60 * 60 * 1000); // 1 hora
+              console.log(`✅ ¡ÉXITO RÁPIDO! ${transformed.length} propiedades REALES con ${attempt.creds.name}`);
+              return transformed;
             }
           }
+        } catch (error) {
+          console.log(`❌ ${attempt.endpoint} + ${attempt.creds.name}: ${error.message}`);
+          // Continuar con el siguiente intento sin delay
         }
       }
       
-      throw new Error('TODAS las combinaciones de endpoint + credenciales fallaron');
+      // ESTRATEGIA 2: Si las prioritarias fallan, probar en paralelo las restantes (más rápido)
+      console.log(`🔄 Probando combinaciones restantes en paralelo...`);
+      
+      const remainingAttempts = [];
+      for (const endpoint of ENTERPRISE_CONFIG.endpoints.slice(2)) { // Endpoints restantes
+        for (const creds of ENTERPRISE_CONFIG.credentialSets.slice(2)) { // Credenciales restantes
+          remainingAttempts.push({ endpoint, creds, timeout: 4000 });
+        }
+      }
+      
+      // Ejecutar hasta 3 intentos en paralelo para no sobrecargar
+      const parallelPromises = remainingAttempts.slice(0, 3).map(async (attempt) => {
+        try {
+          const params = {
+            per_page: Math.min(limit, 50),
+            page,
+            status: 'publish'
+          };
+          
+          if (attempt.creds.key && attempt.creds.secret) {
+            params.consumer_key = attempt.creds.key;
+            params.consumer_secret = attempt.creds.secret;
+          }
+          
+          const response = await axios.get(`${attempt.endpoint}/products`, {
+            params,
+            timeout: attempt.timeout,
+            headers: { 'Accept': 'application/json' }
+          });
+
+          if (response.status === 200 && Array.isArray(response.data) && response.data.length > 0) {
+            return response.data.map(transformWooCommerceProperty).filter(Boolean);
+          }
+          return null;
+        } catch (error) {
+          return null;
+        }
+      });
+      
+      // Esperar el primer resultado exitoso
+      const results = await Promise.allSettled(parallelPromises);
+      for (const result of results) {
+        if (result.status === 'fulfilled' && result.value && result.value.length > 0) {
+          enterpriseCache.set(cacheKey, result.value, 60 * 60 * 1000);
+          console.log(`✅ ¡ÉXITO PARALELO! ${result.value.length} propiedades REALES`);
+          return result.value;
+        }
+      }
+      
+      throw new Error('Todas las estrategias rápidas fallaron');
     });
   } catch (error) {
-    console.log(`💥 WooCommerce conexión falló después de todos los intentos: ${error.message}`);
-    console.log(`🎯 Circuit breaker estado:`, persistentCircuitBreaker.getState());
+    console.log(`💥 Búsqueda rápida falló: ${error.message}`);
     
-    // FALLBACK A DATOS PREMIUM SOLO DESPUÉS DE INTENTOS EXHAUSTIVOS
+    // FALLBACK RÁPIDO A DATOS PREMIUM
     const premiumData = enterpriseCache.getPremiumData();
-    
-    // Aplicar paginación a los datos premium
     const startIndex = (page - 1) * limit;
     const paginatedData = premiumData.slice(startIndex, startIndex + limit);
     
-    // Guardar en cache por menos tiempo para reintentar pronto
-    enterpriseCache.set(cacheKey, paginatedData, 15 * 60 * 1000); // 15 minutos
+    // Cache por menos tiempo para reintentar pronto
+    enterpriseCache.set(cacheKey, paginatedData, 10 * 60 * 1000); // 10 minutos
     
-    console.log(`🆘 Usando fallback premium: ${paginatedData.length} propiedades (reintentará en 15min)`);
+    console.log(`🆘 Fallback premium rápido: ${paginatedData.length} propiedades (reintentará en 10min)`);
     return paginatedData;
   }
 };
