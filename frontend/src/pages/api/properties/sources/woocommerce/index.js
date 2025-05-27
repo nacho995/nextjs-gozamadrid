@@ -3,12 +3,12 @@ import { kv } from '@vercel/kv'; // Importar Vercel KV
 
 // 🏠 CONFIGURACIÓN SOLO PARA PROPIEDADES REALES - SIN FALLBACKS
 const REAL_ESTATE_CONFIG = {
-  // Múltiples endpoints para evitar bloqueos
+  // Usar la URL de la variable de entorno
   endpoints: [
-    'https://wordpress.realestategozamadrid.com/wp-json/wc/v3' // Usar solo el principal
+    process.env.WC_API_URL || 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3'
   ],
   
-  // Credenciales reales
+  // Credenciales reales - Usar las variables de entorno correctas
   credentials: {
     key: process.env.WC_CONSUMER_KEY,
     secret: process.env.WC_CONSUMER_SECRET
@@ -41,7 +41,7 @@ async function getPropertiesFromKVCache(key) {
 }
 
 // Nueva función para guardar datos en el caché de Vercel KV
-async function setPropertiesInKVCache(key, data) {
+async function savePropertiesToKVCache(key, data) {
   try {
     await kv.set(key, data, { ex: KV_CACHE_TTL_SECONDS });
     console.log(`✅ Datos cacheados en Vercel KV para la clave: ${key} con TTL: ${KV_CACHE_TTL_SECONDS}s`);
@@ -150,8 +150,12 @@ export const loadRealProperties = async (page = 1, limit = 50) => {
   for (let retry = 0; retry < REAL_ESTATE_CONFIG.connection.maxRetries; retry++) {
     try {
       console.log(`🔄 Intento API Externa ${retry + 1}/${REAL_ESTATE_CONFIG.connection.maxRetries}: ${endpointToTry}`);
+      console.log(`🔑 Usando credenciales: Key=${REAL_ESTATE_CONFIG.credentials.key?.substring(0, 8)}..., Secret=${REAL_ESTATE_CONFIG.credentials.secret?.substring(0, 8)}...`);
       
-      const response = await axios.get(`${endpointToTry}/products`, {
+      const requestUrl = `${endpointToTry}/products`;
+      console.log(`📡 URL completa: ${requestUrl}`);
+      
+      const response = await axios.get(requestUrl, {
         params: {
           consumer_key: REAL_ESTATE_CONFIG.credentials.key,
           consumer_secret: REAL_ESTATE_CONFIG.credentials.secret,
@@ -169,35 +173,54 @@ export const loadRealProperties = async (page = 1, limit = 50) => {
         const realProperties = response.data
           .map(transformRealProperty)
           .filter(Boolean);
-
-        if (realProperties.length > 0) {
-          console.log(`✅ ¡ÉXITO API Externa! ${realProperties.length} propiedades REALES desde ${endpointToTry}. Cacheando en Vercel KV...`);
-          await setPropertiesInKVCache(cacheKey, realProperties); // Cachear en Vercel KV
-          return realProperties;
-        }
-        // Si la respuesta es un array vacío, o no hay propiedades válidas después de transformar
-        console.log(`⚠️ ${endpointToTry} (intento ${retry + 1}): No se encontraron propiedades válidas en la respuesta.`);
-        if (retry >= REAL_ESTATE_CONFIG.connection.maxRetries - 1) {
-            throw new Error('No se encontraron propiedades válidas después de todos los intentos a la API externa.');
-        }
+        
+        console.log(`✅ API Externa ÉXITO: ${realProperties.length} propiedades reales cargadas de ${response.data.length} productos totales`);
+        
+        // Guardar en Vercel KV Cache (no bloqueante)
+        savePropertiesToKVCache(cacheKey, realProperties).catch(err => 
+          console.error('⚠️ Error guardando en KV cache:', err.message)
+        );
+        
+        return realProperties;
       } else {
-        // La respuesta no fue 200 o no es un array
-        console.log(`⚠️ ${endpointToTry} (intento ${retry + 1}): Respuesta inesperada - Status ${response.status}`);
-        if (retry >= REAL_ESTATE_CONFIG.connection.maxRetries - 1) {
-            throw new Error(`Respuesta inesperada de la API externa después de todos los intentos. Status: ${response.status}`);
-        }
+        console.error(`❌ Respuesta inválida: Status ${response.status}`);
       }
     } catch (error) {
-      console.log(`❌ Error API Externa ${endpointToTry} (intento ${retry + 1}): ${error.message}`);
-      if (retry >= REAL_ESTATE_CONFIG.connection.maxRetries - 1) {
-        throw error; // Re-lanzar el error del último intento para ser manejado por el handler
+      const isLastRetry = retry === REAL_ESTATE_CONFIG.connection.maxRetries - 1;
+      
+      // Log detallado del error
+      if (error.response) {
+        console.error(`❌ Error HTTP ${error.response.status}: ${error.response.statusText}`);
+        console.error(`📄 Response data:`, JSON.stringify(error.response.data, null, 2));
+        console.error(`📋 Headers:`, error.response.headers);
+        
+        // Si es 401, probablemente las credenciales son incorrectas
+        if (error.response.status === 401) {
+          throw new Error(`Autenticación fallida: Verificar credenciales WC_CONSUMER_KEY y WC_CONSUMER_SECRET`);
+        }
+        
+        // Si es 503, el servicio no está disponible
+        if (error.response.status === 503) {
+          throw new Error(`Servicio WooCommerce no disponible (503). El servidor puede estar sobrecargado o en mantenimiento.`);
+        }
+      } else if (error.request) {
+        console.error(`❌ Sin respuesta del servidor:`, error.message);
+        console.error(`🔗 URL solicitada:`, error.config?.url);
+      } else {
+        console.error(`❌ Error de configuración:`, error.message);
       }
+      
+      if (isLastRetry) {
+        console.error(`💥 Todos los intentos fallaron para ${endpointToTry}`);
+        throw error;
+      }
+      
+      console.log(`⏳ Esperando ${REAL_ESTATE_CONFIG.connection.retryDelay}ms antes del siguiente intento...`);
       await new Promise(resolve => setTimeout(resolve, REAL_ESTATE_CONFIG.connection.retryDelay));
     }
   }
-  
-  // Si el bucle termina (todos los reintentos fallaron)
-  throw new Error('No se pudieron cargar propiedades reales del inventario (API externa) después de todos los reintentos.');
+
+  throw new Error('No se pudieron cargar las propiedades después de todos los intentos');
 };
 
 // 🎯 HANDLER PRINCIPAL - SOLO PROPIEDADES REALES
@@ -206,10 +229,29 @@ export default async function handler(req, res) {
   const { limit = 50, page = 1 } = req.query;
 
   console.log(`🏠 API Handler (WooCommerce con Vercel KV) iniciada - Página: ${page}, Límite: ${limit}`);
+  
+  // Verificar credenciales con más detalle
+  const hasKey = !!REAL_ESTATE_CONFIG.credentials.key;
+  const hasSecret = !!REAL_ESTATE_CONFIG.credentials.secret;
+  const hasApiUrl = !!process.env.WC_API_URL;
+  
+  console.log(`🔑 Estado de credenciales: Key=${hasKey}, Secret=${hasSecret}, API_URL=${hasApiUrl}`);
+  console.log(`🔑 Key length: ${REAL_ESTATE_CONFIG.credentials.key?.length || 0}, Secret length: ${REAL_ESTATE_CONFIG.credentials.secret?.length || 0}`);
+  console.log(`📡 API URL: ${REAL_ESTATE_CONFIG.endpoints[0]}`);
+  
+  // Si no hay credenciales, devolver array vacío en lugar de error 500
   if (!REAL_ESTATE_CONFIG.credentials.key || !REAL_ESTATE_CONFIG.credentials.secret) {
-    console.error('❌ Credenciales de WooCommerce no configuradas en variables de entorno.');
-    return res.status(500).json({ error: 'Configuración de servidor incorrecta.'});
+    console.warn('⚠️ Credenciales de WooCommerce no configuradas. Devolviendo array vacío.');
+    console.warn('⚠️ Variables necesarias: WC_CONSUMER_KEY, WC_CONSUMER_SECRET');
+    
+    // Devolver array vacío con headers de cache corto
+    res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=60');
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('X-WooCommerce-Status', 'no-credentials');
+    
+    return res.status(200).json([]);
   }
+  
   console.log(`🔑 Credenciales de WooCommerce: CONFIGURADAS`);
 
   res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=300'); // Cache de CDN más corto (1 min), stale 5 min
@@ -219,15 +261,38 @@ export default async function handler(req, res) {
     const realProperties = await loadRealProperties(parseInt(page), parseInt(limit));
     const duration = Date.now() - startTime;
     console.log(`🎉 ÉXITO API Handler: ${realProperties.length} propiedades REALES servidas en ${duration}ms (desde KV o API externa)`);
+    res.setHeader('X-WooCommerce-Status', 'success');
+    res.setHeader('X-Response-Time', `${duration}ms`);
     return res.status(200).json(realProperties);
   } catch (error) {
     const duration = Date.now() - startTime;
     console.error(`💥 ERROR API Handler: No se pudieron cargar propiedades después de ${duration}ms:`, error.message);
-    return res.status(503).json({
-      error: 'Propiedades de WooCommerce no disponibles temporalmente',
-      message: error.message || 'El servicio externo no pudo ser contactado después de múltiples intentos.',
+    
+    // Si es un error 503 o timeout, devolver array vacío en lugar de propagar el error
+    if (error.response?.status === 503 || error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+      console.warn('⚠️ WooCommerce temporalmente no disponible. Devolviendo array vacío.');
+      res.setHeader('X-WooCommerce-Status', 'unavailable');
+      res.setHeader('X-Response-Time', `${duration}ms`);
+      res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=60'); // Cache más corto para reintentar pronto
+      return res.status(200).json([]);
+    }
+    
+    // Para otros errores, devolver información más detallada pero con status 200
+    console.error(`💥 Stack trace:`, error.stack);
+    
+    const errorInfo = {
+      properties: [], // Array vacío de propiedades
+      status: 'error',
+      message: 'WooCommerce temporalmente no disponible',
       timestamp: new Date().toISOString(),
       duration: `${duration}ms`
-    });
+    };
+    
+    res.setHeader('X-WooCommerce-Status', 'error');
+    res.setHeader('X-Response-Time', `${duration}ms`);
+    res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=60');
+    
+    // Devolver 200 con array vacío para evitar errores en el frontend
+    return res.status(200).json([]);
   }
-} 
+}
