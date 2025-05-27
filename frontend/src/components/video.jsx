@@ -6,7 +6,7 @@ import AnimatedOnScroll from "./AnimatedScroll";
 import Image from "next/legacy/image";
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaSearch, FaMapMarkerAlt, FaBed, FaBath, FaRuler, FaEuroSign, FaFilter, FaCalculator, FaTimes, FaHome, FaArrowRight } from 'react-icons/fa';
-import { fetchAllProperties, normalizeProperty, filterProperties } from '../utils/properties';
+import { normalizeProperty, filterProperties } from '../utils/properties';
 import ControlMenu from './header';
 
 const Video = () => {
@@ -15,6 +15,7 @@ const Video = () => {
     const videoRef = useRef(null);
     const [videoSrc, setVideoSrc] = useState("/video.mp4");
     const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+    const [videoError, setVideoError] = useState(false);
     
     // Estados para el buscador de propiedades
     const [searchFilters, setSearchFilters] = useState({
@@ -38,27 +39,65 @@ const Video = () => {
         const videoElement = videoRef.current;
         if (videoElement) {
             videoElement.loop = true;
-            videoElement.load();
             
-            // Manejar la carga del video
-            videoElement.addEventListener('loadeddata', () => {
+            // Manejar eventos del video
+            const handleLoadedData = () => {
+                console.log('[Video] Video cargado exitosamente');
                 setIsVideoLoaded(true);
-            });
+            };
 
+            const handleError = (error) => {
+                console.error('[Video] Error al cargar el video:', error);
+                console.error('[Video] Intentando cargar video desde:', videoSrc);
+                setVideoError(true);
+                // Intentar con una URL alternativa si falla
+                if (videoSrc === "/video.mp4") {
+                    console.log('[Video] Intentando con URL alternativa...');
+                    setVideoSrc("https://www.realestategozamadrid.com/video.mp4");
+                } else {
+                    console.error('[Video] Todas las URLs de video fallaron, usando imagen de fallback');
+                }
+            };
+
+            const handleCanPlay = () => {
+                console.log('[Video] Video listo para reproducir');
+                setIsVideoLoaded(true);
+            };
+
+            // Añadir event listeners
+            videoElement.addEventListener('loadeddata', handleLoadedData);
+            videoElement.addEventListener('canplay', handleCanPlay);
+            videoElement.addEventListener('error', handleError);
+            
+            // Cargar el video
+            videoElement.load();
+
+            // Timeout para detectar si el video no se carga
+            const loadTimeout = setTimeout(() => {
+                if (!isVideoLoaded) {
+                    console.warn('[Video] Timeout: El video no se cargó en 10 segundos, usando imagen de fallback');
+                    setVideoError(true);
+                }
+            }, 10000); // 10 segundos
+
+            // Intentar reproducir el video
             videoElement.play().catch(error => {
-                console.log("Error al reproducir el video:", error);
+                console.error("[Video] Error al reproducir el video:", error);
+                // En algunos navegadores, el autoplay está bloqueado
+                console.log("[Video] Autoplay bloqueado, el video se reproducirá cuando el usuario interactúe");
             });
 
             // Limpieza
             return () => {
-                videoElement.removeEventListener('loadeddata', () => {
-                    setIsVideoLoaded(true);
-                });
+                clearTimeout(loadTimeout);
+                videoElement.removeEventListener('loadeddata', handleLoadedData);
+                videoElement.removeEventListener('canplay', handleCanPlay);
+                videoElement.removeEventListener('error', handleError);
             };
         }
     }, [videoSrc]);
 
-    // Cargar todas las propiedades reales desde las APIs
+    // Cargar todas las propiedades reales desde las APIs (igual que PropertyPage)
     useEffect(() => {
         const loadAllProperties = async () => {
             setPropertiesLoading(true);
@@ -67,39 +106,60 @@ const Video = () => {
             try {
                 console.log('[Video] Cargando todas las propiedades desde las APIs...');
                 
-                // Limpiar cualquier cache previo
-                if (typeof window !== 'undefined') {
-                    // Limpiar cache de fetch API
-                    if ('caches' in window) {
-                        caches.keys().then(names => {
-                            names.forEach(name => {
-                                if (name.includes('properties') || name.includes('api')) {
-                                    caches.delete(name);
-                                }
-                            });
-                        });
-                    }
-                }
+                // Usar la misma lógica que PropertyPage - llamadas directas a las APIs del backend
+                const [mongoResponse, wooResponse] = await Promise.allSettled([
+                    fetch('/api/properties/sources/mongodb').then(res => {
+                        if (!res.ok) throw new Error(`MongoDB API error: ${res.status}`);
+                        return res.json();
+                    }).catch(err => {
+                        console.error('[Video] Error API MongoDB:', err.message);
+                        return []; // Devolver array vacío en caso de error
+                    }),
+                    fetch('/api/properties/sources/woocommerce').then(res => {
+                        if (!res.ok) throw new Error(`WooCommerce API error: ${res.status}`);
+                        return res.json();
+                    }).catch(err => {
+                        console.error('[Video] Error API WooCommerce:', err.message);
+                        return []; // Devolver array vacío en caso de error
+                    })
+                ]);
+
+                const mongoProperties = mongoResponse.status === 'fulfilled' ? (mongoResponse.value || []) : [];
+                const wooCommerceProperties = wooResponse.status === 'fulfilled' ? (wooResponse.value || []) : [];
                 
-                const properties = await fetchAllProperties();
-                console.log('[Video] Propiedades obtenidas:', properties.length);
+                // Asegurarse de que sean arrays
+                const safeMongoProps = Array.isArray(mongoProperties) ? mongoProperties : [];
+                const safeWooProps = Array.isArray(wooCommerceProperties) ? wooCommerceProperties : [];
+
+                // Marcar la fuente explícitamente
+                const taggedMongoProps = safeMongoProps.map(p => ({ ...p, source: p.source || 'mongodb' }));
+                const taggedWooProps = safeWooProps.map(p => ({ ...p, source: p.source || 'woocommerce' }));
+
+                const allPropertiesRaw = [...taggedMongoProps, ...taggedWooProps];
+                console.log('[Video] Propiedades obtenidas:', allPropertiesRaw.length, `(MongoDB: ${safeMongoProps.length}, WooCommerce: ${safeWooProps.length})`);
                 
-                if (properties.length > 0) {
-                    const normalizedProperties = properties.map(normalizeProperty);
+                if (allPropertiesRaw.length > 0) {
+                    const normalizedProperties = allPropertiesRaw.map(normalizeProperty);
                     console.log('[Video] Propiedades normalizadas:', normalizedProperties.length);
                     setAllProperties(normalizedProperties);
                     
                     // Seleccionar la primera propiedad por defecto
                     setSelectedProperty(normalizedProperties[0]);
-                    console.log('[Video] Primera propiedad seleccionada:', normalizedProperties[0].title);
+                    console.log('[Video] Primera propiedad seleccionada:', normalizedProperties[0]?.title || 'Sin título');
                 } else {
                     console.warn('[Video] No se encontraron propiedades en las APIs');
                     setAllProperties([]);
                     setSelectedProperty(null);
-                    setPropertiesError('No hay propiedades disponibles en este momento');
+                    
+                    // Mostrar error más específico basado en qué falló
+                    if (mongoResponse.status === 'rejected' && wooResponse.status === 'rejected') {
+                        setPropertiesError('Error de conexión con las APIs de propiedades');
+                    } else {
+                        setPropertiesError('No hay propiedades disponibles en este momento');
+                    }
                 }
             } catch (error) {
-                console.error('[Video] Error al cargar propiedades:', error);
+                console.error('[Video] Error inesperado al cargar propiedades:', error);
                 setAllProperties([]);
                 setSelectedProperty(null);
                 setPropertiesError(`Error al cargar propiedades: ${error.message}`);
@@ -147,8 +207,21 @@ const Video = () => {
                     aria-label="Sección de presentación con video y buscador de propiedades de lujo"
                 >
                     <div className="w-full h-[120vh] overflow-hidden relative">
+                        {/* Imagen de fallback cuando el video falla */}
+                        {videoError && (
+                            <div 
+                                className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                                style={{
+                                    backgroundImage: "url('/gozamadridwp.jpg')",
+                                }}
+                                aria-label="Imagen de fondo de Goza Madrid"
+                            >
+                                <div className="absolute inset-0 bg-black/40"></div>
+                            </div>
+                        )}
+                        
                         {/* Fallback para cuando el video no está cargado */}
-                        {!isVideoLoaded && (
+                        {!isVideoLoaded && !videoError && (
                             <div 
                                 className="absolute inset-0 bg-black/50 flex items-center justify-center"
                                 aria-label="Cargando video"
@@ -157,19 +230,22 @@ const Video = () => {
                             </div>
                         )}
                         
-                        <video
-                            className="absolute top-0 left-0 w-full h-full object-cover"
-                            autoPlay
-                            muted
-                            playsInline
-                            ref={videoRef}
-                            aria-label="Video promocional de Goza Madrid"
-                        >
-                            <source src={videoSrc} type="video/mp4" />
-                            <p>Tu navegador no soporta la reproducción de video. 
-                               <a href={videoSrc} download>Descarga el video aquí</a>
-                            </p>
-                        </video>
+                        {/* Video principal */}
+                        {!videoError && (
+                            <video
+                                className="absolute top-0 left-0 w-full h-full object-cover"
+                                autoPlay
+                                muted
+                                playsInline
+                                ref={videoRef}
+                                aria-label="Video promocional de Goza Madrid"
+                            >
+                                <source src={videoSrc} type="video/mp4" />
+                                <p>Tu navegador no soporta la reproducción de video. 
+                                   <a href={videoSrc} download>Descarga el video aquí</a>
+                                </p>
+                            </video>
+                        )}
 
                         {/* Overlay elegante y sutil con transición suave */}
                         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/5 to-black/40"></div>
