@@ -16,9 +16,9 @@ const REAL_ESTATE_CONFIG = {
   
   // Configuración agresiva para superar bloqueos
   connection: {
-    timeout: 8000, // 8 segundos 
+    timeout: 15000, // 15 segundos - aumentado para evitar timeouts
     maxRetries: 3, // Mantener 3 reintentos para el único endpoint/estrategia
-    retryDelay: 1500 
+    retryDelay: 2000 // Aumentar el delay entre reintentos
   }
 };
 
@@ -55,44 +55,68 @@ const transformRealProperty = (property) => {
   try {
     // Extraer metadatos de meta_data si existen
     const metadata = {};
-    if (property.meta_data?.length) {
-      property.meta_data.forEach(meta => {
-        if (!meta.key.startsWith('_')) {
-          metadata[meta.key] = meta.value;
-        }
-      });
-    }
-
-    // Extraer información de la descripción HTML
-    const description = property.description || '';
     let bedrooms = 0;
     let bathrooms = 0;
     let area = 0;
     let floor = null;
+    let address = '';
+    
+    if (property.meta_data?.length) {
+      property.meta_data.forEach(meta => {
+        if (!meta.key.startsWith('_')) {
+          metadata[meta.key] = meta.value;
+          
+          // Extraer valores específicos de los metadatos
+          if (meta.key === 'bedrooms') {
+            bedrooms = parseInt(meta.value) || 0;
+          } else if (meta.key === 'baños' || meta.key === 'bathrooms') {
+            bathrooms = parseInt(meta.value) || 0;
+            // Si es -1, significa que no está especificado
+            if (bathrooms === -1) bathrooms = 0;
+          } else if (meta.key === 'living_area' || meta.key === 'area') {
+            area = parseInt(meta.value) || 0;
+          } else if (meta.key === 'Planta' || meta.key === 'planta') {
+            floor = meta.value;
+          } else if (meta.key === 'address' || meta.key === 'direccion') {
+            address = meta.value || '';
+          }
+        }
+      });
+    }
 
-    // Buscar habitaciones en la descripción
-    const bedroomMatch = description.match(/(\d+)\s*(?:habitacion|dormitorio|bedroom)/i);
-    if (bedroomMatch) bedrooms = parseInt(bedroomMatch[1]);
+    // Si no hay dirección en metadatos, usar el título
+    if (!address) {
+      address = property.name || property.title || '';
+    }
 
-    // Buscar baños en la descripción
-    const bathroomMatch = description.match(/(\d+)\s*(?:baño|bath|aseo)/i);
-    if (bathroomMatch) bathrooms = parseInt(bathroomMatch[1]);
+    // Extraer información adicional de la descripción HTML si es necesario
+    const description = property.description || '';
+    
+    // Si no encontramos habitaciones en metadatos, buscar en la descripción
+    if (bedrooms === 0) {
+      const bedroomMatch = description.match(/(\d+)\s*(?:habitacion|dormitorio|bedroom)/i);
+      if (bedroomMatch) bedrooms = parseInt(bedroomMatch[1]);
+    }
 
-    // Buscar superficie/área en la descripción
-    const areaMatch = description.match(/(\d+)\s*m[²2]?/i);
-    if (areaMatch) area = parseInt(areaMatch[1]);
+    // Si no encontramos baños en metadatos, buscar en la descripción
+    if (bathrooms === 0) {
+      const bathroomMatch = description.match(/(\d+)\s*(?:baño|bath|aseo)/i);
+      if (bathroomMatch) bathrooms = parseInt(bathroomMatch[1]);
+    }
 
-    // Buscar planta en la descripción
-    const floorMatch = description.match(/(\d+)[ªº]?\s*(?:planta|piso)/i);
-    if (floorMatch) floor = floorMatch[1];
+    // Si no encontramos área en metadatos, buscar en la descripción
+    if (area === 0) {
+      const areaMatch = description.match(/(\d+)\s*m[²2]?/i);
+      if (areaMatch) area = parseInt(areaMatch[1]);
+    }
 
-    // Usar metadatos como fallback
-    bedrooms = bedrooms || parseInt(metadata.bedrooms || metadata.habitaciones) || 0;
-    bathrooms = bathrooms || parseInt(metadata.baños || metadata.bathrooms || metadata.banos) || 0;
-    area = area || parseInt(metadata.living_area || metadata.area || metadata.m2 || metadata.superficie) || 0;
-    floor = floor || metadata.Planta || metadata.planta || null;
+    // Si no encontramos planta en metadatos, buscar en la descripción
+    if (!floor) {
+      const floorMatch = description.match(/(\d+)[ªº]?\s*(?:planta|piso)/i);
+      if (floorMatch) floor = floorMatch[1];
+    }
 
-    // Si no encontramos datos, usar valores por defecto razonables
+    // Si aún no tenemos valores, usar valores por defecto razonables
     if (bedrooms === 0) bedrooms = 2; // Valor por defecto
     if (bathrooms === 0) bathrooms = 1; // Valor por defecto
     if (area === 0) area = 80; // Valor por defecto en m²
@@ -101,7 +125,7 @@ const transformRealProperty = (property) => {
 
     return {
       id: String(property.id),
-      title: property.title || property.name || `Propiedad ${property.id}`,
+      title: property.name || property.title || `Propiedad ${property.id}`,
       description: property.description || property.short_description || '',
       price,
       source: 'woocommerce_real_kv', // Indicar que viene de KV o fue cacheado por KV
@@ -115,8 +139,13 @@ const transformRealProperty = (property) => {
         area,
         floor 
       },
-      location: property.title || property.name || metadata.address || metadata.direccion || 'Madrid',
-      metadata,
+      location: address || property.name || property.title || 'Madrid',
+      address: address || property.name || property.title || '',
+      metadata: {
+        ...metadata,
+        categories: property.categories || [],
+        permalink: property.permalink || ''
+      },
       createdAt: property.date_created || new Date().toISOString(),
       updatedAt: property.date_modified || new Date().toISOString()
     };
