@@ -375,9 +375,12 @@ const createServiceStructuredData = (id, title, description, image, serviceUrl) 
 export default function Cards() {
     const [expandedCards, setExpandedCards] = useState(new Set());
     
-    // Estilos dinámicos para el espaciado específico por resolución
+    // Calcular espaciado dinámico basado en cards expandidas
     const getDynamicSpacing = () => {
-        return {}; // Simplificado - el espaciado se maneja en el CTA
+        const hasExpandedCards = expandedCards.size > 0;
+        return {
+            marginBottom: hasExpandedCards ? '100px' : '50px'
+        };
     };
     
     // Extraer descripciones de texto para los datos estructurados
@@ -425,7 +428,7 @@ export default function Cards() {
     
     return (
         <section 
-            className="py-16 lg:py-24 bg-transparent relative z-10"
+            className="py-8 sm:py-12 lg:py-16 bg-transparent relative z-10"
             aria-label="Servicios inmobiliarios destacados"
         >
             <Head>
@@ -483,7 +486,7 @@ export default function Cards() {
                     viewport={{ once: true }}
                     className="text-center mt-16"
                     style={{
-                        marginBottom: '50px', // Espaciado reducido
+                        ...getDynamicSpacing(),
                         transition: 'margin-bottom 0.5s ease-in-out'
                     }}
                 >
