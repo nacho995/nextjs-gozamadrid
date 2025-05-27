@@ -1,32 +1,43 @@
 const fs = require('fs');
 const path = require('path');
 
-const criticalImages = [
-  'logonuevo.png',
-  'logo.png',
-  'favicon.ico',
-  'manifest.json'
+const criticalFiles = [
+  'public/video.mp4',
+  'public/videoExpIngles.mp4',
+  'public/madrid.jpg',
+  'public/logo.png',
+  'public/logonuevo.png',
+  'public/manifest.json',
+  'public/favicon.ico',
+  'public/marta.jpeg'
 ];
 
-console.log('🔍 Verificando imágenes críticas...');
+console.log('🔍 Verificando archivos críticos...\n');
 
-let allPresent = true;
+let allFilesExist = true;
+let totalSize = 0;
 
-criticalImages.forEach(image => {
-  const imagePath = path.join(__dirname, 'public', image);
-  if (fs.existsSync(imagePath)) {
-    const stats = fs.statSync(imagePath);
-    console.log(`✅ ${image} - ${(stats.size / 1024).toFixed(1)} KB`);
+criticalFiles.forEach(file => {
+  const filePath = path.join(__dirname, file);
+  if (fs.existsSync(filePath)) {
+    const stats = fs.statSync(filePath);
+    const sizeInMB = (stats.size / (1024 * 1024)).toFixed(2);
+    totalSize += stats.size;
+    console.log(`✅ ${file} (${sizeInMB} MB)`);
   } else {
-    console.log(`❌ ${image} - NO ENCONTRADO`);
-    allPresent = false;
+    console.log(`❌ ${file} - FALTANTE`);
+    allFilesExist = false;
   }
 });
 
-if (allPresent) {
-  console.log('✅ Todas las imágenes críticas están presentes');
+console.log(`\n📊 Tamaño total: ${(totalSize / (1024 * 1024)).toFixed(2)} MB`);
+
+if (allFilesExist) {
+  console.log('\n🎉 Todos los archivos críticos están presentes');
+  process.exit(0);
 } else {
-  console.log('❌ Faltan imágenes críticas');
+  console.log('\n⚠️ Faltan archivos críticos. El despliegue puede fallar.');
+  process.exit(1);
 }
 
 // Verificar que el directorio de API existe

@@ -15,6 +15,14 @@ const Video = () => {
     const videoRef = useRef(null);
     const [videoSrc, setVideoSrc] = useState("/video.mp4");
     const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+    const [videoError, setVideoError] = useState(false);
+    const [videoSources] = useState([
+        "/video.mp4",
+        "/videoExpIngles.mp4",
+        "https://www.realestategozamadrid.com/video.mp4",
+        "https://www.realestategozamadrid.com/videoExpIngles.mp4"
+    ]);
+    const [currentSourceIndex, setCurrentSourceIndex] = useState(0);
 
     
     // Estados para el buscador de propiedades
@@ -46,6 +54,7 @@ const Video = () => {
             const handleLoadedData = () => {
                 console.log('[Video] ✅ Video cargado exitosamente desde:', videoSrc);
                 setIsVideoLoaded(true);
+                setVideoError(false);
             };
 
             const handleError = (error) => {
@@ -53,22 +62,28 @@ const Video = () => {
                 console.error('[Video] ❌ URL que falló:', videoSrc);
                 console.error('[Video] ❌ Detalles del error:', error.target?.error);
                 
-                // Intentar con una URL alternativa si falla
-                if (videoSrc === "/video.mp4") {
-                    console.log('[Video] 🔄 Intentando con URL alternativa...');
-                    setVideoSrc("https://www.realestategozamadrid.com/video.mp4");
+                // Intentar con la siguiente fuente de video
+                const nextIndex = currentSourceIndex + 1;
+                if (nextIndex < videoSources.length) {
+                    console.log(`[Video] 🔄 Intentando con fuente ${nextIndex + 1}/${videoSources.length}:`, videoSources[nextIndex]);
+                    setCurrentSourceIndex(nextIndex);
+                    setVideoSrc(videoSources[nextIndex]);
                 } else {
-                    console.error('[Video] ❌ Todas las URLs fallaron');
+                    console.error('[Video] ❌ Todas las fuentes de video fallaron');
+                    setVideoError(true);
+                    setIsVideoLoaded(false);
                 }
             };
 
             const handleCanPlay = () => {
                 console.log('[Video] ✅ Video listo para reproducir desde:', videoSrc);
                 setIsVideoLoaded(true);
+                setVideoError(false);
             };
 
             const handleLoadStart = () => {
                 console.log('[Video] 🔄 Iniciando carga del video...');
+                setVideoError(false);
             };
 
             const handleProgress = () => {
@@ -85,8 +100,6 @@ const Video = () => {
             // Cargar el video
             console.log('[Video] 🚀 Llamando a videoElement.load()...');
             videoElement.load();
-
-
 
             // Intentar reproducir el video
             console.log('[Video] 🎬 Intentando reproducir el video...');
@@ -107,7 +120,7 @@ const Video = () => {
         } else {
             console.log('[Video] ⚠️ Elemento video no encontrado en el DOM');
         }
-    }, [videoSrc]);
+    }, [videoSrc, currentSourceIndex, videoSources]);
 
     // Verificar si el video existe
     useEffect(() => {
@@ -238,30 +251,56 @@ const Video = () => {
                     aria-label="Sección de presentación con video y buscador de propiedades de lujo"
                 >
                     <div className="w-full h-[120vh] overflow-hidden relative">
-                        {/* Fallback para cuando el video no está cargado */}
-                        {!isVideoLoaded && (
+                        {/* Imagen de fondo como fallback */}
+                        <div 
+                            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                            style={{
+                                backgroundImage: `url('/madrid.jpg')`,
+                                filter: videoError ? 'none' : 'blur(2px)',
+                                opacity: videoError ? 1 : (isVideoLoaded ? 0 : 0.7)
+                            }}
+                        />
+                        
+                        {/* Fallback para cuando el video no está cargado o hay error */}
+                        {(!isVideoLoaded || videoError) && (
                             <div 
-                                className="absolute inset-0 bg-black/50 flex items-center justify-center"
-                                aria-label="Cargando video"
+                                className="absolute inset-0 bg-black/30 flex items-center justify-center"
+                                aria-label={videoError ? "Error cargando video" : "Cargando video"}
                             >
-                                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amarillo"></div>
+                                {videoError ? (
+                                    <div className="text-center text-white">
+                                        <div className="text-6xl mb-4">🏢</div>
+                                        <h3 className="text-xl font-light mb-2">Propiedades Exclusivas en Madrid</h3>
+                                        <p className="text-white/80 text-sm">Cargando contenido...</p>
+                                    </div>
+                                ) : (
+                                    <div className="text-center text-white">
+                                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amarillo mx-auto mb-4"></div>
+                                        <p className="text-white/80">Cargando video...</p>
+                                        <p className="text-white/60 text-xs mt-2">Fuente {currentSourceIndex + 1} de {videoSources.length}</p>
+                                    </div>
+                                )}
                             </div>
                         )}
                         
                         {/* Video principal */}
-                        <video
-                            className="absolute top-0 left-0 w-full h-full object-cover"
-                            autoPlay
-                            muted
-                            playsInline
-                            ref={videoRef}
-                            aria-label="Video promocional de Goza Madrid"
-                        >
-                            <source src={videoSrc} type="video/mp4" />
-                            <p>Tu navegador no soporta la reproducción de video. 
-                               <a href={videoSrc} download>Descarga el video aquí</a>
-                            </p>
-                        </video>
+                        {!videoError && (
+                            <video
+                                className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ${
+                                    isVideoLoaded ? 'opacity-100' : 'opacity-0'
+                                }`}
+                                autoPlay
+                                muted
+                                playsInline
+                                ref={videoRef}
+                                aria-label="Video promocional de Goza Madrid"
+                            >
+                                <source src={videoSrc} type="video/mp4" />
+                                <p>Tu navegador no soporta la reproducción de video. 
+                                   <a href={videoSrc} download>Descarga el video aquí</a>
+                                </p>
+                            </video>
+                        )}
 
                         {/* Overlay elegante y sutil con transición suave */}
                         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/5 to-black/40"></div>
@@ -277,9 +316,9 @@ const Video = () => {
                                 transition={{ duration: 1.2, delay: 0.3 }}
                                 className="w-full max-w-5xl"
                             >
-                                <div className="bg-black/20 backdrop-blur-xl rounded-2xl p-8 shadow-2xl border border-white/20">
+                                <div className="bg-black/20 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-white/20">
                                     {/* Pestañas elegantes */}
-                                    <div className="flex mb-8 bg-white/20 backdrop-blur-sm rounded-xl p-1 max-w-md mx-auto border border-white/30">
+                                    <div className="flex mb-6 bg-white/20 backdrop-blur-sm rounded-xl p-1 max-w-md mx-auto border border-white/30">
                                         <button
                                             onClick={() => handleFilterChange('operation', 'comprar')}
                                             className={`flex-1 py-3 px-8 rounded-lg font-medium transition-all duration-300 ${
@@ -442,42 +481,39 @@ const Video = () => {
                                             </div>
                                         </div>
                                     ) : (
-                                        // Contenido para vender - ultra premium
-                                        <div className="text-center py-12">
-                                            <div className="max-w-2xl mx-auto">
-                                                                                            <h3 className="font-serif text-3xl font-light text-white mb-6">
-                                                ¿Desea vender su propiedad?
-                                            </h3>
-                                            <p className="text-white/80 mb-8 text-lg font-light leading-relaxed">
+                                        // Contenido para vender - compacto
+                                        <div className="text-center py-6">
+                                            <div className="max-w-xl mx-auto">
+                                                <h3 className="font-serif text-2xl font-light text-white mb-4">
+                                                    ¿Desea vender su propiedad?
+                                                </h3>
+                                                <p className="text-white/80 mb-6 text-base font-light leading-relaxed">
                                                     Obtenga una valoración profesional y gratuita de su propiedad. 
                                                     Nuestros expertos le ayudarán a conseguir el mejor precio del mercado.
                                                 </p>
                                                 
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                                                                                                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center border border-white/20">
-                                                    <div className="text-amarillo text-4xl mb-4">📊</div>
-                                                    <h4 className="font-medium text-white mb-2">Valoración Gratuita</h4>
-                                                    <p className="text-white/70 text-sm">Análisis completo del mercado inmobiliario</p>
-                                                </div>
-                                                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center border border-white/20">
-                                                    <div className="text-amarillo text-4xl mb-4">🏆</div>
-                                                    <h4 className="font-medium text-white mb-2">Expertos en Madrid</h4>
-                                                    <p className="text-white/70 text-sm">Conocimiento especializado del mercado local</p>
-                                                </div>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center border border-white/20">
+                                                        <div className="text-amarillo text-2xl mb-2">📊</div>
+                                                        <h4 className="font-medium text-white mb-1 text-sm">Valoración Gratuita</h4>
+                                                        <p className="text-white/70 text-xs">Análisis completo del mercado</p>
+                                                    </div>
+                                                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center border border-white/20">
+                                                        <div className="text-amarillo text-2xl mb-2">🏆</div>
+                                                        <h4 className="font-medium text-white mb-1 text-sm">Expertos en Madrid</h4>
+                                                        <p className="text-white/70 text-xs">Conocimiento especializado</p>
+                                                    </div>
                                                 </div>
 
                                                 <a
                                                     href="https://valuation.lystos.com?clientId=cd55b10c-5ba6-4f65-854e-5c8adaf88a34"
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="inline-flex items-center gap-3 bg-amarillo hover:bg-amarillo/90 text-white font-medium px-10 py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                                                    className="inline-flex items-center gap-2 bg-amarillo hover:bg-amarillo/90 text-white font-medium px-6 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
                                                 >
-                                                    <FaCalculator className="text-lg" />
+                                                    <FaCalculator className="text-sm" />
                                                     <span>Valorar mi Propiedad</span>
                                                 </a>
-                                                
-                                                {/* Espaciado adicional para evitar solapamiento con la barra inferior */}
-                                                <div className="h-20 mt-8"></div>
                                             </div>
                                         </div>
                                     )}
