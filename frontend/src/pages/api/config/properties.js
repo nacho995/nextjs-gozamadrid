@@ -12,7 +12,7 @@
 // import fetch from 'node-fetch';
 
 // Función para verificar la disponibilidad de un endpoint
-async function checkEndpointAvailability(url, params = {}, timeout = 3000) {
+async function checkEndpointAvailability(url, params = {}, timeout = 2000) {
   try {
     console.log(`[API Config] Verificando disponibilidad de: ${url}`);
     
@@ -21,8 +21,8 @@ async function checkEndpointAvailability(url, params = {}, timeout = 3000) {
       ? `${url}?${new URLSearchParams(params).toString()}`
       : url;
     
-    const response = await fetch(targetUrl, {
-      method: 'HEAD',
+    const response = await fetch(targetUrl + '?limit=1', {
+      method: 'GET',
       signal: AbortSignal.timeout(timeout),
       headers: {
         'Accept': 'application/json',
@@ -76,25 +76,7 @@ export default async function handler(req, res) {
       useProxyForMongoDB: false
     };
 
-    // Verificar disponibilidad de endpoints
-    const protocol = req.headers['x-forwarded-proto'] || (req.connection.encrypted ? 'https' : 'http');
-    const baseUrl = `${protocol}://${req.headers.host}`;
-
-    try {
-      const wooAvailable = await checkEndpointAvailability(`${baseUrl}${config.endpoints.woocommerce.url}`);
-      config.endpoints.woocommerce.available = wooAvailable;
-    } catch (error) {
-      console.warn('[API Config] Error verificando WooCommerce:', error);
-    }
-
-    try {
-      const mongoAvailable = await checkEndpointAvailability(`${baseUrl}${config.endpoints.mongodb.url}`);
-      config.endpoints.mongodb.available = mongoAvailable;
-    } catch (error) {
-      console.warn('[API Config] Error verificando MongoDB:', error);
-    }
-
-    // Obtener credenciales de WooCommerce
+    // Obtener credenciales de WooCommerce PRIMERO
     const WOO_COMMERCE_KEY = process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY || process.env.WOO_COMMERCE_KEY;
     const WOO_COMMERCE_SECRET = process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET || process.env.WOO_COMMERCE_SECRET;
 
@@ -106,6 +88,26 @@ export default async function handler(req, res) {
     } else {
       console.warn('[API Config] Faltan credenciales de WooCommerce');
       config.endpoints.woocommerce.available = false;
+    }
+
+    // Verificar disponibilidad de endpoints
+    const protocol = req.headers['x-forwarded-proto'] || (req.connection.encrypted ? 'https' : 'http');
+    const baseUrl = `${protocol}://${req.headers.host}`;
+
+    try {
+      // Para WooCommerce, necesitamos pasar las credenciales en la verificación
+      const wooUrl = `${baseUrl}${config.endpoints.woocommerce.url}`;
+      const wooAvailable = await checkEndpointAvailability(wooUrl, config.endpoints.woocommerce.params);
+      config.endpoints.woocommerce.available = wooAvailable;
+    } catch (error) {
+      console.warn('[API Config] Error verificando WooCommerce:', error);
+    }
+
+    try {
+      const mongoAvailable = await checkEndpointAvailability(`${baseUrl}${config.endpoints.mongodb.url}`);
+      config.endpoints.mongodb.available = mongoAvailable;
+    } catch (error) {
+      console.warn('[API Config] Error verificando MongoDB:', error);
     }
 
     // Cachear la respuesta por 5 minutos
