@@ -1,413 +1,352 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
-import AnimatedOnScroll from "./AnimatedScroll";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/legacy/image";
 import Head from "next/head";
 import Link from "next/link";
 import { getCleanJsonLd } from "../utils/structuredDataHelper";
+import { 
+  FaChartLine, 
+  FaHome, 
+  FaHandshake, 
+  FaUsers, 
+  FaHeart,
+  FaArrowRight,
+  FaClock,
+  FaEye,
+  FaCheckCircle,
+  FaCalculator
+} from 'react-icons/fa';
 
 const cardData = [
     {
         id: 'venta-agil',
-        front: "Ventas ágiles y seguras en un máximo de 70 días",
-        back: (
-            <ol>
-                <li>Vender un piso no es jugar a la lotería.</li>
-                <li>Sabemos que el mercado inmobiliario ha subido de precio.</li>
-                <li>¡Ojo! Algunos propietarios están inflando los precios, pensando que así sacarán más beneficio.</li>
-                <li>El precio fuera de mercado aleja a compradores.</li>
-            </ol>
-        ),
-        alt: "Análisis de ventas inmobiliarias",
-        image: "/analisis.png"
+        title: "Ventas ágiles y seguras",
+        subtitle: "En un máximo de 70 días",
+        icon: <FaClock className="text-3xl" />,
+        points: [
+            "Vender un piso no es jugar a la lotería",
+            "Sabemos que el mercado inmobiliario ha subido de precio",
+            "Algunos propietarios están inflando los precios",
+            "El precio fuera de mercado aleja a compradores"
+        ],
+        image: "/analisis.png",
+        alt: "Análisis de ventas inmobiliarias"
     },
     {
         id: 'razon-no-venta',
-        front: "¿Por qué no se vende tu inmueble?",
-        back: (
-            <ol>
-                <li>Precio correcto = venta rápida y efectiva.</li>
-                <li>Precio inflado = meses (o años) sin vender, y posibles bajadas obligadas.</li>
-                <li>Si de verdad quieres vender, hazlo con estrategia y no con especulación.</li>
-                <li>Te ayudamos a definir el precio real de tu vivienda para que no pierdas el tiempo.</li>
-            </ol>
-        ),
-        alt: "Estrategias de venta inmobiliaria",
-        image: "/agenteinmo.png"
+        title: "¿Por qué no se vende",
+        subtitle: "tu inmueble?",
+        icon: <FaEye className="text-3xl" />,
+        points: [
+            "Precio correcto = venta rápida y efectiva",
+            "Precio inflado = meses sin vender",
+            "Vende con estrategia, no con especulación",
+            "Te ayudamos a definir el precio real"
+        ],
+        image: "/agenteinmo.png",
+        alt: "Estrategias de venta inmobiliaria"
     },
     {
         id: 'valor-mercado',
-        front: "Vender tu casa: El valor está en el mercado",
-        back: (
-            <ol>
-                <li>Los recuerdos van contigo, el valor lo pone el mercado.</li>
-                <li>Compradores buscan: ubicación, precio, potencial.</li>
-                <li>Acepta el cambio y vende con decisión.</li>
-            </ol>
-        ),
-        alt: "Análisis de mercado inmobiliario",
-        image: "/analisisdemercado.jpeg"
+        title: "El valor está",
+        subtitle: "en el mercado",
+        icon: <FaChartLine className="text-3xl" />,
+        points: [
+            "Los recuerdos van contigo, el valor lo pone el mercado",
+            "Compradores buscan: ubicación, precio, potencial",
+            "Acepta el cambio y vende con decisión"
+        ],
+        image: "/analisisdemercado.jpeg",
+        alt: "Análisis de mercado inmobiliario"
     },
     {
         id: 'agentes-confianza',
-        front: "Agentes Inmobiliarios de Confianza",
-        back: (
-            <ol>
-                <li>Somos vendedores y negociadores.</li>
-                <li>Acompañamos, asesoramos y logramos acuerdos.</li>
-                <li>Dedicación, negociación efectiva y confianza.</li>
-                <li>Vendemos entendiendo y ayudando.</li>
-            </ol>
-        ),
-        alt: "Equipo de agentes inmobiliarios",
-        image: "/agentesinmobiliarios.jpeg"
+        title: "Agentes Inmobiliarios",
+        subtitle: "de Confianza",
+        icon: <FaUsers className="text-3xl" />,
+        points: [
+            "Somos vendedores y negociadores",
+            "Acompañamos, asesoramos y logramos acuerdos",
+            "Dedicación, negociación efectiva y confianza",
+            "Vendemos entendiendo y ayudando"
+        ],
+        image: "/agentesinmobiliarios.jpeg",
+        alt: "Equipo de agentes inmobiliarios"
     },
     {
         id: 'conexion-cliente',
-        front: "Conexión genuina con el cliente",
-        back: (
-            <ol>
-                <li>Escuchamos y asesoramos honestamente.</li>
-                <li>Nos enfocamos en la persona, no solo en la transacción.</li>
-                <li>Creamos confianza para que nos elijan siempre.</li>
-                <li>Marta López: Tu vendedora de confianza.</li>
-            </ol>
-        ),
-        alt: "Atención personalizada al cliente",
-        image: "/formFoto.jpeg"
+        title: "Conexión genuina",
+        subtitle: "con el cliente",
+        icon: <FaHeart className="text-3xl" />,
+        points: [
+            "Escuchamos y asesoramos honestamente",
+            "Nos enfocamos en la persona, no solo en la transacción",
+            "Creamos confianza para que nos elijan siempre",
+            "Marta López: Tu vendedora de confianza"
+        ],
+        image: "/formFoto.jpeg",
+        alt: "Atención personalizada al cliente"
     },
 ];
 
-/* ============================
-   Desktop Version (PC) - visible en lg (≥1024px)
-   ============================ */
-function DesktopCards({ card, index }) {
-    // Mantenemos los refs y estados originales para el efecto de flip en desktop
-    const extraLinksRef = useRef(null);
-    const [extraWidth, setExtraWidth] = useState(0);
-    const venderRef = useRef(null);
-    const [venderRect, setVenderRect] = useState({
-        top: 1,
-        left: 0,
-        width: 0,
-        height: 0,
-        bottom: 0,
-    });
+// Componente de tarjeta con colores corporativos
+function CorporateCard({ card, index, cardId, onExpandChange }) {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
 
-    useEffect(() => {
-        if (extraLinksRef.current) {
-            const resizeObserver = new ResizeObserver((entries) => {
-                for (let entry of entries) {
-                    setExtraWidth(entry.target.scrollWidth);
+    // Función para manejar el cambio de expansión
+    const handleExpandToggle = () => {
+        const newExpandedState = !isExpanded;
+        setIsExpanded(newExpandedState);
+        
+        // Actualizar el set de cards expandidas
+        if (onExpandChange) {
+            onExpandChange(prev => {
+                const newSet = new Set(prev);
+                if (newExpandedState) {
+                    newSet.add(cardId);
+                } else {
+                    newSet.delete(cardId);
                 }
+                console.log('Cards expandidas:', newSet.size); // Debug
+                return newSet;
             });
-            resizeObserver.observe(extraLinksRef.current);
-            return () => resizeObserver.disconnect();
         }
-    }, []);
-
-    useEffect(() => {
-        if (venderRef.current) {
-            const rect = venderRef.current.getBoundingClientRect();
-            setVenderRect(rect);
-        }
-    }, [venderRect, venderRef]);
+    };
 
     return (
-        <AnimatedOnScroll>
-            <div 
-                className="relative w-[40vw] h-[50vh] group [perspective:1000px] transform transition duration-300 hover:scale-105"
-                role="article"
-                aria-label={card.front}
-            >
-                <div 
-                    className="h-full w-[19vw] transition-all duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]"
-                    tabIndex={0}
-                    onKeyPress={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            e.currentTarget.classList.toggle('rotate-y-180');
-                        }
-                    }}
-                >
-                    {/* Cara Frontal */}
-                    <div 
-                        className="absolute inset-0 w-full h-full [backface-visibility:hidden] [-webkit-backface-visibility:hidden]"
-                        role="region"
-                        aria-label="Frente de la tarjeta"
-                    >
-                        <div className="absolute inset-0 rounded-2xl shadow-lg overflow-hidden">
-                            <div className="absolute inset-0 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
-                                <div className="relative w-full h-full">
-                                    <Image
-                                        src="/fondoamarillo.jpg" 
-                                        alt="Fondo decorativo"
-                                        layout="fill"
-                                        objectFit="cover"
-                                        style={{ objectPosition: 'center' }}
-                                        priority={index < 2}
-                                    />
-                                    <div className="absolute inset-0 rounded-xl"></div>
-                                </div>
-                            </div>
-
-                            <div className="relative z-10 flex flex-col justify-center items-center p-6 text-center h-full">
-                                <Image
-                                    src={card.image}
-                                    alt={card.alt}
-                                    width={150}
-                                    height={150}
-                                    className="mb-4 rounded-full h-[12vh] w-[12vh] object-cover border-2 border-white/20 shadow-xl transform transition-transform duration-300 group-hover:scale-110"
-                                    priority={index < 2}
-                                />
-
-                                <h2 
-                                    className="text-2xl font-bold text-center z-20 mt-2 text-white"
-                                    style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}
-                                >
-                                    {card.front}
-                                </h2>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Cara Trasera */}
-                    <div 
-                        className="absolute inset-0 w-full h-full [transform:rotateY(180deg)] [backface-visibility:hidden] [-webkit-backface-visibility:hidden] z-10"
-                        role="region"
-                        aria-label="Reverso de la tarjeta"
-                    >
-                        <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl">
-                            <Image
-                                src="/fondonegro.jpg"
-                                alt="Background"
-                                layout="fill"
-                                objectFit="cover"
-                                quality={100}
-                            />
-                            <div className="absolute inset-0 flex flex-col items-center justify-center p-4 sm:p-6">
-                                <div className="text-center overflow-hidden whitespace-normal break-words max-h-full overflow-y-auto">
-                                    <ol className="list-decimal list-inside text-left text-white text-xs sm:text-sm">
-                                        {card.back.props.children}
-                                    </ol>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </AnimatedOnScroll>
-    );
-}
-
-/* ============================
-   Mobile Version (Smartphones) - visible en <768px
-   ============================ */
-function MobileCard({ card, index }) {
-    const [isFlipped, setIsFlipped] = useState(false);
-    
-    const handleCardClick = () => {
-        setIsFlipped(!isFlipped);
-    };
-    
-    const handleKeyPress = (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            setIsFlipped(!isFlipped);
-        }
-    };
-    
-    // Función para determinar qué imagen mostrar según el índice
-    const getCardImage = () => {
-        switch(index) {
-            case 0: return "/analisis.png";
-            case 1: return "/agenteinmo.png";
-            case 2: return "/analisisdemercado.jpeg";
-            case 3: return "/agentesinmobiliarios.jpeg";
-            case 4: return "/formFoto.jpeg";
-            default: return "/analisis.png";
-        }
-    };
-    
-    return (
-        <div 
-            className="relative w-[90vw] h-[50vh] group [perspective:1000px] transform transition duration-300 hover:scale-105"
-            onClick={handleCardClick}
-            onKeyPress={handleKeyPress}
-            role="article"
-            aria-label={card.front}
-            tabIndex={0}
+        <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: index * 0.1 }}
+            viewport={{ once: true }}
+            className="group relative"
         >
-            <div className={`h-full w-full transition-all duration-500 [transform-style:preserve-3d] ${isFlipped ? '[transform:rotateY(180deg)]' : ''}`}>
-                {/* Cara Frontal */}
-                <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [-webkit-backface-visibility:hidden]">
-                    <div className="absolute inset-0 rounded-2xl shadow-lg overflow-hidden">
-                        {/* Modificación para solucionar el problema en Safari */}
-                        <div className="absolute inset-0 bg-white/5 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
-                            <div className="relative w-full h-full">
-                                <Image
-                                    src="/fondoamarillo.jpg" 
-                                    alt="Fondo"
-                                    layout="fill"
-                                    objectFit="cover"
-                                />
-                                <div className="absolute inset-0 bg-black/30 rounded-xl"></div>
-                            </div>
-                        </div>
-                        
-                        <div className="relative z-10 flex flex-col justify-center items-center p-6 text-center h-full">
-                            {/* Imagen en el centro como en alquilerTuristico */}
-                            <div className="mb-4 hover:scale-110 transition-transform duration-300">
-                                <img
-                                    src={getCardImage()}
-                                    alt={`Imagen para ${card.front}`}
-                                    className="rounded-full h-[12vh] w-[12vh] sm:h-[15vh] sm:w-[15vh] object-cover border-2 border-white/20 shadow-md"
-                                />
-                            </div>
-                            
-                            <h2 
-                                className="text-lg sm:text-lg md:text-xl font-bold mb-2 text-white"
-                                style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}
-                            >
-                                {card.front}
-                            </h2>
-                            
-                            <div 
-                                className="mt-2 text-white/80 text-[10px] sm:text-sm"
-                                style={{ textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)' }}
-                            >
-                                Toca para más info
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Cara Trasera */}
-                <div className="absolute inset-0 w-full h-full [transform:rotateY(180deg)] [backface-visibility:hidden] [-webkit-backface-visibility:hidden] z-10">
-                    <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl">
-                        {/* Fondo con estilo alquilerTuristico */}
-                        <Image
-                            src="/fondonegro.jpg"
-                            alt="Background"
-                            layout="fill"
-                            objectFit="cover"
-                            quality={100}
-                        />
-                        <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center p-8">
-                            <div className="text-center overflow-hidden whitespace-normal break-words">
-                                <ol className="list-decimal list-inside text-left text-white text-xs sm:text-sm md:text-base">
-                                    {card.back.props.children}
-                                </ol>
-                                <span 
-                                    className="mt-4 text-white/80 text-[10px] sm:text-xs block"
-                                    style={{ textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)' }}
-                                >
-                                    Toca para volver
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-function TabletCard({ card, index }) {
-    const [flipped, setFlipped] = useState(false);
-
-    const getCardImage = () => {
-        switch (index) {
-            case 0: return "/analisis.png";
-            case 1: return "/agenteinmo.png";
-            case 2: return "/analisisdemercado.jpeg";
-            case 3: return "/agentesinmobiliarios.jpeg";
-            case 4: return "/formFoto.jpeg";
-            default: return "/analisis.png";
-        }
-    };
-
-    return (
-        <div className="flex flex-col items-center p-2">
             <div
-                className="w-[30vw] h-[55vh] relative transition-transform duration-700 [transform-style:preserve-3d] [-webkit-transform-style:preserve-3d]"
-                onClick={() => setFlipped(!flipped)}
-                style={{ transform: flipped ? "rotateY(180deg)" : "rotateY(0)" }}
+                className="relative overflow-hidden rounded-2xl shadow-xl bg-white border-2 border-gray-100 hover:border-amarillo transition-all duration-300"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                data-expanded={isExpanded}
             >
-                {/* Cara frontal */}
-                <div
-                    className="absolute w-full h-full shadow-lg rounded-2xl p-2 flex items-center justify-center [backface-visibility:hidden] [-webkit-backface-visibility:hidden] overflow-hidden"
-                    aria-hidden={flipped}
-                >
-                    {/* Modificación para solucionar el problema en Safari */}
-                    <div className="absolute inset-0 bg-white/5 backdrop-blur-sm rounded-xl overflow-hidden">
-                        <div className="relative w-full h-full">
-                            <Image
-                                src="/fondoamarillo.jpg" 
-                                alt="Fondo"
-                                layout="fill"
-                                objectFit="cover"
-                            />
-                            <div className="absolute inset-0 bg-black/30 rounded-xl"></div>
-                        </div>
-                    </div>
-                    
-                    <div className="relative z-10 flex flex-col items-center w-full h-full">
-                        {/* Imagen dentro de la tarjeta */}
-                        <div className="mt-2">
-                            <img
-                                src={getCardImage()}
-                                alt={`Imagen para ${card.front}`}
-                                className="rounded-full h-[15vh] w-[15vh] object-cover border-2 border-white/20 shadow-md"
-                            />
-                        </div>
-
-                        {/* Contenido de texto */}
-                        <div className="mt-4 flex-1 flex flex-col justify-center items-center text-center">
-                            <h2 
-                                className="text-lg font-bold mb-2 text-white"
-                                style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}
-                            >
-                                {card.front}
-                            </h2>
-                            <div 
-                                className="mt-2 text-white/80 text-xs"
-                                style={{ textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)' }}
-                            >
-                                Toca para más info
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                {/* Cara trasera */}
-                <div
-                    className="absolute w-full h-full shadow-lg rounded-2xl p-2 flex items-center justify-center text-center [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)] overflow-hidden z-20"
-                    aria-hidden={!flipped}
-                >
+                {/* Imagen de fondo con overlay corporativo */}
+                <div className="relative h-64 lg:h-80 overflow-hidden">
                     <Image
-                        src="/fondonegro.jpg"
-                        alt="Background"
+                        src={card.image}
+                        alt={card.alt}
                         layout="fill"
                         objectFit="cover"
-                        quality={100}
+                        className="transition-transform duration-700 group-hover:scale-110"
+                        priority={index < 3}
                     />
-                    <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center p-6">
-                        <div className="relative z-10 text-center whitespace-normal break-words overflow-hidden">
-                            <ol className="list-decimal list-inside text-left text-white text-xs sm:text-sm md:text-base">
-                                {card.back.props.children}
-                            </ol>
-                            {/* Texto informativo trasero */}
-                            <span
-                                className="block mt-4 text-white/80 text-xs"
-                                style={{ textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)' }}
+                    {/* Overlay con colores corporativos */}
+                    <div className={`absolute inset-0 transition-all duration-500 ${
+                        isHovered 
+                            ? 'bg-gradient-to-t from-black via-black/80 to-black/60' 
+                            : 'bg-gradient-to-t from-black/90 via-black/70 to-black/50'
+                    }`} />
+                    
+                    {/* Contenido principal */}
+                    <div className="absolute inset-0 p-6 flex flex-col justify-between text-white">
+                        {/* Header con icono dorado */}
+                        <div className="flex items-start justify-between">
+                            <motion.div
+                                className="bg-amarillo/20 backdrop-blur-sm p-3 rounded-full border border-amarillo/30"
+                                whileHover={{ scale: 1.1, rotate: 5 }}
+                                transition={{ type: "spring", stiffness: 300 }}
                             >
-                                Toca para volver
-                            </span>
+                                <div className="text-amarillo">
+                                    {card.icon}
+                                </div>
+                            </motion.div>
+                            <div className="text-right">
+                                <div className="text-xs font-medium bg-amarillo/20 backdrop-blur-sm px-3 py-1 rounded-full border border-amarillo/30 text-amarillo">
+                                    Servicio #{index + 1}
+                                </div>
+                            </div>
                         </div>
+
+                        {/* Título principal */}
+                        <div className="space-y-2">
+                            <h3 className="text-2xl lg:text-3xl font-bold leading-tight text-white">
+                                {card.title}
+                            </h3>
+                            <p className="text-lg lg:text-xl font-medium text-amarillo">
+                                {card.subtitle}
+                            </p>
+                        </div>
+
+                        {/* Botón de expansión con colores corporativos */}
+                        <motion.button
+                            onClick={handleExpandToggle}
+                            className="self-start bg-amarillo/20 backdrop-blur-sm hover:bg-amarillo hover:text-black px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center space-x-2 border border-amarillo/30 text-white hover:border-amarillo"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            <span>{isExpanded ? 'Ver menos' : 'Ver detalles'}</span>
+                            <motion.div
+                                animate={{ rotate: isExpanded ? 180 : 0 }}
+                                transition={{ duration: 0.3 }}
+                            >
+                                <FaArrowRight className="text-xs" />
+                            </motion.div>
+                        </motion.button>
                     </div>
                 </div>
+
+                {/* Panel expandible con detalles */}
+                <AnimatePresence>
+                    {isExpanded && (
+                        <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.4, ease: "easeInOut" }}
+                            className="bg-white overflow-hidden border-t border-gray-100"
+                        >
+                            <div className="p-6 space-y-4">
+                                <h4 className="text-lg font-bold text-black flex items-center">
+                                    <FaCheckCircle className="text-amarillo mr-2" />
+                                    Puntos clave:
+                                </h4>
+                                <div className="space-y-3">
+                                    {card.points.map((point, pointIndex) => (
+                                        <motion.div
+                                            key={pointIndex}
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: pointIndex * 0.1 }}
+                                            className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-amarillo/10 transition-colors duration-200 border border-gray-100 hover:border-amarillo/30"
+                                        >
+                                            <div className="w-2 h-2 rounded-full bg-amarillo mt-2 flex-shrink-0" />
+                                            <p className="text-gray-700 text-sm leading-relaxed">{point}</p>
+                                        </motion.div>
+                                    ))}
+                                </div>
+                                
+                                {/* CTA Button con colores corporativos */}
+                                <motion.div
+                                    className="pt-4 border-t border-gray-100"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: 0.3 }}
+                                >
+                                    <a
+                                        href="https://valuation.lystos.com?clientId=cd55b10c-5ba6-4f65-854e-5c8adaf88a34"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center space-x-2 bg-amarillo hover:bg-yellow-600 text-black px-6 py-3 rounded-full font-bold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 border border-amarillo"
+                                    >
+                                        <span>🏠 Valorador Gratuito</span>
+                                        <FaArrowRight className="text-sm" />
+                                    </a>
+                                </motion.div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
-        </div>
+        </motion.div>
     );
+}
+
+// Componente de botón flotante del valorador
+export function FloatingValoradorButton() {
+  const [isVisible, setIsVisible] = useState(true);
+  
+  console.log('🚀 FloatingValoradorButton renderizado, visible:', isVisible);
+
+  return (
+    <AnimatePresence>
+      {isVisible && (
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0, opacity: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          className="fixed bottom-6 right-6"
+          style={{ 
+            zIndex: '2147483647',
+            pointerEvents: 'auto',
+            position: 'fixed',
+            isolation: 'isolate'
+          }}
+        >
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            animate={{ 
+              y: [0, -10, 0],
+              boxShadow: [
+                "0 10px 30px rgba(199, 163, 54, 0.3)",
+                "0 20px 40px rgba(199, 163, 54, 0.5)",
+                "0 10px 30px rgba(199, 163, 54, 0.3)"
+              ]
+            }}
+            transition={{ 
+              y: { duration: 2, repeat: Infinity, ease: "easeInOut" },
+              boxShadow: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+            }}
+            style={{
+              zIndex: '2147483647',
+              pointerEvents: 'auto',
+              position: 'relative'
+            }}
+          >
+            <a
+              href="https://valuation.lystos.com?clientId=cd55b10c-5ba6-4f65-854e-5c8adaf88a34"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-gradient-to-r from-amarillo via-yellow-400 to-amarillo text-black font-bold px-6 py-4 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 inline-flex items-center text-lg border-3 border-yellow-600 relative overflow-hidden group"
+              style={{
+                zIndex: '2147483647',
+                pointerEvents: 'auto !important',
+                position: 'relative',
+                cursor: 'pointer'
+              }}
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Efecto de brillo animado */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+              
+              <FaCalculator className="mr-2 text-xl animate-pulse" />
+              <span className="relative z-10">💰 Valorador Gratuito</span>
+              
+              {/* Botón de cerrar */}
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsVisible(false);
+                }}
+                className="ml-3 text-black/60 hover:text-black text-sm"
+              >
+                ✕
+              </button>
+            </a>
+          </motion.div>
+          
+          {/* Pulso de fondo */}
+          <motion.div
+            className="absolute inset-0 bg-amarillo rounded-full -z-10"
+            style={{
+              zIndex: -1,
+              pointerEvents: 'none'
+            }}
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.1, 0.3]
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 }
 
 // Función para generar datos estructurados de servicio
@@ -434,17 +373,16 @@ const createServiceStructuredData = (id, title, description, image, serviceUrl) 
 };
 
 export default function Cards() {
+    const [expandedCards, setExpandedCards] = useState(new Set());
+    
+    // Estilos dinámicos para el espaciado específico por resolución
+    const getDynamicSpacing = () => {
+        return {}; // Simplificado - el espaciado se maneja en el CTA
+    };
+    
     // Extraer descripciones de texto para los datos estructurados
     const cardDescriptions = cardData.map(card => {
-        let description = "Servicios inmobiliarios profesionales en Madrid";
-        if (typeof card.back === 'object' && card.back.props && card.back.props.children) {
-            const textItems = card.back.props.children
-                .filter(li => typeof li === 'object' && li.props && li.props.children)
-                .map(li => li.props.children);
-            if (textItems.length > 0) {
-                description = textItems.join(" ");
-            }
-        }
+        const description = card.points.join(" ");
         return { id: card.id, description };
     });
     
@@ -453,7 +391,6 @@ export default function Cards() {
         "@context": "https://schema.org",
         "@type": "ItemList",
         "itemListElement": cardData.map((card, index) => {
-            // Buscar la descripción correspondiente
             const descriptionObj = cardDescriptions.find(item => item.id === card.id);
             const description = descriptionObj ? descriptionObj.description : "Servicios inmobiliarios profesionales en Madrid";
             
@@ -463,7 +400,7 @@ export default function Cards() {
                 "item": {
                     "@type": "Service",
                     "serviceType": "RealEstateService",
-                    "name": card.front || "Servicio Inmobiliario",
+                    "name": `${card.title} ${card.subtitle}` || "Servicio Inmobiliario",
                     "description": description,
                     "provider": {
                         "@type": "RealEstateAgent",
@@ -484,9 +421,11 @@ export default function Cards() {
     // Convertir a JSON-LD limpio
     const cleanItemListData = getCleanJsonLd(itemListData);
 
+    console.log('🔥 CARDS EXPANDIDAS:', expandedCards.size, 'Espaciado aplicado:', expandedCards.size > 0 ? '800px + 400px' : '0px'); // Debug
+    
     return (
         <section 
-            className="cards-section"
+            className="py-16 lg:py-24 bg-transparent relative z-10"
             aria-label="Servicios inmobiliarios destacados"
         >
             <Head>
@@ -505,66 +444,74 @@ export default function Cards() {
                 />
             </Head>
             
-            <AnimatedOnScroll>
-                {/* Desktop Version (visible en lg: ≥1024px) */}
-                <div
-                    className="hidden lg:flex justify-center items-center w-full p-10 mt-[-60vh] h-[100vh]"
-                    style={{
-                        background:
-                            "linear-gradient(to top, transparent 0%, gray 50%, transparent 100%)",
-                    }}
-                    role="region"
-                    aria-label="Servicios inmobiliarios - Vista escritorio"
+            <div className="container mx-auto px-4">
+                {/* Header de la sección con colores corporativos */}
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8 }}
+                    viewport={{ once: true }}
+                    className="text-center mb-16"
                 >
-                    <div
-                        className="grid grid-cols-5 grid-rows-5 gap-4 w-full h-[70vh]"
-                    >
-                        {cardData.map((card, index) => (
-                            <div key={index} style={{
-                                gridColumnStart: (() => {
-                                    switch (index) {
-                                        case 0: return 1; // Primera columna
-                                        case 1: return 2; // Segunda columna
-                                        case 2: return 3; // Tercera columna
-                                        case 3: return 4; // Cuarta columna
-                                        case 4: return 5; // Quinta columna
-                                        default: return index + 1;
-                                    }
-                                })(),
-                                gridRowStart: (() => {
-                                    switch (index) {
-                                        case 0: return 4; // Última fila
-                                        case 1: return 1; // Primera fila
-                                        case 2: return 4; // Última fila
-                                        case 3: return 1; // Primera fila
-                                        case 4: return 3; // Fila del medio
-                                        default: return index + 1;
-                                    }
-                                })()
-                            }}>
-                                <DesktopCards key={index} card={card} index={index} />
-                            </div>
-                        ))}
-                    </div>
-                </div>
-                {/* Tablet Version (visible en md: 768px a lg: 1023px) */}
-                <div className="hidden md:flex lg:hidden justify-center items-center w-full p-5 ">
-                    <div className="grid grid-cols-3 gap-4 w-full max-w-3xl">
-                        {cardData.map((card, index) => (
-                            <TabletCard key={index} card={card} index={index} />
-                        ))}
-                    </div>
+                    <h2 className="text-4xl lg:text-5xl font-bold text-black mb-6">
+                        Nuestros <span className="text-amarillo">Servicios</span>
+                    </h2>
+                    <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                        Cada propiedad es única, cada cliente tiene necesidades específicas. 
+                        Descubre cómo podemos ayudarte con nuestros servicios especializados.
+                    </p>
+                </motion.div>
+
+                {/* Grid de tarjetas con colores corporativos */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+                    {cardData.map((card, index) => (
+                        <CorporateCard 
+                            key={card.id} 
+                            card={card} 
+                            index={index} 
+                            cardId={card.id}
+                            onExpandChange={setExpandedCards}
+                        />
+                    ))}
                 </div>
 
-                {/* Mobile Version (visible para pantallas <768px) - Modificada para una columna */}
-                <div className="mt-[50vh] sm:mt-[80vh]  md:hidden flex justify-center items-start w-full p-5">
-                    <div className=" grid grid-cols-1 gap-6 w-full max-w-md">
-                        {cardData.map((card, index) => (
-                            <MobileCard key={index} card={card} index={index} />
-                        ))}
+                {/* CTA final con colores corporativos */}
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.5 }}
+                    viewport={{ once: true }}
+                    className="text-center mt-16"
+                    style={{
+                        marginBottom: '50px', // Espaciado reducido
+                        transition: 'margin-bottom 0.5s ease-in-out'
+                    }}
+                >
+                    <div className="bg-gradient-to-r from-amarillo/10 to-amarillo/5 backdrop-blur-sm rounded-2xl p-8 border border-amarillo/20">
+                        <h3 className="text-2xl font-bold text-black mb-4">
+                            ¿Listo para comenzar?
+                        </h3>
+                        <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+                            Contacta con nosotros y descubre cómo podemos ayudarte a alcanzar tus objetivos inmobiliarios.
+                        </p>
+                        <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            <a
+                                href="https://valuation.lystos.com?clientId=cd55b10c-5ba6-4f65-854e-5c8adaf88a34"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center space-x-2 bg-amarillo hover:bg-yellow-600 text-black font-bold px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 text-lg"
+                            >
+                                <span>🏠 Valorador Gratuito - ¡Descubre el valor real!</span>
+                                <FaArrowRight />
+                            </a>
+                        </motion.div>
                     </div>
-                </div>
-            </AnimatedOnScroll>
+                </motion.div>
+            </div>
+
         </section>
     );
 }
