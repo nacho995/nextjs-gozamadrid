@@ -19,7 +19,9 @@ const REAL_ESTATE_CONFIG = {
 // 🔧 Transformador ultra-simplificado
 const transformRealProperty = (property) => {
   try {
-    return {
+    console.log(`🔧 Transformando propiedad ID: ${property.id}, Name: ${property.name}`);
+    
+    const transformed = {
       id: String(property.id),
       title: property.name || `Propiedad ${property.id}`,
       description: property.short_description || '',
@@ -38,6 +40,9 @@ const transformRealProperty = (property) => {
       address: property.name || '',
       createdAt: property.date_created || new Date().toISOString()
     };
+    
+    console.log(`✅ Propiedad transformada: ${transformed.title}`);
+    return transformed;
   } catch (error) {
     console.error('❌ Error transformando:', error.message);
     return null;
@@ -68,11 +73,14 @@ export const loadRealProperties = async (page = 1, limit = 5) => {
     });
 
     if (response.status === 200 && Array.isArray(response.data)) {
+      console.log(`📊 Datos recibidos: ${response.data.length} productos`);
+      console.log(`📊 Primer producto:`, JSON.stringify(response.data[0], null, 2));
+      
       const realProperties = response.data
         .map(transformRealProperty)
         .filter(Boolean);
       
-      console.log(`✅ ÉXITO: ${realProperties.length} propiedades cargadas`);
+      console.log(`✅ ÉXITO: ${realProperties.length} propiedades cargadas de ${response.data.length} productos`);
       return realProperties;
     } else {
       console.error(`❌ Respuesta inválida: Status ${response.status}`);
