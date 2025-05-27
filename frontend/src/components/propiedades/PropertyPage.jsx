@@ -555,7 +555,14 @@ export default function PropertyPage() {
   // Actualizar el efecto para no llamar a fetchAllProperties
   useEffect(() => {
     setIsClient(true);
-    checkConfig();
+    // Verificar la configuración
+    if (typeof window !== 'undefined' && window.appConfig) {
+      console.log('[PropertyPage] Configuración detectada:', window.appConfig);
+      setIsConfigLoaded(true);
+    } else {
+      console.log('[PropertyPage] Configuración no disponible, continuando sin ella');
+      setIsConfigLoaded(true);
+    }
   }, []);
 
   // Actualizar el efecto de cambio de página
@@ -1292,14 +1299,3 @@ export default function PropertyPage() {
     </>
   );
 }
-
-// Función para verificar la configuración
-const checkConfig = () => {
-  if (typeof window !== 'undefined' && window.appConfig) {
-    console.log('[PropertyPage] Configuración detectada:', window.appConfig);
-    setIsConfigLoaded(true);
-  } else {
-    console.log('[PropertyPage] Configuración no disponible, continuando sin ella');
-    setIsConfigLoaded(true);
-  }
-};
