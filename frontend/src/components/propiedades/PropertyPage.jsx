@@ -488,7 +488,7 @@ const fetchPropertiesFromAPI = async () => {
       params: {
         limit: ITEMS_PER_PAGE
       },
-      timeout: 15000
+      timeout: 30000
     });
     
     if (response.data && (Array.isArray(response.data) || response.data.properties)) {
@@ -519,7 +519,7 @@ const fetchPropertiesFromAPI = async () => {
     // Intentar con el endpoint combinado como respaldo
     try {
       const fallbackResponse = await axios.get('/api/properties', {
-        timeout: 15000
+        timeout: 30000
       });
       
       if (fallbackResponse.data && Array.isArray(fallbackResponse.data)) {
@@ -636,11 +636,11 @@ export default function PropertyPage() {
         // SOLO LLAMAR A LAS RUTAS API DEL BACKEND
         // El backend se encargará de llamar a MongoDB y WooCommerce
         const [mongoResponse, wooResponse] = await Promise.allSettled([
-          axios.get('/api/properties/sources/mongodb').catch(err => {
+          axios.get('/api/properties/sources/mongodb', { timeout: 30000 }).catch(err => {
              console.error('[PropertyPage] Error API MongoDB:', err.response?.data || err.message);
              return { data: [] }; // Devolver array vacío en caso de error
           }),
-          axios.get('/api/properties/sources/woocommerce').catch(err => {
+          axios.get('/api/properties/sources/woocommerce', { timeout: 30000 }).catch(err => {
              console.error('[PropertyPage] Error API WooCommerce:', err.response?.data || err.message);
              // Guardar el error para mostrarlo si es necesario
              setError(`Error al cargar datos de WooCommerce: ${err.response?.data?.error || err.message}`); 

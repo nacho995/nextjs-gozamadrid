@@ -221,7 +221,7 @@ const Video = () => {
                 
                 // Usar la API combinada que funciona sin variables de entorno
                 const response = await axios.get('/api/properties', {
-                    timeout: 15000,
+                    timeout: 30000, // Aumentar timeout a 30 segundos
                     params: {
                         limit: 100 // Obtener más propiedades para el buscador
                     }
