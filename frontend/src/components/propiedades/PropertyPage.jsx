@@ -480,11 +480,11 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-// Actualizar la función fetchPropertiesFromAPI para usar las rutas verificadas
+// Función para obtener propiedades usando endpoints directos (sin proxy obsoleto)
 const fetchPropertiesFromAPI = async () => {
   try {
-    // Intentar con el endpoint de proxy específico para MongoDB - más confiable
-    const response = await axios.get('/api/proxy/mongodb/properties', {
+    // Usar endpoint directo de MongoDB - más confiable y sin proxy obsoleto
+    const response = await axios.get('/api/properties/sources/mongodb', {
       params: {
         limit: ITEMS_PER_PAGE
       },
@@ -516,21 +516,20 @@ const fetchPropertiesFromAPI = async () => {
   } catch (error) {
     console.error('[PropertyPage] Error al obtener propiedades de MongoDB:', error.message);
     
-    // Intentar con el endpoint de propiedades directas como respaldo
+    // Intentar con el endpoint combinado como respaldo
     try {
-      const fallbackResponse = await axios.get('/api/properties/sources/mongodb', {
+      const fallbackResponse = await axios.get('/api/properties', {
         timeout: 15000
       });
       
       if (fallbackResponse.data && Array.isArray(fallbackResponse.data)) {
-        console.log(`[PropertyPage] Se obtuvieron ${fallbackResponse.data.length} propiedades de MongoDB (fallback)`);
-        return fallbackResponse.data.map(property => ({
-          ...property,
-          source: 'mongodb'
-        }));
+        // Filtrar solo propiedades de MongoDB
+        const mongoProperties = fallbackResponse.data.filter(property => property.source === 'mongodb');
+        console.log(`[PropertyPage] Se obtuvieron ${mongoProperties.length} propiedades de MongoDB (fallback)`);
+        return mongoProperties;
       }
     } catch (fallbackError) {
-      console.error('[PropertyPage] Error en endpoint fallback de MongoDB:', fallbackError.message);
+      console.error('[PropertyPage] Error en endpoint fallback combinado:', fallbackError.message);
     }
     
     return [];
@@ -560,21 +559,17 @@ export default function PropertyPage() {
     // // console.log('BASE URL configurada:', BASE_URL);
     // // console.log('Configuración window.appConfig:', window.appConfig);
     
-    // Verificar si hay un proxy o CORS configurado - usar proxy interno para evitar errores CORS
+    // Verificar conectividad con las APIs directas (sin proxy obsoleto)
     try {
-      // Uso de nuestro proxy interno en lugar de fetch directo
-      axios.head('/api/proxy', {
-        params: {
-          source: 'mongodb',
-          path: '/properties'
-        },
+      // Verificar endpoint directo de MongoDB
+      axios.head('/api/properties/sources/mongodb', {
         timeout: 5000
       })
       .then(response => {
-        // // console.log('Verificación de conectividad con API exitosa', response.status);
+        // // console.log('Verificación de conectividad con API MongoDB exitosa', response.status);
       })
       .catch(error => {
-        // // console.log('Verificación de conectividad con API a través del proxy falló, es normal en algunos navegadores', error.message);
+        // // console.log('Verificación de conectividad con API MongoDB falló, es normal en algunos navegadores', error.message);
       });
     } catch (err) {
       // // console.log('Error al intentar verificar conectividad con API', err.message);
