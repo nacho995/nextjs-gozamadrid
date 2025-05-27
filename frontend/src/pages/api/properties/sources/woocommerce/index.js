@@ -78,11 +78,11 @@ export default async function handler(req, res) {
   // Validar que las claves API están presentes
   if (!WC_KEY || !WC_SECRET) {
     console.error('[API WooCommerce] Error: Las variables de entorno WC_CONSUMER_KEY y/o WC_CONSUMER_SECRET no están configuradas en el servidor.');
-    return res.status(500).json({ error: 'Error de configuración interna del servidor.' });
+    return res.status(200).json([]); // Devolver array vacío en lugar de error
   }
   if (!WC_API_URL) {
       console.error('[API WooCommerce] Error: La variable de entorno WC_API_URL no está configurada.');
-      return res.status(500).json({ error: 'Error de configuración interna del servidor (URL API).' });
+      return res.status(200).json([]); // Devolver array vacío en lugar de error
   }
 
   try {
@@ -120,12 +120,11 @@ export default async function handler(req, res) {
     
     if (error.response) {
       console.error(`[API WooCommerce] Respuesta de error: ${error.response.status}`, error.response.data);
-      return res.status(error.response.status).json({
-        error: `Error de WooCommerce: ${error.response.data?.message || 'Error desconocido'}`,
-        status: error.response.status
-      });
+      // Devolver array vacío en lugar de error
+      return res.status(200).json([]);
     }
     
-    return res.status(500).json({ error: `Error al obtener propiedades: ${error.message}` });
+    // Devolver array vacío en lugar de error
+    return res.status(200).json([]);
   }
 } 
