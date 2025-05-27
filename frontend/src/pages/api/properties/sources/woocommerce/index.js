@@ -339,7 +339,7 @@ const transformWooCommerceProperty = (property) => {
 };
 
 // 🚀 FUNCIÓN DE CARGA ULTRA RÁPIDA CON FALLBACK INMEDIATO
-const loadFromWooCommerce = async (page = 1, limit = 20) => {
+export const loadFromWooCommerce = async (page = 1, limit = 20) => {
   const cacheKey = `woocommerce_${page}_${limit}`;
   
   // 1. Verificar cache primero
