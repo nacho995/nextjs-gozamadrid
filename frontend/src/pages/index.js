@@ -1,7 +1,6 @@
 // src/pages/index.js
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Head from 'next/head';
-import { AnimatePresence } from 'framer-motion';
 import { getCleanJsonLd } from "@/utils/structuredDataHelper";
 
 // Importación de componentes directamente en lugar de a través de HomeComponent
@@ -15,40 +14,9 @@ import Cards from "../components/cards";
 import RegisterForm from "../components/FormContact";
 import Guide from "../components/guia";
 import Agreements from "../components/Agreements";
-import PopupLead from "../components/lujo/PopupLead";
+
 
 export default function Home() {
-  // Estados para controlar el popup
-  const [showPopup, setShowPopup] = useState(false);
-  const [isPopupMinimized, setIsPopupMinimized] = useState(true); // Iniciar minimizado
-  
-  // Manejar scroll para mostrar el popup maximizado
-  useEffect(() => {
-    const handleScroll = () => {
-      // Mostrar popup maximizado después de 1500px de scroll si está minimizado
-      if (window.scrollY > 1500 && !sessionStorage.getItem('popupShown') && isPopupMinimized) {
-        setShowPopup(true);
-        setIsPopupMinimized(false);
-        // Guardar en sessionStorage para controlar aparición inicial
-        sessionStorage.setItem('popupShown', 'true');
-      }
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [isPopupMinimized]);
-  
-  // Función para minimizar el popup
-  const minimizePopup = () => {
-    setIsPopupMinimized(true);
-    setShowPopup(false);
-  };
-  
-  // Función para maximizar el popup
-  const maximizePopup = () => {
-    setIsPopupMinimized(false);
-    setShowPopup(true);
-  };
   
   // Enlace a la valoración
   const valorationLink = "https://valuation.lystos.com?clientId=cd55b10c-5ba6-4f65-854e-5c8adaf88a34";
@@ -204,7 +172,7 @@ export default function Home() {
             <Cards />
           </div>
 
-          <div className="w-full h[100vh] lg:mt-[-30vh] md:mt-[100vh]">
+          <div className="w-full h[100vh] lg:mt-[10vh] md:mt-[120vh] mt-[20vh]">
             <Eslogan />
           </div>
           <div className="w-full mb-4">
@@ -237,29 +205,7 @@ export default function Home() {
         <Agreements />
       </div>
 
-      {/* Popup de Captación de Leads - Siempre visible */}
-      <AnimatePresence>
-        {(showPopup && !isPopupMinimized) && (
-          <PopupLead
-            key="popup-lead-maximized" 
-            onClose={() => setShowPopup(false)} 
-            onMinimize={minimizePopup}
-            onMaximize={maximizePopup}
-            valorationLink={valorationLink}
-            isMinimized={false}
-          />
-        )}
-        {isPopupMinimized && (
-          <PopupLead
-            key="popup-lead-minimized" 
-            onClose={() => setShowPopup(false)} 
-            onMinimize={minimizePopup}
-            onMaximize={maximizePopup}
-            valorationLink={valorationLink}
-            isMinimized={true}
-          />
-        )}
-      </AnimatePresence>
+
     </>
   );
 }
