@@ -275,12 +275,25 @@ function MyApp({ Component, pageProps }) {
               {/* Meta tags */}
               <meta name="viewport" content="width=device-width, initial-scale=1" />
               <meta charSet="UTF-8" />
-              <meta name="theme-color" content="#FFD700" /> {/* Amarillo dorado */}
+              <meta name="theme-color" content="#C7A336" /> {/* Color amarillo personalizado */}
 
-              {/* Favicon links */}
-              <link rel="icon" href={`${assetPrefix}/favicon.ico`} sizes="any" />
-              <link rel="icon" href={`${assetPrefix}/icon.svg`} type="image/svg+xml" />
-              <link rel="apple-touch-icon" href={`${assetPrefix}/apple-touch-icon.png`} />
+              {/* Favicon links - Logo de pestaña */}
+              <link rel="icon" href={`${assetPrefix}/logopestana.png`} sizes="any" />
+              <link rel="icon" href={`${assetPrefix}/logopestana.png`} type="image/png" sizes="32x32" />
+              <link rel="icon" href={`${assetPrefix}/logopestana.png`} type="image/png" sizes="16x16" />
+              <link rel="icon" href={`${assetPrefix}/logopestana.png`} type="image/png" sizes="48x48" />
+              <link rel="icon" href={`${assetPrefix}/logopestana.png`} type="image/png" sizes="64x64" />
+              <link rel="icon" href={`${assetPrefix}/logopestana.png`} type="image/png" sizes="128x128" />
+              <link rel="icon" href={`${assetPrefix}/logopestana.png`} type="image/png" sizes="256x256" />
+              <link rel="apple-touch-icon" href={`${assetPrefix}/logopestana.png`} sizes="180x180" />
+              <link rel="apple-touch-icon" href={`${assetPrefix}/logopestana.png`} sizes="152x152" />
+              <link rel="apple-touch-icon" href={`${assetPrefix}/logopestana.png`} sizes="144x144" />
+              <link rel="apple-touch-icon" href={`${assetPrefix}/logopestana.png`} sizes="120x120" />
+              <link rel="apple-touch-icon" href={`${assetPrefix}/logopestana.png`} sizes="114x114" />
+              <link rel="apple-touch-icon" href={`${assetPrefix}/logopestana.png`} sizes="76x76" />
+              <link rel="apple-touch-icon" href={`${assetPrefix}/logopestana.png`} sizes="72x72" />
+              <link rel="apple-touch-icon" href={`${assetPrefix}/logopestana.png`} sizes="60x60" />
+              <link rel="apple-touch-icon" href={`${assetPrefix}/logopestana.png`} sizes="57x57" />
               <link rel="manifest" href={`${assetPrefix}/manifest.json`} />
 
               {/* Preconnect hints */}
