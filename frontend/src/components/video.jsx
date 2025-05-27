@@ -36,46 +36,64 @@ const Video = () => {
     const [propertiesError, setPropertiesError] = useState(null);
 
     useEffect(() => {
+        console.log('[Video] Iniciando configuración del video con src:', videoSrc);
         const videoElement = videoRef.current;
         if (videoElement) {
+            console.log('[Video] Elemento video encontrado, configurando...');
             videoElement.loop = true;
             
             // Manejar eventos del video
             const handleLoadedData = () => {
-                console.log('[Video] Video cargado exitosamente');
+                console.log('[Video] ✅ Video cargado exitosamente desde:', videoSrc);
                 setIsVideoLoaded(true);
             };
 
             const handleError = (error) => {
-                console.error('[Video] Error al cargar el video:', error);
-                console.error('[Video] Intentando cargar video desde:', videoSrc);
+                console.error('[Video] ❌ Error al cargar el video:', error);
+                console.error('[Video] ❌ URL que falló:', videoSrc);
+                console.error('[Video] ❌ Detalles del error:', error.target?.error);
+                
                 // Intentar con una URL alternativa si falla
                 if (videoSrc === "/video.mp4") {
-                    console.log('[Video] Intentando con URL alternativa...');
+                    console.log('[Video] 🔄 Intentando con URL alternativa...');
                     setVideoSrc("https://www.realestategozamadrid.com/video.mp4");
+                } else {
+                    console.error('[Video] ❌ Todas las URLs fallaron');
                 }
             };
 
             const handleCanPlay = () => {
-                console.log('[Video] Video listo para reproducir');
+                console.log('[Video] ✅ Video listo para reproducir desde:', videoSrc);
                 setIsVideoLoaded(true);
+            };
+
+            const handleLoadStart = () => {
+                console.log('[Video] 🔄 Iniciando carga del video...');
+            };
+
+            const handleProgress = () => {
+                console.log('[Video] 📊 Progreso de carga del video...');
             };
 
             // Añadir event listeners
             videoElement.addEventListener('loadeddata', handleLoadedData);
             videoElement.addEventListener('canplay', handleCanPlay);
             videoElement.addEventListener('error', handleError);
+            videoElement.addEventListener('loadstart', handleLoadStart);
+            videoElement.addEventListener('progress', handleProgress);
             
             // Cargar el video
+            console.log('[Video] 🚀 Llamando a videoElement.load()...');
             videoElement.load();
 
 
 
             // Intentar reproducir el video
+            console.log('[Video] 🎬 Intentando reproducir el video...');
             videoElement.play().catch(error => {
-                console.error("[Video] Error al reproducir el video:", error);
+                console.error("[Video] ❌ Error al reproducir el video:", error);
                 // En algunos navegadores, el autoplay está bloqueado
-                console.log("[Video] Autoplay bloqueado, el video se reproducirá cuando el usuario interactúe");
+                console.log("[Video] 🔇 Autoplay bloqueado, el video se reproducirá cuando el usuario interactúe");
             });
 
             // Limpieza
@@ -83,8 +101,31 @@ const Video = () => {
                 videoElement.removeEventListener('loadeddata', handleLoadedData);
                 videoElement.removeEventListener('canplay', handleCanPlay);
                 videoElement.removeEventListener('error', handleError);
+                videoElement.removeEventListener('loadstart', handleLoadStart);
+                videoElement.removeEventListener('progress', handleProgress);
             };
+        } else {
+            console.log('[Video] ⚠️ Elemento video no encontrado en el DOM');
         }
+    }, [videoSrc]);
+
+    // Verificar si el video existe
+    useEffect(() => {
+        const checkVideoExists = async () => {
+            try {
+                console.log('[Video] 🔍 Verificando si el video existe en:', videoSrc);
+                const response = await fetch(videoSrc, { method: 'HEAD' });
+                if (response.ok) {
+                    console.log('[Video] ✅ Video encontrado, tamaño:', response.headers.get('content-length'), 'bytes');
+                } else {
+                    console.error('[Video] ❌ Video no encontrado, status:', response.status);
+                }
+            } catch (error) {
+                console.error('[Video] ❌ Error verificando video:', error);
+            }
+        };
+        
+        checkVideoExists();
     }, [videoSrc]);
 
     // Cargar todas las propiedades reales desde las APIs (igual que PropertyPage)
