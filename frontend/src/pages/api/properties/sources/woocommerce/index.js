@@ -4,7 +4,7 @@ import axios from 'axios';
 const WC_API_URL = process.env.WC_API_URL || process.env.NEXT_PUBLIC_WC_API_URL; // Permitir fallback temporal si NEXT_PUBLIC_WC_API_URL está definida
 const WC_KEY = process.env.WC_CONSUMER_KEY;
 const WC_SECRET = process.env.WC_CONSUMER_SECRET;
-const TIMEOUT = parseInt(process.env.NEXT_PUBLIC_API_TIMEOUT || '15000');
+const TIMEOUT = parseInt(process.env.NEXT_PUBLIC_API_TIMEOUT || '30000');
 
 // Funciones auxiliares
 const formatWooCommerceProperties = (properties) => {
