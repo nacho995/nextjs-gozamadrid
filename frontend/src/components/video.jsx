@@ -15,7 +15,7 @@ const Video = () => {
     const videoRef = useRef(null);
     const [videoSrc, setVideoSrc] = useState("/video.mp4");
     const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-    const [videoError, setVideoError] = useState(false);
+
     
     // Estados para el buscador de propiedades
     const [searchFilters, setSearchFilters] = useState({
@@ -49,13 +49,10 @@ const Video = () => {
             const handleError = (error) => {
                 console.error('[Video] Error al cargar el video:', error);
                 console.error('[Video] Intentando cargar video desde:', videoSrc);
-                setVideoError(true);
                 // Intentar con una URL alternativa si falla
                 if (videoSrc === "/video.mp4") {
                     console.log('[Video] Intentando con URL alternativa...');
                     setVideoSrc("https://www.realestategozamadrid.com/video.mp4");
-                } else {
-                    console.error('[Video] Todas las URLs de video fallaron, usando imagen de fallback');
                 }
             };
 
@@ -72,13 +69,7 @@ const Video = () => {
             // Cargar el video
             videoElement.load();
 
-            // Timeout para detectar si el video no se carga
-            const loadTimeout = setTimeout(() => {
-                if (!isVideoLoaded) {
-                    console.warn('[Video] Timeout: El video no se cargó en 10 segundos, usando imagen de fallback');
-                    setVideoError(true);
-                }
-            }, 10000); // 10 segundos
+
 
             // Intentar reproducir el video
             videoElement.play().catch(error => {
@@ -89,7 +80,6 @@ const Video = () => {
 
             // Limpieza
             return () => {
-                clearTimeout(loadTimeout);
                 videoElement.removeEventListener('loadeddata', handleLoadedData);
                 videoElement.removeEventListener('canplay', handleCanPlay);
                 videoElement.removeEventListener('error', handleError);
@@ -207,21 +197,8 @@ const Video = () => {
                     aria-label="Sección de presentación con video y buscador de propiedades de lujo"
                 >
                     <div className="w-full h-[120vh] overflow-hidden relative">
-                        {/* Imagen de fallback cuando el video falla */}
-                        {videoError && (
-                            <div 
-                                className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-                                style={{
-                                    backgroundImage: "url('/gozamadridwp.jpg')",
-                                }}
-                                aria-label="Imagen de fondo de Goza Madrid"
-                            >
-                                <div className="absolute inset-0 bg-black/40"></div>
-                            </div>
-                        )}
-                        
                         {/* Fallback para cuando el video no está cargado */}
-                        {!isVideoLoaded && !videoError && (
+                        {!isVideoLoaded && (
                             <div 
                                 className="absolute inset-0 bg-black/50 flex items-center justify-center"
                                 aria-label="Cargando video"
@@ -231,21 +208,19 @@ const Video = () => {
                         )}
                         
                         {/* Video principal */}
-                        {!videoError && (
-                            <video
-                                className="absolute top-0 left-0 w-full h-full object-cover"
-                                autoPlay
-                                muted
-                                playsInline
-                                ref={videoRef}
-                                aria-label="Video promocional de Goza Madrid"
-                            >
-                                <source src={videoSrc} type="video/mp4" />
-                                <p>Tu navegador no soporta la reproducción de video. 
-                                   <a href={videoSrc} download>Descarga el video aquí</a>
-                                </p>
-                            </video>
-                        )}
+                        <video
+                            className="absolute top-0 left-0 w-full h-full object-cover"
+                            autoPlay
+                            muted
+                            playsInline
+                            ref={videoRef}
+                            aria-label="Video promocional de Goza Madrid"
+                        >
+                            <source src={videoSrc} type="video/mp4" />
+                            <p>Tu navegador no soporta la reproducción de video. 
+                               <a href={videoSrc} download>Descarga el video aquí</a>
+                            </p>
+                        </video>
 
                         {/* Overlay elegante y sutil con transición suave */}
                         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/5 to-black/40"></div>
