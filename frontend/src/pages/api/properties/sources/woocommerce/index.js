@@ -402,22 +402,26 @@ export const loadFromWooCommerce = async (page = 1, limit = 20) => {
       
       // Probar las combinaciones prioritarias secuencialmente
       for (const attempt of priorityAttempts) {
-        try {
-          console.log(`🔄 Probando: ${attempt.endpoint} con ${attempt.creds.name} (${attempt.timeout}ms)`);
-          
-          const params = {
-            per_page: Math.min(limit, 100),
-            page,
-            status: 'publish',
-            orderby: 'date',
-            order: 'desc'
-          };
-          
-          // Solo agregar credenciales si están disponibles
-          if (attempt.creds.key && attempt.creds.secret) {
-            params.consumer_key = attempt.creds.key;
-            params.consumer_secret = attempt.creds.secret;
-          }
+                 try {
+           console.log(`🔄 Probando: ${attempt.endpoint} con ${attempt.creds.name} (${attempt.timeout}ms)`);
+           console.log(`🔑 Credenciales: key=${attempt.creds.key ? attempt.creds.key.substring(0, 10) + '...' : 'NULL'}, secret=${attempt.creds.secret ? attempt.creds.secret.substring(0, 10) + '...' : 'NULL'}`);
+           
+           const params = {
+             per_page: Math.min(limit, 100),
+             page,
+             status: 'publish',
+             orderby: 'date',
+             order: 'desc'
+           };
+           
+           // Solo agregar credenciales si están disponibles
+           if (attempt.creds.key && attempt.creds.secret) {
+             params.consumer_key = attempt.creds.key;
+             params.consumer_secret = attempt.creds.secret;
+             console.log(`✅ Credenciales agregadas a params`);
+           } else {
+             console.log(`⚠️ Sin credenciales - acceso público`);
+           }
           
           const response = await axios.get(`${attempt.endpoint}/products`, {
             params,
@@ -522,6 +526,19 @@ export default async function handler(req, res) {
   console.log(`🚀 WooCommerce PERSISTENTE iniciado - Página: ${page}, Límite: ${limit}`);
   console.log(`🔧 Endpoints disponibles: ${ENTERPRISE_CONFIG.endpoints.length}`);
   console.log(`🛡️ Circuit breaker estado:`, persistentCircuitBreaker.getState());
+  
+  // 🔍 DIAGNÓSTICO DE VARIABLES DE ENTORNO
+  console.log(`🔍 DIAGNÓSTICO DE CREDENCIALES:`);
+  console.log(`- WC_CONSUMER_KEY: ${process.env.WC_CONSUMER_KEY ? 'CONFIGURADA' : 'NO CONFIGURADA'}`);
+  console.log(`- WC_CONSUMER_SECRET: ${process.env.WC_CONSUMER_SECRET ? 'CONFIGURADA' : 'NO CONFIGURADA'}`);
+  console.log(`- WC_CONSUMER_KEY length: ${process.env.WC_CONSUMER_KEY?.length || 0}`);
+  console.log(`- WC_CONSUMER_SECRET length: ${process.env.WC_CONSUMER_SECRET?.length || 0}`);
+  
+  // Verificar credenciales específicas
+  for (let i = 0; i < ENTERPRISE_CONFIG.credentialSets.length; i++) {
+    const creds = ENTERPRISE_CONFIG.credentialSets[i];
+    console.log(`- Credencial ${i} (${creds.name}): key=${creds.key ? 'SET' : 'NULL'}, secret=${creds.secret ? 'SET' : 'NULL'}`);
+  }
 
   // Headers de respuesta optimizados para datos reales
   res.setHeader('Cache-Control', 's-maxage=2700, stale-while-revalidate=1800'); // 45min cache para datos reales
