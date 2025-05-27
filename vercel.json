@@ -1,8 +1,14 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend && npm install && npm run build",
-  "outputDirectory": "frontend/.next",
-  "installCommand": "cd frontend && npm install",
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/next",
+      "config": {
+        "distDir": ".next"
+      }
+    }
+  ],
   "env": {
     "NEXT_PUBLIC_WP_API_URL": "https://wordpress.realestategozamadrid.com/wp-json/wp/v2",
     "NEXT_PUBLIC_WC_API_URL": "https://wordpress.realestategozamadrid.com/wp-json/wc/v3",
@@ -20,7 +26,7 @@
     }
   ],
   "functions": {
-    "frontend/src/pages/api/**": {
+    "frontend/src/pages/api/**/*.js": {
       "maxDuration": 30
     }
   },
