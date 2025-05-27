@@ -193,10 +193,10 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Cargar en paralelo SOLO propiedades reales
+    // Cargar en paralelo SOLO propiedades reales (optimizado para velocidad)
     const [mongoProperties, wooProperties] = await Promise.allSettled([
       loadMongoDBProperties(Math.ceil(requestedLimit / 2)),
-      loadWooCommerceProperties(50) // Cargar todas las propiedades de WooCommerce
+      loadWooCommerceProperties(Math.min(requestedLimit, 30)) // Limitar para evitar timeout
     ]);
 
     // Procesar resultados
