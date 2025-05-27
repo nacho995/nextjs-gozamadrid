@@ -62,15 +62,17 @@ const formatWooCommerceProperties = (properties) => {
     property.location = location;
     property.metadata = metadata;
     
-    // Log para depuración
-    console.log(`[WooCommerce] ID: ${property.id}, Título: ${property.name}, Habitaciones: ${bedrooms}, Baños: ${bathrooms}, Área: ${area}m²`);
+    // Log para depuración (solo en desarrollo)
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[WooCommerce] ID: ${property.id}, Título: ${property.name}, Habitaciones: ${bedrooms}, Baños: ${bathrooms}, Área: ${area}m²`);
+    }
     
     return property;
   });
 };
 
 export default async function handler(req, res) {
-  const { limit = 100, page = 1 } = req.query;
+  const { limit = 20, page = 1 } = req.query; // Reducir límite por defecto para evitar timeouts
 
   console.log(`[API WooCommerce] Solicitando lista de propiedades. Página: ${page}, Límite: ${limit}`);
   console.log(`[API WooCommerce] URL base: ${WC_API_URL}`);

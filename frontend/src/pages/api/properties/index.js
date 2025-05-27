@@ -173,13 +173,17 @@ export default async function handler(req, res) {
   let allProperties = [];
   let errors = [];
 
+  // Obtener propiedades de WooCommerce con timeout reducido y manejo de errores mejorado
   try {
-    // Obtener propiedades de WooCommerce usando la API interna
     console.log('Intentando obtener propiedades de WooCommerce vía API interna...');
     
     const woocommerceResponse = await axios.get('/api/properties/sources/woocommerce', {
-      ...axiosConfig,
-      baseURL: req.headers.host ? `http://${req.headers.host}` : 'http://localhost:3000'
+      timeout: 10000, // Timeout reducido a 10 segundos
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      baseURL: req.headers.host ? `https://${req.headers.host}` : 'https://www.realestategozamadrid.com'
     });
 
     if (woocommerceResponse.data && Array.isArray(woocommerceResponse.data)) {
@@ -192,20 +196,21 @@ export default async function handler(req, res) {
       status: error.response?.status,
       data: error.response?.data
     });
-    errors.push({
-      source: 'woocommerce',
-      message: error.message,
-      details: error.response?.data || null
-    });
+    // No agregar error a la lista para que la API siga funcionando con solo MongoDB
+    console.log('Continuando sin propiedades de WooCommerce...');
   }
 
+  // Obtener propiedades de MongoDB con timeout optimizado
   try {
-    // Obtener propiedades de MongoDB usando la API interna
     console.log('Intentando obtener propiedades de MongoDB vía API interna...');
     
     const mongodbResponse = await axios.get('/api/properties/sources/mongodb', {
-      ...axiosConfig,
-      baseURL: req.headers.host ? `http://${req.headers.host}` : 'http://localhost:3000'
+      timeout: 5000, // Timeout reducido a 5 segundos para MongoDB
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      baseURL: req.headers.host ? `https://${req.headers.host}` : 'https://www.realestategozamadrid.com'
     });
 
     if (mongodbResponse.data && Array.isArray(mongodbResponse.data)) {
@@ -218,11 +223,8 @@ export default async function handler(req, res) {
       status: error.response?.status,
       data: error.response?.data
     });
-    errors.push({
-      source: 'mongodb',
-      message: error.message,
-      details: error.response?.data || null
-    });
+    // No agregar error a la lista para que la API siga funcionando
+    console.log('Continuando sin propiedades de MongoDB...');
   }
 
   // Si no hay propiedades y hay errores, devolver array vacío (para compatibilidad)
