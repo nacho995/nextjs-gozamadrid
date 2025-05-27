@@ -68,7 +68,11 @@ export default async function handler(req, res) {
       // Añadir credenciales específicas para WooCommerce
       if (source.toLowerCase() === 'woocommerce') {
         targetUrl += targetUrl.includes('?') ? '&' : '?';
-        targetUrl += `consumer_key=${process.env.WC_CONSUMER_KEY || 'ck_d69e61427264a7beea70ca9ee543b45dd00cae85'}&consumer_secret=${process.env.WC_CONSUMER_SECRET || 'cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e'}`;
+        // Verificar credenciales
+if (!process.env.WC_CONSUMER_KEY || !process.env.WC_CONSUMER_SECRET) {
+  return res.status(500).json({ error: 'Credenciales de WooCommerce no configuradas' });
+}
+targetUrl += `consumer_key=${process.env.WC_CONSUMER_KEY}&consumer_secret=${process.env.WC_CONSUMER_SECRET}`;
       }
     } else {
       return res.status(400).json({ 

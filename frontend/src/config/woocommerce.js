@@ -10,9 +10,9 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 // Configuración de URLs
 const WC_API_URL = process.env.NEXT_PUBLIC_WC_API_URL || 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3';
 
-// Credenciales
-const WOO_COMMERCE_KEY = process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY || 'ck_d69e61427264a7beea70ca9ee543b45dd00cae85';
-const WOO_COMMERCE_SECRET = process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET || 'cs_a1757851d6db34bf9fb669c3ce6ef5a0dc855b5e';
+// Credenciales - SOLO desde variables de entorno por seguridad
+const WOO_COMMERCE_KEY = process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY;
+const WOO_COMMERCE_SECRET = process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET;
 
 // Log de configuración al iniciar (solo en servidor)
 if (typeof window === 'undefined') {
