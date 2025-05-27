@@ -1,31 +1,53 @@
 import axios from 'axios';
 
-// Constantes y configuración base
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://realestategozamadrid.com';
-const MONGODB_URL = process.env.MONGODB_URL || '//api.realestategozamadrid.com';
-const WOOCOMMERCE_URL = process.env.NEXT_PUBLIC_WORDPRESS_URL || 'https://wordpress.realestategozamadrid.com';
-const CONSUMER_KEY = process.env.WC_CONSUMER_KEY || process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY;
-const CONSUMER_SECRET = process.env.WC_CONSUMER_SECRET || process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET;
+// Cache en memoria para optimizar rendimiento
+const cache = new Map();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutos
 
-// Configuración común para axios
-const axiosConfig = {
-  timeout: 30000,
-  headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json',
-    'Origin': BASE_URL
+// Configuración optimizada para carga masiva
+const CONFIG = {
+  woocommerce: {
+    batchSize: 20,
+    timeout: 8000,
+    maxRetries: 2
   },
-  validateStatus: function (status) {
-    return status >= 200 && status < 500;
+  mongodb: {
+    batchSize: 30,
+    timeout: 5000,
+    maxRetries: 2
+  },
+  cache: {
+    ttl: CACHE_TTL,
+    maxSize: 1000
   }
 };
 
-// Función para transformar propiedades de WooCommerce
+// Función de cache inteligente
+const getCacheKey = (source, page, limit) => `${source}_${page}_${limit}`;
+
+const getFromCache = (key) => {
+  const cached = cache.get(key);
+  if (cached && Date.now() - cached.timestamp < CONFIG.cache.ttl) {
+    return cached.data;
+  }
+  cache.delete(key);
+  return null;
+};
+
+const setCache = (key, data) => {
+  // Limpiar cache si está lleno
+  if (cache.size >= CONFIG.cache.maxSize) {
+    const oldestKey = cache.keys().next().value;
+    cache.delete(oldestKey);
+  }
+  cache.set(key, { data, timestamp: Date.now() });
+};
+
+// Transformadores optimizados
 const transformWooCommerceProperty = (property) => {
   try {
-    // Extraer metadatos
     const metadata = {};
-    if (property.meta_data && Array.isArray(property.meta_data)) {
+    if (property.meta_data?.length) {
       property.meta_data.forEach(meta => {
         if (!meta.key.startsWith('_')) {
           metadata[meta.key] = meta.value;
@@ -33,45 +55,15 @@ const transformWooCommerceProperty = (property) => {
       });
     }
 
-    // Procesar el precio
-    let price = property.price;
-    if (typeof price === 'string') {
-      price = parseFloat(price.replace(/[^\d.-]/g, ''));
-    }
-    if (price < 10000) {
-      price *= 1000; // Convertir precios en miles a su valor real
-    }
+    let price = parseFloat(String(property.price).replace(/[^\d.-]/g, '')) || 0;
+    if (price < 10000 && price > 0) price *= 1000;
 
-    // Extraer nombre de calle
-    let location = '';
-    // Primero intentar obtener del nombre de la propiedad si parece una dirección
-    if (property.name && (
-        property.name.includes("Calle") || 
-        property.name.includes("Avenida") || 
-        property.name.includes("Plaza") || 
-        /^(Calle|C\/|Avda\.|Av\.|Pza\.|Plaza)\s+[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+\d*/.test(property.name)
-    )) {
-      location = property.name;
-    } 
-    // Luego buscar en los metadatos
-    else if (metadata.address) {
-      if (typeof metadata.address === 'string') {
-        location = metadata.address;
-      } else if (typeof metadata.address === 'object') {
-        location = metadata.address.address || metadata.address.name || '';
-      }
-    }
-
-    // Extraer características principales
     const bedrooms = parseInt(metadata.bedrooms) || 0;
-    const bathrooms = parseInt(metadata.baños) || parseInt(metadata.bathrooms) || parseInt(metadata.banos) || 0;
-    const area = parseInt(metadata.living_area) || parseInt(metadata.area) || parseInt(metadata.m2) || 0;
-    const floor = metadata.Planta || null;
+    const bathrooms = parseInt(metadata.baños || metadata.bathrooms || metadata.banos) || 0;
+    const area = parseInt(metadata.living_area || metadata.area || metadata.m2) || 0;
 
-    console.log(`[WooCommerce Transform] Propiedad ${property.id} - Habitaciones: ${bedrooms}, Baños: ${bathrooms}, Área: ${area}m², Ubicación: ${location}`);
-
-    const transformed = {
-      id: property.id.toString(),
+    return {
+      id: String(property.id),
       title: property.name || '',
       description: property.description || property.short_description || '',
       price,
@@ -80,26 +72,18 @@ const transformWooCommerceProperty = (property) => {
         url: img.src,
         alt: img.alt || property.name || 'Imagen de propiedad'
       })) || [],
-      features: {
-        bedrooms: bedrooms,
-        bathrooms: bathrooms,
-        area: area,
-        floor: floor
-      },
-      location: location,
+      features: { bedrooms, bathrooms, area, floor: metadata.Planta || null },
+      location: property.name || metadata.address || '',
       metadata,
       createdAt: property.date_created || new Date().toISOString(),
       updatedAt: property.date_modified || new Date().toISOString()
     };
-
-    return transformed;
   } catch (error) {
-    console.error('Error transformando propiedad de WooCommerce:', error);
+    console.error('Error transformando WooCommerce:', error.message);
     return null;
   }
 };
 
-// Función para transformar propiedades de MongoDB
 const transformMongoDBProperty = (property) => {
   try {
     return {
@@ -124,145 +108,252 @@ const transformMongoDBProperty = (property) => {
       updatedAt: property.updatedAt || new Date().toISOString()
     };
   } catch (error) {
-    console.error('Error transformando propiedad de MongoDB:', error);
+    console.error('Error transformando MongoDB:', error.message);
     return null;
   }
 };
 
-export default async function handler(req, res) {
-  console.log('API Handler iniciado:', {
-    method: req.method,
-    url: req.url,
-    query: req.query,
-    headers: req.headers
-  });
+// Función de retry con backoff exponencial
+const withRetry = async (fn, maxRetries = 2, baseDelay = 1000) => {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      if (attempt === maxRetries) throw error;
+      const delay = baseDelay * Math.pow(2, attempt);
+      await new Promise(resolve => setTimeout(resolve, delay));
+      console.log(`Reintentando... Intento ${attempt + 2}/${maxRetries + 1}`);
+    }
+  }
+};
 
-  // Configurar CORS
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,HEAD');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
-
-  // Manejar peticiones OPTIONS y HEAD
-  if (req.method === 'OPTIONS' || req.method === 'HEAD') {
-    console.log('Respondiendo a petición OPTIONS/HEAD');
-    res.setHeader('Content-Length', '0');
-    res.status(200).end();
-    return;
+// Cargador optimizado de WooCommerce
+const loadWooCommerceProperties = async (page = 1, limit = 20) => {
+  const cacheKey = getCacheKey('woocommerce', page, limit);
+  const cached = getFromCache(cacheKey);
+  if (cached) {
+    console.log(`🚀 WooCommerce cache hit: ${cached.length} propiedades`);
+    return cached;
   }
 
-  if (req.method !== 'GET') {
-    console.log('Método no permitido:', req.method);
-    return res.status(405).json({ error: 'Método no permitido' });
-  }
-
-  // Verificar si es una petición de verificación
-  const isVerificationRequest = req.url.includes('/sources/');
-  if (isVerificationRequest) {
-    console.log('Respondiendo a petición de verificación');
-    return res.status(200).json({ status: 'available' });
-  }
-
-  const { page = 1, limit = 12 } = req.query;
-  const pageNumber = parseInt(page);
-  const limitNumber = parseInt(limit);
-  
-  console.log('Iniciando obtención de propiedades:', { page: pageNumber, limit: limitNumber });
-  
-  let allProperties = [];
-  let errors = [];
-
-  // Obtener propiedades de WooCommerce directamente
-  try {
-    console.log('Intentando obtener propiedades de WooCommerce directamente...');
-    
+  return withRetry(async () => {
     const WC_API_URL = process.env.WC_API_URL || process.env.NEXT_PUBLIC_WC_API_URL;
     const WC_KEY = process.env.WC_CONSUMER_KEY;
     const WC_SECRET = process.env.WC_CONSUMER_SECRET;
-    
-    if (WC_API_URL && WC_KEY && WC_SECRET) {
-      const woocommerceResponse = await axios.get(`${WC_API_URL}/products`, {
-        params: {
-          consumer_key: WC_KEY,
-          consumer_secret: WC_SECRET,
-          per_page: 100, // Aumentar a 100 para obtener más propiedades
-          page: 1
-        },
-        timeout: 15000, // Aumentar timeout para manejar más datos
-        headers: {
-          'User-Agent': 'Goza Madrid Real Estate/1.0',
-          'Accept': 'application/json'
-        }
-      });
 
-      if (woocommerceResponse.data && Array.isArray(woocommerceResponse.data)) {
-        // Transformar propiedades de WooCommerce
-        const transformedWooCommerce = woocommerceResponse.data.map(transformWooCommerceProperty).filter(Boolean);
-        console.log(`Obtenidas ${transformedWooCommerce.length} propiedades de WooCommerce directamente`);
-        allProperties = [...allProperties, ...transformedWooCommerce];
-      }
-    } else {
-      console.log('Credenciales de WooCommerce no disponibles, saltando...');
+    if (!WC_API_URL || !WC_KEY || !WC_SECRET) {
+      console.log('⚠️ WooCommerce: Credenciales no disponibles');
+      return [];
     }
-  } catch (error) {
-    console.error('Error obteniendo propiedades de WooCommerce directamente:', {
-      message: error.message,
-      status: error.response?.status
+
+    console.log(`🔄 WooCommerce: Cargando página ${page}, límite ${limit}`);
+    
+    const response = await axios.get(`${WC_API_URL}/products`, {
+      params: {
+        consumer_key: WC_KEY,
+        consumer_secret: WC_SECRET,
+        per_page: Math.min(limit, CONFIG.woocommerce.batchSize),
+        page
+      },
+      timeout: CONFIG.woocommerce.timeout,
+      headers: {
+        'User-Agent': 'Goza Madrid Real Estate/2.0',
+        'Accept': 'application/json'
+      }
     });
-    console.log('Continuando sin propiedades de WooCommerce...');
+
+    if (!response.data || !Array.isArray(response.data)) {
+      throw new Error('Respuesta inválida de WooCommerce');
+    }
+
+    const transformed = response.data
+      .map(transformWooCommerceProperty)
+      .filter(Boolean);
+
+    setCache(cacheKey, transformed);
+    console.log(`✅ WooCommerce: ${transformed.length} propiedades cargadas`);
+    return transformed;
+  }, CONFIG.woocommerce.maxRetries);
+};
+
+// Cargador optimizado de MongoDB
+const loadMongoDBProperties = async (page = 1, limit = 30) => {
+  const cacheKey = getCacheKey('mongodb', page, limit);
+  const cached = getFromCache(cacheKey);
+  if (cached) {
+    console.log(`🚀 MongoDB cache hit: ${cached.length} propiedades`);
+    return cached;
   }
 
-  // Obtener propiedades de MongoDB directamente
-  try {
-    console.log('Intentando obtener propiedades de MongoDB directamente...');
-    
-    const MONGODB_BASE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://api.realestategozamadrid.com';
-    
-    const mongodbResponse = await axios.get(`${MONGODB_BASE_URL}/api/properties`, {
+  return withRetry(async () => {
+    const MONGODB_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 
+                            process.env.NEXT_PUBLIC_BACKEND_URL || 
+                            'http://api.realestategozamadrid.com';
+
+    console.log(`🔄 MongoDB: Cargando página ${page}, límite ${limit}`);
+
+    const response = await axios.get(`${MONGODB_BASE_URL}/api/properties`, {
       params: {
-        limit: 100, // Solicitar hasta 100 propiedades
-        page: 1
+        limit: Math.min(limit, CONFIG.mongodb.batchSize),
+        page
       },
-      timeout: 8000, // Aumentar timeout
+      timeout: CONFIG.mongodb.timeout,
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }
     });
 
-    if (mongodbResponse.data && Array.isArray(mongodbResponse.data)) {
-      // Transformar propiedades de MongoDB
-      const transformedMongoDB = mongodbResponse.data.map(transformMongoDBProperty).filter(Boolean);
-      console.log(`Obtenidas ${transformedMongoDB.length} propiedades de MongoDB directamente`);
-      allProperties = [...allProperties, ...transformedMongoDB];
+    if (!response.data || !Array.isArray(response.data)) {
+      throw new Error('Respuesta inválida de MongoDB');
     }
-  } catch (error) {
-    console.error('Error obteniendo propiedades de MongoDB directamente:', {
-      message: error.message,
-      status: error.response?.status
+
+    const transformed = response.data
+      .map(transformMongoDBProperty)
+      .filter(Boolean);
+
+    setCache(cacheKey, transformed);
+    console.log(`✅ MongoDB: ${transformed.length} propiedades cargadas`);
+    return transformed;
+  }, CONFIG.mongodb.maxRetries);
+};
+
+// Cargador paralelo con circuit breaker
+const loadPropertiesParallel = async (page = 1, limit = 12) => {
+  const startTime = Date.now();
+  console.log(`🚀 Iniciando carga paralela - Página: ${page}, Límite: ${limit}`);
+
+  // Calcular límites por fuente para optimizar
+  const wooLimit = Math.ceil(limit * 0.6); // 60% WooCommerce
+  const mongoLimit = Math.ceil(limit * 0.4); // 40% MongoDB
+
+  const promises = [
+    loadWooCommerceProperties(page, wooLimit).catch(error => {
+      console.error('❌ WooCommerce falló:', error.message);
+      return [];
+    }),
+    loadMongoDBProperties(page, mongoLimit).catch(error => {
+      console.error('❌ MongoDB falló:', error.message);
+      return [];
+    })
+  ];
+
+  // Timeout de seguridad para toda la operación
+  const timeoutPromise = new Promise((_, reject) => 
+    setTimeout(() => reject(new Error('Timeout general')), 20000)
+  );
+
+  try {
+    const results = await Promise.race([
+      Promise.allSettled(promises),
+      timeoutPromise
+    ]);
+
+    const allProperties = [];
+    results.forEach((result, index) => {
+      const source = index === 0 ? 'WooCommerce' : 'MongoDB';
+      if (result.status === 'fulfilled' && Array.isArray(result.value)) {
+        allProperties.push(...result.value);
+        console.log(`✅ ${source}: ${result.value.length} propiedades`);
+      } else {
+        console.log(`⚠️ ${source}: ${result.reason?.message || 'Error'}`);
+      }
     });
-    console.log('Continuando sin propiedades de MongoDB...');
+
+    // Ordenar por fecha de creación (más recientes primero)
+    allProperties.sort((a, b) => {
+      const dateA = new Date(a.createdAt || a.date_created || 0);
+      const dateB = new Date(b.createdAt || b.date_created || 0);
+      return dateB - dateA;
+    });
+
+    const duration = Date.now() - startTime;
+    console.log(`🎯 Carga completada: ${allProperties.length} propiedades en ${duration}ms`);
+
+    return allProperties;
+  } catch (error) {
+    console.error('💥 Error en carga paralela:', error.message);
+    return [];
+  }
+};
+
+export default async function handler(req, res) {
+  const startTime = Date.now();
+  
+  // Headers de optimización
+  res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=60');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,HEAD');
+  res.setHeader('Content-Type', 'application/json');
+
+  // Manejar preflight
+  if (req.method === 'OPTIONS' || req.method === 'HEAD') {
+    return res.status(200).end();
   }
 
-  // Si no hay propiedades y hay errores, devolver array vacío (para compatibilidad)
-  if (allProperties.length === 0 && errors.length > 0) {
-    console.warn('No se pudieron obtener propiedades de ninguna fuente:', errors);
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Método no permitido' });
+  }
+
+  // Parsear parámetros con valores por defecto optimizados
+  const { 
+    page = 1, 
+    limit = 50, // Aumentado para mejor UX
+    source = 'all',
+    cache: useCache = 'true'
+  } = req.query;
+
+  const pageNumber = Math.max(1, parseInt(page));
+  const limitNumber = Math.min(100, Math.max(1, parseInt(limit))); // Máximo 100
+  const shouldUseCache = useCache !== 'false';
+
+  console.log(`📊 API Request: página=${pageNumber}, límite=${limitNumber}, fuente=${source}, cache=${shouldUseCache}`);
+
+  try {
+    let properties = [];
+
+    if (source === 'woocommerce') {
+      properties = await loadWooCommerceProperties(pageNumber, limitNumber);
+    } else if (source === 'mongodb') {
+      properties = await loadMongoDBProperties(pageNumber, limitNumber);
+    } else {
+      // Carga paralela optimizada (por defecto)
+      properties = await loadPropertiesParallel(pageNumber, limitNumber);
+    }
+
+    // Aplicar paginación final si es necesario
+    const startIndex = (pageNumber - 1) * limitNumber;
+    const paginatedProperties = properties.slice(startIndex, startIndex + limitNumber);
+
+    const duration = Date.now() - startTime;
+    const response = {
+      data: paginatedProperties,
+      meta: {
+        page: pageNumber,
+        limit: limitNumber,
+        total: paginatedProperties.length,
+        sources: {
+          woocommerce: paginatedProperties.filter(p => p.source === 'woocommerce').length,
+          mongodb: paginatedProperties.filter(p => p.source === 'mongodb').length
+        },
+        performance: {
+          duration: `${duration}ms`,
+          cached: shouldUseCache,
+          timestamp: new Date().toISOString()
+        }
+      }
+    };
+
+    console.log(`🎉 Respuesta enviada: ${paginatedProperties.length} propiedades en ${duration}ms`);
+    
+    // Para compatibilidad con el frontend existente, devolver solo el array
+    return res.status(200).json(paginatedProperties);
+    
+  } catch (error) {
+    const duration = Date.now() - startTime;
+    console.error(`💥 Error general (${duration}ms):`, error.message);
+    
+    // Devolver array vacío para mantener compatibilidad
     return res.status(200).json([]);
   }
-
-  // Si no hay propiedades pero tampoco hay errores, devolver array vacío
-  if (allProperties.length === 0) {
-    return res.status(200).json([]);
-  }
-
-  // Ordenar propiedades por fecha de creación si tienen esa información
-  allProperties.sort((a, b) => {
-    const dateA = new Date(a.createdAt || a.date_created || 0);
-    const dateB = new Date(b.createdAt || b.date_created || 0);
-    return dateB - dateA;
-  });
-
-  // Devolver todas las propiedades sin paginación
-  console.log(`Devolviendo todas las ${allProperties.length} propiedades encontradas`);
-  return res.status(200).json(allProperties);
 } 

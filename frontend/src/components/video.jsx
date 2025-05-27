@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaSearch, FaMapMarkerAlt, FaBed, FaBath, FaRuler, FaEuroSign, FaFilter, FaCalculator, FaTimes, FaHome, FaArrowRight } from 'react-icons/fa';
 import { normalizeProperty, filterProperties } from '../utils/properties';
 import ControlMenu from './header';
-import axios from 'axios';
+import { useProperties } from '../hooks/useProperties';
 
 const Video = () => {
     const pathname = usePathname();
@@ -63,9 +63,19 @@ const Video = () => {
     const [selectedProperty, setSelectedProperty] = useState(null);
     const [showMap, setShowMap] = useState(false);
     const [mapLoading, setMapLoading] = useState(false);
-    const [allProperties, setAllProperties] = useState([]);
-    const [propertiesLoading, setPropertiesLoading] = useState(true);
-    const [propertiesError, setPropertiesError] = useState(null);
+    
+    // Hook optimizado para propiedades con cache y retry
+    const { 
+        properties: allProperties, 
+        loading: propertiesLoading, 
+        error: propertiesError,
+        meta,
+        refresh: refreshProperties
+    } = useProperties({
+        limit: 100, // Cargar más propiedades para el buscador
+        autoLoad: true,
+        enableCache: true
+    });
 
     // Cargar script de diagnóstico en producción
     useEffect(() => {
@@ -210,52 +220,16 @@ const Video = () => {
         }
     }, [videoSrc]);
 
-    // Cargar todas las propiedades reales desde la API combinada (como funcionaba antes)
+    // Efecto para seleccionar la primera propiedad cuando se cargan
     useEffect(() => {
-        const loadAllProperties = async () => {
-            setPropertiesLoading(true);
-            setPropertiesError(null);
-            
-            try {
-                console.log('[Video] Cargando todas las propiedades desde la API combinada...');
-                
-                // Usar la API combinada que funciona sin variables de entorno
-                const response = await axios.get('/api/properties', {
-                    timeout: 30000, // Aumentar timeout a 30 segundos
-                    params: {
-                        limit: 100 // Obtener más propiedades para el buscador
-                    }
-                });
-
-                const allPropertiesRaw = response.data || [];
-                console.log('[Video] Propiedades obtenidas de API combinada:', allPropertiesRaw.length);
-                
-                if (allPropertiesRaw.length > 0) {
-                    const normalizedProperties = allPropertiesRaw.map(normalizeProperty);
-                    console.log('[Video] Propiedades normalizadas:', normalizedProperties.length);
-                    setAllProperties(normalizedProperties);
-                    
-                    // Seleccionar la primera propiedad por defecto
-                    setSelectedProperty(normalizedProperties[0]);
-                    console.log('[Video] Primera propiedad seleccionada:', normalizedProperties[0]?.title || 'Sin título');
-                } else {
-                    console.warn('[Video] No se encontraron propiedades en la API combinada');
-                    setAllProperties([]);
-                    setSelectedProperty(null);
-                    setPropertiesError('No hay propiedades disponibles en este momento');
-                }
-            } catch (error) {
-                console.error('[Video] Error al cargar propiedades desde API combinada:', error);
-                setAllProperties([]);
-                setSelectedProperty(null);
-                setPropertiesError(`Error al cargar propiedades: ${error.response?.data?.error || error.message}`);
-            } finally {
-                setPropertiesLoading(false);
-            }
-        };
-
-        loadAllProperties();
-    }, []);
+        if (allProperties.length > 0 && !selectedProperty) {
+            const normalizedProperties = allProperties.map(normalizeProperty);
+            setSelectedProperty(normalizedProperties[0]);
+            console.log('[Video] 🎯 Primera propiedad seleccionada:', normalizedProperties[0]?.title || 'Sin título');
+            console.log('[Video] 📊 Total propiedades cargadas:', allProperties.length);
+            console.log('[Video] 📊 Fuentes:', meta?.sources || 'No disponible');
+        }
+    }, [allProperties, selectedProperty, meta]);
 
     // Función para filtrar propiedades usando la utilidad
     const getFilteredProperties = () => {
