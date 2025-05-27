@@ -93,6 +93,7 @@ export default function ControlMenu() {
   const { menuVisible, toggleMenu, dropdownVisible, toggleDropdown } = useNavbar();
   const pathname = usePathname();
   const isExpRealty = pathname === '/exp-realty';
+  const isHomePage = pathname === '/';
 
   const extraLinksRef = useRef(null);
   const [extraWidth, setExtraWidth] = useState(0);
@@ -198,13 +199,16 @@ export default function ControlMenu() {
         </script>
       </Head>
 
-      <header className="relative w-full z-[9999]">
+      <header className={`w-full z-[9999] ${isHomePage ? 'absolute top-0 left-0' : 'relative'}`}>
+        {/* Gradiente de integración sutil */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-transparent pointer-events-none"></div>
+        
         {/* Botón de menú para móviles */}
         {!menuVisible && (
           <div className="lg:hidden fixed right-4 top-4 z-[9999] text-white">
             <button 
               onClick={handleMenuToggle} 
-              className="text-white hover:text-amarillo flex items-center justify-center bg-black/40 backdrop-blur-sm p-3 rounded-full shadow-lg hover:shadow-amarillo/30 transition-all duration-300"
+              className="text-white hover:text-amarillo flex items-center justify-center bg-black/30 backdrop-blur-md p-3 rounded-full shadow-lg hover:shadow-amarillo/30 transition-all duration-300 border border-white/10"
               aria-expanded={menuVisible}
               aria-controls="mobile-menu"
               aria-label={menuVisible ? "Cerrar menú" : "Abrir menú"}
@@ -216,8 +220,8 @@ export default function ControlMenu() {
 
         {/* Menú Principal Desktop */}
         <nav 
-          className={`mb-10 relative z-[9999] flex-col items-center px-24 p-4 w-max mx-auto rounded-full shadow-2xl hidden lg:flex ${
-            isExpRealty ? 'header-gradient-exp' : 'header-gradient-default'
+          className={`${isHomePage ? 'mt-6 mb-0' : 'mb-6'} relative z-[9999] flex-col items-center px-24 p-4 w-max mx-auto rounded-full shadow-2xl hidden lg:flex backdrop-blur-xl border border-white/10 ${
+            isHomePage ? 'bg-black/15' : isExpRealty ? 'bg-black/20' : 'bg-black/20'
           }`}
           role="navigation"
           aria-label="Menú principal"
@@ -226,7 +230,7 @@ export default function ControlMenu() {
           <div className="absolute left-1/4 top-1/2 flex space-x-4 mt-4 ml-4">
             <button 
               onClick={handleMenuToggle} 
-              className={`${isExpRealty ? 'text-white' : 'text-white'} hover:text-amarillo transition-all duration-300 flex items-center space-x-2 bg-black/20 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg hover:shadow-amarillo/30 group`}
+              className={`${isExpRealty ? 'text-white' : 'text-white'} hover:text-amarillo transition-all duration-300 flex items-center space-x-2 bg-black/30 backdrop-blur-md px-4 py-2 rounded-full shadow-lg hover:shadow-amarillo/30 group border border-white/10`}
               aria-label={menuVisible ? "Ver menos opciones" : "Ver más opciones"}
             >
               <span className="hidden lg:block font-medium">{menuVisible ? "Ver menos" : "Ver más"}</span>
@@ -295,7 +299,7 @@ export default function ControlMenu() {
                 <>
                   <div className="absolute h-[20px] w-full" style={{ top: "100%", left: 0 }} />
                   <div
-                    className="absolute bg-black bg-opacity-50 backdrop-blur-sm rounded-lg shadow-lg flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold z-[9998]"
+                    className="absolute bg-black/30 backdrop-blur-xl rounded-lg shadow-lg flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold z-[9998] border border-white/10"
                     style={{
                       top: "calc(100% + 18px)",
                       left: "50%",
@@ -377,7 +381,7 @@ export default function ControlMenu() {
                     }}
                   />
                   <div 
-                    className="absolute bg-black bg-opacity-50 backdrop-blur-sm rounded-lg shadow-lg flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold z-[9998]"
+                    className="absolute bg-black/30 backdrop-blur-xl rounded-lg shadow-lg flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold z-[9998] border border-white/10"
                     style={{
                       top: "calc(100% + 18px)",
                       left: "50%",

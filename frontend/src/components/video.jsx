@@ -1,13 +1,17 @@
 import React from 'react';
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
+import { usePathname } from 'next/navigation';
 import AnimatedOnScroll from "./AnimatedScroll";
 import Image from "next/legacy/image";
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaSearch, FaMapMarkerAlt, FaBed, FaBath, FaRuler, FaEuroSign, FaFilter, FaCalculator, FaTimes, FaHome, FaArrowRight } from 'react-icons/fa';
 import { fetchAllProperties, normalizeProperty, filterProperties } from '../utils/properties';
+import ControlMenu from './header';
 
 const Video = () => {
+    const pathname = usePathname();
+    const isHomePage = pathname === '/';
     const videoRef = useRef(null);
     const [videoSrc, setVideoSrc] = useState("/video.mp4");
     const [isVideoLoaded, setIsVideoLoaded] = useState(false);
@@ -134,6 +138,9 @@ const Video = () => {
 
     return (
         <>
+            {/* Header superpuesto solo en la página home */}
+            {isHomePage && <ControlMenu />}
+            
             <AnimatedOnScroll>
                 <section 
                     className="relative min-h-[120vh]"
@@ -168,8 +175,8 @@ const Video = () => {
                         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/5 to-black/40"></div>
                         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
 
-                        {/* Contenedor principal premium - Solo buscador centrado */}
-                        <div className="absolute inset-0 flex flex-col justify-center items-center z-20 px-6 lg:px-12">
+                        {/* Contenedor principal premium - Solo buscador en la parte inferior */}
+                        <div className="absolute inset-0 flex flex-col justify-end items-center z-20 px-6 lg:px-12 pb-16 lg:pb-20">
                             
                             {/* Buscador premium centrado */}
                             <motion.div
@@ -215,7 +222,7 @@ const Video = () => {
                                                         placeholder="Ubicación (ej. Malasaña, Salamanca...)"
                                                         value={searchFilters.location}
                                                         onChange={(e) => handleFilterChange('location', e.target.value)}
-                                                        className="w-full px-4 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amarillo focus:border-amarillo text-gray-700 placeholder-gray-400"
+                                                        className="w-full px-4 py-4 border border-white/30 rounded-xl focus:ring-2 focus:ring-amarillo focus:border-amarillo text-white placeholder-white/70 bg-white/10 backdrop-blur-sm"
                                                     />
                                                 </div>
 
@@ -224,7 +231,7 @@ const Video = () => {
                                                     <select
                                                         value={searchFilters.propertyType}
                                                         onChange={(e) => handleFilterChange('propertyType', e.target.value)}
-                                                        className="w-full px-4 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amarillo focus:border-amarillo appearance-none bg-white text-gray-700"
+                                                        className="w-full px-4 py-4 border border-white/30 rounded-xl focus:ring-2 focus:ring-amarillo focus:border-amarillo appearance-none bg-white/10 backdrop-blur-sm text-white"
                                                     >
                                                         <option value="todos">Todos los tipos</option>
                                                         <option value="piso">Piso</option>
@@ -245,7 +252,7 @@ const Video = () => {
                                                             handleFilterChange('maxPrice', range[1] || '');
                                                             handleFilterChange('priceRange', e.target.value);
                                                         }}
-                                                        className="w-full px-4 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amarillo focus:border-amarillo appearance-none bg-white text-gray-700"
+                                                        className="w-full px-4 py-4 border border-white/30 rounded-xl focus:ring-2 focus:ring-amarillo focus:border-amarillo appearance-none bg-white/10 backdrop-blur-sm text-white"
                                                     >
                                                         <option value="">Precio</option>
                                                         <option value="0-500000">Hasta 500.000€</option>
@@ -281,11 +288,11 @@ const Video = () => {
 
                                             {/* Filtros adicionales */}
                                             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
-                                                <select
-                                                    value={searchFilters.bedrooms}
-                                                    onChange={(e) => handleFilterChange('bedrooms', e.target.value)}
-                                                    className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amarillo focus:border-amarillo appearance-none bg-white text-gray-700 text-sm"
-                                                >
+                                                                                            <select
+                                                value={searchFilters.bedrooms}
+                                                onChange={(e) => handleFilterChange('bedrooms', e.target.value)}
+                                                className="px-4 py-3 border border-white/30 rounded-xl focus:ring-2 focus:ring-amarillo focus:border-amarillo appearance-none bg-white/10 backdrop-blur-sm text-white text-sm"
+                                            >
                                                     <option value="">Habitaciones</option>
                                                     <option value="1">1+ habitación</option>
                                                     <option value="2">2+ habitaciones</option>
@@ -293,11 +300,11 @@ const Video = () => {
                                                     <option value="4">4+ habitaciones</option>
                                                 </select>
 
-                                                <select
-                                                    value={searchFilters.bathrooms}
-                                                    onChange={(e) => handleFilterChange('bathrooms', e.target.value)}
-                                                    className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amarillo focus:border-amarillo appearance-none bg-white text-gray-700 text-sm"
-                                                >
+                                                                                            <select
+                                                value={searchFilters.bathrooms}
+                                                onChange={(e) => handleFilterChange('bathrooms', e.target.value)}
+                                                className="px-4 py-3 border border-white/30 rounded-xl focus:ring-2 focus:ring-amarillo focus:border-amarillo appearance-none bg-white/10 backdrop-blur-sm text-white text-sm"
+                                            >
                                                     <option value="">Baños</option>
                                                     <option value="1">1+ baño</option>
                                                     <option value="2">2+ baños</option>
@@ -309,13 +316,13 @@ const Video = () => {
                                                     placeholder="Superficie mín. (m²)"
                                                     value={searchFilters.minSize}
                                                     onChange={(e) => handleFilterChange('minSize', e.target.value)}
-                                                    className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amarillo focus:border-amarillo text-gray-700 placeholder-gray-400 text-sm"
+                                                    className="px-4 py-3 border border-white/30 rounded-xl focus:ring-2 focus:ring-amarillo focus:border-amarillo text-white placeholder-white/70 bg-white/10 backdrop-blur-sm text-sm"
                                                 />
                                             </div>
 
                                             {/* Indicador de propiedades */}
                                             <div className="text-center pt-2">
-                                                <div className="inline-flex items-center gap-2 text-gray-600 text-sm">
+                                                <div className="inline-flex items-center gap-2 text-white/80 text-sm">
                                                     {propertiesLoading ? (
                                                         <>
                                                             <div className="animate-spin rounded-full h-3 w-3 border-t-2 border-amarillo"></div>
@@ -346,25 +353,25 @@ const Video = () => {
                                         // Contenido para vender - ultra premium
                                         <div className="text-center py-12">
                                             <div className="max-w-2xl mx-auto">
-                                                <h3 className="font-serif text-3xl font-light text-gray-900 mb-6">
-                                                    ¿Desea vender su propiedad?
-                                                </h3>
-                                                <p className="text-gray-600 mb-8 text-lg font-light leading-relaxed">
+                                                                                            <h3 className="font-serif text-3xl font-light text-white mb-6">
+                                                ¿Desea vender su propiedad?
+                                            </h3>
+                                            <p className="text-white/80 mb-8 text-lg font-light leading-relaxed">
                                                     Obtenga una valoración profesional y gratuita de su propiedad. 
                                                     Nuestros expertos le ayudarán a conseguir el mejor precio del mercado.
                                                 </p>
                                                 
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                                                    <div className="bg-gray-50 rounded-2xl p-8 text-center">
-                                                        <div className="text-amarillo text-4xl mb-4">📊</div>
-                                                        <h4 className="font-medium text-gray-900 mb-2">Valoración Gratuita</h4>
-                                                        <p className="text-gray-600 text-sm">Análisis completo del mercado inmobiliario</p>
-                                                    </div>
-                                                    <div className="bg-gray-50 rounded-2xl p-8 text-center">
-                                                        <div className="text-amarillo text-4xl mb-4">🏆</div>
-                                                        <h4 className="font-medium text-gray-900 mb-2">Expertos en Madrid</h4>
-                                                        <p className="text-gray-600 text-sm">Conocimiento especializado del mercado local</p>
-                                                    </div>
+                                                                                                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center border border-white/20">
+                                                    <div className="text-amarillo text-4xl mb-4">📊</div>
+                                                    <h4 className="font-medium text-white mb-2">Valoración Gratuita</h4>
+                                                    <p className="text-white/70 text-sm">Análisis completo del mercado inmobiliario</p>
+                                                </div>
+                                                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center border border-white/20">
+                                                    <div className="text-amarillo text-4xl mb-4">🏆</div>
+                                                    <h4 className="font-medium text-white mb-2">Expertos en Madrid</h4>
+                                                    <p className="text-white/70 text-sm">Conocimiento especializado del mercado local</p>
+                                                </div>
                                                 </div>
 
                                                 <a
