@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Videos de Goza Madrid</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            max-width: 600px;
+            text-align: center;
+            background: rgba(0,0,0,0.5);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .logo {
+            width: 100px;
+            height: 100px;
+            background: #C7A336;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+        h1 {
+            color: #C7A336;
+            margin-bottom: 20px;
+        }
+        .video-links {
+            margin: 30px 0;
+        }
+        .video-link {
+            display: inline-block;
+            background: #C7A336;
+            color: black;
+            padding: 15px 30px;
+            margin: 10px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+        .video-link:hover {
+            transform: scale(1.05);
+        }
+        .info {
+            background: rgba(199, 163, 54, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: 1px solid #C7A336;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🏢</div>
+        <h1>Goza Madrid - Videos Promocionales</h1>
+        <p>Los videos promocionales están temporalmente alojados externamente debido a su tamaño.</p>
+        
+        <div class="video-links">
+            <a href="https://drive.google.com/file/d/YOUR_VIDEO_ID/view" class="video-link" target="_blank">
+                📹 Video Principal (10MB)
+            </a>
+            <a href="https://drive.google.com/file/d/YOUR_VIDEO_ID_2/view" class="video-link" target="_blank">
+                📹 Video en Inglés (16MB)
+            </a>
+        </div>
+        
+        <div class="info">
+            <h3>💡 Para desarrolladores</h3>
+            <p>Los archivos de video superan los límites de Vercel. Considera usar:</p>
+            <ul style="text-align: left;">
+                <li>Google Drive o Dropbox para hosting</li>
+                <li>Vimeo o YouTube para embedding</li>
+                <li>AWS S3 o Cloudinary para CDN</li>
+                <li>Comprimir videos a menos de 5MB cada uno</li>
+            </ul>
+        </div>
+        
+        <p style="margin-top: 30px;">
+            <a href="/" style="color: #C7A336;">← Volver a la página principal</a>
+        </p>
+    </div>
+</body>
+</html> 

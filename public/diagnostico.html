@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico - Real Estate Goza Madrid</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-item {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #ddd;
+        }
+        .success {
+            background-color: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-left-color: #dc3545;
+            color: #721c24;
+        }
+        .loading {
+            background-color: #fff3cd;
+            border-left-color: #ffc107;
+            color: #856404;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #video-test {
+            width: 100%;
+            max-width: 400px;
+            height: 200px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Diagnóstico de Archivos Estáticos</h1>
+        <p>Esta página verifica que todos los archivos críticos estén disponibles.</p>
+        
+        <button onclick="ejecutarDiagnostico()">🚀 Ejecutar Diagnóstico</button>
+        <button onclick="limpiarResultados()">🧹 Limpiar</button>
+        
+        <div id="resultados"></div>
+        
+        <h2>🎬 Test de Video</h2>
+        <video id="video-test" controls>
+            <source src="/video.mp4" type="video/mp4">
+            <source src="/videoExpIngles.mp4" type="video/mp4">
+            Tu navegador no soporta video HTML5.
+        </video>
+        <div id="video-status" class="test-item loading">Cargando video...</div>
+    </div>
+
+    <script>
+        const archivosAChecar = [
+            { url: '/video.mp4', nombre: 'Video Principal', tipo: 'video' },
+            { url: '/videoExpIngles.mp4', nombre: 'Video Inglés', tipo: 'video' },
+            { url: '/madrid.jpg', nombre: 'Imagen Madrid', tipo: 'imagen' },
+            { url: '/logo.png', nombre: 'Logo', tipo: 'imagen' },
+            { url: '/logonuevo.png', nombre: 'Logo Nuevo', tipo: 'imagen' },
+            { url: '/manifest.json', nombre: 'Manifest', tipo: 'json' },
+            { url: '/favicon.ico', nombre: 'Favicon', tipo: 'imagen' },
+            { url: '/marta.jpeg', nombre: 'Imagen Marta', tipo: 'imagen' }
+        ];
+
+        async function checarArchivo(archivo) {
+            try {
+                const response = await fetch(archivo.url, { method: 'HEAD' });
+                const tamaño = response.headers.get('content-length');
+                const tipo = response.headers.get('content-type');
+                
+                return {
+                    ...archivo,
+                    disponible: response.ok,
+                    status: response.status,
+                    tamaño: tamaño ? `${(tamaño / 1024 / 1024).toFixed(2)} MB` : 'Desconocido',
+                    tipoMime: tipo || 'Desconocido'
+                };
+            } catch (error) {
+                return {
+                    ...archivo,
+                    disponible: false,
+                    error: error.message
+                };
+            }
+        }
+
+        async function ejecutarDiagnostico() {
+            const resultados = document.getElementById('resultados');
+            resultados.innerHTML = '<h2>📊 Resultados del Diagnóstico</h2>';
+            
+            for (const archivo of archivosAChecar) {
+                const div = document.createElement('div');
+                div.className = 'test-item loading';
+                div.innerHTML = `🔄 Verificando ${archivo.nombre}...`;
+                resultados.appendChild(div);
+                
+                const resultado = await checarArchivo(archivo);
+                
+                if (resultado.disponible) {
+                    div.className = 'test-item success';
+                    div.innerHTML = `
+                        ✅ <strong>${resultado.nombre}</strong><br>
+                        📁 Tamaño: ${resultado.tamaño}<br>
+                        🏷️ Tipo: ${resultado.tipoMime}<br>
+                        🔗 URL: ${resultado.url}
+                    `;
+                } else {
+                    div.className = 'test-item error';
+                    div.innerHTML = `
+                        ❌ <strong>${resultado.nombre}</strong><br>
+                        🚫 Status: ${resultado.status || 'Error'}<br>
+                        ⚠️ Error: ${resultado.error || 'No disponible'}<br>
+                        🔗 URL: ${resultado.url}
+                    `;
+                }
+            }
+            
+            // Agregar información del navegador
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'test-item';
+            infoDiv.innerHTML = `
+                <h3>🌐 Información del Navegador</h3>
+                <strong>User Agent:</strong> ${navigator.userAgent}<br>
+                <strong>URL Actual:</strong> ${window.location.href}<br>
+                <strong>Protocolo:</strong> ${window.location.protocol}<br>
+                <strong>Host:</strong> ${window.location.host}
+            `;
+            resultados.appendChild(infoDiv);
+        }
+
+        function limpiarResultados() {
+            document.getElementById('resultados').innerHTML = '';
+        }
+
+        // Test del video
+        const video = document.getElementById('video-test');
+        const videoStatus = document.getElementById('video-status');
+
+        video.addEventListener('loadeddata', () => {
+            videoStatus.className = 'test-item success';
+            videoStatus.innerHTML = '✅ Video cargado correctamente';
+        });
+
+        video.addEventListener('error', (e) => {
+            videoStatus.className = 'test-item error';
+            videoStatus.innerHTML = `❌ Error cargando video: ${e.target.error?.message || 'Error desconocido'}`;
+        });
+
+        // Ejecutar diagnóstico automáticamente al cargar
+        window.addEventListener('load', () => {
+            setTimeout(ejecutarDiagnostico, 1000);
+        });
+    </script>
+</body>
+</html> 

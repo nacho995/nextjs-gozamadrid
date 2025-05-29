@@ -729,7 +729,7 @@ export default function BlogPage() {
                 />
             </Head>
             {loading && <LoadingScreen />}
-            <main className="relative mt-[-30vh] py-8">
+            <main className="relative py-8 mt-32">
                 <AnimatedOnScroll>
                     <div className="relative container mx-auto px-4">
                         {/* Encabezado mejorado con semántica correcta */}
