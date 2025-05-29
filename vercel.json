@@ -15,6 +15,8 @@
       "dest": "/frontend/$1"
     }
   ],
+  "installCommand": "npm install && cd frontend && npm install",
+  "buildCommand": "node copy-assets.js && cd frontend && npm run build",
   "env": {
     "NEXT_PUBLIC_WP_API_URL": "https://wordpress.realestategozamadrid.com/wp-json/wp/v2",
     "NEXT_PUBLIC_WC_API_URL": "https://wordpress.realestategozamadrid.com/wp-json/wc/v3",
