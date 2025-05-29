@@ -13,130 +13,67 @@ import { CookieProvider } from '../context/CookieContext';
 import config from '@/config/config';
 import Script from 'next/script';
 
-// Script para interceptar las peticiones HEAD
-const DISABLE_HEAD_SCRIPT = `
-  // Desactivar HEAD requests
-  (function() {
-    // Interceptar fetch
-    const originalFetch = window.fetch;
-    window.fetch = function(url, options = {}) {
-      // Si es una petición HEAD, convertir a GET o cancelar
-      if (options && options.method && options.method.toUpperCase() === 'HEAD') {
-        console.log('[App] Interceptando HEAD request:', url);
-        options.method = 'GET';
-      }
-      return originalFetch(url, options);
-    };
-
-    // Interceptar XMLHttpRequest
-    const originalXHROpen = XMLHttpRequest.prototype.open;
-    XMLHttpRequest.prototype.open = function(method, url, ...rest) {
-      // Si es una petición HEAD, convertir a GET o cancelar
-      if (method && method.toUpperCase() === 'HEAD') {
-        console.log('[App] Interceptando HEAD XHR:', url);
-        method = 'GET';
-      }
-      return originalXHROpen.call(this, method, url, ...rest);
-    };
-    
-    // Parchar el prefetching de Next.js
-    if (window.__NEXT_DATA__ && window.__NEXT_DATA__.props) {
-      try {
-        // Forzar rutas dinámicas para evitar prefetching
-        window.__NEXT_DATA__.props.pageProps.__N_SSG = false;
-        window.__NEXT_DATA__.props.pageProps.__N_SSP = false;
-        
-        // Parchar router de Next.js cuando esté disponible
-        setTimeout(() => {
-          if (window.next && window.next.router) {
-            const originalPrefetch = window.next.router.prefetch;
-            window.next.router.prefetch = function() {
-              console.log('[App] Prefetch desactivado');
-              return Promise.resolve();
-            };
-          }
-        }, 0);
-      } catch (e) {
-        console.warn('[App] No se pudo modificar Next.js data');
-      }
-    }
-    
-    console.log('[App] Interceptación de HEAD requests activada');
-  })();
-`;
-
-// Detectar qué ruta del proxy está disponible
+// Detectar qué ruta del proxy está disponible - simplificado
 if (typeof window !== 'undefined') {
   // Resolver problema de 404 al cargar directamente una ruta
-  // Si estamos en la página 404.html, redirigir a la página principal
   if (window.location.pathname === '/404' || window.location.pathname === '/404.html') {
     window.location.href = '/';
   }
 
-  // Función modificada para verificar la disponibilidad de endpoints usando GET en lugar de HEAD
+  // Función simplificada para verificar endpoints
   async function checkEndpointAvailability(url) {
     try {
       console.log(`[_app.js] Verificando disponibilidad de: ${url}`);
       const response = await fetch(url, {
-        method: 'GET', // Cambiado de HEAD a GET
-        headers: {
-          'Accept': 'application/json'
-        },
-        // Timeout más corto para la verificación
-        signal: AbortSignal.timeout(5000)
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+        signal: AbortSignal.timeout(3000) // Timeout reducido
       });
       
       const available = response.ok;
       console.log(`[_app.js] Endpoint ${url} disponible:`, available);
       return available;
     } catch (error) {
-      console.warn(`[_app.js] Error verificando endpoint ${url}:`, error);
+      console.warn(`[_app.js] Error verificando endpoint ${url}:`, error.message);
       return false;
     }
   }
   
-  // Al cargar, verificar ambas rutas
-  const BASE_URL = typeof window !== 'undefined' ? window.location.origin : 'https://www.realestategozamadrid.com';
+  // Al cargar, verificar endpoints principales
+  const BASE_URL = window.location.origin;
 
   Promise.all([
+    checkEndpointAvailability(`${BASE_URL}/api/properties/sources/mongodb`),
     checkEndpointAvailability(`${BASE_URL}/api/properties/sources/woocommerce`),
-    checkEndpointAvailability(`${BASE_URL}/api/proxy/wordpress/posts`),
-    checkEndpointAvailability(`${BASE_URL}/api/properties/sources/mongodb`)
-  ]).then(([wooCommerceApiAvailable, wordPressProxyAvailable, mongodbApiAvailable]) => {
+    checkEndpointAvailability(`${BASE_URL}/api/proxy/wordpress/posts`)
+  ]).then(([mongodbAvailable, wooCommerceAvailable, wordPressProxyAvailable]) => {
     console.log('[_app.js] Estado de endpoints:', {
-      'proxy/wordpress': wordPressProxyAvailable,
-      'properties/woocommerce': wooCommerceApiAvailable,
-      'properties/mongodb': mongodbApiAvailable
+      'properties/mongodb': mongodbAvailable,
+      'properties/woocommerce': wooCommerceAvailable,
+      'proxy/wordpress': wordPressProxyAvailable
     });
     
-    // Determinar qué ruta usar basado en la disponibilidad
-    const useProxyRoute = !wooCommerceApiAvailable && !mongodbApiAvailable;
-    const useWooCommerceProxy = false; // Ya no usamos proxy de WooCommerce
+    // Configuración simplificada
+    window.__ENDPOINTS_STATUS = {
+      mongodb: mongodbAvailable,
+      woocommerce: wooCommerceAvailable,
+      wordpress: wordPressProxyAvailable
+    };
     
-    window.__USE_PROXY_ROUTE = useProxyRoute;
-    window.__USE_WOOCOMMERCE_PROXY = useWooCommerceProxy;
-    
-    console.log('[_app.js] Configuración de rutas:', {
-      useProxyRoute,
-      useWooCommerceProxy
-    });
-    
-    if (useProxyRoute) {
-      console.log('[_app.js] Usando proxy general debido a que los endpoints directos no están disponibles');
-    } else if (useWooCommerceProxy) {
-      console.log('[_app.js] Usando proxy específico de WooCommerce');
-    } else {
-      console.log('[_app.js] Usando endpoints directos de la API');
-    }
+    console.log('[_app.js] Configuración de rutas:', window.__ENDPOINTS_STATUS);
+    console.log('[_app.js] Usando endpoints directos de la API');
   }).catch(error => {
     console.error('[_app.js] Error detectando endpoints disponibles:', error);
-    // Por defecto, usar endpoints directos
-    window.__USE_PROXY_ROUTE = false;
-    window.__USE_WOOCOMMERCE_PROXY = false;
+    // Configuración por defecto
+    window.__ENDPOINTS_STATUS = {
+      mongodb: true,
+      woocommerce: true,
+      wordpress: true
+    };
   });
 }
 
-// Función para cargar la configuración global
+// Función para cargar la configuración global - simplificada
 async function loadConfig() {
   try {
     console.log('[_app.js] Cargando configuración desde:', '/api/config/properties');
@@ -160,17 +97,16 @@ async function loadConfig() {
     
     window.appConfig = {
       ...apiConfig,
-      frontendUrl: '',  // Usar rutas relativas en el cliente
+      frontendUrl: '',
       apiUrl: '/api/properties',
       debug: process.env.NODE_ENV === 'development'
     };
 
-    // ***** FORZAR USO DE ENDPOINTS DIRECTOS PARA MONGODB *****
+    // Forzar uso de endpoints directos para MongoDB
     if (window.appConfig.endpoints && window.appConfig.endpoints.mongodb) {
       window.appConfig.endpoints.mongodb.useProxy = false;
       console.log('[_app.js] Forzando uso de endpoint directo para MongoDB');
     }
-    // También asegurarse de que la propiedad global useProxyForMongoDB sea false
     window.appConfig.useProxyForMongoDB = false;
     console.log('[_app.js] Forzando useProxyForMongoDB a false globalmente');
 
@@ -181,7 +117,7 @@ async function loadConfig() {
     
     // Configuración por defecto en caso de error
     window.appConfig = {
-      frontendUrl: '',  // Usar rutas relativas en el cliente
+      frontendUrl: '',
       apiUrl: '/api/properties',
       debug: process.env.NODE_ENV === 'development',
       timeout: 15000,
@@ -198,10 +134,11 @@ async function loadConfig() {
           available: true,
           params: {}
         }
-      }
+      },
+      useProxyForMongoDB: false
     };
     
-    console.log('[_app.js] Usando configuración por defecto:', window.appConfig);
+    console.log('[_app.js] Usando configuración por defecto');
     return false;
   }
 }
@@ -305,9 +242,6 @@ function MyApp({ Component, pageProps }) {
               
               {/* Deshabilitar prefetching para ciertas páginas o globalmente */}
               <meta httpEquiv="x-dns-prefetch-control" content="off" />
-
-              {/* Script para interceptar HEAD requests (opcional, podría ir en _document o aquí) */}
-              {/* <script dangerouslySetInnerHTML={{ __html: DISABLE_HEAD_SCRIPT }} /> */}
             </Head>
 
             {/* Meta Pixel Code - Base */}

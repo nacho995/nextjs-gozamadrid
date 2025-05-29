@@ -37,11 +37,9 @@ const getOrganizationSchema = () => ({
 });
 
 const Layout = ({ children }) => {
-  // Usar el router para detectar la página actual
   const router = useRouter();
-  
-  // Verificar si estamos en la página de propiedades-lujo
   const isLuxuryPropertiesPage = router.pathname === '/propiedades-lujo';
+  const isHomePage = router.pathname === '/';
   
   return (
   <>
@@ -58,6 +56,11 @@ const Layout = ({ children }) => {
       <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
       <link rel="manifest" href="/site.webmanifest" />
       <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#fbbf24" />
+      
+      {/* Preload crítico solo cuando sea necesario */}
+      {!isHomePage && (
+        <link rel="preload" href="/logo.png" as="image" type="image/png" />
+      )}
       
       {/* Metadatos para rendimiento */}
       <link rel="preconnect" href="https://fonts.googleapis.com" />
