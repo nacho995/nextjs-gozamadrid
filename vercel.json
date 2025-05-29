@@ -24,12 +24,6 @@
       "schedule": "*/30 * * * *"
     }
   ],
-  "functions": {
-    "frontend/src/pages/api/**/*.js": {
-      "maxDuration": 30,
-      "memory": 1024
-    }
-  },
   "rewrites": [
     {
       "source": "/video.mp4",
