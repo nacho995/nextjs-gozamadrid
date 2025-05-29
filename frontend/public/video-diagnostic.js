@@ -1,5 +1,18 @@
-// Script de diagnóstico para verificar archivos de video
+// Script de diagnóstico optimizado para verificar archivos de video
 (function() {
+    // Solo ejecutar en producción y limitar la frecuencia
+    if (window.location.hostname !== 'www.realestategozamadrid.com') {
+        return;
+    }
+    
+    // Verificar si ya se ejecutó en los últimos 5 minutos
+    const lastRun = localStorage.getItem('videoDiagnosticLastRun');
+    const now = Date.now();
+    if (lastRun && (now - parseInt(lastRun)) < 5 * 60 * 1000) {
+        console.log('🔍 [Video Diagnostic] Saltando diagnóstico - ejecutado recientemente');
+        return;
+    }
+    
     console.log('🔍 [Video Diagnostic] Iniciando diagnóstico de archivos de video...');
     
     const videoFiles = [
@@ -11,8 +24,10 @@
     
     async function checkFile(url) {
         try {
-            console.log(`🔍 [Video Diagnostic] Verificando: ${url}`);
-            const response = await fetch(url, { method: 'HEAD' });
+            const response = await fetch(url, { 
+                method: 'HEAD',
+                signal: AbortSignal.timeout(3000) // Timeout de 3 segundos
+            });
             
             const result = {
                 url: url,
@@ -20,8 +35,7 @@
                 ok: response.ok,
                 contentType: response.headers.get('content-type'),
                 contentLength: response.headers.get('content-length'),
-                lastModified: response.headers.get('last-modified'),
-                cacheControl: response.headers.get('cache-control')
+                lastModified: response.headers.get('last-modified')
             };
             
             if (response.ok) {
@@ -32,7 +46,7 @@
             
             return result;
         } catch (error) {
-            console.error(`❌ [Video Diagnostic] ${url} - ERROR:`, error);
+            console.error(`❌ [Video Diagnostic] ${url} - ERROR:`, error.message);
             return {
                 url: url,
                 error: error.message,
@@ -57,7 +71,8 @@
         
         console.log('📊 [Video Diagnostic] Resumen de resultados:', results);
         
-        // Guardar resultados en localStorage para debugging
+        // Guardar resultados y timestamp
+        localStorage.setItem('videoDiagnosticLastRun', now.toString());
         localStorage.setItem('videoDiagnostic', JSON.stringify({
             timestamp: new Date().toISOString(),
             hostname: window.location.hostname,

@@ -15,52 +15,79 @@ const Video = () => {
     const pathname = usePathname();
     const isHomePage = pathname === '/';
     const videoRef = useRef(null);
+    const isInitializedRef = useRef(false);
 
     // Estado inicial consistente para SSR
-    const [videoSrc, setVideoSrc] = useState("/video.mp4"); // Fuente base por defecto
-    const [videoSources, setVideoSources] = useState(["/video.mp4", "/videoExpIngles.mp4"]); // Fuentes base
-    const [currentSourceIndex, setCurrentSourceIndex] = useState(0);
-    const [isClientHydrated, setIsClientHydrated] = useState(false); // Para controlar post-hidratación
-
+    const [videoSrc, setVideoSrc] = useState("/video.mp4");
+    const [isClientHydrated, setIsClientHydrated] = useState(false);
     const [isVideoLoaded, setIsVideoLoaded] = useState(false);
     const [videoError, setVideoError] = useState(false);
 
+    // Un solo useEffect para la inicialización del cliente
     useEffect(() => {
-        // Este efecto se ejecuta solo en el cliente, después de la hidratación
+        if (isInitializedRef.current) return;
+        
         setIsClientHydrated(true);
+        isInitializedRef.current = true;
+        
+        console.log('[Video] (Cliente Hidratado) Iniciando configuración del video con src:', videoSrc);
+        
+        // Cargar script de diagnóstico solo en producción y una vez
+        if (window.location.hostname === 'www.realestategozamadrid.com') {
+            const existingScript = document.querySelector('script[src="/video-diagnostic.js"]');
+            if (!existingScript) {
+                const script = document.createElement('script');
+                script.src = '/video-diagnostic.js';
+                script.async = true;
+                document.head.appendChild(script);
+            }
+        }
+    }, []);
 
-        const determineVideoSources = () => {
-            const isProduction = 
-                window.location.hostname === 'www.realestategozamadrid.com' ||
-                window.location.hostname === 'realestategozamadrid.com';
-            
-            let newSources = [];
-            if (isProduction) {
-                newSources = [
-                    "/video.mp4",
-                    "/videoExpIngles.mp4",
-                    `${window.location.origin}/video.mp4`,
-                    `${window.location.origin}/videoExpIngles.mp4`,
-                    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-                ];
-            } else {
-                newSources = [
-                    "/video.mp4",
-                    "/videoExpIngles.mp4",
-                    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-                ];
-            }
-            setVideoSources(newSources);
-            // Asegurarse de que videoSrc también se actualice si el índice actual es válido para las nuevas fuentes
-            // O simplemente reiniciar al primer video de las fuentes determinadas.
-            if (newSources.length > 0) {
-                setVideoSrc(newSources[0]);
-                setCurrentSourceIndex(0);
-            }
+    // Un solo useEffect para configurar el video después de la hidratación
+    useEffect(() => {
+        if (!isClientHydrated || !videoRef.current || isVideoLoaded) return;
+
+        const videoElement = videoRef.current;
+        console.log('[Video] Configurando elemento video...');
+        
+        videoElement.loop = true;
+        
+        const handleLoadedData = () => {
+            console.log('[Video] ✅ Video cargado exitosamente');
+            setIsVideoLoaded(true);
+            setVideoError(false);
         };
 
-        determineVideoSources();
-    }, []); // El array vacío asegura que solo se ejecuta una vez post-montaje
+        const handleError = (error) => {
+            console.error('[Video] ❌ Error al cargar el video:', error);
+            setVideoError(true);
+            setIsVideoLoaded(false);
+        };
+
+        const handleCanPlay = () => {
+            console.log('[Video] ✅ Video listo para reproducir');
+            setIsVideoLoaded(true);
+            setVideoError(false);
+        };
+
+        // Event listeners
+        videoElement.addEventListener('loadeddata', handleLoadedData);
+        videoElement.addEventListener('canplay', handleCanPlay);
+        videoElement.addEventListener('error', handleError);
+        
+        // Cargar y reproducir
+        videoElement.load();
+        videoElement.play().catch(error => {
+            console.log("[Video] Autoplay bloqueado, el usuario debe interactuar primero");
+        });
+
+        return () => {
+            videoElement.removeEventListener('loadeddata', handleLoadedData);
+            videoElement.removeEventListener('canplay', handleCanPlay);
+            videoElement.removeEventListener('error', handleError);
+        };
+    }, [isClientHydrated]);
 
     // Estados para el buscador de propiedades
     const [searchFilters, setSearchFilters] = useState({
@@ -86,8 +113,8 @@ const Video = () => {
         meta,
         refresh: refreshProperties
     } = useProperties({
-        limit: 33, // Cargar todas las propiedades disponibles
-        source: 'all', // Cargar de ambas fuentes: MongoDB y WooCommerce
+        limit: 33,
+        source: 'all',
         autoLoad: true,
         enableCache: true
     });
@@ -104,151 +131,6 @@ const Video = () => {
             setShowNoPropertiesMessage(false);
         }
     }, [allProperties, propertiesLoading, propertiesError]);
-
-    // Cargar script de diagnóstico en producción
-    useEffect(() => {
-        if (typeof window !== 'undefined' && window.location.hostname === 'www.realestategozamadrid.com') {
-            const script = document.createElement('script');
-            script.src = '/video-diagnostic.js';
-            script.async = true;
-            document.head.appendChild(script);
-        }
-    }, []);
-
-    useEffect(() => {
-        if (!isClientHydrated) return; // Esperar a que el cliente esté hidratado y las fuentes correctas seteadas
-
-        console.log('[Video] (Cliente Hidratado) Iniciando configuración del video con src:', videoSrc);
-        const videoElement = videoRef.current;
-        if (videoElement) {
-            console.log('[Video] Elemento video encontrado, configurando...');
-            videoElement.loop = true;
-            
-            // Manejar eventos del video
-            const handleLoadedData = () => {
-                console.log('[Video] ✅ Video cargado exitosamente desde:', videoSrc);
-                setIsVideoLoaded(true);
-                setVideoError(false);
-            };
-
-            const handleError = (error) => {
-                console.error('[Video] ❌ Error al cargar el video:', error);
-                console.error('[Video] ❌ URL que falló:', videoSrc);
-                console.error('[Video] ❌ Detalles del error:', error.target?.error);
-                console.error('[Video] ❌ Código de error:', error.target?.error?.code);
-                console.error('[Video] ❌ Mensaje de error:', error.target?.error?.message);
-                console.error('[Video] ❌ Estado de red:', error.target?.networkState);
-                console.error('[Video] ❌ Estado de ready:', error.target?.readyState);
-                
-                // Intentar con la siguiente fuente de video
-                const nextIndex = currentSourceIndex + 1;
-                if (nextIndex < videoSources.length) {
-                    console.log(`[Video] 🔄 Intentando con fuente ${nextIndex + 1}/${videoSources.length}:`, videoSources[nextIndex]);
-                    setCurrentSourceIndex(nextIndex);
-                    setVideoSrc(videoSources[nextIndex]);
-                } else {
-                    console.error('[Video] ❌ Todas las fuentes de video fallaron');
-                    console.error('[Video] ❌ Fuentes intentadas:', videoSources);
-                    setVideoError(true);
-                    setIsVideoLoaded(false);
-                    
-                    // Intentar recuperación automática después de 10 segundos
-                    setTimeout(() => {
-                        console.log('[Video] 🔄 Intentando recuperación automática...');
-                        setCurrentSourceIndex(0);
-                        setVideoSrc(videoSources[0]);
-                        setVideoError(false);
-                    }, 10000);
-                }
-            };
-
-            const handleCanPlay = () => {
-                console.log('[Video] ✅ Video listo para reproducir desde:', videoSrc);
-                setIsVideoLoaded(true);
-                setVideoError(false);
-            };
-
-            const handleLoadStart = () => {
-                console.log('[Video] 🔄 Iniciando carga del video...');
-                setVideoError(false);
-            };
-
-            const handleProgress = () => {
-                console.log('[Video] 📊 Progreso de carga del video...');
-            };
-
-            // Añadir event listeners
-            videoElement.addEventListener('loadeddata', handleLoadedData);
-            videoElement.addEventListener('canplay', handleCanPlay);
-            videoElement.addEventListener('error', handleError);
-            videoElement.addEventListener('loadstart', handleLoadStart);
-            videoElement.addEventListener('progress', handleProgress);
-            
-            // Cargar el video
-            console.log('[Video] 🚀 Llamando a videoElement.load()...');
-            videoElement.load();
-
-            // Intentar reproducir el video
-            console.log('[Video] 🎬 Intentando reproducir el video...');
-            videoElement.play().catch(error => {
-                console.error("[Video] ❌ Error al reproducir el video:", error);
-                // En algunos navegadores, el autoplay está bloqueado
-                console.log("[Video] 🔇 Autoplay bloqueado, el video se reproducirá cuando el usuario interactúe");
-            });
-
-            // Limpieza
-            return () => {
-                videoElement.removeEventListener('loadeddata', handleLoadedData);
-                videoElement.removeEventListener('canplay', handleCanPlay);
-                videoElement.removeEventListener('error', handleError);
-                videoElement.removeEventListener('loadstart', handleLoadStart);
-                videoElement.removeEventListener('progress', handleProgress);
-            };
-        } else {
-            console.log('[Video] ⚠️ Elemento video no encontrado en el DOM');
-        }
-    }, [videoSrc, currentSourceIndex, videoSources, isClientHydrated]);
-
-    // Verificar si el video existe
-    useEffect(() => {
-        if (!isClientHydrated || typeof window === 'undefined') return; // Esperar y asegurar que window exista
-
-        const checkVideoExists = async () => {
-            try {
-                console.log('[Video] 🔍 Verificando si el video existe en:', videoSrc);
-                console.log('[Video] 🔍 Hostname actual:', typeof window !== 'undefined' ? window.location.hostname : 'SSR');
-                console.log('[Video] 🔍 URL completa:', typeof window !== 'undefined' ? window.location.href : 'SSR');
-                
-                const response = await fetch(videoSrc, { 
-                    method: 'HEAD',
-                    cache: 'no-cache',
-                    headers: {
-                        'Accept': 'video/mp4,video/*,*/*'
-                    }
-                });
-                
-                console.log('[Video] 📊 Response status:', response.status);
-                console.log('[Video] 📊 Response headers:', Object.fromEntries(response.headers.entries()));
-                
-                if (response.ok) {
-                    const contentLength = response.headers.get('content-length');
-                    const contentType = response.headers.get('content-type');
-                    console.log('[Video] ✅ Video encontrado');
-                    console.log('[Video] ✅ Tamaño:', contentLength ? `${Math.round(contentLength / 1024 / 1024)}MB` : 'Desconocido');
-                    console.log('[Video] ✅ Tipo:', contentType);
-                } else {
-                    console.error('[Video] ❌ Video no encontrado, status:', response.status);
-                    console.error('[Video] ❌ Status text:', response.statusText);
-                }
-            } catch (error) {
-                console.error('[Video] ❌ Error verificando video:', error);
-                console.error('[Video] ❌ Error name:', error.name);
-                console.error('[Video] ❌ Error message:', error.message);
-            }
-        };
-        
-        checkVideoExists();
-    }, [videoSrc, isClientHydrated]);
 
     // Efecto para seleccionar la primera propiedad cuando se cargan
     useEffect(() => {
@@ -446,7 +328,6 @@ const Video = () => {
                                     <div className="text-center text-white">
                                         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amarillo mx-auto mb-4"></div>
                                         <p className="text-white/80">Cargando video...</p>
-                                        <p className="text-white/60 text-xs mt-2">Fuente {currentSourceIndex + 1} de {videoSources.length}</p>
                                     </div>
                                 )}
                             </div>
@@ -462,7 +343,6 @@ const Video = () => {
                                 muted
                                 playsInline
                                 ref={videoRef}
-                                // Asegurar que el src del video solo se establece después de la hidratación y determinación de fuentes
                                 src={isClientHydrated ? videoSrc : undefined} 
                                 aria-label="Video promocional de Goza Madrid"
                             >
