@@ -729,20 +729,9 @@ export default function BlogPage() {
                 />
             </Head>
             {loading && <LoadingScreen />}
-            <main className="relative py-8 mt-32">
+            <main className="relative py-8 z-10 bg-transparent">
                 <AnimatedOnScroll>
                     <div className="relative container mx-auto px-4">
-                        {/* Encabezado mejorado con semántica correcta */}
-                        <header className="mb-12 text-center">
-                            <h1 className="text-4xl sm:text-5xl font-bold mb-4 text-black">
-                                Blog de Goza Madrid
-                            </h1>
-                            <p className="text-lg max-w-3xl mx-auto text-gray-600">
-                                Descubre nuestros artículos sobre el sector inmobiliario, consejos para inversores y propietarios, 
-                                y las últimas tendencias del mercado en Madrid.
-                            </p>
-                        </header>
-
                         {/* Indicador de carga */}
                         {loading ? (
                             <div role="status" aria-label="Cargando artículos del blog">
