@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Determinar la URL base de la API según el entorno
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8081'; // Usar env var, fallback a localhost:8081
+// Determinar la URL base de la API según el entorno - usar la URL que funciona
+const BASE_URL = 'http://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com';
 const TIMEOUT = parseInt(process.env.NEXT_PUBLIC_API_TIMEOUT || '30000');
 
 // Funciones auxiliares
