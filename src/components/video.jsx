@@ -1,0 +1,934 @@
+import React from 'react';
+import Link from "next/link";
+import { useState, useEffect, useRef } from "react";
+import { usePathname } from 'next/navigation';
+import AnimatedOnScroll from "./AnimatedScroll";
+import Image from "next/legacy/image";
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaSearch, FaMapMarkerAlt, FaBed, FaBath, FaRuler, FaEuroSign, FaFilter, FaCalculator, FaTimes, FaHome, FaArrowRight, FaEye } from 'react-icons/fa';
+import { normalizeProperty, filterProperties } from '../utils/properties';
+import ControlMenu from './header';
+import { useProperties } from '../hooks/useProperties';
+import SmartLocationSearch from './smart-location-search';
+
+const Video = () => {
+    const pathname = usePathname();
+    const isHomePage = pathname === '/';
+    const videoRef = useRef(null);
+    const isInitializedRef = useRef(false);
+
+    // Estado inicial consistente para SSR
+    const [videoSrc, setVideoSrc] = useState("/video.mp4");
+    const [isClientHydrated, setIsClientHydrated] = useState(false);
+    const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+    const [videoError, setVideoError] = useState(false);
+
+    // Un solo useEffect para la inicialización del cliente
+    useEffect(() => {
+        if (isInitializedRef.current) return;
+        
+        setIsClientHydrated(true);
+        isInitializedRef.current = true;
+        
+        console.log('[Video] (Cliente Hidratado) Iniciando configuración del video con src:', videoSrc);
+        
+        // Cargar script de diagnóstico solo en producción y una vez
+        if (window.location.hostname === 'www.realestategozamadrid.com') {
+            const existingScript = document.querySelector('script[src="/video-diagnostic.js"]');
+            if (!existingScript) {
+                const script = document.createElement('script');
+                script.src = '/video-diagnostic.js';
+                script.async = true;
+                document.head.appendChild(script);
+            }
+        }
+    }, []);
+
+    // Un solo useEffect para configurar el video después de la hidratación
+    useEffect(() => {
+        if (!isClientHydrated || !videoRef.current || isVideoLoaded) return;
+
+        const videoElement = videoRef.current;
+        console.log('[Video] Configurando elemento video...');
+        
+        videoElement.loop = true;
+        
+        const handleLoadedData = () => {
+            console.log('[Video] ✅ Video cargado exitosamente');
+            setIsVideoLoaded(true);
+            setVideoError(false);
+        };
+
+        const handleError = (error) => {
+            console.error('[Video] ❌ Error al cargar el video:', error);
+            setVideoError(true);
+            setIsVideoLoaded(false);
+        };
+
+        const handleCanPlay = () => {
+            console.log('[Video] ✅ Video listo para reproducir');
+            setIsVideoLoaded(true);
+            setVideoError(false);
+        };
+
+        // Event listeners
+        videoElement.addEventListener('loadeddata', handleLoadedData);
+        videoElement.addEventListener('canplay', handleCanPlay);
+        videoElement.addEventListener('error', handleError);
+        
+        // Cargar y reproducir
+        videoElement.load();
+        videoElement.play().catch(error => {
+            console.log("[Video] Autoplay bloqueado, el usuario debe interactuar primero");
+        });
+
+        return () => {
+            videoElement.removeEventListener('loadeddata', handleLoadedData);
+            videoElement.removeEventListener('canplay', handleCanPlay);
+            videoElement.removeEventListener('error', handleError);
+        };
+    }, [isClientHydrated]);
+
+    // Estados para el buscador de propiedades
+    const [searchFilters, setSearchFilters] = useState({
+        location: '',
+        propertyType: 'todos',
+        operation: 'comprar',
+        priceRange: '',
+        minPrice: '',
+        maxPrice: '',
+        bedrooms: '',
+        bathrooms: '',
+        minSize: ''
+    });
+    const [selectedProperty, setSelectedProperty] = useState(null);
+    const [showMap, setShowMap] = useState(false);
+    const [mapLoading, setMapLoading] = useState(false);
+    
+    // Hook optimizado para propiedades REALES con cache y retry
+    const { 
+        properties: allProperties, 
+        loading: propertiesLoading, 
+        error: propertiesError,
+        meta,
+        refresh: refreshProperties
+    } = useProperties({
+        limit: 33,
+        source: 'all',
+        autoLoad: true,
+        enableCache: true
+    });
+
+    // Estado para manejar cuando no hay propiedades reales
+    const [showNoPropertiesMessage, setShowNoPropertiesMessage] = useState(false);
+
+    // Verificar si hay propiedades reales disponibles
+    useEffect(() => {
+        if (!propertiesLoading && allProperties.length === 0 && propertiesError) {
+            console.log('🏠 No hay propiedades reales disponibles');
+            setShowNoPropertiesMessage(true);
+        } else if (allProperties.length > 0) {
+            setShowNoPropertiesMessage(false);
+        }
+    }, [allProperties, propertiesLoading, propertiesError]);
+
+    // Efecto para seleccionar la primera propiedad cuando se cargan
+    useEffect(() => {
+        if (allProperties.length > 0 && !selectedProperty) {
+            const normalizedProperties = allProperties.map(normalizeProperty);
+            setSelectedProperty(normalizedProperties[0]);
+            console.log('[Video] 🎯 Primera propiedad seleccionada:', normalizedProperties[0]?.title || 'Sin título');
+            console.log('[Video] 📊 Total propiedades cargadas:', allProperties.length);
+            console.log('[Video] 📊 Fuentes:', meta?.sources || 'No disponible');
+        }
+    }, [allProperties, selectedProperty, meta]);
+
+    // Función para filtrar propiedades usando la utilidad
+    const getFilteredProperties = () => {
+        return filterProperties(allProperties, searchFilters);
+    };
+
+    // Función para seleccionar una propiedad y actualizar el mapa
+    const selectProperty = (property) => {
+        console.log('🏠 Seleccionando propiedad:', property.title);
+        setMapLoading(true);
+        setSelectedProperty(property);
+        
+        // Actualizar el mapa inmediatamente con la nueva propiedad
+        setTimeout(() => {
+            setMapLoading(false);
+            console.log('✅ Mapa actualizado para:', property.title);
+        }, 500); // Reducido el tiempo para una experiencia más fluida
+    };
+
+    // Función para manejar cambios en filtros
+    const handleFilterChange = (field, value) => {
+        setMapLoading(true);
+        setSearchFilters(prev => ({
+            ...prev,
+            [field]: value
+        }));
+        // Limpiar selección cuando cambien los filtros para mostrar todas las propiedades filtradas
+        setSelectedProperty(null);
+        // Simular tiempo de actualización del mapa
+        setTimeout(() => setMapLoading(false), 800);
+    };
+
+    // Efecto para actualizar el mapa cuando se abra el modal
+    useEffect(() => {
+        if (showMap && getFilteredProperties().length > 0) {
+            // Limpiar selección para mostrar todas las propiedades al abrir
+            setSelectedProperty(null);
+        }
+    }, [showMap]);
+
+    // Función para generar URL del mapa con múltiples ubicaciones inteligente
+    const getMultipleLocationsMapUrl = () => {
+        try {
+            const filteredProps = getFilteredProperties();
+            console.log('🗺️ Propiedades filtradas para el mapa:', filteredProps.length);
+            
+            if (filteredProps.length === 0) {
+                console.log('⚠️ No hay propiedades filtradas, usando mapa de Madrid por defecto');
+                return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1sen!2ses!4v1234567890123';
+            }
+            
+            // Si hay filtro de ubicación, priorizar propiedades cercanas a esa ubicación
+            let sortedProperties = [...filteredProps];
+            if (searchFilters.location && searchFilters.location.trim()) {
+                const searchLocation = searchFilters.location.toLowerCase();
+                
+                // Ordenar por relevancia de ubicación
+                sortedProperties.sort((a, b) => {
+                    const aLocationMatch = (a.location?.toLowerCase().includes(searchLocation) ? 2 : 0) +
+                                         (a.title?.toLowerCase().includes(searchLocation) ? 1 : 0);
+                    const bLocationMatch = (b.location?.toLowerCase().includes(searchLocation) ? 2 : 0) +
+                                         (b.title?.toLowerCase().includes(searchLocation) ? 1 : 0);
+                    return bLocationMatch - aLocationMatch;
+                });
+                
+                console.log('🎯 Propiedades ordenadas por relevancia de ubicación:', searchLocation);
+            }
+            
+            // Crear una consulta con múltiples ubicaciones para Google Maps
+            const locations = sortedProperties
+                .slice(0, 10) // Tomar las 10 más relevantes
+                .map(property => {
+                    try {
+                        // Usar coordenadas si están disponibles, sino usar la dirección
+                        if (property.coordinates && 
+                            property.coordinates.lat && 
+                            property.coordinates.lng &&
+                            !isNaN(property.coordinates.lat) &&
+                            !isNaN(property.coordinates.lng)) {
+                            return `${property.coordinates.lat},${property.coordinates.lng}`;
+                        } else {
+                            const location = property.location || property.title || 'Madrid, España';
+                            return encodeURIComponent(location);
+                        }
+                    } catch (error) {
+                        console.error('❌ Error procesando propiedad para mapa:', error);
+                        return encodeURIComponent('Madrid, España');
+                    }
+                })
+                .filter(location => location); // Filtrar ubicaciones vacías
+            
+            console.log('📍 Ubicaciones para el mapa (ordenadas por relevancia):', locations);
+            
+            // Si hay filtro de ubicación específico, centrar el mapa en esa área
+            let baseUrl = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1';
+            
+            if (searchFilters.location && searchFilters.location.trim()) {
+                // Usar la ubicación de búsqueda como centro del mapa
+                const searchLocation = encodeURIComponent(`${searchFilters.location}, Madrid, España`);
+                baseUrl = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12149.5!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1&q=${searchLocation}`;
+                console.log('🎯 Mapa centrado en:', searchFilters.location);
+            }
+            
+            // Agregar las ubicaciones como parámetros adicionales
+            if (locations.length > 0) {
+                const finalUrl = `${baseUrl}&markers=${locations.join('|')}`;
+                console.log('🔗 URL final del mapa:', finalUrl);
+                return finalUrl;
+            }
+            
+            return baseUrl;
+        } catch (error) {
+            console.error('❌ Error generando URL del mapa:', error);
+            // Devolver mapa de Madrid por defecto en caso de error
+            return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1sen!2ses!4v1234567890123';
+        }
+    };
+
+    // Generar URL del mapa embebido de Google Maps
+    const getMapEmbedUrl = (property) => {
+        try {
+            if (!property) {
+                console.log('⚠️ No hay propiedad seleccionada para el mapa');
+                return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1sen!2ses!4v1234567890123';
+            }
+            
+            console.log('🗺️ Generando mapa para propiedad:', property.title);
+            
+            if (property.coordinates && 
+                property.coordinates.lat && 
+                property.coordinates.lng &&
+                !isNaN(property.coordinates.lat) &&
+                !isNaN(property.coordinates.lng)) {
+                const { lat, lng } = property.coordinates;
+                console.log(`📍 Usando coordenadas: ${lat}, ${lng}`);
+                // Zoom más cercano para propiedades individuales (zoom 16)
+                return `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1518.75!2d${lng}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z${lat},${lng}!5e0!3m2!1ses!2ses!4v${Date.now()}`;
+            } else {
+                console.log('📍 Usando ubicación por texto:', property.location || property.title);
+                const location = encodeURIComponent(property.location || property.title || 'Madrid, España');
+                // Zoom medio para búsquedas por texto (zoom 15)
+                return `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3037.5!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1&q=${location}&zoom=15&v=${Date.now()}`;
+            }
+        } catch (error) {
+            console.error('❌ Error generando URL del mapa individual:', error);
+            return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1sen!2ses!4v1234567890123';
+        }
+    };
+
+    return (
+        <>
+            {/* Header superpuesto solo en la página home */}
+            {isHomePage && <ControlMenu />}
+            
+            <AnimatedOnScroll>
+                <section 
+                    className="relative min-h-[120vh]"
+                    aria-label="Sección de presentación con video y buscador de propiedades de lujo"
+                >
+                    <div className="w-full h-[120vh] overflow-hidden relative">
+                        {/* Imagen de fondo como fallback */}
+                        <div 
+                            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                            style={{
+                                backgroundImage: `url('/madrid.jpg')`,
+                                filter: videoError ? 'none' : 'blur(2px)',
+                                opacity: videoError ? 1 : (isVideoLoaded ? 0 : 0.7)
+                            }}
+                        />
+                        
+                        {/* Fallback para cuando el video no está cargado o hay error */}
+                        {(!isVideoLoaded || videoError) && (
+                            <div 
+                                className="absolute inset-0 bg-black/30 flex items-center justify-center"
+                                aria-label={videoError ? "Error cargando video" : "Cargando video"}
+                            >
+                                {videoError ? (
+                                    <div className="text-center text-white">
+                                        <div className="text-6xl mb-4">🏢</div>
+                                        <h3 className="text-xl font-light mb-2">Propiedades Exclusivas en Madrid</h3>
+                                        <p className="text-white/80 text-sm">Cargando contenido...</p>
+                                    </div>
+                                ) : (
+                                    <div className="text-center text-white">
+                                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amarillo mx-auto mb-4"></div>
+                                        <p className="text-white/80">Cargando video...</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        
+                        {/* Video principal */}
+                        {!videoError && (
+                            <video
+                                className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ${
+                                    isVideoLoaded ? 'opacity-100' : 'opacity-0'
+                                }`}
+                                autoPlay
+                                muted
+                                playsInline
+                                ref={videoRef}
+                                src={isClientHydrated ? videoSrc : undefined} 
+                                aria-label="Video promocional de Goza Madrid"
+                            >
+                                {isClientHydrated && <source src={videoSrc} type="video/mp4" />}
+                                <p>Tu navegador no soporta la reproducción de video. 
+                                   <a href={videoSrc} download>Descarga el video aquí</a>
+                                </p>
+                            </video>
+                        )}
+
+                        {/* Overlay elegante y sutil con transición suave */}
+                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/5 to-black/40"></div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
+
+                        {/* Contenedor principal premium - Solo buscador en la parte inferior */}
+                        <div className="absolute inset-0 flex flex-col justify-end items-center z-20 px-6 lg:px-12 pb-16 lg:pb-20">
+                            
+                            {/* Buscador premium centrado */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 1.2, delay: 0.3 }}
+                                className="w-full max-w-5xl"
+                            >
+                                <div className="bg-black/20 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-white/20">
+                                    {/* Pestañas elegantes */}
+                                    <div className="flex mb-6 bg-white/20 backdrop-blur-sm rounded-xl p-1 max-w-md mx-auto border border-white/30">
+                                        <button
+                                            onClick={() => handleFilterChange('operation', 'comprar')}
+                                            className={`flex-1 py-3 px-8 rounded-lg font-medium transition-all duration-300 ${
+                                                searchFilters.operation === 'comprar'
+                                                    ? 'bg-amarillo text-white shadow-lg'
+                                                    : 'text-white hover:text-amarillo'
+                                            }`}
+                                        >
+                                            Comprar
+                                        </button>
+                                        <button
+                                            onClick={() => handleFilterChange('operation', 'vender')}
+                                            className={`flex-1 py-3 px-8 rounded-lg font-medium transition-all duration-300 ${
+                                                searchFilters.operation === 'vender'
+                                                    ? 'bg-amarillo text-white shadow-lg'
+                                                    : 'text-white hover:text-amarillo'
+                                            }`}
+                                        >
+                                            Vender
+                                        </button>
+                                    </div>
+
+                                    {/* Contenido según la pestaña */}
+                                    {searchFilters.operation === 'comprar' ? (
+                                        <div className="space-y-6">
+                                            {/* Fila principal de búsqueda */}
+                                            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+                                                {/* Ubicación */}
+                                                <div className="lg:col-span-2 relative">
+                                                    <SmartLocationSearch
+                                                        value={searchFilters.location}
+                                                        onChange={(value) => handleFilterChange('location', value)}
+                                                        properties={allProperties}
+                                                        placeholder="Ubicación (ej. Malasaña, Salamanca...)"
+                                                        className="w-full px-4 py-4 border border-white/30 rounded-xl focus:ring-2 focus:ring-amarillo focus:border-amarillo text-white placeholder-white/70 bg-white/10 backdrop-blur-sm"
+                                                    />
+                                                </div>
+
+                                                {/* Tipo de propiedad */}
+                                                <div className="relative">
+                                                    <select
+                                                        value={searchFilters.propertyType}
+                                                        onChange={(e) => handleFilterChange('propertyType', e.target.value)}
+                                                        className="w-full px-4 py-4 border border-white/30 rounded-xl focus:ring-2 focus:ring-amarillo focus:border-amarillo appearance-none bg-white/10 backdrop-blur-sm text-white"
+                                                    >
+                                                        <option value="todos">Todos los tipos</option>
+                                                        <option value="piso">Piso</option>
+                                                        <option value="atico">Ático</option>
+                                                        <option value="duplex">Dúplex</option>
+                                                        <option value="estudio">Estudio</option>
+                                                        <option value="casa">Casa</option>
+                                                    </select>
+                                                </div>
+
+                                                {/* Precio */}
+                                                <div className="relative">
+                                                    <select
+                                                        value={searchFilters.priceRange}
+                                                        onChange={(e) => {
+                                                            const range = e.target.value.split('-');
+                                                            handleFilterChange('minPrice', range[0] || '');
+                                                            handleFilterChange('maxPrice', range[1] || '');
+                                                            handleFilterChange('priceRange', e.target.value);
+                                                        }}
+                                                        className="w-full px-4 py-4 border border-white/30 rounded-xl focus:ring-2 focus:ring-amarillo focus:border-amarillo appearance-none bg-white/10 backdrop-blur-sm text-white"
+                                                    >
+                                                        <option value="">Precio</option>
+                                                        <option value="0-500000">Hasta 500.000€</option>
+                                                        <option value="500000-800000">500.000€ - 800.000€</option>
+                                                        <option value="800000-1200000">800.000€ - 1.200.000€</option>
+                                                        <option value="1200000-2000000">1.200.000€ - 2.000.000€</option>
+                                                        <option value="2000000-">Más de 2.000.000€</option>
+                                                    </select>
+                                                </div>
+
+                                                {/* Botón de búsqueda */}
+                                                <div>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            console.log('🗺️ Botón Ver Mapa clickeado');
+                                                            try {
+                                                                setShowMap(true);
+                                                                console.log('✅ Modal del mapa activado');
+                                                            } catch (error) {
+                                                                console.error('❌ Error al abrir el mapa:', error);
+                                                            }
+                                                        }}
+                                                        disabled={propertiesLoading}
+                                                        type="button"
+                                                        className="w-full bg-amarillo hover:bg-amarillo/90 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium px-6 py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02] disabled:transform-none"
+                                                    >
+                                                        {propertiesLoading ? (
+                                                            <div className="flex items-center justify-center gap-2">
+                                                                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-white"></div>
+                                                                <span className="hidden sm:inline">Cargando...</span>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="flex items-center justify-center gap-2">
+                                                                <FaMapMarkerAlt className="text-sm" />
+                                                                <span className="hidden sm:inline">Ver en Mapa</span>
+                                                                <span className="sm:hidden">Mapa</span>
+                                                            </div>
+                                                        )}
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            {/* Filtros adicionales */}
+                                            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+                                                <select
+                                                    value={searchFilters.bedrooms}
+                                                    onChange={(e) => handleFilterChange('bedrooms', e.target.value)}
+                                                    className="px-4 py-3 border border-white/30 rounded-xl focus:ring-2 focus:ring-amarillo focus:border-amarillo appearance-none bg-white/10 backdrop-blur-sm text-white text-sm"
+                                                >
+                                                    <option value="">Habitaciones</option>
+                                                    <option value="1">1+ habitación</option>
+                                                    <option value="2">2+ habitaciones</option>
+                                                    <option value="3">3+ habitaciones</option>
+                                                    <option value="4">4+ habitaciones</option>
+                                                </select>
+
+                                                <select
+                                                    value={searchFilters.bathrooms}
+                                                    onChange={(e) => handleFilterChange('bathrooms', e.target.value)}
+                                                    className="px-4 py-3 border border-white/30 rounded-xl focus:ring-2 focus:ring-amarillo focus:border-amarillo appearance-none bg-white/10 backdrop-blur-sm text-white text-sm"
+                                                >
+                                                    <option value="">Baños</option>
+                                                    <option value="1">1+ baño</option>
+                                                    <option value="2">2+ baños</option>
+                                                    <option value="3">3+ baños</option>
+                                                </select>
+
+                                                <input
+                                                    type="number"
+                                                    placeholder="Superficie mín. (m²)"
+                                                    value={searchFilters.minSize}
+                                                    onChange={(e) => handleFilterChange('minSize', e.target.value)}
+                                                    className="px-4 py-3 border border-white/30 rounded-xl focus:ring-2 focus:ring-amarillo focus:border-amarillo text-white placeholder-white/70 bg-white/10 backdrop-blur-sm text-sm"
+                                                />
+                                            </div>
+
+                                            {/* Indicador de propiedades */}
+                                            <div className="text-center pt-2">
+                                                <div className="inline-flex items-center gap-2 text-white/80 text-sm">
+                                                    {propertiesLoading ? (
+                                                        <>
+                                                            <div className="animate-spin rounded-full h-3 w-3 border-t-2 border-amarillo"></div>
+                                                            <span>Cargando propiedades...</span>
+                                                        </>
+                                                    ) : propertiesError ? (
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-red-500">⚠️ {propertiesError}</span>
+                                                            <button 
+                                                                onClick={() => window.location.reload()} 
+                                                                className="bg-amarillo text-white px-2 py-1 rounded text-xs hover:bg-amarillo/90 transition-colors"
+                                                            >
+                                                                🔄 Reintentar
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-amarillo font-medium">
+                                                            {allProperties.length} propiedades disponibles
+                                                            {getFilteredProperties().length !== allProperties.length && (
+                                                                <span className="text-white/90">
+                                                                    {` • `}
+                                                                    <span className="bg-amarillo/20 px-2 py-1 rounded-full text-amarillo text-xs font-semibold">
+                                                                        {getFilteredProperties().length} coinciden
+                                                                    </span>
+                                                                </span>
+                                                            )}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        // Contenido para vender - compacto
+                                        <div className="text-center py-6">
+                                            <div className="max-w-xl mx-auto">
+                                                <h3 className="font-serif text-2xl font-light text-white mb-4">
+                                                    ¿Desea vender su propiedad?
+                                                </h3>
+                                                <p className="text-white/80 mb-6 text-base font-light leading-relaxed">
+                                                    Obtenga una valoración profesional y gratuita de su propiedad. 
+                                                    Nuestros expertos le ayudarán a conseguir el mejor precio del mercado.
+                                                </p>
+                                                
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center border border-white/20">
+                                                        <div className="text-amarillo text-2xl mb-2">📊</div>
+                                                        <h4 className="font-medium text-white mb-1 text-sm">Valoración Gratuita</h4>
+                                                        <p className="text-white/70 text-xs">Análisis completo del mercado</p>
+                                                    </div>
+                                                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center border border-white/20">
+                                                        <div className="text-amarillo text-2xl mb-2">🏆</div>
+                                                        <h4 className="font-medium text-white mb-1 text-sm">Expertos en Madrid</h4>
+                                                        <p className="text-white/70 text-xs">Conocimiento especializado</p>
+                                                    </div>
+                                                </div>
+
+                                                <a
+                                                    href="https://valuation.lystos.com?clientId=cd55b10c-5ba6-4f65-854e-5c8adaf88a34"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="inline-flex items-center gap-2 bg-amarillo hover:bg-amarillo/90 text-white font-medium px-6 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                                                >
+                                                    <FaCalculator className="text-sm" />
+                                                    <span>Valorar mi Propiedad</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </motion.div>
+                        </div>
+                    </div>
+
+                    {/* Botón valorador flotante premium */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.8, delay: 2 }}
+                        className="fixed bottom-8 right-8 z-50"
+                    >
+                        <a
+                            href="https://valuation.lystos.com?clientId=cd55b10c-5ba6-4f65-854e-5c8adaf88a34"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group bg-amarillo hover:bg-amarillo/90 text-white px-6 py-4 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 flex items-center gap-3 transform hover:scale-105"
+                        >
+                            <FaCalculator className="text-lg" />
+                            <span className="font-medium hidden lg:inline">Valorador Gratuito</span>
+                            <span className="font-medium lg:hidden">Valorar</span>
+                        </a>
+                    </motion.div>
+
+                    {/* Modal de resultados con diseño premium */}
+                    <AnimatePresence>
+                        {showMap && (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                                onClick={() => setShowMap(false)}
+                            >
+                                <motion.div
+                                    initial={{ scale: 0.95, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    exit={{ scale: 0.95, opacity: 0 }}
+                                    className="bg-white rounded-3xl max-w-7xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <div className="flex justify-between items-center p-8 border-b border-gray-100">
+                                        <div>
+                                            <h2 className="font-serif text-3xl font-light text-gray-900">
+                                                Propiedades Encontradas
+                                                <span className="text-amarillo font-normal ml-2">({getFilteredProperties().length})</span>
+                                            </h2>
+                                            <p className="text-gray-600 text-sm mt-2 font-light">
+                                                Haz clic en cualquier propiedad para ver su ubicación exacta en el mapa
+                                            </p>
+                                        </div>
+                                        <button
+                                            onClick={() => setShowMap(false)}
+                                            className="text-gray-400 hover:text-gray-600 text-2xl p-2 hover:bg-gray-100 rounded-full transition-colors"
+                                        >
+                                            <FaTimes />
+                                        </button>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 h-[75vh]">
+                                        {/* Lista de propiedades con diseño premium */}
+                                        <div className="overflow-y-auto p-8 space-y-6">
+                                            {propertiesLoading ? (
+                                                <div className="flex items-center justify-center py-16">
+                                                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-amarillo"></div>
+                                                    <span className="ml-3 text-gray-600 font-light">Conectando con el servidor...</span>
+                                                </div>
+                                            ) : propertiesError || showNoPropertiesMessage ? (
+                                                <div className="text-center py-16 text-red-600">
+                                                    <FaTimes className="text-5xl text-red-400 mx-auto mb-6" />
+                                                    <h3 className="font-serif text-2xl font-light mb-4">
+                                                        {showNoPropertiesMessage ? 'Propiedades reales no disponibles' : 'No se pueden cargar las propiedades'}
+                                                    </h3>
+                                                    <p className="text-sm mb-2 text-gray-600">
+                                                        {showNoPropertiesMessage 
+                                                            ? 'Las propiedades reales del inventario no están disponibles en este momento.'
+                                                            : propertiesError
+                                                        }
+                                                    </p>
+                                                    <p className="text-xs text-gray-500 mb-6">
+                                                        {showNoPropertiesMessage 
+                                                            ? 'Estamos trabajando para conectar con nuestro inventario de propiedades reales. Inténtelo de nuevo en unos minutos.'
+                                                            : 'Asegúrate de que el servidor backend esté corriendo en el puerto 8081'
+                                                        }
+                                                    </p>
+                                                    <button 
+                                                        onClick={() => {
+                                                            setShowNoPropertiesMessage(false);
+                                                            refreshProperties();
+                                                        }} 
+                                                        className="bg-amarillo text-white px-6 py-3 rounded-xl hover:bg-amarillo/90 transition-colors font-medium"
+                                                    >
+                                                        🔄 Reintentar conexión
+                                                    </button>
+                                                </div>
+                                            ) : getFilteredProperties().length === 0 ? (
+                                                <div className="text-center py-16 text-gray-600">
+                                                    <FaMapMarkerAlt className="text-5xl text-amarillo mx-auto mb-6" />
+                                                    <h3 className="font-serif text-2xl font-light mb-4">
+                                                        {allProperties.length === 0 ? 'No hay propiedades disponibles' : 'No se encontraron propiedades'}
+                                                    </h3>
+                                                    <p className="font-light">
+                                                        {allProperties.length === 0 
+                                                            ? 'Las propiedades se están cargando desde las APIs' 
+                                                            : 'Intenta ajustar los filtros de búsqueda'
+                                                        }
+                                                    </p>
+                                                </div>
+                                            ) : (
+                                                getFilteredProperties().map((property) => (
+                                                <motion.div
+                                                    key={property.id}
+                                                    whileHover={{ scale: 1.02 }}
+                                                    className={`bg-white rounded-2xl p-6 cursor-pointer transition-all duration-300 border-2 group shadow-lg hover:shadow-xl ${
+                                                        selectedProperty?.id === property.id 
+                                                            ? 'border-amarillo bg-amarillo/10' 
+                                                            : 'border-gray-100 hover:border-amarillo/30'
+                                                    }`}
+                                                    onClick={() => {
+                                                        console.log('🖱️ Click en propiedad:', property.title);
+                                                        selectProperty(property);
+                                                    }}
+                                                    title={`Ver ${property.title} en el mapa`}
+                                                >
+                                                    <div className="flex gap-6">
+                                                        <img
+                                                            src={property.image}
+                                                            alt={property.title}
+                                                            className="w-24 h-24 object-cover rounded-xl"
+                                                        />
+                                                        <div className="flex-1">
+                                                            <h3 className={`font-serif text-xl font-light transition-colors mb-2 ${
+                                                                selectedProperty?.id === property.id 
+                                                                    ? 'text-amarillo' 
+                                                                    : 'text-gray-900 group-hover:text-amarillo'
+                                                            }`}>
+                                                                {property.title}
+                                                            </h3>
+                                                            <p className="text-gray-600 flex items-center gap-2 mb-3 font-light">
+                                                                <FaMapMarkerAlt className="text-amarillo" />
+                                                                {property.location}
+                                                                {selectedProperty?.id === property.id && (
+                                                                    <span className="ml-2 text-xs bg-amarillo text-white px-2 py-1 rounded-full font-medium">
+                                                                        Seleccionado
+                                                                    </span>
+                                                                )}
+                                                            </p>
+                                                            <div className="flex items-center gap-6 mb-3 text-sm text-gray-600">
+                                                                <span className="flex items-center gap-1">
+                                                                    <FaBed className="text-amarillo" />
+                                                                    {property.bedrooms}
+                                                                </span>
+                                                                <span className="flex items-center gap-1">
+                                                                    <FaBath className="text-amarillo" />
+                                                                    {property.bathrooms}
+                                                                </span>
+                                                                <span className="flex items-center gap-1">
+                                                                    <FaRuler className="text-amarillo" />
+                                                                    {property.size}m²
+                                                                </span>
+                                                            </div>
+                                                            <div className="flex items-center justify-between">
+                                                                <p className="text-2xl font-light text-amarillo">
+                                                                    €{property.price}
+                                                                </p>
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation(); // Evitar que se active selectProperty
+                                                                        
+                                                                        // Determinar el ID correcto según el tipo de propiedad
+                                                                        const propertyId = property._id || property.id;
+                                                                        console.log('🔗 Navegando a propiedad:', property.title, 'ID:', propertyId);
+                                                                        
+                                                                        // Usar la URL correcta
+                                                                        window.open(`/property/${propertyId}`, '_blank');
+                                                                    }}
+                                                                    className="bg-amarillo hover:bg-amarillo/90 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                                                                    title={`Ver detalles de ${property.title}`}
+                                                                >
+                                                                    <FaEye className="text-xs" />
+                                                                    Ver detalles
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                                ))
+                                            )}
+                                        </div>
+                                        
+                                        {/* Google Maps con diseño premium */}
+                                        <div className="relative bg-gray-50">
+                                            {getFilteredProperties().length > 0 ? (
+                                                <div className="h-full flex flex-col">
+                                                    <div className="p-6 bg-white border-b border-gray-100">
+                                                        <h3 className="font-serif text-xl font-light text-gray-900 mb-2">
+                                                            {selectedProperty ? selectedProperty.title : `${getFilteredProperties().length} Propiedades en el Mapa`}
+                                                        </h3>
+                                                        <p className="text-gray-600 flex items-center gap-2 font-light">
+                                                            <FaMapMarkerAlt className="text-amarillo" />
+                                                            {selectedProperty ? selectedProperty.location : 'Madrid, España'}
+                                                        </p>
+                                                        {!selectedProperty && (
+                                                            <p className="text-sm text-gray-500 mt-2">
+                                                                Haz clic en una propiedad para centrar el mapa en su ubicación
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    
+                                                    <div className="flex-1 relative">
+                                                        {mapLoading && (
+                                                            <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-amarillo"></div>
+                                                                    <span className="text-gray-700 font-medium">Actualizando mapa...</span>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        
+                                                        {selectedProperty ? (
+                                                            // Mapa centrado en propiedad seleccionada
+                                                            <iframe
+                                                                key={`property-map-${selectedProperty.id}-${Date.now()}`}
+                                                                src={getMapEmbedUrl(selectedProperty)}
+                                                                width="100%"
+                                                                height="100%"
+                                                                style={{ border: 0 }}
+                                                                allowFullScreen=""
+                                                                loading="lazy"
+                                                                referrerPolicy="no-referrer-when-downgrade"
+                                                                title={`Mapa de ${selectedProperty.title || 'Propiedad'}`}
+                                                                className="w-full h-full transition-opacity duration-300"
+                                                                onLoad={() => {
+                                                                    console.log('✅ Mapa individual cargado para:', selectedProperty.title);
+                                                                }}
+                                                                onError={(e) => {
+                                                                    console.error('❌ Error cargando iframe del mapa individual:', e);
+                                                                    e.target.src = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1sen!2ses!4v1234567890123';
+                                                                }}
+                                                            ></iframe>
+                                                        ) : (
+                                                            // Mapa con todas las propiedades filtradas
+                                                            <iframe
+                                                                key={`map-${getFilteredProperties().length}-${JSON.stringify(searchFilters)}`}
+                                                                src={getMultipleLocationsMapUrl()}
+                                                                width="100%"
+                                                                height="100%"
+                                                                style={{ border: 0 }}
+                                                                allowFullScreen=""
+                                                                loading="lazy"
+                                                                referrerPolicy="no-referrer-when-downgrade"
+                                                                title={`Mapa con ${getFilteredProperties().length} propiedades disponibles`}
+                                                                className="w-full h-full"
+                                                                onError={(e) => {
+                                                                    console.error('❌ Error cargando iframe del mapa múltiple:', e);
+                                                                    e.target.src = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1sen!2ses!4v1234567890123';
+                                                                }}
+                                                            ></iframe>
+                                                        )}
+                                                    </div>
+                                                    
+                                                    {/* Controles del mapa */}
+                                                    <div className="p-4 bg-white border-t border-gray-100">
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="flex items-center gap-4">
+                                                                <button
+                                                                    onClick={() => setSelectedProperty(null)}
+                                                                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                                                        !selectedProperty 
+                                                                            ? 'bg-amarillo text-white' 
+                                                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                                                    }`}
+                                                                >
+                                                                    Ver Todas
+                                                                </button>
+                                                                <span className="text-sm text-gray-500">
+                                                                    {getFilteredProperties().length} propiedades
+                                                                </span>
+                                                            </div>
+                                                            
+                                                                                                                         <div className="flex items-center gap-2">
+                                                                 {selectedProperty ? (
+                                                                     <a
+                                                                         href={`https://www.google.com/maps/dir/?api=1&destination=${selectedProperty.coordinates.lat},${selectedProperty.coordinates.lng}`}
+                                                                         target="_blank"
+                                                                         rel="noopener noreferrer"
+                                                                         className="flex items-center gap-2 bg-amarillo text-white px-4 py-2 rounded-lg hover:bg-amarillo/90 transition-colors text-sm font-medium"
+                                                                     >
+                                                                         <FaMapMarkerAlt />
+                                                                         Cómo llegar
+                                                                     </a>
+                                                                 ) : (
+                                                                     <a
+                                                                         href="https://www.google.com/maps/place/Madrid,+Spain"
+                                                                         target="_blank"
+                                                                         rel="noopener noreferrer"
+                                                                         className="flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium"
+                                                                     >
+                                                                         <FaMapMarkerAlt />
+                                                                         Ver Madrid
+                                                                     </a>
+                                                                 )}
+                                                             </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="h-full flex items-center justify-center">
+                                                    <div className="text-center text-gray-600">
+                                                        <FaMapMarkerAlt className="text-6xl text-amarillo mx-auto mb-6" />
+                                                        <h3 className="font-serif text-2xl font-light mb-4">No hay propiedades para mostrar</h3>
+                                                        <p className="font-light">Ajusta los filtros de búsqueda para ver propiedades en el mapa</p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </section>
+            </AnimatedOnScroll>
+
+            {/* Barra inferior premium minimalista - Justo debajo del video */}
+            <div className="relative w-full bg-gradient-to-r from-gray-900 via-black to-gray-900 border-t border-amarillo/20">
+                <div className="relative w-full py-8 flex items-center justify-center px-6">
+                    <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 1, delay: 1.5 }}
+                        className="text-center max-w-3xl"
+                    >
+                        <h2 className="font-serif text-xl sm:text-2xl lg:text-4xl font-light text-white mb-3">
+                            Invierte en 
+                            <span className="font-normal text-amarillo italic"> bienes inmuebles</span>
+                        </h2>
+                        <p className="text-base lg:text-lg text-white/70 font-light tracking-wide">
+                            Las mejores oportunidades de inversión en Madrid
+                        </p>
+                    </motion.div>
+                </div>
+            </div>
+        </>
+    );
+};
+
+export default Video;
