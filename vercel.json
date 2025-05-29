@@ -24,80 +24,6 @@
       "schedule": "*/30 * * * *"
     }
   ],
-  "rewrites": [
-    {
-      "source": "/video.mp4",
-      "destination": "/video.mp4"
-    },
-    {
-      "source": "/videoExpIngles.mp4", 
-      "destination": "/videoExpIngles.mp4"
-    },
-    {
-      "source": "/madrid.jpg",
-      "destination": "/madrid.jpg"
-    },
-    {
-      "source": "/favicon.ico",
-      "destination": "/favicon.ico"
-    },
-    {
-      "source": "/manifest.json",
-      "destination": "/manifest.json"
-    },
-    {
-      "source": "/icon.svg",
-      "destination": "/icon.svg"
-    },
-    {
-      "source": "/logopestana.png",
-      "destination": "/logopestana.png"
-    },
-    {
-      "source": "/agenteinmo.png",
-      "destination": "/agenteinmo.png"
-    },
-    {
-      "source": "/analisis.png",
-      "destination": "/analisis.png"
-    },
-    {
-      "source": "/analisisdemercado.jpeg",
-      "destination": "/analisisdemercado.jpeg"
-    },
-    {
-      "source": "/acuerdosyconvenios.jpg",
-      "destination": "/acuerdosyconvenios.jpg"
-    },
-    {
-      "source": "/inicio.jpg",
-      "destination": "/inicio.jpg"
-    },
-    {
-      "source": "/guia.jpg",
-      "destination": "/guia.jpg"
-    },
-    {
-      "source": "/formFoto.jpeg",
-      "destination": "/formFoto.jpeg"
-    },
-    {
-      "source": "/gozamadridwp.jpg",
-      "destination": "/gozamadridwp.jpg"
-    },
-    {
-      "source": "/exp-gold.gif",
-      "destination": "/exp-gold.gif"
-    },
-    {
-      "source": "/css/styles.css",
-      "destination": "/css/styles.css"
-    },
-    {
-      "source": "/video-diagnostic.js",
-      "destination": "/video-diagnostic.js"
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -117,24 +43,7 @@
       ]
     },
     {
-      "source": "/video.mp4",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "video/mp4"
-        },
-        {
-          "key": "Accept-Ranges",
-          "value": "bytes"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000"
-        }
-      ]
-    },
-    {
-      "source": "/videoExpIngles.mp4",
+      "source": "/(.*)\\.(mp4|webm|ogg)",
       "headers": [
         {
           "key": "Content-Type",
