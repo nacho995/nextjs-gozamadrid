@@ -14,6 +14,7 @@ export default async function handler(req, res) {
         configured: false,
         accessible: false,
         url: null,
+        urlsTested: [],
         error: null,
         properties: 0
       },
@@ -21,6 +22,7 @@ export default async function handler(req, res) {
         configured: false,
         accessible: false,
         url: null,
+        urlsTested: [],
         hasCredentials: false,
         error: null,
         properties: 0
@@ -28,20 +30,27 @@ export default async function handler(req, res) {
     }
   };
 
-  // 1. Verificar configuración MongoDB
-  const MONGO_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8081';
-  report.sources.mongodb.configured = !!MONGO_URL;
-  report.sources.mongodb.url = MONGO_URL;
+  // 1. Verificar MongoDB con múltiples URLs
+  const MONGO_URLS = [
+    'http://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com', // URL que funciona
+    process.env.NEXT_PUBLIC_API_URL,
+    'http://api.realestategozamadrid.com', // HTTP en lugar de HTTPS
+    'http://localhost:8081'
+  ].filter(Boolean);
 
-  if (MONGO_URL) {
+  report.sources.mongodb.configured = MONGO_URLS.length > 0;
+  report.sources.mongodb.urlsTested = MONGO_URLS;
+
+  for (const mongoUrl of MONGO_URLS) {
     try {
-      console.log('[Diagnostic] Probando conexión MongoDB:', MONGO_URL);
-      const mongoResponse = await axios.get(`${MONGO_URL}/api/properties`, {
-        timeout: 10000,
+      console.log('[Diagnostic] Probando MongoDB:', mongoUrl);
+      const mongoResponse = await axios.get(`${mongoUrl}/api/properties`, {
+        timeout: 8000,
         headers: { 'Accept': 'application/json' }
       });
       
       report.sources.mongodb.accessible = true;
+      report.sources.mongodb.url = mongoUrl;
       
       let properties = [];
       if (Array.isArray(mongoResponse.data)) {
@@ -51,53 +60,69 @@ export default async function handler(req, res) {
       }
       
       report.sources.mongodb.properties = properties.length;
-      console.log(`[Diagnostic] MongoDB: ${properties.length} propiedades encontradas`);
+      console.log(`[Diagnostic] ✅ MongoDB OK: ${properties.length} propiedades desde ${mongoUrl}`);
+      break; // Salir del bucle si encontramos una URL que funciona
     } catch (error) {
-      report.sources.mongodb.error = error.message;
-      console.error('[Diagnostic] Error MongoDB:', error.message);
+      console.log(`[Diagnostic] ❌ MongoDB fallo: ${mongoUrl} - ${error.message}`);
+      if (mongoUrl === MONGO_URLS[MONGO_URLS.length - 1]) {
+        // Solo guardar el error del último intento
+        report.sources.mongodb.error = error.message;
+      }
     }
   }
 
-  // 2. Verificar configuración WooCommerce
-  const WC_API_URL = process.env.NEXT_PUBLIC_WC_API_URL || 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3';
+  // 2. Verificar WooCommerce con múltiples URLs
+  const WC_URLS = [
+    'https://wordpress.realestategozamadrid.com/wp-json/wc/v3',
+    'https://realestategozamadrid.com/wp-json/wc/v3',
+    'https://www.realestategozamadrid.com/wp-json/wc/v3'
+  ];
+  
   const WC_KEY = process.env.WC_CONSUMER_KEY || process.env.NEXT_PUBLIC_WOO_COMMERCE_KEY;
   const WC_SECRET = process.env.WC_CONSUMER_SECRET || process.env.NEXT_PUBLIC_WOO_COMMERCE_SECRET;
 
-  report.sources.woocommerce.configured = !!WC_API_URL;
-  report.sources.woocommerce.url = WC_API_URL;
+  report.sources.woocommerce.configured = WC_URLS.length > 0;
+  report.sources.woocommerce.urlsTested = WC_URLS;
   report.sources.woocommerce.hasCredentials = !!(WC_KEY && WC_SECRET);
 
-  if (WC_API_URL && WC_KEY && WC_SECRET) {
-    try {
-      console.log('[Diagnostic] Probando conexión WooCommerce:', WC_API_URL);
-      const wcResponse = await axios.get(`${WC_API_URL}/products`, {
-        params: {
-          consumer_key: WC_KEY,
-          consumer_secret: WC_SECRET,
-          status: 'publish',
-          per_page: 10
-        },
-        timeout: 15000,
-        headers: { 'Accept': 'application/json' }
-      });
-      
-      report.sources.woocommerce.accessible = true;
-      
-      if (Array.isArray(wcResponse.data)) {
-        report.sources.woocommerce.properties = wcResponse.data.length;
-        console.log(`[Diagnostic] WooCommerce: ${wcResponse.data.length} propiedades encontradas`);
-      }
-    } catch (error) {
-      report.sources.woocommerce.error = error.message;
-      console.error('[Diagnostic] Error WooCommerce:', error.message);
-      
-      // Verificar si es un error de CORS o credenciales
-      if (error.response?.status === 401) {
-        report.sources.woocommerce.error = 'Credenciales inválidas (401)';
-      } else if (error.response?.status === 403) {
-        report.sources.woocommerce.error = 'Acceso denegado (403)';
-      } else if (error.code === 'ENOTFOUND') {
-        report.sources.woocommerce.error = 'Dominio no encontrado';
+  if (WC_KEY && WC_SECRET) {
+    for (const wcUrl of WC_URLS) {
+      try {
+        console.log('[Diagnostic] Probando WooCommerce:', wcUrl);
+        const wcResponse = await axios.get(`${wcUrl}/products`, {
+          params: {
+            consumer_key: WC_KEY,
+            consumer_secret: WC_SECRET,
+            status: 'publish',
+            per_page: 5
+          },
+          timeout: 10000,
+          headers: { 'Accept': 'application/json' }
+        });
+        
+        report.sources.woocommerce.accessible = true;
+        report.sources.woocommerce.url = wcUrl;
+        
+        if (Array.isArray(wcResponse.data)) {
+          report.sources.woocommerce.properties = wcResponse.data.length;
+          console.log(`[Diagnostic] ✅ WooCommerce OK: ${wcResponse.data.length} propiedades desde ${wcUrl}`);
+        }
+        break; // Salir del bucle si encontramos una URL que funciona
+      } catch (error) {
+        console.log(`[Diagnostic] ❌ WooCommerce fallo: ${wcUrl} - ${error.message}`);
+        if (wcUrl === WC_URLS[WC_URLS.length - 1]) {
+          // Solo guardar el error del último intento
+          report.sources.woocommerce.error = error.message;
+          
+          // Verificar tipos específicos de error
+          if (error.response?.status === 401) {
+            report.sources.woocommerce.error = 'Credenciales inválidas (401)';
+          } else if (error.response?.status === 403) {
+            report.sources.woocommerce.error = 'Acceso denegado (403)';
+          } else if (error.code === 'ENOTFOUND') {
+            report.sources.woocommerce.error = 'Dominio no encontrado';
+          }
+        }
       }
     }
   } else {

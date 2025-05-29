@@ -7,7 +7,7 @@
   "env": {
     "NEXT_PUBLIC_WP_API_URL": "https://wordpress.realestategozamadrid.com/wp-json/wp/v2",
     "NEXT_PUBLIC_WC_API_URL": "https://wordpress.realestategozamadrid.com/wp-json/wc/v3",
-    "NEXT_PUBLIC_API_URL": "http://api.realestategozamadrid.com",
+    "NEXT_PUBLIC_API_URL": "http://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com",
     "NEXT_PUBLIC_API_TIMEOUT": "10000",
     "NEXT_PUBLIC_MAX_RETRIES": "5",
     "NODE_ENV": "production",
