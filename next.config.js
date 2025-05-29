@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+const path = require('path');
+
 const nextConfig = {
   reactStrictMode: true,
   images: {
@@ -15,6 +17,10 @@ const nextConfig = {
   },
   publicRuntimeConfig: {
     staticFolder: '/public',
+  },
+  webpack: (config) => {
+    config.resolve.alias['@'] = path.resolve(__dirname, 'src');
+    return config;
   },
   async headers() {
     return [
