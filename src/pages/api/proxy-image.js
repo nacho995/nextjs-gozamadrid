@@ -21,8 +21,15 @@ export default async function handler(req, res) {
   let { url } = req.query;
 
   if (!url) {
-    // Redirigir a una imagen placeholder en lugar de devolver un error
-    return res.redirect(307, 'https://via.placeholder.com/800x600?text=Sin+Imagen');
+    return res.redirect(307, 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80');
+  }
+
+  // Validar que la URL sea válida
+  try {
+    new URL(url);
+  } catch (error) {
+    console.error('[proxy-image] URL inválida:', url);
+    return res.redirect(307, 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80');
   }
 
   try {
@@ -36,7 +43,7 @@ export default async function handler(req, res) {
       new URL(url);
     } catch (error) {
       console.error(`[proxy-image] URL inválida: ${url}`);
-      return res.redirect(307, 'https://via.placeholder.com/800x600?text=URL+Inválida');
+      return res.redirect(307, 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80');
     }
 
     // Si la URL ya es de un servicio de proxy confiable como weserv.nl, redirigir directamente
@@ -46,9 +53,8 @@ export default async function handler(req, res) {
 
     console.log(`[proxy-image] Proxy para imagen: ${url}`);
 
-    // Método alternativo: usar weserv.nl como proxy externo
-    // Esto es más confiable que manejar el binario nosotros mismos
-    const weservUrl = `https://images.weserv.nl/?url=${encodeURIComponent(url)}&n=-1&default=https://via.placeholder.com/800x600?text=Sin+Imagen`;
+    // URL del servicio de imágenes con fallback
+    const weservUrl = `https://images.weserv.nl/?url=${encodeURIComponent(url)}&n=-1&default=https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80`;
     return res.redirect(307, weservUrl);
 
     /* Mantener el código original como alternativa, pero usar el método de redirección
@@ -76,6 +82,6 @@ export default async function handler(req, res) {
     console.error(`[proxy-image] Error al procesar la imagen: ${error.message}`);
     
     // En caso de error, redirigir a una imagen placeholder
-    return res.redirect(307, 'https://via.placeholder.com/800x600?text=Error+de+Imagen');
+    return res.redirect(307, 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80');
   }
 } 
