@@ -69,21 +69,58 @@ export default async function handler(req, res) {
       const data = await tryWordPressAPI(wpUrl);
       
       // Procesar los posts para asegurar formato consistente
-      const processedPosts = Array.isArray(data) ? data.map(post => ({
-        id: post.id,
-        title: post.title,
-        content: post.content,
-        excerpt: post.excerpt,
-        date: post.date,
-        slug: post.slug,
-        status: post.status,
-        author: post.author,
-        featured_media: post.featured_media,
-        categories: post.categories || [],
-        tags: post.tags || [],
-        _embedded: post._embedded || {},
-        _links: post._links || {}
-      })) : [];
+      const processedPosts = Array.isArray(data) ? data.map(post => {
+        // Función para procesar URLs de imágenes featured media
+        const processFeaturedMedia = (embedded) => {
+          if (!embedded || !embedded['wp:featuredmedia'] || !embedded['wp:featuredmedia'][0]) {
+            return null;
+          }
+
+          const media = embedded['wp:featuredmedia'][0];
+          let sourceUrl = media.source_url;
+
+          // Corregir URLs problemáticas
+          if (sourceUrl) {
+            // Corregir subdomain incorrecto
+            if (sourceUrl.includes('wordpress.realestategozamadrid.com')) {
+              sourceUrl = sourceUrl.replace('wordpress.realestategozamadrid.com', 'www.realestategozamadrid.com');
+            }
+            
+            // Asegurar HTTPS
+            if (sourceUrl.startsWith('http:')) {
+              sourceUrl = sourceUrl.replace('http:', 'https:');
+            }
+
+            // Actualizar el objeto media
+            media.source_url = sourceUrl;
+          }
+
+          return media;
+        };
+
+        // Procesar embedded media
+        const processedEmbedded = post._embedded ? {
+          ...post._embedded,
+          'wp:featuredmedia': post._embedded['wp:featuredmedia'] ? 
+            [processFeaturedMedia(post._embedded)] : []
+        } : {};
+
+        return {
+          id: post.id,
+          title: post.title,
+          content: post.content,
+          excerpt: post.excerpt,
+          date: post.date,
+          slug: post.slug,
+          status: post.status,
+          author: post.author,
+          featured_media: post.featured_media,
+          categories: post.categories || [],
+          tags: post.tags || [],
+          _embedded: processedEmbedded,
+          _links: post._links || {}
+        };
+      }) : [];
 
       // Establecer headers de caché
       res.setHeader('Cache-Control', 'public, max-age=300'); // 5 minutos de caché
