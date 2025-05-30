@@ -1,6 +1,6 @@
 /**
  * Endpoint de compatibilidad para /api/blogs
- * Redirige las llamadas al proxy de WordPress
+ * Llama directamente a WordPress y devuelve blogs procesados
  */
 export default async function handler(req, res) {
   // Configurar CORS
@@ -23,35 +23,84 @@ export default async function handler(req, res) {
     // Convertir limit a per_page si está presente
     const perPage = limit || per_page || 10;
     
-    // Construir URL para el proxy de WordPress
-    const proxyUrl = new URL('/api/proxy/wordpress/posts', `${req.headers['x-forwarded-proto'] || 'http'}://${req.headers.host}`);
-    proxyUrl.searchParams.set('per_page', perPage);
-    proxyUrl.searchParams.set('page', page);
-    proxyUrl.searchParams.set('_embed', _embed);
+    console.log(`[/api/blogs] Obteniendo ${perPage} blogs desde WordPress`);
     
-    console.log(`[/api/blogs] Redirigiendo a: ${proxyUrl.toString()}`);
+    // URLs de WordPress a probar (en orden de prioridad)
+    const WORDPRESS_URLS = [
+      'https://www.realestategozamadrid.com/wp-json/wp/v2',
+      'https://realestategozamadrid.com/wp-json/wp/v2'
+    ];
+
+    let lastError = null;
     
-    // Hacer la llamada al proxy de WordPress
-    const response = await fetch(proxyUrl.toString(), {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'User-Agent': 'GozaMadrid-BlogsProxy/1.0'
+    for (const wpUrl of WORDPRESS_URLS) {
+      try {
+        const url = new URL(`${wpUrl}/posts`);
+        url.searchParams.set('per_page', perPage);
+        url.searchParams.set('page', page);
+        url.searchParams.set('_embed', _embed);
+        url.searchParams.set('status', 'publish');
+
+        console.log(`[/api/blogs] Intentando: ${url.toString()}`);
+
+        const response = await fetch(url.toString(), {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'GozaMadrid-BlogsProxy/1.0',
+            'Cache-Control': 'no-cache'
+          },
+          signal: AbortSignal.timeout(8000)
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log(`[/api/blogs] Éxito con ${wpUrl}: ${Array.isArray(data) ? data.length : 0} posts`);
+        
+        // Procesar los posts para formato consistente
+        const processedPosts = Array.isArray(data) ? data.map(post => {
+          let featuredImageUrl = null;
+          
+          // Intentar extraer imagen featured
+          if (post._embedded && post._embedded['wp:featuredmedia'] && post._embedded['wp:featuredmedia'][0]) {
+            const media = post._embedded['wp:featuredmedia'][0];
+            featuredImageUrl = media.source_url;
+            
+            // Corregir URLs problemáticas
+            if (featuredImageUrl) {
+              if (featuredImageUrl.includes('wordpress.realestategozamadrid.com')) {
+                featuredImageUrl = featuredImageUrl.replace('wordpress.realestategozamadrid.com', 'www.realestategozamadrid.com');
+              }
+              if (featuredImageUrl.startsWith('http:')) {
+                featuredImageUrl = featuredImageUrl.replace('http:', 'https:');
+              }
+            }
+          }
+          
+          return {
+            ...post,
+            featured_image_url: featuredImageUrl
+          };
+        }) : [];
+
+        // Configurar headers de caché
+        res.setHeader('Cache-Control', 'public, max-age=300'); // 5 minutos de caché
+        res.setHeader('X-Source', 'wordpress-direct');
+        
+        return res.status(200).json(processedPosts);
+        
+      } catch (error) {
+        console.error(`[/api/blogs] Error con ${wpUrl}: ${error.message}`);
+        lastError = error;
+        continue;
       }
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Proxy WordPress falló: ${response.status} ${response.statusText}`);
     }
     
-    const data = await response.json();
-    
-    // Configurar headers de caché
-    res.setHeader('Cache-Control', 'public, max-age=300'); // 5 minutos de caché
-    res.setHeader('X-Redirected-From', 'blogs');
-    res.setHeader('X-Redirected-To', 'proxy/wordpress/posts');
-    
-    return res.status(200).json(data);
+    // Si todas las URLs fallaron, devolver datos de ejemplo
+    throw lastError || new Error('Todas las URLs de WordPress fallaron');
     
   } catch (error) {
     console.error('[/api/blogs] Error:', error.message);
@@ -74,7 +123,8 @@ export default async function handler(req, res) {
           'wp:featuredmedia': [{
             source_url: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80'
           }]
-        }
+        },
+        featured_image_url: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80'
       },
       {
         id: 'sample-2',
@@ -92,7 +142,8 @@ export default async function handler(req, res) {
           'wp:featuredmedia': [{
             source_url: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&h=600&fit=crop&q=80'
           }]
-        }
+        },
+        featured_image_url: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&h=600&fit=crop&q=80'
       }
     ];
     
