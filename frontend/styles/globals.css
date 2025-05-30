@@ -94,8 +94,23 @@ body {
 }
 
 /* Quitar línea específicamente del título principal del blog */
-.blog-main-title::before {
+.blog-main-title::before,
+h1.blog-main-title::before,
+h2.blog-main-title::before {
   display: none !important;
+  content: none !important;
+}
+
+/* Asegurar que no hay border ni underline */
+.blog-main-title {
+  border-bottom: none !important;
+  text-decoration: none !important;
+  position: relative;
+}
+
+.blog-main-title::after {
+  display: none !important;
+  content: none !important;
 }
 
 .prose h3 {

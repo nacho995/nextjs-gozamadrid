@@ -45,7 +45,7 @@ if (typeof window !== 'undefined') {
   Promise.all([
     checkEndpointAvailability(`${BASE_URL}/api/properties/sources/mongodb`),
     checkEndpointAvailability(`${BASE_URL}/api/properties/sources/woocommerce`),
-    checkEndpointAvailability(`${BASE_URL}/api/proxy/wordpress/posts`)
+    checkEndpointAvailability(`${BASE_URL}/api/wordpress-proxy`)
   ]).then(([mongodbAvailable, wooCommerceAvailable, wordPressProxyAvailable]) => {
     console.log('[_app.js] Estado de endpoints:', {
       'properties/mongodb': mongodbAvailable,
