@@ -91,7 +91,20 @@ export default function BlogPreview() {
       </Head>
 
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <div className="relative bg-gradient-to-b from-black to-gray-900 text-white py-16">
+        {/* Background fijo */}
+        <div
+          className="fixed inset-0 z-0"
+          style={{
+            backgroundImage: "url('/gozamadridwp2.jpg')",
+            backgroundAttachment: "fixed",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat"
+          }}
+        ></div>
+        
+        {/* Hero section con título y subtítulo */}
+        <div className="relative z-10 bg-gradient-to-b from-black to-gray-900 text-white py-16 mt-20">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
               Blog Inmobiliario
@@ -101,17 +114,11 @@ export default function BlogPreview() {
             </p>
           </div>
         </div>
-        <div
-          className="fixed inset-0 z-0 opacity-100"
-          style={{
-            backgroundImage: "url('/gozamadridwp2.jpg')",
-            backgroundAttachment: "fixed",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat"
-          }}
-        ></div>
-        <BlogPage />
+        
+        {/* Contenido principal */}
+        <div className="relative z-10">
+          <BlogPage />
+        </div>
       </div>
     </>
   );
