@@ -117,7 +117,8 @@ export const getBlogPosts = async () => {
 // Función para obtener un post específico del blog
 export const getBlogById = async (id) => {
   try {
-    const data = await fetchWithRetry(`${config.WP_API_URL}/posts/${id}`);
+    // Usar nuestro proxy en lugar de hacer llamada directa a WordPress
+    const data = await fetchWithRetry(`/api/proxy/blog-by-id?id=${encodeURIComponent(id)}`);
     return data;
   } catch (error) {
     console.error('Error al obtener post del blog:', error);
