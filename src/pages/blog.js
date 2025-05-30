@@ -104,7 +104,7 @@ export default function BlogPreview() {
         ></div>
         
         {/* Hero section con título y subtítulo */}
-        <div className="relative z-10 bg-gradient-to-b from-black to-gray-900 text-white py-16 mt-20">
+        <div className="relative z-10 text-black py-16 mt-20">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 blog-main-title">
               Blog Inmobiliario
