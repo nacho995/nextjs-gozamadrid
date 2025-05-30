@@ -832,7 +832,7 @@ export default function BlogPage() {
                                                          {/* Contenido de la tarjeta */}
                                                          <div className="flex flex-1 flex-col p-6">
                                                              {/* Título */}
-                                                             <h2 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-amarillo transition-colors line-clamp-2" itemProp="headline">
+                                                             <h2 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-amarillo transition-colors line-clamp-2 blog-card-title" itemProp="headline">
                                                                  {safeRenderValue(blog.title)}
                                                              </h2>
                                                              
