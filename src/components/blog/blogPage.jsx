@@ -729,7 +729,7 @@ export default function BlogPage() {
                 />
             </Head>
             {loading && <LoadingScreen />}
-            <main className="relative py-8 z-10 bg-transparent">
+            <main className="relative py-8">
                 <AnimatedOnScroll>
                     <div className="relative container mx-auto px-4">
                         {/* Indicador de carga */}
