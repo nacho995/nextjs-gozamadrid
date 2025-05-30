@@ -669,16 +669,28 @@ export default function BlogPage() {
                 
                 const strId = String(id);
                 
+                // Manejar IDs de muestra sin hacer llamadas a la API
+                if (strId.startsWith('sample')) {
+                    const sampleBlog = blogs.find(blog => String(blog._id) === strId);
+                    if (sampleBlog) {
+                        setSelectedBlog(sampleBlog);
+                        return;
+                    }
+                }
+                
                 if (strId.startsWith('wp-')) {
                     blogId = strId.substring(3);
                 } else {
                     blogId = strId;
                 }
                 
-                const data = await getBlogById(blogId);
-                
-                if (data) {
-                    setSelectedBlog(data);
+                // Solo hacer llamada a la API si no es un ID de muestra
+                if (!strId.startsWith('sample')) {
+                    const data = await getBlogById(blogId);
+                    
+                    if (data) {
+                        setSelectedBlog(data);
+                    }
                 }
             } catch (error) {
                 try {
