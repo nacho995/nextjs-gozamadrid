@@ -223,35 +223,45 @@ export default function BlogPage() {
                             if (!seenPosts.has(wpKey)) {
                                 let featuredImageUrl = null;
                                 
-                                // Extraer imagen destacada
-                                if (post._embedded && 
+                                // 1. Primero intentar con el campo featured_image_url procesado por el proxy
+                                if (post.featured_image_url) {
+                                    featuredImageUrl = post.featured_image_url;
+                                    console.log(`[BlogPage] Usando featured_image_url para post ${post.id}: ${featuredImageUrl}`);
+                                }
+                                
+                                // 2. Si no, extraer imagen destacada de _embedded
+                                else if (post._embedded && 
                                     post._embedded['wp:featuredmedia'] && 
                                     post._embedded['wp:featuredmedia'][0]) {
                                     
                                     const media = post._embedded['wp:featuredmedia'][0];
                                     featuredImageUrl = media.source_url || null;
+                                    console.log(`[BlogPage] Usando _embedded media para post ${post.id}: ${featuredImageUrl}`);
                                     
                                     // Asegurarnos de que la URL de la imagen sea segura (HTTPS)
                                     if (featuredImageUrl && featuredImageUrl.startsWith('http:')) {
                                         featuredImageUrl = featuredImageUrl.replace('http:', 'https:');
                                     }
                                     
-                                    // Usar weserv.nl como proxy para evitar errores de contenido mixto
-                                    if (featuredImageUrl) {
-                                        featuredImageUrl = `https://images.weserv.nl/?url=${encodeURIComponent(featuredImageUrl)}&n=-1`;
+                                    // Corregir subdomain incorrecto de WordPress
+                                    if (featuredImageUrl && featuredImageUrl.includes('wordpress.realestategozamadrid.com')) {
+                                        featuredImageUrl = featuredImageUrl.replace('wordpress.realestategozamadrid.com', 'www.realestategozamadrid.com');
                                     }
                                 }
                                 
-                                if (!featuredImageUrl && post.featured_media_url) {
+                                // 3. Fallback a featured_media_url
+                                else if (post.featured_media_url) {
                                     featuredImageUrl = post.featured_media_url;
                                     if (featuredImageUrl.startsWith('http:')) {
                                         featuredImageUrl = featuredImageUrl.replace('http:', 'https:');
                                     }
-                                    featuredImageUrl = `https://images.weserv.nl/?url=${encodeURIComponent(featuredImageUrl)}&n=-1`;
+                                    if (featuredImageUrl.includes('wordpress.realestategozamadrid.com')) {
+                                        featuredImageUrl = featuredImageUrl.replace('wordpress.realestategozamadrid.com', 'www.realestategozamadrid.com');
+                                    }
                                 }
                                 
-                                // Intentar obtener la imagen desde uagb_featured_image_src si existe
-                                if (!featuredImageUrl && post.uagb_featured_image_src) {
+                                // 4. Intentar obtener la imagen desde uagb_featured_image_src si existe
+                                else if (post.uagb_featured_image_src) {
                                     let imgSrc = null;
                                     // Intentar con diferentes tamaños de imagen
                                     if (post.uagb_featured_image_src.large) {
@@ -269,12 +279,23 @@ export default function BlogPage() {
                                         if (featuredImageUrl.startsWith('http:')) {
                                             featuredImageUrl = featuredImageUrl.replace('http:', 'https:');
                                         }
-                                        featuredImageUrl = `https://images.weserv.nl/?url=${encodeURIComponent(featuredImageUrl)}&n=-1`;
+                                        if (featuredImageUrl.includes('wordpress.realestategozamadrid.com')) {
+                                            featuredImageUrl = featuredImageUrl.replace('wordpress.realestategozamadrid.com', 'www.realestategozamadrid.com');
+                                        }
                                     }
                                 }
                                 
-                                if (!featuredImageUrl) {
+                                // Si encontramos una imagen, usar proxy para evitar errores de CORS
+                                if (featuredImageUrl) {
+                                    // Solo usar proxy si no es ya una imagen de Unsplash o no está ya proxificada
+                                    if (!featuredImageUrl.includes('images.unsplash.com') && 
+                                        !featuredImageUrl.includes('images.weserv.nl')) {
+                                        featuredImageUrl = `https://images.weserv.nl/?url=${encodeURIComponent(featuredImageUrl)}&w=800&h=600&fit=cover&default=${encodeURIComponent('https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80')}`;
+                                    }
+                                } else {
+                                    // Fallback a imagen por defecto
                                     featuredImageUrl = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80';
+                                    console.log(`[BlogPage] No se encontró imagen para post ${post.id}, usando fallback`);
                                 }
                                 
                                 const wpBlog = {
