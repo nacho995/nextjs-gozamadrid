@@ -18,11 +18,12 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Método no permitido' });
   }
 
-  // URL base de la API en AWS Elastic Beanstalk
-  const baseUrl = process.env.NEXT_PUBLIC_API_MONGODB_URL || 'http://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com';
+  // Construir URL para obtener blogs
+  const baseUrl = process.env.NEXT_PUBLIC_API_MONGODB_URL || 'https://nextjs-gozamadrid-qrfk.onrender.com';
+  const endpoint = `${baseUrl}/api/blogs`;
   const limit = req.query.limit || 100;
 
-  console.log(`[proxy/backend/blogs] Intentando conectar a: ${baseUrl}/api/blogs`);
+  console.log(`[proxy/backend/blogs] Intentando conectar a: ${endpoint}`);
 
   // Blogs de muestra como respaldo
   const sampleBlogs = [
@@ -115,7 +116,7 @@ export default async function handler(req, res) {
     
     // Intentar obtener los blogs del backend real
     try {
-      console.log(`[proxy/backend/blogs] Obteniendo blogs desde ${baseUrl}/api/blogs`);
+      console.log(`[proxy/backend/blogs] Obteniendo blogs desde ${endpoint}`);
       
       // Usar nuestro propio proxy para evitar problemas de contenido mixto
       const apiProxyUrl = '/api/proxy-raw';
@@ -124,7 +125,7 @@ export default async function handler(req, res) {
         url: apiProxyUrl,
         timeout: 10000, // 10 segundos de timeout
         data: {
-          url: `${baseUrl}/api/blogs`,
+          url: endpoint,
           method: 'GET',
           headers: {
             'Accept': 'application/json',

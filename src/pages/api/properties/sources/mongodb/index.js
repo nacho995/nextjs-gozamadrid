@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Determinar la URL base de la API según el entorno - usar la URL que funciona
-const BASE_URL = 'http://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com';
+const BASE_URL = 'https://nextjs-gozamadrid-qrfk.onrender.com';
 const TIMEOUT = parseInt(process.env.NEXT_PUBLIC_API_TIMEOUT || '30000');
 
 // Funciones auxiliares

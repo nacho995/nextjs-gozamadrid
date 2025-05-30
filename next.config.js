@@ -22,6 +22,14 @@ const nextConfig = {
     config.resolve.alias['@'] = path.resolve(__dirname, 'src');
     return config;
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/proxy/:path*',
+        destination: '/api/proxy/:path*',
+      },
+    ];
+  },
   async headers() {
     return [
       {
@@ -39,6 +47,31 @@ const nextConfig = {
             key: 'Accept-Ranges',
             value: 'bytes',
           },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+        ],
+      },
+      {
+        source: '/videoExpIngles.mp4',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'video/mp4',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000',
+          },
+          {
+            key: 'Accept-Ranges',
+            value: 'bytes',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
         ],
       },
       {
@@ -55,6 +88,10 @@ const nextConfig = {
           {
             key: 'Accept-Ranges',
             value: 'bytes',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
           },
         ],
       },
