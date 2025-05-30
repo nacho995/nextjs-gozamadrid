@@ -273,7 +273,7 @@ export default function BlogPage() {
                                 }
                                 
                                 if (!featuredImageUrl) {
-                                    featuredImageUrl = 'https://via.placeholder.com/800x600?text=GozaMadrid';
+                                    featuredImageUrl = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80';
                                 }
                                 
                                 const wpBlog = {
@@ -332,7 +332,7 @@ export default function BlogPage() {
                                         // Asegurar que tiene imagen
                                         if (!blog.image) {
                                             blog.image = {
-                                                src: 'https://via.placeholder.com/800x600?text=GozaMadrid',
+                                                src: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80',
                                                 alt: blog.title || 'Imagen del blog'
                                             };
                                         } else if (typeof blog.image === 'string') {
@@ -557,7 +557,7 @@ export default function BlogPage() {
                             // Si no hay imagen, usar placeholder
                             else {
                                 blogImage = {
-                                    src: 'https://via.placeholder.com/800x600?text=GozaMadrid',
+                                    src: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80',
                                     alt: blog.title || 'Imagen del blog'
                                 };
                             }
@@ -600,7 +600,7 @@ export default function BlogPage() {
                         date: new Date().toISOString(),
                         dateFormatted: new Date().toLocaleDateString('es-ES'),
                         image: {
-                            src: 'https://via.placeholder.com/800x600?text=GozaMadrid',
+                            src: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80',
                             alt: 'Inversión inmobiliaria en Madrid'
                         },
                         slug: 'invertir-mercado-inmobiliario-madrid',
@@ -615,7 +615,7 @@ export default function BlogPage() {
                         date: new Date(Date.now() - 7*24*60*60*1000).toISOString(),
                         dateFormatted: new Date(Date.now() - 7*24*60*60*1000).toLocaleDateString('es-ES'),
                         image: {
-                            src: 'https://via.placeholder.com/800x600?text=GozaMadrid',
+                            src: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop&q=80',
                             alt: 'Barrios en Madrid'
                         },
                         slug: 'barrios-mayor-revalorizacion-madrid',
@@ -785,7 +785,7 @@ export default function BlogPage() {
                                                                      src={blog.image.src}
                                                                      alt={blog.image.alt || `Imagen para el artículo: ${blog.title}` || "Imagen del blog"}
                                                                      className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
-                                                                     fallbackSrc="https://via.placeholder.com/800x600?text=GozaMadrid"
+                                                                     fallbackSrc="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80"
                                                                  />
                                                              ) : (
                                                                  <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
