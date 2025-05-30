@@ -18,10 +18,12 @@ const Video = () => {
     const isInitializedRef = useRef(false);
 
     // Estado inicial consistente para SSR
-    const [videoSrc, setVideoSrc] = useState("/video.mp4");
+    const [videoSrc, setVideoSrc] = useState("/api/video?file=video.mp4");
     const [isClientHydrated, setIsClientHydrated] = useState(false);
     const [isVideoLoaded, setIsVideoLoaded] = useState(false);
     const [videoError, setVideoError] = useState(false);
+    const [videoErrorMessage, setVideoErrorMessage] = useState('');
+    const [retryCount, setRetryCount] = useState(0);
 
     // Un solo useEffect para la inicialización del cliente
     useEffect(() => {
@@ -44,50 +46,160 @@ const Video = () => {
         }
     }, []);
 
-    // Un solo useEffect para configurar el video después de la hidratación
+    // Función para verificar si el video está disponible
+    const checkVideoAvailability = async (src) => {
+        try {
+            console.log(`[Video] 🔍 Verificando disponibilidad de: ${src}`);
+            const response = await fetch(src, { method: 'HEAD' });
+            const isAvailable = response.ok;
+            console.log(`[Video] 📊 Video ${src} disponible: ${isAvailable} (status: ${response.status})`);
+            return isAvailable;
+        } catch (error) {
+            console.error(`[Video] ❌ Error verificando video ${src}:`, error);
+            return false;
+        }
+    };
+
+    // Función para intentar cargar video con fallbacks
+    const loadVideoWithFallbacks = async () => {
+        const videoSources = [
+            "/api/video?file=video.mp4", // Endpoint API como primera opción
+            "/video.mp4", // Directo desde public
+            "/api/video?file=videoExpIngles.mp4", // Fallback 1 via API
+            "/videoExpIngles.mp4", // Fallback 1 directo
+            "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny_mp4_640x360_SF.mp4" // Fallback externo
+        ];
+
+        for (let i = 0; i < videoSources.length; i++) {
+            const src = videoSources[i];
+            console.log(`[Video] 🔄 Intentando cargar: ${src} (intento ${i + 1}/${videoSources.length})`);
+            
+            const isAvailable = await checkVideoAvailability(src);
+            if (isAvailable) {
+                console.log(`[Video] ✅ Video encontrado: ${src}`);
+                setVideoSrc(src);
+                return src;
+            }
+        }
+
+        console.error('[Video] ❌ Ningún video disponible, usando imagen de fallback');
+        setVideoError(true);
+        setVideoErrorMessage('Videos no disponibles temporalmente');
+        return null;
+    };
+
+    // Efecto mejorado para la configuración del video
     useEffect(() => {
-        if (!isClientHydrated || !videoRef.current || isVideoLoaded) return;
+        if (!isClientHydrated || !videoRef.current) return;
 
         const videoElement = videoRef.current;
-        console.log('[Video] Configurando elemento video...');
+        console.log('[Video] 🎬 Configurando elemento video...');
         
         videoElement.loop = true;
+        videoElement.muted = true; // Asegurar que esté muteado para autoplay
+        videoElement.playsInline = true;
         
         const handleLoadedData = () => {
             console.log('[Video] ✅ Video cargado exitosamente');
             setIsVideoLoaded(true);
             setVideoError(false);
+            setVideoErrorMessage('');
+            setRetryCount(0);
         };
 
-        const handleError = (error) => {
+        const handleError = async (error) => {
             console.error('[Video] ❌ Error al cargar el video:', error);
             setVideoError(true);
             setIsVideoLoaded(false);
+            
+            // Intentar retry con diferentes fuentes
+            if (retryCount < 2) {
+                console.log(`[Video] 🔄 Reintentando carga (${retryCount + 1}/2)...`);
+                setRetryCount(prev => prev + 1);
+                
+                const newSrc = await loadVideoWithFallbacks();
+                if (newSrc && newSrc !== videoSrc) {
+                    setVideoSrc(newSrc);
+                    // El efecto se disparará de nuevo con el nuevo src
+                    return;
+                }
+            }
+            
+            setVideoErrorMessage('Error cargando video');
         };
 
         const handleCanPlay = () => {
             console.log('[Video] ✅ Video listo para reproducir');
             setIsVideoLoaded(true);
             setVideoError(false);
+            setVideoErrorMessage('');
+        };
+
+        const handleLoadStart = () => {
+            console.log('[Video] 🔄 Iniciando carga del video...');
+            setVideoError(false);
+            setVideoErrorMessage('');
         };
 
         // Event listeners
         videoElement.addEventListener('loadeddata', handleLoadedData);
         videoElement.addEventListener('canplay', handleCanPlay);
         videoElement.addEventListener('error', handleError);
+        videoElement.addEventListener('loadstart', handleLoadStart);
         
-        // Cargar y reproducir
-        videoElement.load();
-        videoElement.play().catch(error => {
-            console.log("[Video] Autoplay bloqueado, el usuario debe interactuar primero");
-        });
+        // Inicializar carga del video
+        const initializeVideo = async () => {
+            // Si es el primer intento, verificar si el video actual está disponible
+            if (retryCount === 0) {
+                const isCurrentAvailable = await checkVideoAvailability(videoSrc);
+                if (!isCurrentAvailable) {
+                    console.log('[Video] ⚠️ Video principal no disponible, buscando alternativas...');
+                    const newSrc = await loadVideoWithFallbacks();
+                    if (newSrc && newSrc !== videoSrc) {
+                        setVideoSrc(newSrc);
+                        return; // El efecto se disparará de nuevo
+                    }
+                }
+            }
+            
+            // Cargar y reproducir
+            try {
+                videoElement.load();
+                const playPromise = videoElement.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.log("[Video] ⚠️ Autoplay bloqueado:", error.message);
+                        // No es un error crítico, el usuario puede hacer click para reproducir
+                    });
+                }
+            } catch (error) {
+                console.error("[Video] ❌ Error iniciando reproducción:", error);
+                handleError(error);
+            }
+        };
+
+        initializeVideo();
 
         return () => {
             videoElement.removeEventListener('loadeddata', handleLoadedData);
             videoElement.removeEventListener('canplay', handleCanPlay);
             videoElement.removeEventListener('error', handleError);
+            videoElement.removeEventListener('loadstart', handleLoadStart);
         };
-    }, [isClientHydrated]);
+    }, [isClientHydrated, videoSrc, retryCount]);
+
+    // Función para intentar reproducir manualmente
+    const handleVideoClick = async () => {
+        if (videoRef.current && !videoError) {
+            try {
+                await videoRef.current.play();
+                console.log('[Video] ✅ Reproducción iniciada por usuario');
+            } catch (error) {
+                console.error('[Video] ❌ Error reproducción manual:', error);
+            }
+        }
+    };
 
     // Estados para el buscador de propiedades
     const [searchFilters, setSearchFilters] = useState({
@@ -312,7 +424,7 @@ const Video = () => {
                             }}
                         />
                         
-                        {/* Fallback para cuando el video no está cargado o hay error */}
+                        {/* Overlay de estado del video */}
                         {(!isVideoLoaded || videoError) && (
                             <div 
                                 className="absolute inset-0 bg-black/30 flex items-center justify-center"
@@ -322,12 +434,25 @@ const Video = () => {
                                     <div className="text-center text-white">
                                         <div className="text-6xl mb-4">🏢</div>
                                         <h3 className="text-xl font-light mb-2">Propiedades Exclusivas en Madrid</h3>
-                                        <p className="text-white/80 text-sm">Cargando contenido...</p>
+                                        <p className="text-white/80 text-sm mb-4">
+                                            {videoErrorMessage || 'Video no disponible temporalmente'}
+                                        </p>
+                                        <button 
+                                            onClick={() => window.location.reload()}
+                                            className="px-4 py-2 bg-amarillo text-black rounded-lg hover:bg-yellow-400 transition-colors text-sm font-medium"
+                                        >
+                                            Reintentar carga
+                                        </button>
                                     </div>
                                 ) : (
                                     <div className="text-center text-white">
                                         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amarillo mx-auto mb-4"></div>
                                         <p className="text-white/80">Cargando video...</p>
+                                        {retryCount > 0 && (
+                                            <p className="text-white/60 text-xs mt-2">
+                                                Intento {retryCount + 1}/3
+                                            </p>
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -338,19 +463,36 @@ const Video = () => {
                             <video
                                 className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ${
                                     isVideoLoaded ? 'opacity-100' : 'opacity-0'
-                                }`}
+                                } cursor-pointer`}
                                 autoPlay
                                 muted
                                 playsInline
                                 ref={videoRef}
-                                src={isClientHydrated ? videoSrc : undefined} 
-                                aria-label="Video promocional de Goza Madrid"
+                                src={isClientHydrated ? videoSrc : undefined}
+                                onClick={handleVideoClick}
+                                aria-label="Video promocional de Goza Madrid - Click para reproducir"
+                                title="Click para reproducir video"
                             >
                                 {isClientHydrated && <source src={videoSrc} type="video/mp4" />}
                                 <p>Tu navegador no soporta la reproducción de video. 
                                    <a href={videoSrc} download>Descarga el video aquí</a>
                                 </p>
                             </video>
+                        )}
+
+                        {/* Botón de reproducción visible cuando hay autoplay bloqueado */}
+                        {isVideoLoaded && !videoError && videoRef.current?.paused && (
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <button 
+                                    onClick={handleVideoClick}
+                                    className="pointer-events-auto bg-black/50 hover:bg-black/70 rounded-full p-4 transition-all duration-300 text-white"
+                                    aria-label="Reproducir video"
+                                >
+                                    <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
                         )}
 
                         {/* Overlay elegante y sutil con transición suave */}
@@ -697,7 +839,7 @@ const Video = () => {
                                                 <motion.div
                                                     key={property.id}
                                                     whileHover={{ scale: 1.02 }}
-                                                    className={`bg-white rounded-2xl p-6 cursor-pointer transition-all duration-300 border-2 group shadow-lg hover:shadow-xl ${
+                                                    className={`bg-white rounded-2xl p-4 lg:p-6 cursor-pointer transition-all duration-300 border-2 group shadow-lg hover:shadow-xl ${
                                                         selectedProperty?.id === property.id 
                                                             ? 'border-amarillo bg-amarillo/10' 
                                                             : 'border-gray-100 hover:border-amarillo/30'
@@ -708,45 +850,112 @@ const Video = () => {
                                                     }}
                                                     title={`Ver ${property.title} en el mapa`}
                                                 >
-                                                    <div className="flex gap-6">
-                                                        <img
-                                                            src={property.image}
-                                                            alt={property.title}
-                                                            className="w-24 h-24 object-cover rounded-xl"
-                                                        />
-                                                        <div className="flex-1">
-                                                            <h3 className={`font-serif text-xl font-light transition-colors mb-2 ${
+                                                    {/* Layout responsivo: stack en móvil, horizontal en desktop */}
+                                                    <div className="flex flex-col sm:flex-row gap-4 lg:gap-6">
+                                                        {/* Imagen responsive */}
+                                                        <div className="relative w-full sm:w-32 lg:w-36 h-48 sm:h-24 lg:h-28 flex-shrink-0">
+                                                            <img
+                                                                src={(() => {
+                                                                    // Función para obtener la imagen con fallbacks
+                                                                    const getPropertyImage = (prop) => {
+                                                                        // Prioridad 1: Campo image normalizado
+                                                                        if (prop.image && prop.image !== "/analisis.png") {
+                                                                            return prop.image;
+                                                                        }
+                                                                        
+                                                                        // Prioridad 2: Array de imágenes (tomar la primera)
+                                                                        if (prop.images && Array.isArray(prop.images) && prop.images.length > 0) {
+                                                                            const firstImage = prop.images[0];
+                                                                            if (typeof firstImage === 'string') {
+                                                                                return firstImage;
+                                                                            }
+                                                                            if (firstImage.src) return firstImage.src;
+                                                                            if (firstImage.url) return firstImage.url;
+                                                                        }
+                                                                        
+                                                                        // Prioridad 3: Campo featured_image
+                                                                        if (prop.featured_image) {
+                                                                            return prop.featured_image;
+                                                                        }
+                                                                        
+                                                                        // Prioridad 4: Campos de imagen alternativos
+                                                                        if (prop.featuredImage) {
+                                                                            return prop.featuredImage;
+                                                                        }
+                                                                        
+                                                                        // Prioridad 5: Thumbnail
+                                                                        if (prop.thumbnail) {
+                                                                            return prop.thumbnail;
+                                                                        }
+                                                                        
+                                                                        // Fallback final: imagen por defecto
+                                                                        return "https://placekitten.com/400/300";
+                                                                    };
+                                                                    
+                                                                    return getPropertyImage(property);
+                                                                })()}
+                                                                alt={property.title || 'Imagen de propiedad'}
+                                                                className="w-full h-full object-cover rounded-xl"
+                                                                onError={(e) => {
+                                                                    // Fallback en caso de error de carga
+                                                                    if (e.target.src !== "https://placekitten.com/400/300") {
+                                                                        e.target.src = "https://placekitten.com/400/300";
+                                                                    }
+                                                                }}
+                                                                loading="lazy"
+                                                            />
+                                                            
+                                                            {/* Badge de estado si está seleccionado */}
+                                                            {selectedProperty?.id === property.id && (
+                                                                <div className="absolute top-2 right-2">
+                                                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-amarillo text-white shadow-lg">
+                                                                        ✓ Seleccionado
+                                                                    </span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        
+                                                        {/* Contenido de la propiedad */}
+                                                        <div className="flex-1 min-w-0">
+                                                            {/* Título responsive */}
+                                                            <h3 className={`font-serif text-lg sm:text-xl font-light transition-colors mb-2 line-clamp-2 ${
                                                                 selectedProperty?.id === property.id 
                                                                     ? 'text-amarillo' 
                                                                     : 'text-gray-900 group-hover:text-amarillo'
                                                             }`}>
                                                                 {property.title}
                                                             </h3>
-                                                            <p className="text-gray-600 flex items-center gap-2 mb-3 font-light">
-                                                                <FaMapMarkerAlt className="text-amarillo" />
-                                                                {property.location}
-                                                                {selectedProperty?.id === property.id && (
-                                                                    <span className="ml-2 text-xs bg-amarillo text-white px-2 py-1 rounded-full font-medium">
-                                                                        Seleccionado
-                                                                    </span>
-                                                                )}
+                                                            
+                                                            {/* Ubicación responsive */}
+                                                            <p className="text-gray-600 flex items-start sm:items-center gap-2 mb-3 font-light text-sm sm:text-base">
+                                                                <FaMapMarkerAlt className="text-amarillo mt-0.5 sm:mt-0 flex-shrink-0" />
+                                                                <span className="line-clamp-2 sm:line-clamp-1">
+                                                                    {property.location}
+                                                                </span>
                                                             </p>
-                                                            <div className="flex items-center gap-6 mb-3 text-sm text-gray-600">
-                                                                <span className="flex items-center gap-1">
+                                                            
+                                                            {/* Características responsive */}
+                                                            <div className="grid grid-cols-3 gap-2 sm:flex sm:items-center sm:gap-4 lg:gap-6 mb-4 text-sm text-gray-600">
+                                                                <span className="flex items-center gap-1 justify-center sm:justify-start">
                                                                     <FaBed className="text-amarillo" />
-                                                                    {property.bedrooms}
+                                                                    <span className="hidden sm:inline">{property.bedrooms}</span>
+                                                                    <span className="sm:hidden">{property.bedrooms}</span>
                                                                 </span>
-                                                                <span className="flex items-center gap-1">
+                                                                <span className="flex items-center gap-1 justify-center sm:justify-start">
                                                                     <FaBath className="text-amarillo" />
-                                                                    {property.bathrooms}
+                                                                    <span className="hidden sm:inline">{property.bathrooms}</span>
+                                                                    <span className="sm:hidden">{property.bathrooms}</span>
                                                                 </span>
-                                                                <span className="flex items-center gap-1">
+                                                                <span className="flex items-center gap-1 justify-center sm:justify-start">
                                                                     <FaRuler className="text-amarillo" />
-                                                                    {property.size}m²
+                                                                    <span className="hidden sm:inline">{property.size}m²</span>
+                                                                    <span className="sm:hidden">{property.size}m²</span>
                                                                 </span>
                                                             </div>
-                                                            <div className="flex items-center justify-between">
-                                                                <p className="text-2xl font-light text-amarillo">
+                                                            
+                                                            {/* Footer responsive con precio y botón */}
+                                                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                                                                <p className="text-xl lg:text-2xl font-light text-amarillo">
                                                                     €{property.price}
                                                                 </p>
                                                                 <button
@@ -760,11 +969,11 @@ const Video = () => {
                                                                         // Usar la URL correcta
                                                                         window.open(`/property/${propertyId}`, '_blank');
                                                                     }}
-                                                                    className="bg-amarillo hover:bg-amarillo/90 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                                                                    className="w-full sm:w-auto bg-amarillo hover:bg-amarillo/90 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
                                                                     title={`Ver detalles de ${property.title}`}
                                                                 >
                                                                     <FaEye className="text-xs" />
-                                                                    Ver detalles
+                                                                    <span>Ver detalles</span>
                                                                 </button>
                                                             </div>
                                                         </div>
