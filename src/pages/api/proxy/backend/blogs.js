@@ -1,8 +1,6 @@
-import axios from 'axios';
-
 /**
- * Proxy para obtener blogs del backend en AWS Elastic Beanstalk
- * Este endpoint se conecta a la API de blogs de Elastic Beanstalk
+ * Proxy para obtener blogs del backend en Render
+ * Este endpoint se conecta a la API de blogs de Render
  */
 export default async function handler(req, res) {
   // Permitir solicitudes CORS
@@ -19,7 +17,7 @@ export default async function handler(req, res) {
   }
 
   // Construir URL para obtener blogs
-  const baseUrl = process.env.NEXT_PUBLIC_API_MONGODB_URL || 'https://nextjs-gozamadrid-qrfk.onrender.com';
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://nextjs-gozamadrid-qrfk.onrender.com';
   const endpoint = `${baseUrl}/api/blogs`;
   const limit = req.query.limit || 100;
 
@@ -28,129 +26,81 @@ export default async function handler(req, res) {
   // Blogs de muestra como respaldo
   const sampleBlogs = [
     {
-      _id: 'sample-aws-1',
-      title: 'Mercado inmobiliario en Madrid 2023',
-      description: 'Análisis del mercado inmobiliario en Madrid durante el 2023, tendencias y perspectivas',
-      slug: 'mercado-inmobiliario-madrid-2023',
+      _id: 'sample-render-1',
+      title: 'Mercado inmobiliario en Madrid 2024',
+      description: 'Análisis del mercado inmobiliario en Madrid durante el 2024, tendencias y perspectivas para el próximo año',
+      slug: 'mercado-inmobiliario-madrid-2024',
       date: new Date().toISOString(),
       dateFormatted: new Date().toLocaleDateString('es-ES'),
       image: {
-        src: '/img/default-blog-image.jpg',
+        src: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80',
         alt: 'Mercado inmobiliario en Madrid'
       },
-      source: 'aws-beanstalk-sample',
-      author: 'Analista Goza Madrid'
+      source: 'render-sample',
+      author: 'Analista Goza Madrid',
+      content: 'Análisis detallado del mercado inmobiliario...',
+      excerpt: 'Las tendencias del mercado inmobiliario en Madrid muestran...'
     },
     {
-      _id: 'sample-aws-2',
-      title: 'Cómo elegir el mejor barrio para invertir',
-      description: 'Guía para seleccionar los mejores barrios de Madrid donde realizar una inversión inmobiliaria rentable',
-      slug: 'elegir-mejor-barrio-inversion',
+      _id: 'sample-render-2',
+      title: 'Cómo elegir el mejor barrio para invertir en Madrid',
+      description: 'Guía completa para seleccionar los mejores barrios de Madrid donde realizar una inversión inmobiliaria rentable y segura',
+      slug: 'elegir-mejor-barrio-inversion-madrid',
       date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
       dateFormatted: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toLocaleDateString('es-ES'),
       image: {
-        src: '/img/default-blog-image.jpg',
+        src: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&h=600&fit=crop&q=80',
         alt: 'Barrios para invertir en Madrid'
       },
-      source: 'aws-beanstalk-sample',
-      author: 'Asesor Inmobiliario'
+      source: 'render-sample',
+      author: 'Asesor Inmobiliario',
+      content: 'Guía para inversores sobre los mejores barrios...',
+      excerpt: 'La elección del barrio correcto es fundamental...'
     },
     {
-      _id: 'sample-aws-3',
-      title: 'Tendencias en decoración para 2023',
-      description: 'Las últimas tendencias en decoración de interiores para pisos y apartamentos en Madrid',
-      slug: 'tendencias-decoracion-2023',
+      _id: 'sample-render-3',
+      title: 'Tendencias en decoración de interiores 2024',
+      description: 'Las últimas tendencias en decoración de interiores para pisos y apartamentos en Madrid, estilos y colores de moda',
+      slug: 'tendencias-decoracion-interiores-2024',
       date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
       dateFormatted: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toLocaleDateString('es-ES'),
       image: {
-        src: '/img/default-blog-image.jpg',
+        src: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop&q=80',
         alt: 'Decoración de interiores'
       },
-      source: 'aws-beanstalk-sample',
-      author: 'Diseñador de Interiores'
+      source: 'render-sample',
+      author: 'Diseñador de Interiores',
+      content: 'Las tendencias de decoración para este año...',
+      excerpt: 'La decoración de interiores evoluciona constantemente...'
     }
   ];
 
   try {
-    // Comprobar si el servicio está disponible (ping rápido)
-    let serverAvailable = false;
-    try {
-      console.log(`[proxy/backend/blogs] Comprobando disponibilidad de ${baseUrl}`);
-      
-      // En lugar de hacer un ping directamente, que puede fallar por contenido mixto,
-      // intentaremos usar nuestro propio proxy para verificar el estado
-      const proxyPingUrl = '/api/proxy-raw';
-      const pingResponse = await axios({
-        method: 'POST',
-        url: proxyPingUrl,
-        timeout: 5000,
-        data: {
-          url: `${baseUrl}`,
-          method: 'HEAD',
-          headers: {
-            'User-Agent': 'GozaMadrid-Frontend/1.0',
-            'Accept': 'application/json'
-          }
-        }
-      }).catch(err => {
-        console.error(`[proxy/backend/blogs] Error en ping proxy: ${err.message}`);
-        return { status: 0 };
-      });
-      
-      if (pingResponse.status >= 200 && pingResponse.status < 300) {
-        console.log(`[proxy/backend/blogs] Servidor disponible a través de proxy (status: ${pingResponse.status})`);
-        serverAvailable = true;
-      } else {
-        console.log(`[proxy/backend/blogs] Servidor respondió con estado no óptimo a través de proxy: ${pingResponse.status}`);
-      }
-    } catch (pingError) {
-      console.error(`[proxy/backend/blogs] Error de conexión en el ping: ${pingError.message}`);
-      // No interrumpimos, intentaremos de todas formas la solicitud principal
-    }
+    console.log(`[proxy/backend/blogs] Obteniendo blogs desde ${endpoint}`);
     
-    // Si el servidor no está disponible según el ping, retornamos inmediatamente los datos de muestra
-    if (!serverAvailable) {
-      console.log('[proxy/backend/blogs] Servidor no disponible, devolviendo datos de muestra');
-      return res.status(200).json(sampleBlogs);
-    }
-    
-    // Intentar obtener los blogs del backend real
-    try {
-      console.log(`[proxy/backend/blogs] Obteniendo blogs desde ${endpoint}`);
-      
-      // Usar nuestro propio proxy para evitar problemas de contenido mixto
-      const apiProxyUrl = '/api/proxy-raw';
-      const response = await axios({
-        method: 'POST',
-        url: apiProxyUrl,
-        timeout: 10000, // 10 segundos de timeout
-        data: {
-          url: endpoint,
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Cache-Control': 'no-cache',
-            'User-Agent': 'GozaMadrid-Frontend/1.0',
-            'Origin': 'https://www.realestategozamadrid.com'
-          }
-        },
-        validateStatus: function (status) {
-          return status < 500; // Aceptar cualquier respuesta que no sea un 5xx
-        }
-      }).catch(err => {
-        console.error(`[proxy/backend/blogs] Error en solicitud proxy: ${err.message}`);
-        return { status: 0, data: null };
-      });
+    // Realizar solicitud directa sin axios
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'User-Agent': 'GozaMadrid-Frontend/1.0',
+      },
+      signal: AbortSignal.timeout(8000) // 8 segundos de timeout
+    });
 
-      // Verificar si la respuesta contiene datos
-      if (response.status >= 200 && response.status < 300 && response.data && Array.isArray(response.data)) {
-        console.log(`[proxy/backend/blogs] Blogs obtenidos: ${response.data.length}`);
+    // Verificar si la respuesta es exitosa
+    if (response.ok) {
+      const data = await response.json();
+      
+      if (data && Array.isArray(data) && data.length > 0) {
+        console.log(`[proxy/backend/blogs] Blogs obtenidos: ${data.length}`);
         
         // Procesar cada blog
-        const blogs = response.data.map(blog => {
+        const blogs = data.map(blog => {
           // Asegurar valores mínimos para todas las propiedades
           const processedBlog = {
-            _id: blog._id || blog.id || `aws-${Math.random().toString(36).substring(2, 11)}`,
+            _id: blog._id || blog.id || `render-${Math.random().toString(36).substring(2, 11)}`,
             id: blog.id || blog._id || `id-${Math.random().toString(36).substring(2, 9)}`,
             title: blog.title || 'Sin título',
             content: blog.content || blog.description || '',
@@ -158,7 +108,8 @@ export default async function handler(req, res) {
             slug: blog.slug || `blog-${Math.random().toString(36).substring(2, 7)}`,
             date: blog.date || blog.createdAt || new Date().toISOString(),
             dateFormatted: new Date(blog.date || blog.createdAt || new Date()).toLocaleDateString('es-ES'),
-            source: 'aws-beanstalk',
+            source: 'render',
+            author: blog.author || 'Equipo Goza Madrid',
             ...blog
           };
           
@@ -167,55 +118,41 @@ export default async function handler(req, res) {
             const firstImage = processedBlog.images[0];
             processedBlog.image = {
               src: typeof firstImage === 'string' 
-                ? `/api/proxy-image?url=${encodeURIComponent(firstImage)}`
-                : `/api/proxy-image?url=${encodeURIComponent(firstImage.src || firstImage.url || '')}`,
+                ? firstImage.startsWith('http') ? firstImage : `https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80`
+                : firstImage.src || firstImage.url || 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80',
               alt: processedBlog.title || 'Imagen del blog'
             };
           } else if (!processedBlog.image) {
             processedBlog.image = {
-              src: '/img/default-blog-image.jpg',
+              src: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80',
               alt: processedBlog.title || 'Imagen del blog'
             };
           } else if (typeof processedBlog.image === 'string') {
             processedBlog.image = {
-              src: `/api/proxy-image?url=${encodeURIComponent(processedBlog.image)}`,
+              src: processedBlog.image.startsWith('http') ? processedBlog.image : 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80',
               alt: processedBlog.title || 'Imagen del blog'
             };
-          } else if (processedBlog.image.src) {
-            if (!processedBlog.image.src.startsWith('/api/proxy-image')) {
-              processedBlog.image.src = `/api/proxy-image?url=${encodeURIComponent(processedBlog.image.src)}`;
-            }
           }
           
           return processedBlog;
         });
         
+        // Cachear respuesta exitosa
+        res.setHeader('Cache-Control', 'public, max-age=300');
         return res.status(200).json(blogs);
-      } else {
-        console.log(`[proxy/backend/blogs] Respuesta no válida: Status ${response.status}`);
-        
-        if (response.data && typeof response.data === 'object') {
-          console.log('[proxy/backend/blogs] Datos de respuesta:', JSON.stringify(response.data).substring(0, 200) + '...');
-        }
-        
-        // Devolver datos de muestra si no hay respuesta válida
-        return res.status(200).json(sampleBlogs);
       }
-    } catch (apiError) {
-      console.error(`[proxy/backend/blogs] Error en la solicitud a la API: ${apiError.message}`);
-      
-      if (apiError.response) {
-        console.error(`[proxy/backend/blogs] Status: ${apiError.response.status}, Datos:`, 
-          typeof apiError.response.data === 'object' ? JSON.stringify(apiError.response.data).substring(0, 200) : apiError.response.data);
-      }
-      
-      // Enviar datos de muestra en caso de error
-      return res.status(200).json(sampleBlogs);
     }
-  } catch (generalError) {
-    console.error(`[proxy/backend/blogs] Error general: ${generalError.message}`);
     
-    // Siempre devolver una respuesta válida
+    // Si llegamos aquí, no hay datos válidos del servidor
+    console.log('[proxy/backend/blogs] No hay datos válidos del servidor, usando datos de muestra');
+    res.setHeader('Cache-Control', 'public, max-age=60'); // Cache más corto para muestra
+    return res.status(200).json(sampleBlogs);
+    
+  } catch (error) {
+    console.error(`[proxy/backend/blogs] Error: ${error.message}`);
+    
+    // Siempre devolver una respuesta válida con datos de muestra
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     return res.status(200).json(sampleBlogs);
   }
 } 
