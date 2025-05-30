@@ -439,7 +439,7 @@ export default function BlogPage() {
                     // Intentar con un endpoint alternativo utilizando nuestro proxy-raw
                     try {
                         console.log("Intentando cargar blogs a través de proxy-raw...");
-                        const directUrl = 'http://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com';
+                        const directUrl = 'https://nextjs-gozamadrid-qrfk.onrender.com';
                         
                         // Utilizar el nuevo proxy-raw para evitar problemas de contenido mixto
                         const proxyResponse = await fetch('/api/proxy-raw', {

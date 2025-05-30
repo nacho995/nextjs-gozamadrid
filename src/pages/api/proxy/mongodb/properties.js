@@ -71,9 +71,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Usar URL hardcodeada para evitar problemas con variables de entorno
-    // Siempre utilizar HTTP ya que HTTPS no está configurado correctamente
-    const MONGODB_API_URL = 'http://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api/properties';
+    // URLs principales para AWS Elastic Beanstalk que sabemos que funcionan
+    const MONGODB_API_URL = 'https://nextjs-gozamadrid-qrfk.onrender.com/api/properties';
     
     console.log('[MongoDB Proxy] Iniciando petición a:', MONGODB_API_URL);
 
@@ -144,11 +143,11 @@ export default async function handler(req, res) {
     } catch (fetchError) {
       console.error('[MongoDB Proxy] Error obteniendo datos:', fetchError);
       
-      // Probar con una URL alternativa
+      // Intentar con URL alternativa
+      console.log('[MongoDB Proxy] Primer intento falló, intentando con URL alternativa...');
+      const alternativeUrl = 'https://nextjs-gozamadrid-qrfk.onrender.com/api/properties/sources/mongodb';
+      
       try {
-        console.log('[MongoDB Proxy] Intentando con URL alternativa...');
-        const alternativeUrl = 'http://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api/properties/sources/mongodb';
-        
         const alternativeData = await fetchWithRetry(alternativeUrl, {
           headers: {
             'Accept': 'application/json',
