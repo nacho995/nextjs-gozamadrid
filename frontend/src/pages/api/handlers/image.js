@@ -36,7 +36,8 @@ export default async function handler(req, res) {
     }
     
     // Usar un servicio de proxy confiable para evitar errores QUIC_PROTOCOL_ERROR
-    const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(url)}&n=-1&default=https://via.placeholder.com/800x600?text=Sin+Imagen&errorredirect=https://via.placeholder.com/800x600?text=Error`;
+    const fallbackImage = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80';
+    const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(url)}&w=800&h=600&fit=cover&default=${encodeURIComponent(fallbackImage)}`;
     console.log(`Redirigiendo a proxy: ${proxyUrl}`);
     
     // Redirigir a la URL del proxy
@@ -63,5 +64,5 @@ function isValidUrl(urlString) {
  * Redirige a una imagen de marcador de posición
  */
 function redirectToPlaceholder(res) {
-  return res.redirect(307, '/img/default-property-image.jpg');
+  return res.redirect(307, 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80');
 } 
