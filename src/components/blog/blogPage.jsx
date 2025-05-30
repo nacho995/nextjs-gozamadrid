@@ -201,8 +201,8 @@ export default function BlogPage() {
             // PASO 1: Intentar obtener blogs de WordPress directamente desde proxy/wordpress/posts
             try {
                 console.log("Cargando blogs desde el proxy de WordPress...");
-                // Usar el endpoint que sabemos que funciona temporalmente
-                const wpResponse = await fetch('/api/blogs?limit=100', {
+                // Usar el endpoint correcto de WordPress
+                const wpResponse = await fetch('/api/proxy/wordpress/posts?per_page=100&_embed=true', {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
@@ -314,7 +314,7 @@ export default function BlogPage() {
                 // Intentar con el fallback de WordPress solo si aún no tenemos blogs
                 if (!hasLoadedAnyBlogs) {
                     try {
-                        const fallbackWpResponse = await fetch('/api/blogs?limit=100', {
+                        const fallbackWpResponse = await fetch('/api/proxy/wordpress/posts?per_page=100&_embed=true', {
                             headers: {
                                 'Accept': 'application/json',
                                 'Cache-Control': 'no-store, no-cache, must-revalidate'
