@@ -99,11 +99,68 @@ export default async function handler(req, res) {
         };
 
         // Procesar embedded media
-        const processedEmbedded = post._embedded ? {
-          ...post._embedded,
-          'wp:featuredmedia': post._embedded['wp:featuredmedia'] ? 
-            [processFeaturedMedia(post._embedded)] : []
-        } : {};
+        let processedEmbedded = {};
+        let featuredImageUrl = null;
+
+        if (post._embedded) {
+          processedEmbedded = { ...post._embedded };
+          
+          // Procesar featured media si existe
+          if (post._embedded['wp:featuredmedia'] && post._embedded['wp:featuredmedia'][0]) {
+            const processedMedia = processFeaturedMedia(post._embedded);
+            if (processedMedia) {
+              processedEmbedded['wp:featuredmedia'] = [processedMedia];
+              featuredImageUrl = processedMedia.source_url;
+            }
+          }
+        }
+
+        // Si no hay imagen en _embedded, intentar extraer de otros campos
+        if (!featuredImageUrl) {
+          // Intentar con featured_media_url si existe
+          if (post.featured_media_url) {
+            featuredImageUrl = post.featured_media_url;
+            // Corregir URL
+            if (featuredImageUrl.includes('wordpress.realestategozamadrid.com')) {
+              featuredImageUrl = featuredImageUrl.replace('wordpress.realestategozamadrid.com', 'www.realestategozamadrid.com');
+            }
+            if (featuredImageUrl.startsWith('http:')) {
+              featuredImageUrl = featuredImageUrl.replace('http:', 'https:');
+            }
+          }
+          
+          // Intentar con uagb_featured_image_src si existe
+          else if (post.uagb_featured_image_src) {
+            if (post.uagb_featured_image_src.large && post.uagb_featured_image_src.large[0]) {
+              featuredImageUrl = post.uagb_featured_image_src.large[0];
+            } else if (post.uagb_featured_image_src.medium && post.uagb_featured_image_src.medium[0]) {
+              featuredImageUrl = post.uagb_featured_image_src.medium[0];
+            } else if (post.uagb_featured_image_src.full && post.uagb_featured_image_src.full[0]) {
+              featuredImageUrl = post.uagb_featured_image_src.full[0];
+            }
+            
+            // Corregir URL si se encontró
+            if (featuredImageUrl) {
+              if (featuredImageUrl.includes('wordpress.realestategozamadrid.com')) {
+                featuredImageUrl = featuredImageUrl.replace('wordpress.realestategozamadrid.com', 'www.realestategozamadrid.com');
+              }
+              if (featuredImageUrl.startsWith('http:')) {
+                featuredImageUrl = featuredImageUrl.replace('http:', 'https:');
+              }
+            }
+          }
+        }
+
+        // Si encontramos una imagen pero no está en _embedded, agregarla
+        if (featuredImageUrl && (!processedEmbedded['wp:featuredmedia'] || processedEmbedded['wp:featuredmedia'].length === 0)) {
+          processedEmbedded['wp:featuredmedia'] = [{
+            source_url: featuredImageUrl,
+            alt_text: post.title?.rendered || '',
+            media_type: 'image'
+          }];
+        }
+
+        console.log(`[WordPress Proxy] Post ${post.id}: featured image = ${featuredImageUrl || 'NO IMAGE'}`);
 
         return {
           id: post.id,
@@ -118,7 +175,9 @@ export default async function handler(req, res) {
           categories: post.categories || [],
           tags: post.tags || [],
           _embedded: processedEmbedded,
-          _links: post._links || {}
+          // Agregar campos adicionales para compatibilidad
+          featured_image_url: featuredImageUrl,
+          uagb_featured_image_src: post.uagb_featured_image_src || null
         };
       }) : [];
 
