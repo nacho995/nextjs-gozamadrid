@@ -4,8 +4,11 @@
 
 import config from '@/config/config';
 
-// URL base para el proxy de WordPress
-const WP_PROXY_URL = config.getWordPressBaseUrl();
+// API URLs con fallback para desarrollo
+const WORDPRESS_API = process.env.NEXT_PUBLIC_WP_API_URL || 'https://www.realestategozamadrid.com/wp-json/wp/v2';
+
+// URL del proxy moderno para WordPress - usar el endpoint simple que funciona
+const WP_PROXY_URL = process.env.NEXT_PUBLIC_WP_PROXY_URL || 'https://www.realestategozamadrid.com/api/wordpress-proxy';
 
 const WORDPRESS_API_URL = process.env.WORDPRESS_API_URL;
 
