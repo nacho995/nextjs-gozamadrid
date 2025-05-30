@@ -594,13 +594,13 @@ export default function BlogPage() {
                 const sampleBlogs = [
                     {
                         _id: 'sample1',
-                        title: 'Cómo invertir en el mercado inmobiliario de Madrid en 2023',
+                        title: 'Cómo invertir en el mercado inmobiliario de Madrid en 2024',
                         description: 'Guía completa para inversores que buscan oportunidades en el mercado inmobiliario madrileño, con análisis de zonas y rentabilidades.',
                         content: '<p>Este es un artículo de muestra para desarrollo. Aquí iría el contenido completo del blog.</p>',
                         date: new Date().toISOString(),
                         dateFormatted: new Date().toLocaleDateString('es-ES'),
                         image: {
-                            src: 'https://via.placeholder.com/800x600?text=GozaMadrid',
+                            src: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80',
                             alt: 'Inversión inmobiliaria en Madrid'
                         },
                         slug: 'invertir-mercado-inmobiliario-madrid',
@@ -615,7 +615,7 @@ export default function BlogPage() {
                         date: new Date(Date.now() - 7*24*60*60*1000).toISOString(),
                         dateFormatted: new Date(Date.now() - 7*24*60*60*1000).toLocaleDateString('es-ES'),
                         image: {
-                            src: 'https://via.placeholder.com/800x600?text=GozaMadrid',
+                            src: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&h=600&fit=crop&q=80',
                             alt: 'Barrios en Madrid'
                         },
                         slug: 'barrios-mayor-revalorizacion-madrid',

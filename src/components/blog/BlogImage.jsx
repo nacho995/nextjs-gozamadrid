@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Image from "next/legacy/image";
 import Head from 'next/head';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80';
 
 const BlogImage = ({ src, alt, className = "", priority = false, sizes = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw", fallbackSrc }) => {
   const [mounted, setMounted] = useState(false);
@@ -13,103 +14,103 @@ const BlogImage = ({ src, alt, className = "", priority = false, sizes = "(max-w
   const imageRef = useRef(null);
   const [imageDimensions, setImageDimensions] = useState({ width: 800, height: 600 });
   const [debugInfo, setDebugInfo] = useState({ original: null, processed: null });
-  const [safeSrc, setSafeSrc] = useState(fallbackSrc || 'https://via.placeholder.com/800x600?text=GozaMadrid');
+  const [safeSrc, setSafeSrc] = useState(fallbackSrc || FALLBACK_IMAGE);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Procesar la URL de la imagen en un efecto para evitar re-renderizados infinitos
-  useEffect(() => {
-    // Función para procesar la URL de la imagen
-    const processImageUrl = (url) => {
-      let processedUrl = fallbackSrc || 'https://via.placeholder.com/800x600?text=GozaMadrid';
-      
-      if (!url) return processedUrl;
-
-      // Si es un array (formato del esquema de blogs), tomar el primer elemento
-      if (Array.isArray(url) && url.length > 0) {
-        const firstImage = url[0];
-        if (typeof firstImage === 'object' && firstImage.src) {
-          return processImageUrl(firstImage.src);
-        } else if (typeof firstImage === 'string') {
-          return processImageUrl(firstImage);
-        }
-        return processedUrl;
-      }
-
-      // Si url es un objeto, extraer la URL
-      if (typeof url === 'object') {
-        if (url.src) return processImageUrl(url.src);
-        if (url.url) return processImageUrl(url.url);
-        if (url.source_url) return processImageUrl(url.source_url);
-        return processedUrl;
-      }
-
-      // Asegurarse de que url sea una cadena
-      if (typeof url !== 'string') {
-        return processedUrl;
-      }
-
-      // Si la URL ya es un servicio de proxy, usarla directamente
-      if (url.includes('images.weserv.nl') || url.includes('via.placeholder.com')) {
-        return url;
-      }
-      
-      // Reemplazar http: con https: para evitar problemas de contenido mixto
-      if (url.startsWith('http:')) {
-        url = url.replace('http:', 'https:');
-      }
-
-      // Eliminar referencias a imageproxy
-      if (url.includes('imageproxy/')) {
-        return processedUrl;
-      }
-
-      // Si es una URL relativa y no empieza con /, agregarlo
-      if (!url.startsWith('http') && !url.startsWith('/')) {
-        url = '/' + url;
-      }
-
-      // Si es una URL relativa al servidor, mantenerla tal cual (excepto default-blog-image)
-      if (url.startsWith('/') && !url.startsWith('//')) {
-        // Comprobar si es la imagen por defecto problemática
-        if (url === '/img/default-blog-image.jpg') {
-          return 'https://via.placeholder.com/800x600?text=GozaMadrid';
-        }
-        
-        // Si es una URL relativa, intentar usar la URL completa del servidor
-        const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-        return `${baseUrl}${url}`;
-      }
-
-      // Para todas las demás URLs (externas), usar weserv.nl directamente
-      if (url.startsWith('http') || url.startsWith('https') || url.startsWith('//')) {
-        // Asegurarse de que la URL tenga el protocolo
-        if (url.startsWith('//')) {
-          url = 'https:' + url;
-        }
-
-        // Usar weserv.nl directamente para todas las imágenes externas
-        processedUrl = `https://images.weserv.nl/?url=${encodeURIComponent(url)}&n=-1`;
-        return processedUrl;
-      }
-
-      // Para cualquier otro caso, usar la URL base de la API para construir la URL completa
-      processedUrl = `${API_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+  // Función para procesar URLs de imagen
+  const processImageUrl = useCallback((url) => {
+    if (!url || typeof url !== 'string') {
+      let processedUrl = fallbackSrc || FALLBACK_IMAGE;
+      console.log('[BlogImage] URL inválida, usando fallback:', processedUrl);
       return processedUrl;
-    };
+    }
 
-    // Procesar la URL y actualizar el estado
-    const processedSrc = processImageUrl(src);
-    setSafeSrc(processedSrc);
-    
-    // Actualizar la información de depuración
-    setDebugInfo({
-      original: src,
-      processed: processedSrc
-    });
-  }, [src, fallbackSrc]);
+    // Si es una URL completa válida, usarla directamente
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+
+    // Si es una ruta relativa, convertirla a absoluta
+    if (url.startsWith('/')) {
+      const baseUrl = typeof window !== 'undefined' 
+        ? window.location.origin 
+        : process.env.NEXT_PUBLIC_BASE_URL || '';
+      return `${baseUrl}${url}`;
+    }
+
+    // Si no es una URL válida, usar fallback
+    console.warn('[BlogImage] URL no válida:', url);
+    return fallbackSrc || FALLBACK_IMAGE;
+  }, [fallbackSrc]);
+
+  // Función para comprobar si una URL es válida
+  const isValidImageUrl = useCallback((url) => {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  }, []);
+
+  // Función para obtener un fallback confiable
+  const getSafeFallback = useCallback(() => {
+    if (fallbackSrc && isValidImageUrl(fallbackSrc)) {
+      // No usar via.placeholder.com si está en el fallbackSrc
+      if (fallbackSrc.includes('images.weserv.nl') || fallbackSrc.includes('via.placeholder.com')) {
+        return FALLBACK_IMAGE;
+      }
+      return fallbackSrc;
+    }
+    return FALLBACK_IMAGE;
+  }, [fallbackSrc, isValidImageUrl]);
+
+  // Función para manejar errores de carga
+  const handleError = useCallback((error) => {
+    console.error('Error cargando imagen:', src, 'usando fallback');
+    setError(true);
+    setLoading(false);
+    setSafeSrc(getSafeFallback());
+  }, [src, getSafeFallback]);
+
+  // Función para manejar carga exitosa
+  const handleLoad = useCallback(() => {
+    setLoading(false);
+    setError(false);
+  }, []);
+
+  // Efecto para procesar la URL inicial
+  useEffect(() => {
+    if (src) {
+      const processedSrc = processImageUrl(src);
+      if (isValidImageUrl(processedSrc)) {
+        setSafeSrc(processedSrc);
+        setError(false);
+        setLoading(true);
+      } else {
+        console.warn('[BlogImage] URL procesada no válida:', processedSrc);
+        setSafeSrc(getSafeFallback());
+        setError(true);
+        setLoading(false);
+      }
+    } else {
+      setSafeSrc(getSafeFallback());
+      setError(true);
+      setLoading(false);
+    }
+  }, [src, processImageUrl, isValidImageUrl, getSafeFallback]);
+
+  // Función para reintentar la carga
+  const retryLoad = useCallback(() => {
+    setError(false);
+    setLoading(true);
+    // Forzar recarga agregando timestamp
+    const retryUrl = `${safeSrc}${safeSrc.includes('?') ? '&' : '?'}retry=${Date.now()}`;
+    setSafeSrc(retryUrl);
+  }, [safeSrc]);
 
   // Generate a unique ID for structured data references
   const imageId = `blog-image-${Math.random().toString(36).substring(2, 9)}`;
@@ -123,14 +124,6 @@ const BlogImage = ({ src, alt, className = "", priority = false, sizes = "(max-w
     "name": alt || "Imagen del blog",
     "description": alt || "Fotografía del blog",
     "representativeOfPage": priority
-  };
-
-  const handleImageError = () => {
-    console.warn(`Error cargando imagen: ${safeSrc}, usando fallback`);
-    setError(true);
-    setLoading(false);
-    // Usar un placeholder externo en lugar de la imagen local
-    setSafeSrc('https://via.placeholder.com/800x600?text=GozaMadrid');
   };
 
   if (!mounted) {
@@ -147,7 +140,7 @@ const BlogImage = ({ src, alt, className = "", priority = false, sizes = "(max-w
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify({
               ...imageSchema,
-              contentUrl: 'https://via.placeholder.com/800x600?text=GozaMadrid' 
+              contentUrl: FALLBACK_IMAGE 
             }) }}
           />
         </Head>
@@ -161,11 +154,11 @@ const BlogImage = ({ src, alt, className = "", priority = false, sizes = "(max-w
           itemID={`#${imageId}`}
         >
           <img 
-            src="https://via.placeholder.com/800x600?text=GozaMadrid" 
+            src={FALLBACK_IMAGE} 
             alt={alt || "Imagen no disponible"} 
             className="object-cover w-full h-full"
           />
-          <meta itemProp="contentUrl" content="https://via.placeholder.com/800x600?text=GozaMadrid" />
+          <meta itemProp="contentUrl" content={FALLBACK_IMAGE} />
           <meta itemProp="name" content={alt || "Imagen no disponible"} />
         </div>
       </>
@@ -198,8 +191,8 @@ const BlogImage = ({ src, alt, className = "", priority = false, sizes = "(max-w
           src={safeSrc}
           alt={alt || "Imagen del blog"}
           className={`w-full h-full object-cover ${className}`}
-          onError={handleImageError}
-          onLoad={() => setLoading(false)}
+          onError={handleError}
+          onLoad={handleLoad}
           loading={priority ? 'eager' : 'lazy'}
           decoding="async"
           itemProp="contentUrl"
