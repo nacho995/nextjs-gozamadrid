@@ -1,10 +1,6 @@
-import axios from 'axios';
-
-const WP_API_URL = process.env.NEXT_PUBLIC_WP_API_URL || 'https://wordpress.realestategozamadrid.com/wp-json/wp/v2';
-
 /**
  * Proxy para obtener posts de WordPress
- * Este endpoint se conecta directamente a la API de WordPress
+ * Este endpoint se conecta directamente a la API de WordPress con múltiples fallbacks
  */
 export default async function handler(req, res) {
   // Configurar CORS
@@ -23,168 +19,132 @@ export default async function handler(req, res) {
   // Parámetros de consulta
   const { per_page = 10, page = 1, _embed = 'true' } = req.query;
 
-  // URL base de WordPress
-  const WORDPRESS_API_URL = process.env.NEXT_PUBLIC_WP_API_URL || 'https://wordpress.realestategozamadrid.com/wp-json/wp/v2';
-  
-  try {
-    console.log(`[WordPress Proxy] Obteniendo posts desde ${WORDPRESS_API_URL}/posts`);
-    
-    // Construir URL con parámetros
-    const url = new URL(`${WORDPRESS_API_URL}/posts`);
-    url.searchParams.append('per_page', per_page);
-    url.searchParams.append('page', page);
-    url.searchParams.append('_embed', _embed);
-    
-    // Realizar la solicitud a WordPress
+  // URLs de WordPress a probar (en orden de prioridad)
+  const WORDPRESS_URLS = [
+    process.env.NEXT_PUBLIC_WP_API_URL || 'https://www.realestategozamadrid.com/wp-json/wp/v2',
+    'https://www.realestategozamadrid.com/wp-json/wp/v2',
+    'https://realestategozamadrid.com/wp-json/wp/v2'
+  ];
+
+  // Función para intentar conexión con una URL
+  const tryWordPressAPI = async (baseUrl) => {
+    const url = new URL(`${baseUrl}/posts`);
+    url.searchParams.set('per_page', per_page);
+    url.searchParams.set('page', page);
+    url.searchParams.set('_embed', _embed);
+    url.searchParams.set('status', 'publish');
+
+    console.log(`[WordPress Proxy] Intentando: ${url.toString()}`);
+
     const response = await fetch(url.toString(), {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'User-Agent': 'GozaMadrid-Frontend/1.0',
+        'User-Agent': 'GozaMadrid-Proxy/1.0',
+        'Cache-Control': 'no-cache',
+        // Agregar headers adicionales para evitar bloqueos
+        'Referer': 'https://www.realestategozamadrid.com',
+        'Origin': 'https://www.realestategozamadrid.com'
       },
-      // Timeout de 10 segundos
-      signal: AbortSignal.timeout(10000)
+      // Timeout de 8 segundos por intento
+      signal: AbortSignal.timeout(8000)
     });
 
     if (!response.ok) {
-      console.error(`[WordPress Proxy] Error ${response.status}: ${response.statusText}`);
-      
-      // Si WordPress no está disponible, devolver datos de ejemplo
-      const samplePosts = [
-        {
-          id: 1,
-          title: { rendered: 'Tendencias del mercado inmobiliario en Madrid 2024' },
-          excerpt: { rendered: 'Análisis completo de las tendencias más importantes del mercado inmobiliario madrileño para este año.' },
-          content: { rendered: '<p>Contenido completo del artículo sobre tendencias inmobiliarias...</p>' },
-          date: new Date().toISOString(),
-          slug: 'tendencias-mercado-inmobiliario-madrid-2024',
-          featured_media: 0,
-          author: 1,
-          categories: [1],
-          tags: [],
-          _embedded: {
-            'wp:featuredmedia': [{
-              source_url: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop'
-            }]
-          }
-        },
-        {
-          id: 2,
-          title: { rendered: 'Guía para inversores: Los mejores barrios de Madrid' },
-          excerpt: { rendered: 'Descubre cuáles son los barrios con mayor potencial de revalorización y rentabilidad de alquiler.' },
-          content: { rendered: '<p>Guía completa para inversores inmobiliarios en Madrid...</p>' },
-          date: new Date(Date.now() - 7*24*60*60*1000).toISOString(),
-          slug: 'guia-inversores-mejores-barrios-madrid',
-          featured_media: 0,
-          author: 1,
-          categories: [1],
-          tags: [],
-          _embedded: {
-            'wp:featuredmedia': [{
-              source_url: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&h=600&fit=crop'
-            }]
-          }
-        },
-        {
-          id: 3,
-          title: { rendered: 'Decoración de interiores: Tendencias 2024' },
-          excerpt: { rendered: 'Las últimas tendencias en decoración que están marcando el estilo de los hogares madrileños.' },
-          content: { rendered: '<p>Artículo sobre las tendencias de decoración más actuales...</p>' },
-          date: new Date(Date.now() - 14*24*60*60*1000).toISOString(),
-          slug: 'decoracion-interiores-tendencias-2024',
-          featured_media: 0,
-          author: 1,
-          categories: [2],
-          tags: [],
-          _embedded: {
-            'wp:featuredmedia': [{
-              source_url: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop'
-            }]
-          }
-        }
-      ];
-
-      console.log(`[WordPress Proxy] Devolviendo ${samplePosts.length} posts de ejemplo`);
-      
-      // Agregar headers de cache
-      res.setHeader('Cache-Control', 'public, max-age=300');
-      return res.status(200).json(samplePosts);
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
-    // Procesar la respuesta exitosa
-    const posts = await response.json();
+    const data = await response.json();
+    console.log(`[WordPress Proxy] Éxito con ${baseUrl}: ${Array.isArray(data) ? data.length : 0} posts`);
     
-    if (!Array.isArray(posts)) {
-      console.error('[WordPress Proxy] La respuesta no es un array:', typeof posts);
-      return res.status(500).json({ error: 'Formato de respuesta inválido' });
+    return data;
+  };
+
+  // Intentar con cada URL hasta que una funcione
+  let lastError = null;
+  for (const wpUrl of WORDPRESS_URLS) {
+    try {
+      console.log(`[WordPress Proxy] Probando WordPress en: ${wpUrl}`);
+      
+      const data = await tryWordPressAPI(wpUrl);
+      
+      // Procesar los posts para asegurar formato consistente
+      const processedPosts = Array.isArray(data) ? data.map(post => ({
+        id: post.id,
+        title: post.title,
+        content: post.content,
+        excerpt: post.excerpt,
+        date: post.date,
+        slug: post.slug,
+        status: post.status,
+        author: post.author,
+        featured_media: post.featured_media,
+        categories: post.categories || [],
+        tags: post.tags || [],
+        _embedded: post._embedded || {},
+        _links: post._links || {}
+      })) : [];
+
+      // Establecer headers de caché
+      res.setHeader('Cache-Control', 'public, max-age=300'); // 5 minutos de caché
+      
+      return res.status(200).json(processedPosts);
+
+    } catch (error) {
+      console.error(`[WordPress Proxy] Error con ${wpUrl}: ${error.message}`);
+      lastError = error;
+      // Continuar con la siguiente URL
+      continue;
     }
-
-    console.log(`[WordPress Proxy] ${posts.length} posts obtenidos exitosamente`);
-    
-    // Procesar cada post para asegurar formato consistente
-    const processedPosts = posts.map(post => {
-      // Asegurar que tiene imagen destacada
-      let featuredImageUrl = null;
-      
-      if (post._embedded && post._embedded['wp:featuredmedia'] && post._embedded['wp:featuredmedia'][0]) {
-        featuredImageUrl = post._embedded['wp:featuredmedia'][0].source_url;
-      }
-      
-      // Si no tiene imagen, usar una por defecto
-      if (!featuredImageUrl) {
-        featuredImageUrl = `https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80`;
-      }
-      
-      // Asegurar que la imagen sea HTTPS
-      if (featuredImageUrl && featuredImageUrl.startsWith('http:')) {
-        featuredImageUrl = featuredImageUrl.replace('http:', 'https:');
-      }
-      
-      return {
-        ...post,
-        _embedded: {
-          ...post._embedded,
-          'wp:featuredmedia': [{
-            source_url: featuredImageUrl
-          }]
-        }
-      };
-    });
-
-    // Cachear la respuesta por 5 minutos
-    res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=600');
-    
-    return res.status(200).json(processedPosts);
-    
-  } catch (error) {
-    console.error('[WordPress Proxy] Error:', error.message);
-    
-    // En caso de error, devolver posts de ejemplo
-    const fallbackPosts = [
-      {
-        id: 'fallback-1',
-        title: { rendered: 'Artículo de ejemplo - Mercado inmobiliario' },
-        excerpt: { rendered: 'Este es un artículo de ejemplo mientras solucionamos la conexión con WordPress.' },
-        content: { rendered: '<p>Contenido de ejemplo...</p>' },
-        date: new Date().toISOString(),
-        slug: 'articulo-ejemplo-mercado-inmobiliario',
-        featured_media: 0,
-        author: 1,
-        categories: [1],
-        tags: [],
-        _embedded: {
-          'wp:featuredmedia': [{
-            source_url: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80'
-          }]
-        }
-      }
-    ];
-
-    console.log('[WordPress Proxy] Devolviendo posts de fallback debido a error');
-    
-    // Sin cache en caso de error
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    return res.status(200).json(fallbackPosts);
   }
+
+  // Si todas las URLs fallaron, devolver datos de ejemplo para desarrollo
+  console.log('[WordPress Proxy] Todas las URLs fallaron, devolviendo datos de ejemplo');
+  
+  const samplePosts = [
+    {
+      id: 'sample-1',
+      title: { rendered: 'Guía de inversión inmobiliaria en Madrid 2024' },
+      content: { rendered: '<p>Descubre las mejores oportunidades de inversión en el mercado inmobiliario madrileño.</p>' },
+      excerpt: { rendered: 'Las claves para invertir con éxito en propiedades en Madrid.' },
+      date: new Date().toISOString(),
+      slug: 'guia-inversion-inmobiliaria-madrid-2024',
+      status: 'publish',
+      author: 1,
+      featured_media: 0,
+      categories: [1],
+      tags: [],
+      _embedded: {
+        'wp:featuredmedia': [{
+          source_url: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80'
+        }]
+      },
+      _links: {}
+    },
+    {
+      id: 'sample-2',
+      title: { rendered: 'Los barrios más rentables para alquilar en Madrid' },
+      content: { rendered: '<p>Análisis de los barrios con mayor demanda de alquiler y mejor rentabilidad.</p>' },
+      excerpt: { rendered: 'Descubre dónde invertir para obtener los mejores rendimientos por alquiler.' },
+      date: new Date(Date.now() - 7*24*60*60*1000).toISOString(),
+      slug: 'barrios-rentables-alquiler-madrid',
+      status: 'publish',
+      author: 1,
+      featured_media: 0,
+      categories: [1],
+      tags: [],
+      _embedded: {
+        'wp:featuredmedia': [{
+          source_url: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&h=600&fit=crop&q=80'
+        }]
+      },
+      _links: {}
+    }
+  ];
+
+  // Sin caché para datos de ejemplo
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('X-Fallback', 'sample-data');
+  
+  return res.status(200).json(samplePosts);
 } 

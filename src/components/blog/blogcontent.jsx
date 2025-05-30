@@ -46,13 +46,13 @@ const getImageSrc = (image, defaultImage) => {
   // Para imágenes de WordPress, devolver la URL con proxy para evitar errores HTTP2_PROTOCOL_ERROR
   if (image._embedded?.['wp:featuredmedia']?.[0]?.source_url) {
     const wpImageUrl = image._embedded['wp:featuredmedia'][0].source_url;
-    const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(wpImageUrl)}&default=https://via.placeholder.com/800x600?text=Sin+Imagen`;
+    const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(wpImageUrl)}&default=https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80`;
     // console.log('Imagen de WordPress (_embedded) con proxy:', { original: wpImageUrl, proxy: proxyUrl });
     return proxyUrl;
   }
   
   if (image.source_url) {
-    const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(image.source_url)}&default=https://via.placeholder.com/800x600?text=Sin+Imagen`;
+    const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(image.source_url)}&default=https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80`;
     // console.log('Imagen de WordPress (source_url) con proxy:', { original: image.source_url, proxy: proxyUrl });
     return proxyUrl;
   }
@@ -90,7 +90,7 @@ const getImageSrc = (image, defaultImage) => {
   if (typeof image === 'string') {
     // Si es una URL de WordPress, usar proxy
     if (image.includes('realestategozamadrid.com') || image.includes('gozamadrid.com') || image.includes('wp-content')) {
-      const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(image)}&default=https://via.placeholder.com/800x600?text=Sin+Imagen`;
+      const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(image)}&default=https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80`;
       // console.log('Imagen de WordPress (string) con proxy:', { original: image, proxy: proxyUrl });
       return proxyUrl;
     }
@@ -151,7 +151,7 @@ const processHTMLContent = (content, blogImages) => {
           before.includes('wp-image')) {
         
         // Usar un proxy de imágenes para evitar errores HTTP2_PROTOCOL_ERROR
-        const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(src)}&default=https://via.placeholder.com/800x600?text=Sin+Imagen`;
+        const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(src)}&default=https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&q=80`;
         
         // Devolver una etiqueta de imagen simplificada
         return `<img src="${proxyUrl}" alt="${alt}" loading="lazy" class="w-full rounded-lg shadow-md my-4 object-contain" />`;
