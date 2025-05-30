@@ -167,6 +167,11 @@ body {
   border-radius: 3px;
 }
 
+/* Quitar línea específicamente de los títulos de las tarjetas de blog */
+.blog-card-title::before {
+  display: none !important;
+}
+
 .prose h3 {
   font-size: 1.5rem;
   margin-top: 2.5rem;
