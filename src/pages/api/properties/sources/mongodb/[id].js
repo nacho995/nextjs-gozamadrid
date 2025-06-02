@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   try {
     console.log(`[MongoDB API] Obteniendo propiedad con ID: ${id}`);
     
-    // Usar la nueva URL de Render
+    // Usar la URL de Render
     const url = `https://nextjs-gozamadrid-qrfk.onrender.com/api/properties/${id}`;
     console.log(`[MongoDB API] URL de solicitud: ${url}`);
     
