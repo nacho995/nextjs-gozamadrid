@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { normalizePrice, getPriceValue } from '../../../utils/priceFormatter';
 
 // Importar la función bulletproof de WooCommerce directamente
 import { loadFromWooCommerce as loadWooCommerceBulletproof } from './sources/woocommerce/index.js';
@@ -45,8 +46,8 @@ const transformWooCommerceProperty = (property) => {
       });
     }
 
-    let price = parseFloat(String(property.price).replace(/[^\d.-]/g, '')) || 0;
-    if (price < 10000 && price > 0) price *= 1000;
+    // Usar la nueva utilidad para normalizar el precio
+    const price = normalizePrice(property.price);
 
     const bedrooms = parseInt(metadata.bedrooms) || 0;
     const bathrooms = parseInt(metadata.baños || metadata.bathrooms || metadata.banos) || 0;
@@ -76,11 +77,14 @@ const transformWooCommerceProperty = (property) => {
 
 const transformMongoDBProperty = (property) => {
   try {
+    // Usar la nueva utilidad para normalizar el precio
+    const price = normalizePrice(property.price);
+    
     return {
       id: property._id,
       title: property.title || '',
       description: property.description || '',
-      price: typeof property.price === 'string' ? parseFloat(property.price.replace(/[^\d.-]/g, '')) : property.price,
+      price,
       source: 'mongodb',
       images: Array.isArray(property.images) ? property.images.map(img => ({
         url: img,

@@ -11,6 +11,7 @@ import config from '@/config/config';
 import axios from 'axios';
 import { wooCommerceCache } from '@/services/woocommerce-cache';
 import { useProperties } from '@/hooks/useProperties';
+import { formatPrice, getPriceValue } from '@/utils/priceFormatter';
 
 // Estilos consistentes con el resto de la web
 const textShadowStyle = { textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' };
@@ -722,39 +723,8 @@ export default function PropertyPage() {
         // Extraer precio
         let price = "Consultar";
         if (isWordPressProperty && property.price) {
-          price = new Intl.NumberFormat('es-ES', {
-            style: 'currency',
-            currency: 'EUR',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-          }).format(parseInt(property.price));
-        } else if (isMongoDBProperty && property.price) {
-          // Convertir el precio a número si es una cadena
-          let numericPrice;
-          if (typeof property.price === 'string') {
-            // Eliminar cualquier carácter que no sea número o punto
-            const cleanPrice = property.price.replace(/[^\d.-]/g, '');
-            numericPrice = parseFloat(cleanPrice);
-            
-            // Si el precio parece ser un precio reducido (menos de 10000), multiplicarlo por 1000
-            // Esto es para corregir casos donde el precio se guarda como "350" en lugar de "350000"
-            if (!isNaN(numericPrice) && numericPrice < 10000) {
-              numericPrice = numericPrice * 1000;
-            }
-          } else {
-            numericPrice = property.price;
-            // Si el precio parece ser un precio reducido (menos de 10000), multiplicarlo por 1000
-            if (numericPrice < 10000) {
-              numericPrice = numericPrice * 1000;
-            }
-          }
-          
-          price = new Intl.NumberFormat('es-ES', {
-            style: 'currency',
-            currency: 'EUR',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-          }).format(numericPrice);
+          const normalizedPrice = getPriceValue(property.price);
+          price = formatPrice(normalizedPrice);
         }
 
         // Obtener la imagen principal
@@ -904,22 +874,7 @@ export default function PropertyPage() {
           let formattedPrice = 'Consultar';
           try {
             if (property.price) {
-              // Convertir a número si es una cadena de texto
-              let price = typeof property.price === 'string' 
-                ? parseFloat(property.price.replace(/[^\d.-]/g, '')) 
-                : property.price;
-              
-              // Verificar si el precio parece muy bajo (probablemente en miles)
-              if (price < 10000 && price > 100) {
-                price = price * 1000; // Convertir a euros reales
-              }
-              
-              formattedPrice = new Intl.NumberFormat('es-ES', {
-                style: 'currency',
-                currency: 'EUR',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0
-              }).format(price);
+              formattedPrice = formatPrice(property.price);
             }
           } catch (e) {
             console.error('Error al formatear precio:', e);

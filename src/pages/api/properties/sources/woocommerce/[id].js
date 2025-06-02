@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { normalizePrice } from '../../../../../utils/priceFormatter';
 
 // 🏠 CONFIGURACIÓN PARA PROPIEDADES INDIVIDUALES DE WOOCOMMERCE
 const REAL_ESTATE_CONFIG = {
@@ -70,7 +71,7 @@ const transformRealProperty = (property) => {
     if (bathrooms === 0) bathrooms = 1; // Valor por defecto
     if (area === 0) area = 80; // Valor por defecto en m²
 
-    let price = parseFloat(String(property.price).replace(/[^\d.-]/g, '')) || 0;
+    let price = normalizePrice(property.price);
 
     return {
       id: String(property.id),

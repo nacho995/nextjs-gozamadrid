@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { formatPrice, getPriceValue } from './priceFormatter';
 
 // Función para obtener todas las propiedades desde las APIs
 export const fetchAllProperties = async () => {
@@ -105,12 +106,17 @@ export const normalizeProperty = (property) => {
 
   // Función auxiliar para obtener precio
   const getPrice = (prop) => {
-    if (prop.price) return prop.price.toString();
-    if (prop.regular_price) return prop.regular_price.toString();
-    if (prop.sale_price) return prop.sale_price.toString();
-    if (prop.meta && prop.meta.price) return prop.meta.price.toString();
+    // Intentar obtener el precio de diferentes campos
+    let rawPrice = null;
+    if (prop.price) rawPrice = prop.price;
+    else if (prop.regular_price) rawPrice = prop.regular_price;
+    else if (prop.sale_price) rawPrice = prop.sale_price;
+    else if (prop.meta && prop.meta.price) rawPrice = prop.meta.price;
     
-    return "Consultar";
+    if (!rawPrice) return "Consultar";
+    
+    // Usar la nueva utilidad para formatear
+    return formatPrice(rawPrice);
   };
 
   // Función auxiliar para obtener ubicación

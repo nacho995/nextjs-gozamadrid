@@ -2,17 +2,33 @@
 User-agent: *
 Allow: /
 Disallow: /api/
-Disallow: /_next/
+Disallow: /admin/
+Disallow: /test/
+Disallow: /debug/
+Disallow: /diagnostic/
+Disallow: /_app
+Disallow: /_document
+Disallow: /_error
 Disallow: /404
 Disallow: /500
-Disallow: /admin
-Disallow: /test
-Disallow: /diagnostico*
-Disallow: /diagnostic*
+
+# Googlebot
+User-agent: Googlebot
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Crawl-delay: 1
+
+# Bingbot
+User-agent: Bingbot
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Crawl-delay: 1
 
 # Host
-Host: https://realestategozamadrid.com
+Host: https://www.realestategozamadrid.com
 
 # Sitemaps
-Sitemap: https://realestategozamadrid.com/sitemap.xml
-Sitemap: https://realestategozamadrid.com/server-sitemap.xml
+Sitemap: https://www.realestategozamadrid.com/sitemap.xml
+Sitemap: https://www.realestategozamadrid.com/server-sitemap.xml

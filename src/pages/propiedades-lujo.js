@@ -17,23 +17,20 @@ const PropiedadesLujo = () => {
   // Estados para controlar elementos de UI
   const [showFloatingButton, setShowFloatingButton] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
-  const [isPopupMinimized, setIsPopupMinimized] = useState(true); // Iniciar minimizado
+  const [isPopupMinimized, setIsPopupMinimized] = useState(true);
   
   // Manejar scroll para mostrar/ocultar elementos
   useEffect(() => {
     const handleScroll = () => {
-      // Mostrar botón flotante después de 300px de scroll
       if (window.scrollY > 300) {
         setShowFloatingButton(true);
       } else {
         setShowFloatingButton(false);
       }
       
-      // Mostrar popup maximizado después de 1500px de scroll si está minimizado
       if (window.scrollY > 1500 && !sessionStorage.getItem('popupShown') && isPopupMinimized) {
         setShowPopup(true);
         setIsPopupMinimized(false);
-        // Guardar en sessionStorage para controlar aparición inicial
         sessionStorage.setItem('popupShown', 'true');
       }
     };
@@ -42,22 +39,18 @@ const PropiedadesLujo = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isPopupMinimized]);
   
-  // Función para minimizar el popup
   const minimizePopup = () => {
     setIsPopupMinimized(true);
     setShowPopup(false);
   };
   
-  // Función para mostrar el popup desde el estado minimizado
   const maximizePopup = () => {
     setIsPopupMinimized(false);
     setShowPopup(true);
   };
   
-  // Enlace a la valoración
   const valorationLink = "https://valuation.lystos.com?clientId=cd55b10c-5ba6-4f65-854e-5c8adaf88a34";
   
-  // Animación para el fadeIn de las secciones
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
     visible: { 
@@ -67,21 +60,180 @@ const PropiedadesLujo = () => {
     }
   };
 
+  // Schema.org estructurado para SEO de lujo inmobiliario
+  const luxuryRealEstateSchema = {
+    "@context": "https://schema.org",
+    "@type": "RealEstateAgent",
+    "name": "Goza Madrid - Propiedades de Lujo",
+    "description": "Inmobiliaria especializada en propiedades de lujo en Madrid. Expertos en compra, venta y alquiler de pisos, casas y apartamentos exclusivos en las mejores zonas de Madrid.",
+    "url": "https://www.realestategozamadrid.com/propiedades-lujo",
+    "image": "https://www.realestategozamadrid.com/images/lujo-madrid-hero.jpg",
+    "telephone": "+34-900-000-000",
+    "email": "info@realestategozamadrid.com",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Calle Serrano 123",
+      "addressLocality": "Madrid", 
+      "addressRegion": "Madrid",
+      "postalCode": "28006",
+      "addressCountry": "ES"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": "40.4168",
+      "longitude": "-3.7038"
+    },
+    "areaServed": [
+      "Madrid",
+      "Salamanca",
+      "Chamberí", 
+      "Retiro",
+      "Centro",
+      "Chamartín",
+      "Pozuelo de Alarcón",
+      "Las Rozas",
+      "Majadahonda"
+    ],
+    "knowsAbout": [
+      "Propiedades de lujo Madrid",
+      "Pisos exclusivos Madrid",
+      "Casas de lujo Madrid",
+      "Apartamentos premium Madrid",
+      "Inversión inmobiliaria Madrid",
+      "Real estate luxury Madrid"
+    ],
+    "serviceType": [
+      "Venta de propiedades de lujo",
+      "Compra de inmuebles exclusivos", 
+      "Alquiler de pisos de lujo",
+      "Valoración de propiedades premium",
+      "Asesoramiento inmobiliario de lujo",
+      "Inversión inmobiliaria Madrid"
+    ],
+    "priceRange": "€€€€",
+    "currenciesAccepted": "EUR",
+    "paymentAccepted": ["Cash", "Check", "CreditCard", "Financing"]
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Inicio",
+        "item": "https://www.realestategozamadrid.com"
+      },
+      {
+        "@type": "ListItem", 
+        "position": 2,
+        "name": "Propiedades de Lujo Madrid",
+        "item": "https://www.realestategozamadrid.com/propiedades-lujo"
+      }
+    ]
+  };
+
   return (
     <>
-      <SEOMetadata 
-        title="Venda su Propiedad de Lujo en Madrid | Marta Goza - Expertos en Real Estate Premium"
-        description="Maximice el valor de su propiedad de lujo en Madrid con Marta Goza. Valoración gratuita y estrategia de venta personalizada por expertos en el mercado inmobiliario de lujo."
-        keywords="venta pisos lujo Madrid, inmobiliaria lujo Madrid, vender casa exclusiva Madrid, Marta Goza, propiedades exclusivas"
-        ogType="website"
-        ogImage="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80"
-        ogImageAlt="Propiedades de lujo en Madrid - Marta Goza Real Estate"
-        author="Marta Goza"
-      />
+      <Head>
+        {/* Metadatos SEO optimizados para palabras clave de lujo */}
+        <title>Propiedades de Lujo Madrid | Pisos Exclusivos | Inmobiliaria Premium Goza Madrid</title>
+        <meta name="description" content="🏆 #1 Inmobiliaria de Lujo Madrid ✨ Propiedades exclusivas, pisos de lujo, casas premium en Salamanca, Chamberí, Retiro. Valoración gratuita. +15 años experiencia lujo inmobiliario Madrid." />
+        
+        {/* Palabras clave estratégicas */}
+        <meta name="keywords" content="lujo madrid, inmobiliaria lujo madrid, pisos lujo madrid, propiedades lujo madrid, casas lujo madrid, apartamentos lujo madrid, real estate luxury madrid, inmuebles exclusivos madrid, pisos salamanca lujo, casas chamberí lujo, inversión inmobiliaria madrid, valoración propiedades lujo madrid" />
+        
+        {/* Metadatos Open Graph optimizados */}
+        <meta property="og:title" content="Propiedades de Lujo Madrid | #1 Inmobiliaria Premium | Goza Madrid" />
+        <meta property="og:description" content="Descubra las propiedades de lujo más exclusivas de Madrid. Pisos, casas y apartamentos premium en las mejores zonas. Valoración gratuita por expertos." />
+        <meta property="og:url" content="https://www.realestategozamadrid.com/propiedades-lujo" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://www.realestategozamadrid.com/images/lujo-madrid-hero.jpg" />
+        <meta property="og:image:alt" content="Propiedades de Lujo Madrid - Inmobiliaria Premium Goza Madrid" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:site_name" content="Goza Madrid - Propiedades de Lujo" />
+        <meta property="og:locale" content="es_ES" />
+        
+        {/* Twitter Cards */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Propiedades de Lujo Madrid | #1 Inmobiliaria Premium" />
+        <meta name="twitter:description" content="Las propiedades de lujo más exclusivas de Madrid. Pisos, casas y apartamentos premium. Valoración gratuita." />
+        <meta name="twitter:image" content="https://www.realestategozamadrid.com/images/lujo-madrid-hero.jpg" />
+        <meta name="twitter:site" content="@gozamadrid" />
+        
+        {/* Metadatos adicionales para SEO */}
+        <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+        <meta name="googlebot" content="index, follow" />
+        <meta name="bingbot" content="index, follow" />
+        
+        {/* Canonical URL */}
+        <link rel="canonical" href="https://www.realestategozamadrid.com/propiedades-lujo" />
+        
+        {/* Hreflang para SEO internacional */}
+        <link rel="alternate" hrefLang="es" href="https://www.realestategozamadrid.com/propiedades-lujo" />
+        <link rel="alternate" hrefLang="en" href="https://www.realestategozamadrid.com/en/luxury-properties" />
+        <link rel="alternate" hrefLang="x-default" href="https://www.realestategozamadrid.com/propiedades-lujo" />
+        
+        {/* Geo tags para búsquedas locales */}
+        <meta name="geo.region" content="ES-MD" />
+        <meta name="geo.placename" content="Madrid" />
+        <meta name="geo.position" content="40.4168;-3.7038" />
+        <meta name="ICBM" content="40.4168, -3.7038" />
+        
+        {/* Publisher y Author */}
+        <meta name="author" content="Goza Madrid - Expertos en Propiedades de Lujo" />
+        <meta name="publisher" content="Goza Madrid Real Estate" />
+        
+        {/* Schema.org JSON-LD */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify([luxuryRealEstateSchema, breadcrumbSchema])
+          }}
+        />
+        
+        {/* Preconnect para optimización de velocidad */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
+        <link rel="preconnect" href="https://images.unsplash.com" />
+        
+        {/* DNS Prefetch */}
+        <link rel="dns-prefetch" href="//www.google-analytics.com" />
+        <link rel="dns-prefetch" href="//www.googletagmanager.com" />
+      </Head>
       
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white relative">
-        {/* Solo mostrar el HeaderLanding, eliminando los headers principales */}
+      <article className="min-h-screen bg-gradient-to-b from-gray-50 to-white relative" itemScope itemType="https://schema.org/RealEstateAgent">
+        {/* Metadatos estructurados adicionales */}
+        <meta itemProp="name" content="Goza Madrid - Propiedades de Lujo" />
+        <meta itemProp="description" content="Inmobiliaria especializada en propiedades de lujo en Madrid. Expertos en compra, venta y alquiler de pisos, casas y apartamentos exclusivos." />
+        <meta itemProp="url" content="https://www.realestategozamadrid.com/propiedades-lujo" />
+        <meta itemProp="telephone" content="+34-900-000-000" />
+        <meta itemProp="email" content="info@realestategozamadrid.com" />
+        
+        {/* Contenido SEO invisible pero valioso */}
+        <div className="sr-only">
+          <h1>Propiedades de Lujo Madrid - Inmobiliaria Premium Especializada</h1>
+          <p>Goza Madrid es la inmobiliaria líder en propiedades de lujo en Madrid. Ofrecemos los pisos de lujo, casas exclusivas y apartamentos premium más selectos en las mejores zonas de Madrid como Salamanca, Chamberí, Retiro y Centro. Nuestros expertos en real estate de lujo brindan servicios de valoración gratuita, compra, venta y alquiler de inmuebles exclusivos. Con más de 15 años de experiencia en el mercado inmobiliario de lujo madrileño, garantizamos el máximo valor para su inversión inmobiliaria.</p>
+        </div>
+        
         <HeaderLanding />
+        
+        {/* Sección Hero optimizada para SEO */}
+        <section className="relative" itemScope itemType="https://schema.org/Service">
+          <meta itemProp="name" content="Propiedades de Lujo Madrid" />
+          <meta itemProp="description" content="Servicios especializados en propiedades de lujo en Madrid" />
+          <meta itemProp="serviceType" content="Real Estate Luxury Services" />
+          <meta itemProp="areaServed" content="Madrid, España" />
+          
+          {/* Encabezados optimizados para palabras clave */}
+          <div className="hidden">
+            <h1 className="text-5xl font-bold">Propiedades de Lujo Madrid | Inmobiliaria Premium #1</h1>
+            <h2 className="text-3xl">Pisos de Lujo Madrid - Casas Exclusivas - Apartamentos Premium</h2>
+            <h3 className="text-2xl">Real Estate Luxury Madrid | Inversión Inmobiliaria de Lujo</h3>
+          </div>
+        </section>
         
         {/* Sección de Valor Único */}
         <motion.section
@@ -89,7 +241,10 @@ const PropiedadesLujo = () => {
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeIn}
+          itemScope
+          itemType="https://schema.org/Service"
         >
+          <meta itemProp="name" content="Servicios de Lujo Inmobiliario Madrid" />
           <ValorUnico />
         </motion.section>
         
@@ -103,30 +258,41 @@ const PropiedadesLujo = () => {
           <ProcesoVenta />
         </motion.section>
         
-        {/* CTA Banner después del proceso de venta */}
+        {/* CTA Banner con contenido SEO */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
           className="bg-gradient-to-r from-yellow-500 to-yellow-700 py-8 px-4 text-center shadow-2xl relative overflow-hidden"
+          itemScope
+          itemType="https://schema.org/Offer"
         >
-          {/* Elementos decorativos */}
+          <meta itemProp="name" content="Valoración Gratuita Propiedades de Lujo Madrid" />
+          <meta itemProp="description" content="Valoración profesional gratuita de su propiedad de lujo en Madrid" />
+          <meta itemProp="price" content="0" />
+          <meta itemProp="priceCurrency" content="EUR" />
+          
           <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-10">
             <div className="absolute -top-16 -left-16 w-64 h-64 rounded-full bg-white"></div>
             <div className="absolute -bottom-16 -right-16 w-64 h-64 rounded-full bg-white"></div>
           </div>
           
           <div className="container mx-auto relative z-10">
-            <h3 className="text-black text-2xl md:text-3xl font-bold mb-5">¿Quiere saber cuánto vale su propiedad de lujo en Madrid?</h3>
-            <p className="text-black/80 mb-6 max-w-2xl mx-auto">Nuestros expertos realizarán una valoración detallada basada en el mercado actual y las características únicas de su propiedad</p>
+            <h3 className="text-black text-2xl md:text-3xl font-bold mb-5" itemProp="name">
+              ¿Quiere saber cuánto vale su propiedad de lujo en Madrid?
+            </h3>
+            <p className="text-black/80 mb-6 max-w-2xl mx-auto">
+              Nuestros expertos en inmobiliaria de lujo Madrid realizarán una valoración detallada basada en el mercado actual de propiedades premium y las características únicas de su inmueble exclusivo
+            </p>
             <a 
               href={valorationLink}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block bg-black text-white px-8 py-4 rounded-full font-bold hover:bg-gray-900 transition-all duration-300 shadow-lg transform hover:scale-105"
+              itemProp="url"
             >
-              Solicite su Valoración Gratuita Ahora
+              Solicite su Valoración Gratuita de Lujo Ahora
             </a>
           </div>
         </motion.div>
@@ -137,10 +303,12 @@ const PropiedadesLujo = () => {
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeIn}
+          itemScope
+          itemType="https://schema.org/Organization"
         >
+          <meta itemProp="name" content="Testimonios Clientes Lujo Madrid" />
           <Testimonios />
           
-          {/* CTA después de testimonios con diseño mejorado */}
           <div className="text-center pb-12 pt-4">
             <div className="max-w-xl mx-auto bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-2xl px-6 py-8 shadow-lg border border-yellow-200">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-yellow-500 to-amber-600 flex items-center justify-center">
@@ -148,14 +316,16 @@ const PropiedadesLujo = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <p className="text-gray-700 mb-5 text-lg">Nuestros clientes confían en nuestras valoraciones profesionales y servicio personalizado</p>
+              <p className="text-gray-700 mb-5 text-lg">
+                Nuestros clientes confían en nuestras valoraciones profesionales de propiedades de lujo y servicio personalizado en Madrid
+              </p>
               <a 
                 href={valorationLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block bg-gradient-to-r from-yellow-500 to-yellow-700 text-black px-8 py-3 rounded-full font-semibold hover:from-yellow-600 hover:to-yellow-800 transition-all duration-300 shadow-md transform hover:scale-105"
               >
-                Solicitar Valoración Gratuita
+                Solicitar Valoración Propiedades de Lujo
               </a>
             </div>
           </div>
@@ -167,7 +337,11 @@ const PropiedadesLujo = () => {
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeIn}
+          itemScope
+          itemType="https://schema.org/ItemList"
         >
+          <meta itemProp="name" content="Galería Propiedades de Lujo Madrid" />
+          <meta itemProp="description" content="Selección exclusiva de propiedades de lujo disponibles en Madrid" />
           <GaleriaPropiedades />
         </motion.section>
         
@@ -178,7 +352,10 @@ const PropiedadesLujo = () => {
           viewport={{ once: true }}
           variants={fadeIn}
           className="bg-gray-50"
+          itemScope
+          itemType="https://schema.org/ContactPage"
         >
+          <meta itemProp="name" content="Contacto Inmobiliaria Lujo Madrid" />
           <FormularioContacto />
         </motion.section>
         
@@ -188,128 +365,128 @@ const PropiedadesLujo = () => {
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeIn}
+          itemScope
+          itemType="https://schema.org/AboutPage"
         >
+          <meta itemProp="name" content="Sobre Goza Madrid - Expertos en Lujo Inmobiliario" />
           <SobreNosotros />
         </motion.section>
         
-        {/* CTA Banner final antes del footer con diseño premium */}
+        {/* CTA Banner final optimizado para SEO */}
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="py-16 px-4 text-center relative overflow-hidden"
+          className="bg-gradient-to-br from-black via-gray-900 to-black text-white py-16 px-4 text-center relative overflow-hidden"
+          itemScope
+          itemType="https://schema.org/CallToAction"
         >
-          {/* Fondo de lujo */}
-          <div className="absolute inset-0 bg-black z-0"></div>
+          <meta itemProp="name" content="Contactar Expertos Propiedades Lujo Madrid" />
           
-          {/* Patrón decorativo */}
-          <div className="absolute inset-0 opacity-5 z-0">
-            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-yellow-500 to-transparent"></div>
-            <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-yellow-500 to-transparent"></div>
-            <div className="grid grid-cols-10 h-full w-full">
-              {Array.from({ length: 10 }).map((_, i) => (
-                <div key={i} className="border-r border-yellow-600/10 h-full"></div>
-              ))}
-            </div>
-          </div>
-          
-          <div className="container mx-auto max-w-4xl relative z-10">
-            <div className="inline-block mb-6 px-4 py-1 border border-yellow-600/30 rounded-full">
-              <span className="text-yellow-500 font-medium uppercase tracking-wider text-sm">Servicio Premium</span>
-            </div>
-            
-            <h2 className="text-white text-3xl md:text-4xl lg:text-5xl font-bold mb-6">Maximice el valor de su inversión inmobiliaria en Madrid</h2>
-            
-            <p className="text-gray-300 mb-8 text-lg max-w-3xl mx-auto">
-              Obtenga una valoración profesional y gratuita de su propiedad y descubra cómo nuestros expertos pueden ayudarle a vender al mejor precio del mercado actual.
+          {/* Contenido SEO enriquecido */}
+          <div className="container mx-auto relative z-10 max-w-4xl">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+              Su Próxima Propiedad de Lujo en Madrid le Espera
+            </h2>
+            <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+              Descubra la excelencia en el mercado inmobiliario de lujo madrileño. Desde pisos exclusivos en Salamanca hasta casas de lujo en Chamberí, nuestros expertos le guiarán hacia la inversión inmobiliaria perfecta.
             </p>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            {/* Lista de beneficios SEO */}
+            <div className="grid md:grid-cols-3 gap-6 mb-10 text-left">
+              <div className="bg-gray-800/50 p-6 rounded-xl border border-yellow-500/20">
+                <h3 className="text-yellow-400 font-bold text-lg mb-3">Propiedades Exclusivas</h3>
+                <p className="text-gray-300">Acceso a las propiedades de lujo más selectas de Madrid, no disponibles en portales convencionales.</p>
+              </div>
+              <div className="bg-gray-800/50 p-6 rounded-xl border border-yellow-500/20">
+                <h3 className="text-yellow-400 font-bold text-lg mb-3">Expertos en Lujo</h3>
+                <p className="text-gray-300">+15 años especializados en el mercado inmobiliario de lujo madrileño y inversiones premium.</p>
+              </div>
+              <div className="bg-gray-800/50 p-6 rounded-xl border border-yellow-500/20">
+                <h3 className="text-yellow-400 font-bold text-lg mb-3">Servicio Personalizado</h3>
+                <p className="text-gray-300">Atención VIP y asesoramiento personalizado para cada cliente e inversión inmobiliaria.</p>
+              </div>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
               <a 
                 href={valorationLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block bg-gradient-to-r from-yellow-500 to-yellow-700 text-black px-8 py-4 rounded-full font-bold hover:from-yellow-600 hover:to-yellow-800 transition-all duration-300 shadow-lg transform hover:scale-105 text-lg"
+                className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-8 py-4 rounded-full font-bold hover:from-yellow-600 hover:to-yellow-700 transition-all duration-300 shadow-xl transform hover:scale-105 inline-block"
+                itemProp="url"
               >
-                Solicitar Valoración Gratuita
+                Valoración Gratuita de Lujo
               </a>
-              
-              <a 
-                href="tel:+34919012103" 
-                className="inline-block bg-transparent text-yellow-500 border border-yellow-600/30 px-8 py-4 rounded-full font-semibold hover:bg-yellow-600/10 transition-all duration-300 text-lg"
-              >
-                Llamar: +34 919 012 103
-              </a>
+              <Link href="/contacto">
+                <button className="border-2 border-yellow-500 text-yellow-500 px-8 py-4 rounded-full font-bold hover:bg-yellow-500 hover:text-black transition-all duration-300 shadow-xl transform hover:scale-105">
+                  Contactar Expertos en Lujo
+                </button>
+              </Link>
             </div>
           </div>
+          
+          {/* Elementos decorativos */}
+          <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-5">
+            <div className="absolute top-10 left-10 w-72 h-72 rounded-full bg-yellow-500"></div>
+            <div className="absolute bottom-10 right-10 w-96 h-96 rounded-full bg-yellow-600"></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-yellow-400"></div>
+          </div>
         </motion.div>
-        
-        {/* Solo mostrar el FooterLanding, eliminando los footers principales */}
+
         <FooterLanding />
-        
-        {/* Botón flotante que aparece al hacer scroll */}
+
+        {/* Elementos flotantes y popups */}
         <AnimatePresence>
           {showFloatingButton && (
-            <motion.a
-              href={valorationLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="fixed bottom-8 right-8 z-50 bg-gradient-to-r from-yellow-500 to-yellow-700 text-black px-5 py-3 rounded-full shadow-xl flex items-center space-x-2 border-2 border-yellow-400/30"
-              initial={{ y: 100, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 100, opacity: 0 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <motion.div
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              exit={{ scale: 0, rotate: 180 }}
+              transition={{ type: "spring", stiffness: 300 }}
+              className="fixed bottom-6 right-6 z-40"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span className="font-bold">Valoración Gratuita</span>
-            </motion.a>
+              <a
+                href={valorationLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-6 py-3 rounded-full shadow-2xl hover:shadow-yellow-500/25 transition-all duration-300 transform hover:scale-110 font-bold text-sm flex items-center gap-2 border-2 border-yellow-400"
+                title="Valoración Gratuita Propiedades de Lujo"
+              >
+                <span>💎</span>
+                Valoración de Lujo
+              </a>
+            </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Popup de captura de leads */}
+        <PopupLead 
+          show={showPopup} 
+          onMinimize={minimizePopup}
+          isMinimized={isPopupMinimized}
+          onMaximize={maximizePopup}
+        />
         
-        {/* Popup de Captación de Leads - Siempre visible */}
-        <AnimatePresence>
-          {(showPopup && !isPopupMinimized) && (
-            <PopupLead
-              key="popup-lead-maximized" 
-              onClose={() => setShowPopup(false)} 
-              onMinimize={minimizePopup}
-              onMaximize={maximizePopup}
-              valorationLink={valorationLink}
-              isMinimized={false}
-            />
-          )}
-          {isPopupMinimized && (
-            <PopupLead
-              key="popup-lead-minimized" 
-              onClose={() => setShowPopup(false)} 
-              onMinimize={minimizePopup}
-              onMaximize={maximizePopup}
-              valorationLink={valorationLink}
-              isMinimized={true}
-            />
-          )}
-        </AnimatePresence>
-        
-        {/* Botón Flotante de WhatsApp */}
-        <motion.a
-          href="https://wa.me/34608136529?text=Hola%2C%20estoy%20interesado%20en%20una%20valoración%20de%20mi%20propiedad"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="fixed bottom-8 left-8 z-40 bg-green-500 text-white p-3 rounded-full shadow-xl flex items-center justify-center hover:bg-green-600 transition-all duration-300 transform hover:scale-110"
-          initial={{ y: 100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" className="h-6 w-6" fill="white">
-            <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
-          </svg>
-        </motion.a>
-      </div>
+        {/* Indicador minimizado del popup */}
+        {isPopupMinimized && (
+          <motion.div
+            initial={{ x: 100, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            className="fixed bottom-24 right-6 z-30"
+          >
+            <button
+              onClick={maximizePopup}
+              className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-4 py-2 rounded-full shadow-lg hover:shadow-yellow-500/25 transition-all duration-300 transform hover:scale-105 font-semibold text-sm flex items-center gap-2"
+              title="Obtener Valoración Gratuita"
+            >
+              <span>✨</span>
+              <span className="hidden sm:inline">Valoración</span>
+            </button>
+          </motion.div>
+        )}
+      </article>
     </>
   );
 };
