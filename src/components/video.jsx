@@ -298,26 +298,20 @@ const Video = () => {
             const filteredProps = getFilteredProperties();
             console.log('🗺️ Propiedades filtradas para el mapa:', filteredProps.length);
             
-            if (filteredProps.length === 0) {
-                console.log('⚠️ No hay propiedades filtradas, usando mapa de Madrid por defecto');
-                return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1sen!2ses!4v1638360000000';
-            }
-            
             // Si hay filtro de ubicación, buscar esa ubicación
             if (searchFilters.location && searchFilters.location.trim()) {
-                const searchLocation = encodeURIComponent(`${searchFilters.location} Madrid España`);
+                const searchLocation = encodeURIComponent(`${searchFilters.location}, Madrid, España`);
                 console.log('🎯 Mapa centrado en:', searchFilters.location);
-                return `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12149.5!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1&q=${searchLocation}`;
+                return `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12149.5!2d-3.7038!3d40.4168!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z${searchLocation}!5e0!3m2!1ses!2ses!4v1638360000000`;
             }
             
-            // Para múltiples propiedades, usar el centro de Madrid
-            console.log('🗺️ Mostrando mapa general de Madrid con propiedades');
-            return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1sen!2ses!4v1638360000000';
+            // Mapa general de Madrid
+            console.log('🗺️ Mostrando mapa general de Madrid');
+            return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1ses!2ses!4v1638360000000';
             
         } catch (error) {
             console.error('❌ Error generando URL del mapa:', error);
-            // Devolver mapa de Madrid por defecto en caso de error
-            return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1sen!2ses!4v1638360000000';
+            return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1ses!2ses!4v1638360000000';
         }
     };
 
@@ -326,29 +320,34 @@ const Video = () => {
         try {
             if (!property) {
                 console.log('⚠️ No hay propiedad seleccionada para el mapa');
-                return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1sen!2ses!4v1638360000000';
+                return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1ses!2ses!4v1638360000000';
             }
             
             console.log('🗺️ Generando mapa para propiedad:', property.title);
             
+            // Verificar si tiene coordenadas válidas
             if (property.coordinates && 
                 property.coordinates.lat && 
                 property.coordinates.lng &&
-                !isNaN(property.coordinates.lat) &&
-                !isNaN(property.coordinates.lng)) {
-                const { lat, lng } = property.coordinates;
+                !isNaN(parseFloat(property.coordinates.lat)) &&
+                !isNaN(parseFloat(property.coordinates.lng))) {
+                
+                const lat = parseFloat(property.coordinates.lat);
+                const lng = parseFloat(property.coordinates.lng);
                 console.log(`📍 Usando coordenadas: ${lat}, ${lng}`);
-                // Usar coordenadas válidas para el mapa embebido
-                return `https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3037.0!2d${lng}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2ses!4v${Date.now()}`;
+                
+                // URL simple con coordenadas
+                return `https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3037.0!2d${lng}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses!2ses!4v${Date.now()}`;
             } else {
                 console.log('📍 Usando ubicación por texto:', property.location || property.title);
-                const location = encodeURIComponent(`${property.location || property.title || 'Madrid'} España`);
-                // Usar búsqueda por ubicación con parámetro q
-                return `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3037.5!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1&q=${location}`;
+                const location = encodeURIComponent(`${property.location || property.title || 'Madrid'}, Madrid, España`);
+                
+                // URL simple con búsqueda
+                return `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12149.5!2d-3.7038!3d40.4168!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z${location}!5e0!3m2!1ses!2ses!4v${Date.now()}`;
             }
         } catch (error) {
             console.error('❌ Error generando URL del mapa individual:', error);
-            return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1sen!2ses!4v1638360000000';
+            return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1ses!2ses!4v1638360000000';
         }
     };
 
@@ -1024,7 +1023,22 @@ const Video = () => {
                                                             <div className="flex items-center gap-2">
                                                                 {selectedProperty ? (
                                                                     <a
-                                                                        href={`https://www.google.com/maps/dir/?api=1&destination=${selectedProperty.coordinates?.lat || 'Madrid'},${selectedProperty.coordinates?.lng || 'España'}`}
+                                                                        href={(() => {
+                                                                            // Validar coordenadas antes de usar
+                                                                            if (selectedProperty.coordinates && 
+                                                                                selectedProperty.coordinates.lat && 
+                                                                                selectedProperty.coordinates.lng &&
+                                                                                !isNaN(parseFloat(selectedProperty.coordinates.lat)) &&
+                                                                                !isNaN(parseFloat(selectedProperty.coordinates.lng))) {
+                                                                                const lat = parseFloat(selectedProperty.coordinates.lat);
+                                                                                const lng = parseFloat(selectedProperty.coordinates.lng);
+                                                                                return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+                                                                            } else {
+                                                                                // Usar ubicación por texto si no hay coordenadas válidas
+                                                                                const location = encodeURIComponent(`${selectedProperty.location || selectedProperty.title || 'Madrid'}, Madrid, España`);
+                                                                                return `https://www.google.com/maps/dir/?api=1&destination=${location}`;
+                                                                            }
+                                                                        })()}
                                                                         target="_blank"
                                                                         rel="noopener noreferrer"
                                                                         className="flex items-center gap-1 bg-amarillo text-white px-2 sm:px-3 py-1.5 rounded-lg hover:bg-amarillo/90 transition-colors text-xs font-medium"
