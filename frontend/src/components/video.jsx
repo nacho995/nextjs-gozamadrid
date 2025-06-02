@@ -324,6 +324,7 @@ const Video = () => {
             }
             
             console.log('🗺️ Generando mapa para propiedad:', property.title);
+            console.log('📍 Datos de coordenadas disponibles:', property.coordinates);
             
             // Verificar si tiene coordenadas válidas
             if (property.coordinates && 
@@ -334,17 +335,23 @@ const Video = () => {
                 
                 const lat = parseFloat(property.coordinates.lat);
                 const lng = parseFloat(property.coordinates.lng);
-                console.log(`📍 Usando coordenadas: ${lat}, ${lng}`);
+                console.log(`📍 Usando coordenadas exactas: ${lat}, ${lng}`);
                 
-                // URL simple con coordenadas
-                return `https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3037.0!2d${lng}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses!2ses!4v${Date.now()}`;
-            } else {
-                console.log('📍 Usando ubicación por texto:', property.location || property.title);
-                const location = encodeURIComponent(`${property.location || property.title || 'Madrid'}, Madrid, España`);
-                
-                // URL simple con búsqueda
-                return `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12149.5!2d-3.7038!3d40.4168!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z${location}!5e0!3m2!1ses!2ses!4v${Date.now()}`;
-            }
+                // Usar Google Maps Search embed con coordenadas - formato más simple
+                return `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dOWTgVbF-mL9Ps&q=${lat},${lng}&zoom=17&center=${lat},${lng}`;
+            } 
+            
+            // Si no hay coordenadas válidas, usar búsqueda por ubicación
+            console.log('📍 Usando ubicación por texto:', property.location || property.title);
+            // Limpiar ubicación para búsqueda
+            const locationText = property.location || property.title || 'Madrid';
+            // Tomar solo la parte principal de la ubicación
+            const cleanLocation = locationText.split(',')[0].trim();
+            console.log('📍 Ubicación limpia para buscar:', cleanLocation);
+            
+            // Usar Google Maps Search embed con texto de ubicación
+            return `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dOWTgVbF-mL9Ps&q=${encodeURIComponent(cleanLocation + ', Madrid, España')}&zoom=16`;
+            
         } catch (error) {
             console.error('❌ Error generando URL del mapa individual:', error);
             return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1ses!2ses!4v1638360000000';
