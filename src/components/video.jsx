@@ -335,23 +335,22 @@ const Video = () => {
                 
                 const lat = parseFloat(property.coordinates.lat);
                 const lng = parseFloat(property.coordinates.lng);
-                console.log(`📍 Usando coordenadas exactas: ${lat}, ${lng}`);
+                console.log(`📍 Usando coordenadas exactas con marcador: ${lat}, ${lng}`);
                 
-                // URL pública de Google Maps embed con coordenadas específicas
-                return `https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d1500!2d${lng}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2s${lat}%2C${lng}!5e0!3m2!1ses!2ses!4v${Date.now()}`;
+                // URL de Google Maps embed con marcador rojo en la ubicación exacta
+                const zoom = 16; // Zoom más cercano para ver mejor la ubicación
+                return `https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d1500!2d${lng}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f${zoom}!3m2!1m1!2s${lat}%2C${lng}!5e0!3m2!1ses!2ses!4v${Date.now()}&markers=color:red%7C${lat},${lng}`;
             } 
             
-            // Si no hay coordenadas válidas, usar búsqueda por ubicación
-            console.log('📍 Usando ubicación por texto:', property.location || property.title);
-            // Limpiar ubicación para búsqueda
+            // Si no hay coordenadas válidas, usar búsqueda por ubicación con marcador
+            console.log('📍 Usando ubicación por texto con marcador:', property.location || property.title);
             const locationText = property.location || property.title || 'Madrid';
-            // Tomar solo la parte principal de la ubicación
             const cleanLocation = locationText.split(',')[0].trim();
             console.log('📍 Ubicación limpia para buscar:', cleanLocation);
             
-            // URL pública de Google Maps embed con búsqueda por texto
+            // URL de Google Maps embed con búsqueda por texto (automáticamente añade marcador)
             const searchQuery = encodeURIComponent(`${cleanLocation}, Madrid, España`);
-            return `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3037!2d-3.7038!3d40.4168!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z${searchQuery}!5e0!3m2!1ses!2ses!4v${Date.now()}`;
+            return `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3037!2d-3.7038!3d40.4168!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f15.1!3m3!1m2!1s0x0%3A0x0!2z${searchQuery}!5e0!3m2!1ses!2ses!4v${Date.now()}`;
             
         } catch (error) {
             console.error('❌ Error generando URL del mapa individual:', error);

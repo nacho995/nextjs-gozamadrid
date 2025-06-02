@@ -97,6 +97,7 @@ const transformMongoDBProperty = (property) => {
         floor: property.floor || null
       },
       location: property.location || property.address || '',
+      coordinates: property.coordinates || null,
       metadata: property.metadata || {},
       createdAt: property.createdAt || new Date().toISOString(),
       updatedAt: property.updatedAt || new Date().toISOString()
