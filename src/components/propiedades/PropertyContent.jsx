@@ -1,11 +1,11 @@
 "use client";
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { HiMiniSquare3Stack3D } from "react-icons/hi2";
-import { FaRestroom, FaBuilding, FaEuroSign, FaCalendarAlt, FaClock, FaHandshake, FaEnvelope, FaUser, FaTimes, FaMapMarkerAlt, FaChevronLeft, FaChevronRight, FaRuler, FaBed, FaBath, FaArrowLeft, FaRegHeart, FaHeart, FaShareAlt, FaWhatsapp, FaPrint, FaSpinner } from "react-icons/fa";
+import { FaRestroom, FaBuilding, FaEuroSign, FaCalendarAlt, FaClock, FaHandshake, FaEnvelope, FaUser, FaTimes, FaMapMarkerAlt, FaChevronLeft, FaChevronRight, FaRuler, FaBed, FaBath, FaArrowLeft, FaRegHeart, FaHeart, FaShareAlt, FaWhatsapp, FaPrint, FaSpinner, FaDownload, FaParking, FaSwimmingPool } from "react-icons/fa";
 import Link from "next/link";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { addDays, setHours, setMinutes } from "date-fns";
 import es from "date-fns/locale/es";
 import { toast } from "sonner";
@@ -14,6 +14,7 @@ import Head from "next/head";
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import Image from "next/legacy/image";
 import CountryPrefix from "../CountryPrefix";
+import { formatPrice, generateOfferRanges, getPriceValue } from '@/utils/priceFormatter';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://goza-madrid.onrender.com';
 
@@ -501,46 +502,6 @@ export default function DefaultPropertyContent({ property }) {
     if (!loadedImages[newIndex]) {
       setImageLoading(true);
     }
-  };
-
-  // Función para generar rangos de ofertas
-  const generateOfferRanges = (price) => {
-    // Si el precio es una cadena formateada (ej: "350.000 €"), extraer el valor numérico
-    let numericPrice;
-    
-    if (typeof price === 'string') {
-      // Eliminar símbolos de moneda, puntos y espacios
-      const cleanPrice = price.replace(/[€$.\s]/g, '').replace(',', '.');
-      numericPrice = parseFloat(cleanPrice);
-    } else {
-      numericPrice = price;
-    }
-    
-    if (isNaN(numericPrice) || numericPrice <= 0) return [];
-    
-    const ranges = [];
-    
-    // Ofertas por debajo del precio
-    ranges.push({
-      label: "5% menos",
-      value: Math.round(numericPrice * 0.95),
-      percentage: -5
-    });
-    
-    ranges.push({
-      label: "10% menos",
-      value: Math.round(numericPrice * 0.9),
-      percentage: -10
-    });
-    
-    // Precio exacto
-    ranges.push({
-      label: "Precio publicado",
-      value: numericPrice,
-      percentage: 0
-    });
-    
-    return ranges;
   };
 
   // Efecto para actualizar imageLoading cuando cambie current
@@ -1091,46 +1052,7 @@ export default function DefaultPropertyContent({ property }) {
   
   // Formatear el precio correctamente
   let priceValue = propertyState.price;
-  let formattedPrice = 'Consultar precio';
-  
-  if (priceValue) {
-    // Si es un string, intentar convertirlo a número para formatear
-    if (typeof priceValue === 'string') {
-      // Eliminar cualquier carácter que no sea número o punto
-      const cleanPrice = priceValue.replace(/[^\d.-]/g, '');
-      
-      // Convertir a número
-      const numericPrice = parseFloat(cleanPrice);
-      
-      if (!isNaN(numericPrice)) {
-        // Si el precio parece ser un precio reducido (menos de 10000), multiplicarlo por 1000
-        // Esto es para corregir casos donde el precio se guarda como "350" en lugar de "350000"
-        const adjustedPrice = numericPrice < 10000 ? numericPrice * 1000 : numericPrice;
-        
-        // Formatear con separador de miles
-        formattedPrice = new Intl.NumberFormat('es-ES', {
-          style: 'currency',
-          currency: 'EUR',
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 0
-        }).format(adjustedPrice);
-      } else {
-        // Si no se puede convertir a número, usar el string original
-        formattedPrice = priceValue;
-      }
-    } else if (typeof priceValue === 'number') {
-      // Si ya es un número, formatear directamente
-      // Si el precio parece ser un precio reducido (menos de 10000), multiplicarlo por 1000
-      const adjustedPrice = priceValue < 10000 ? priceValue * 1000 : priceValue;
-      
-      formattedPrice = new Intl.NumberFormat('es-ES', {
-        style: 'currency',
-        currency: 'EUR',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      }).format(adjustedPrice);
-    }
-  }
+  let formattedPrice = formatPrice(priceValue);
   
   const location = propertyState.location || 'Madrid, España';
   const propertyType = propertyState.type || 'Propiedad';
