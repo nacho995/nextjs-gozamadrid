@@ -1,0 +1,27 @@
+{
+  "propertyCoordinates": {
+    "Don Pedro": { "lat": 40.4168, "lng": -3.7038, "address": "La Latina, Madrid" },
+    "Antonia Merce 2": { "lat": 40.4186, "lng": -3.7074, "address": "Calle Antonia Mercé, Madrid" },
+    "Padilla 80": { "lat": 40.4347, "lng": -3.6760, "address": "Calle Padilla 80, Madrid" },
+    "General Pardiñas 69": { "lat": 40.4350, "lng": -3.6800, "address": "Calle General Pardiñas 69, Madrid" },
+    "General Díaz Porlier 95": { "lat": 40.4320, "lng": -3.6770, "address": "Calle General Díaz Porlier 95, Madrid" },
+    "Ayala 94": { "lat": 40.4340, "lng": -3.6750, "address": "Calle Ayala 94, Madrid" },
+    "Montera 39": { "lat": 40.4204, "lng": -3.7007, "address": "Calle Montera 39, Madrid" },
+    "Tetuán 20": { "lat": 40.4270, "lng": -3.7010, "address": "Calle Tetuán 20, Madrid" },
+    "Ortega y Gasset 47": { "lat": 40.4320, "lng": -3.6920, "address": "Calle Ortega y Gasset 47, Madrid" },
+    "Diego de León 60": { "lat": 40.4380, "lng": -3.6750, "address": "Calle Diego de León 60, Madrid" },
+    "Isabel la Católica 7": { "lat": 40.4150, "lng": -3.7050, "address": "Calle Isabel la Católica 7, Madrid" },
+    "Principe De Vergara 39": { "lat": 40.4280, "lng": -3.6850, "address": "Calle Príncipe de Vergara 39, Madrid" },
+    "Diego de Leon 52": { "lat": 40.4370, "lng": -3.6760, "address": "Calle Diego de León 52, Madrid" },
+    "Ventura de la Vega 7": { "lat": 40.4160, "lng": -3.6980, "address": "Calle Ventura de la Vega 7, Madrid" },
+    "General Pardiñas 8": { "lat": 40.4300, "lng": -3.6900, "address": "Calle General Pardiñas 8, Madrid" },
+    "Hermosilla 121": { "lat": 40.4280, "lng": -3.6720, "address": "Calle Hermosilla 121, Madrid" },
+    "Jorge Juan 103": { "lat": 40.4260, "lng": -3.6780, "address": "Calle Jorge Juan 103, Madrid" },
+    "Serrano 45": { "lat": 40.4290, "lng": -3.6850, "address": "Calle Serrano 45, Madrid" },
+    "Velázquez 35": { "lat": 40.4310, "lng": -3.6880, "address": "Calle Velázquez 35, Madrid" },
+    "Goya 30": { "lat": 40.4240, "lng": -3.6840, "address": "Calle Goya 30, Madrid" },
+    "Alcalá 200": { "lat": 40.4250, "lng": -3.6750, "address": "Calle Alcalá 200, Madrid" },
+    "Conde de Peñalver 45": { "lat": 40.4280, "lng": -3.6720, "address": "Calle Conde de Peñalver 45, Madrid" },
+    "María de Molina 50": { "lat": 40.4400, "lng": -3.6800, "address": "Calle María de Molina 50, Madrid" }
+  }
+} 
