@@ -1,8 +1,46 @@
 import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
 
 // Determinar la URL base de la API según el entorno - usar la URL que funciona
 const BASE_URL = 'https://nextjs-gozamadrid-qrfk.onrender.com';
 const TIMEOUT = parseInt(process.env.NEXT_PUBLIC_API_TIMEOUT || '30000');
+
+// Cargar coordenadas desde el archivo JSON
+let coordinatesData = {};
+try {
+  const coordinatesPath = path.join(process.cwd(), 'coordinates-data.json');
+  if (fs.existsSync(coordinatesPath)) {
+    const rawData = fs.readFileSync(coordinatesPath, 'utf8');
+    coordinatesData = JSON.parse(rawData).propertyCoordinates || {};
+    console.log(`📍 Coordenadas cargadas para ${Object.keys(coordinatesData).length} propiedades`);
+  }
+} catch (error) {
+  console.log('⚠️ No se pudieron cargar las coordenadas:', error.message);
+}
+
+// Función para encontrar coordenadas por título
+const findCoordinatesForProperty = (title) => {
+  if (!title) return null;
+  
+  // Buscar coincidencia exacta
+  if (coordinatesData[title]) {
+    return coordinatesData[title];
+  }
+  
+  // Buscar coincidencia parcial
+  for (const [key, coords] of Object.entries(coordinatesData)) {
+    // Limpiar títulos para comparación
+    const cleanTitle = title.toLowerCase().trim();
+    const cleanKey = key.toLowerCase().trim();
+    
+    if (cleanTitle.includes(cleanKey) || cleanKey.includes(cleanTitle.split(',')[0].trim())) {
+      return coords;
+    }
+  }
+  
+  return null;
+};
 
 // Funciones auxiliares
 const formatMongoDBProperties = (properties) => {
@@ -11,6 +49,19 @@ const formatMongoDBProperties = (properties) => {
   return properties.map(property => {
     // Agregar un identificador explícito para la fuente
     property.source = 'mongodb';
+    
+    // Buscar y agregar coordenadas si no las tiene
+    if (!property.coordinates && property.title) {
+      const coords = findCoordinatesForProperty(property.title);
+      if (coords) {
+        property.coordinates = {
+          lat: coords.lat,
+          lng: coords.lng
+        };
+        console.log(`📍 Coordenadas agregadas para: ${property.title} -> ${coords.lat}, ${coords.lng}`);
+      }
+    }
+    
     return property;
   });
 };
@@ -54,31 +105,21 @@ export default async function handler(req, res) {
       }
     }
     
-    // Formatear las propiedades para uso en la aplicación
+    // Formatear las propiedades para uso en la aplicación (incluyendo coordenadas)
     const formattedProperties = formatMongoDBProperties(properties);
     
     console.log(`[API Route MongoDB] ${formattedProperties.length} propiedades encontradas desde ${BASE_URL}`);
+    console.log(`📍 Propiedades con coordenadas: ${formattedProperties.filter(p => p.coordinates).length}`);
     
     return res.status(200).json(formattedProperties);
   } catch (error) {
-    // Log más detallado del error
-    console.error(`[API Route MongoDB] Error al obtener propiedades desde ${BASE_URL}:`, error.message);
+    console.error(`[API Route MongoDB] Error conectando con ${BASE_URL}:`, error.message);
     
-    if (error.response) {
-      // Si el error viene del backend (8081 o producción)
-      console.error(`[API Route MongoDB] Respuesta de error del backend (${BASE_URL}): ${error.response.status}`, error.response.data);
-      // Devolver array vacío en lugar de error para evitar mostrar datos de ejemplo
-      return res.status(200).json([]);
-    } else if (error.request) {
-      // Si la petición se hizo pero no se recibió respuesta (ej. backend no disponible)
-      console.error(`[API Route MongoDB] No se recibió respuesta del backend (${BASE_URL}). ¿Está corriendo?`);
-      // Devolver array vacío en lugar de error 503
-      return res.status(200).json([]);
-    } else {
-      // Otro tipo de error (ej. configuración de axios)
-      console.error('[API Route MongoDB] Error al configurar la petición:', error.message);
-      // Devolver array vacío en lugar de error 500
-      return res.status(200).json([]);
-    }
+    return res.status(500).json({
+      error: 'Error al conectar con MongoDB',
+      message: error.message,
+      backend_url: BASE_URL,
+      timestamp: new Date().toISOString()
+    });
   }
 } 
