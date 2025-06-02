@@ -7,8 +7,8 @@ export default async function handler(req, res) {
   }
   
   try {
-    // Usar directamente la URL del backend de MongoDB que funciona
-    const url = `http://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api/properties/${id}`;
+    // Usar la URL de Render que funciona
+    const url = `https://nextjs-gozamadrid-qrfk.onrender.com/api/properties/${id}`;
     
     console.log(`[API] Solicitando propiedad MongoDB con ID ${id} desde ${url}`);
     
