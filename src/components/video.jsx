@@ -337,8 +337,8 @@ const Video = () => {
                 const lng = parseFloat(property.coordinates.lng);
                 console.log(`📍 Usando coordenadas exactas: ${lat}, ${lng}`);
                 
-                // Usar Google Maps Search embed con coordenadas - formato más simple
-                return `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dOWTgVbF-mL9Ps&q=${lat},${lng}&zoom=17&center=${lat},${lng}`;
+                // URL pública de Google Maps embed con coordenadas específicas
+                return `https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d1500!2d${lng}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2s${lat}%2C${lng}!5e0!3m2!1ses!2ses!4v${Date.now()}`;
             } 
             
             // Si no hay coordenadas válidas, usar búsqueda por ubicación
@@ -349,8 +349,9 @@ const Video = () => {
             const cleanLocation = locationText.split(',')[0].trim();
             console.log('📍 Ubicación limpia para buscar:', cleanLocation);
             
-            // Usar Google Maps Search embed con texto de ubicación
-            return `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dOWTgVbF-mL9Ps&q=${encodeURIComponent(cleanLocation + ', Madrid, España')}&zoom=16`;
+            // URL pública de Google Maps embed con búsqueda por texto
+            const searchQuery = encodeURIComponent(`${cleanLocation}, Madrid, España`);
+            return `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3037!2d-3.7038!3d40.4168!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z${searchQuery}!5e0!3m2!1ses!2ses!4v${Date.now()}`;
             
         } catch (error) {
             console.error('❌ Error generando URL del mapa individual:', error);
