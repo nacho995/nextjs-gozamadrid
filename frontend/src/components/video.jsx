@@ -762,7 +762,7 @@ const Video = () => {
                                     initial={{ scale: 0.95, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
                                     exit={{ scale: 0.95, opacity: 0 }}
-                                    className="bg-white rounded-2xl sm:rounded-3xl w-full max-w-7xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden shadow-2xl"
+                                    className="bg-white rounded-2xl sm:rounded-3xl w-full max-w-5xl max-h-[85vh] sm:max-h-[80vh] overflow-hidden shadow-2xl"
                                     onClick={(e) => e.stopPropagation()}
                                 >
                                     <div className="flex justify-between items-center p-4 sm:p-6 lg:p-8 border-b border-gray-100">

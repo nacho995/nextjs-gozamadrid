@@ -762,30 +762,30 @@ const Video = () => {
                                     initial={{ scale: 0.95, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
                                     exit={{ scale: 0.95, opacity: 0 }}
-                                    className="bg-white rounded-2xl sm:rounded-3xl w-full max-w-7xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden shadow-2xl"
+                                    className="bg-white rounded-2xl sm:rounded-3xl w-full max-w-5xl max-h-[85vh] sm:max-h-[80vh] overflow-hidden shadow-2xl"
                                     onClick={(e) => e.stopPropagation()}
                                 >
-                                    <div className="flex justify-between items-center p-4 sm:p-6 lg:p-8 border-b border-gray-100">
+                                    <div className="flex justify-between items-center p-3 sm:p-4 lg:p-6 border-b border-gray-100">
                                         <div>
-                                            <h2 className="font-serif text-xl sm:text-2xl lg:text-3xl font-light text-gray-900">
+                                            <h2 className="font-serif text-lg sm:text-xl lg:text-2xl font-light text-gray-900">
                                                 Propiedades Encontradas
                                                 <span className="text-amarillo font-normal ml-2">({getFilteredProperties().length})</span>
                                             </h2>
-                                            <p className="text-gray-600 text-xs sm:text-sm mt-2 font-light">
-                                                Haz clic en cualquier propiedad para ver su ubicación exacta en el mapa
+                                            <p className="text-gray-600 text-xs sm:text-sm mt-1 font-light">
+                                                Haz clic en cualquier propiedad para ver su ubicación en el mapa
                                             </p>
                                         </div>
                                         <button
                                             onClick={() => setShowMap(false)}
-                                            className="text-gray-400 hover:text-gray-600 text-xl sm:text-2xl p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
+                                            className="text-gray-400 hover:text-gray-600 text-lg sm:text-xl p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
                                         >
                                             <FaTimes />
                                         </button>
                                     </div>
                                     
-                                    <div className="grid grid-cols-1 lg:grid-cols-2 h-[70vh] sm:h-[75vh]">
-                                        {/* Lista de propiedades con diseño premium */}
-                                        <div className="overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 h-[65vh] sm:h-[70vh]">
+                                        {/* Lista de propiedades con diseño premium compacto */}
+                                        <div className="overflow-y-auto p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4">
                                             {propertiesLoading ? (
                                                 <div className="flex items-center justify-center py-16">
                                                     <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-amarillo"></div>
@@ -837,7 +837,7 @@ const Video = () => {
                                                 <motion.div
                                                     key={property.id}
                                                     whileHover={{ scale: 1.02 }}
-                                                    className={`bg-white rounded-2xl p-4 lg:p-6 cursor-pointer transition-all duration-300 border-2 group shadow-lg hover:shadow-xl ${
+                                                    className={`bg-white rounded-xl p-3 lg:p-4 cursor-pointer transition-all duration-300 border-2 group shadow-lg hover:shadow-xl ${
                                                         selectedProperty?.id === property.id 
                                                             ? 'border-amarillo bg-amarillo/10' 
                                                             : 'border-gray-100 hover:border-amarillo/30'
@@ -848,10 +848,10 @@ const Video = () => {
                                                     }}
                                                     title={`Ver ${property.title} en el mapa`}
                                                 >
-                                                    {/* Layout responsivo: stack en móvil, horizontal en desktop */}
-                                                    <div className="flex flex-col sm:flex-row gap-4 lg:gap-6">
-                                                        {/* Imagen responsive */}
-                                                        <div className="relative w-full sm:w-32 lg:w-36 h-48 sm:h-24 lg:h-28 flex-shrink-0">
+                                                    {/* Layout responsivo compacto */}
+                                                    <div className="flex flex-col sm:flex-row gap-3 lg:gap-4">
+                                                        {/* Imagen responsive más pequeña */}
+                                                        <div className="relative w-full sm:w-24 lg:w-32 h-32 sm:h-20 lg:h-24 flex-shrink-0">
                                                             <img
                                                                 src={(() => {
                                                                     // Función para obtener la imagen con fallbacks
@@ -893,7 +893,7 @@ const Video = () => {
                                                                     return getPropertyImage(property);
                                                                 })()}
                                                                 alt={property.title || 'Imagen de propiedad'}
-                                                                className="w-full h-full object-cover rounded-xl"
+                                                                className="w-full h-full object-cover rounded-lg"
                                                                 onError={(e) => {
                                                                     // Fallback en caso de error de carga
                                                                     if (e.target.src !== "https://placekitten.com/400/300") {
@@ -905,18 +905,18 @@ const Video = () => {
                                                             
                                                             {/* Badge de estado si está seleccionado */}
                                                             {selectedProperty?.id === property.id && (
-                                                                <div className="absolute top-2 right-2">
+                                                                <div className="absolute top-1 right-1">
                                                                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-amarillo text-white shadow-lg">
-                                                                        ✓ Seleccionado
+                                                                        ✓ En mapa
                                                                     </span>
                                                                 </div>
                                                             )}
                                                         </div>
                                                         
-                                                        {/* Contenido de la propiedad */}
+                                                        {/* Contenido de la propiedad más compacto */}
                                                         <div className="flex-1 min-w-0">
-                                                            {/* Título responsive */}
-                                                            <h3 className={`font-serif text-lg sm:text-xl font-light transition-colors mb-2 line-clamp-2 ${
+                                                            {/* Título responsive más compacto */}
+                                                            <h3 className={`font-serif text-sm sm:text-base lg:text-lg font-light transition-colors mb-1 line-clamp-2 ${
                                                                 selectedProperty?.id === property.id 
                                                                     ? 'text-amarillo' 
                                                                     : 'text-gray-900 group-hover:text-amarillo'
@@ -924,36 +924,33 @@ const Video = () => {
                                                                 {property.title}
                                                             </h3>
                                                             
-                                                            {/* Ubicación responsive */}
-                                                            <p className="text-gray-600 flex items-start sm:items-center gap-2 mb-3 font-light text-sm sm:text-base">
-                                                                <FaMapMarkerAlt className="text-amarillo mt-0.5 sm:mt-0 flex-shrink-0" />
-                                                                <span className="line-clamp-2 sm:line-clamp-1">
+                                                            {/* Ubicación responsive compacta */}
+                                                            <p className="text-gray-600 flex items-start sm:items-center gap-1 mb-2 font-light text-xs sm:text-sm">
+                                                                <FaMapMarkerAlt className="text-amarillo mt-0.5 sm:mt-0 flex-shrink-0 text-xs" />
+                                                                <span className="line-clamp-1">
                                                                     {property.location}
                                                                 </span>
                                                             </p>
                                                             
-                                                            {/* Características responsive */}
-                                                            <div className="grid grid-cols-3 gap-2 sm:flex sm:items-center sm:gap-4 lg:gap-6 mb-4 text-sm text-gray-600">
+                                                            {/* Características responsive compactas */}
+                                                            <div className="grid grid-cols-3 gap-1 sm:flex sm:items-center sm:gap-3 mb-2 text-xs text-gray-600">
                                                                 <span className="flex items-center gap-1 justify-center sm:justify-start">
-                                                                    <FaBed className="text-amarillo" />
-                                                                    <span className="hidden sm:inline">{property.bedrooms}</span>
-                                                                    <span className="sm:hidden">{property.bedrooms}</span>
+                                                                    <FaBed className="text-amarillo text-xs" />
+                                                                    <span>{property.bedrooms}</span>
                                                                 </span>
                                                                 <span className="flex items-center gap-1 justify-center sm:justify-start">
-                                                                    <FaBath className="text-amarillo" />
-                                                                    <span className="hidden sm:inline">{property.bathrooms}</span>
-                                                                    <span className="sm:hidden">{property.bathrooms}</span>
+                                                                    <FaBath className="text-amarillo text-xs" />
+                                                                    <span>{property.bathrooms}</span>
                                                                 </span>
                                                                 <span className="flex items-center gap-1 justify-center sm:justify-start">
-                                                                    <FaRuler className="text-amarillo" />
-                                                                    <span className="hidden sm:inline">{property.size}m²</span>
-                                                                    <span className="sm:hidden">{property.size}m²</span>
+                                                                    <FaRuler className="text-amarillo text-xs" />
+                                                                    <span>{property.size}m²</span>
                                                                 </span>
                                                             </div>
                                                             
-                                                            {/* Footer responsive con precio y botón */}
-                                                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                                                                <p className="text-xl lg:text-2xl font-light text-amarillo">
+                                                            {/* Footer responsive con precio y botón más compacto */}
+                                                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                                                                <p className="text-base lg:text-lg font-light text-amarillo">
                                                                     €{property.price}
                                                                 </p>
                                                                 <button
@@ -967,11 +964,11 @@ const Video = () => {
                                                                         // Usar la URL correcta
                                                                         window.open(`/property/${propertyId}`, '_blank');
                                                                     }}
-                                                                    className="w-full sm:w-auto bg-amarillo hover:bg-amarillo/90 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                                                                    className="w-full sm:w-auto bg-amarillo hover:bg-amarillo/90 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
                                                                     title={`Ver detalles de ${property.title}`}
                                                                 >
                                                                     <FaEye className="text-xs" />
-                                                                    <span>Ver detalles</span>
+                                                                    <span>Detalles</span>
                                                                 </button>
                                                             </div>
                                                         </div>
@@ -985,19 +982,19 @@ const Video = () => {
                                         <div className="relative bg-gray-50">
                                             {getFilteredProperties().length > 0 ? (
                                                 <div className="h-full flex flex-col">
-                                                    <div className="p-4 sm:p-6 bg-white border-b border-gray-100">
-                                                        <h3 className="font-serif text-lg sm:text-xl font-light text-gray-900 mb-2">
+                                                    <div className="p-3 sm:p-4 bg-white border-b border-gray-100">
+                                                        <h3 className="font-serif text-sm sm:text-base lg:text-lg font-light text-gray-900 mb-1">
                                                             {selectedProperty ? selectedProperty.title : `${getFilteredProperties().length} Propiedades en el Mapa`}
                                                         </h3>
-                                                        <p className="text-gray-600 flex items-center gap-2 font-light text-sm sm:text-base">
-                                                            <FaMapMarkerAlt className="text-amarillo flex-shrink-0" />
+                                                        <p className="text-gray-600 flex items-center gap-2 font-light text-xs sm:text-sm">
+                                                            <FaMapMarkerAlt className="text-amarillo flex-shrink-0 text-xs" />
                                                             <span className="truncate">
                                                                 {selectedProperty ? selectedProperty.location : 'Madrid, España'}
                                                             </span>
                                                         </p>
                                                         {!selectedProperty && (
-                                                            <p className="text-xs sm:text-sm text-gray-500 mt-2">
-                                                                Haz clic en una propiedad para centrar el mapa en su ubicación
+                                                            <p className="text-xs text-gray-500 mt-1">
+                                                                Haz clic en una propiedad para centrar el mapa
                                                             </p>
                                                         )}
                                                     </div>
@@ -1005,9 +1002,9 @@ const Video = () => {
                                                     <div className="flex-1 relative min-h-0">
                                                         {mapLoading && (
                                                             <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center">
-                                                                <div className="flex items-center gap-3">
-                                                                    <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-amarillo"></div>
-                                                                    <span className="text-gray-700 font-medium text-sm sm:text-base">Actualizando mapa...</span>
+                                                                <div className="flex items-center gap-2">
+                                                                    <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-amarillo"></div>
+                                                                    <span className="text-gray-700 font-medium text-sm">Actualizando mapa...</span>
                                                                 </div>
                                                             </div>
                                                         )}
@@ -1054,13 +1051,13 @@ const Video = () => {
                                                         )}
                                                     </div>
                                                     
-                                                    {/* Controles del mapa responsivos */}
-                                                    <div className="p-3 sm:p-4 bg-white border-t border-gray-100">
-                                                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-                                                            <div className="flex items-center gap-3 sm:gap-4">
+                                                    {/* Controles del mapa responsivos más compactos */}
+                                                    <div className="p-2 sm:p-3 bg-white border-t border-gray-100">
+                                                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3">
+                                                            <div className="flex items-center gap-2 sm:gap-3">
                                                                 <button
                                                                     onClick={() => setSelectedProperty(null)}
-                                                                    className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+                                                                    className={`px-2 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                                                                         !selectedProperty 
                                                                             ? 'bg-amarillo text-white' 
                                                                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -1068,7 +1065,7 @@ const Video = () => {
                                                                 >
                                                                     Ver Todas
                                                                 </button>
-                                                                <span className="text-xs sm:text-sm text-gray-500">
+                                                                <span className="text-xs text-gray-500">
                                                                     {getFilteredProperties().length} propiedades
                                                                 </span>
                                                             </div>
@@ -1076,12 +1073,12 @@ const Video = () => {
                                                             <div className="flex items-center gap-2">
                                                                 {selectedProperty ? (
                                                                     <a
-                                                                        href={`https://www.google.com/maps/dir/?api=1&destination=${selectedProperty.coordinates.lat},${selectedProperty.coordinates.lng}`}
+                                                                        href={`https://www.google.com/maps/dir/?api=1&destination=${selectedProperty.coordinates?.lat || 'Madrid'},${selectedProperty.coordinates?.lng || 'España'}`}
                                                                         target="_blank"
                                                                         rel="noopener noreferrer"
-                                                                        className="flex items-center gap-2 bg-amarillo text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-amarillo/90 transition-colors text-xs sm:text-sm font-medium"
+                                                                        className="flex items-center gap-1 bg-amarillo text-white px-2 sm:px-3 py-1.5 rounded-lg hover:bg-amarillo/90 transition-colors text-xs font-medium"
                                                                     >
-                                                                        <FaMapMarkerAlt />
+                                                                        <FaMapMarkerAlt className="text-xs" />
                                                                         <span className="hidden sm:inline">Cómo llegar</span>
                                                                         <span className="sm:hidden">Ruta</span>
                                                                     </a>
@@ -1090,9 +1087,9 @@ const Video = () => {
                                                                         href="https://www.google.com/maps/place/Madrid,+Spain"
                                                                         target="_blank"
                                                                         rel="noopener noreferrer"
-                                                                        className="flex items-center gap-2 bg-gray-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-xs sm:text-sm font-medium"
+                                                                        className="flex items-center gap-1 bg-gray-600 text-white px-2 sm:px-3 py-1.5 rounded-lg hover:bg-gray-700 transition-colors text-xs font-medium"
                                                                     >
-                                                                        <FaMapMarkerAlt />
+                                                                        <FaMapMarkerAlt className="text-xs" />
                                                                         <span className="hidden sm:inline">Ver Madrid</span>
                                                                         <span className="sm:hidden">Madrid</span>
                                                                     </a>
@@ -1104,9 +1101,9 @@ const Video = () => {
                                             ) : (
                                                 <div className="h-full flex items-center justify-center p-4">
                                                     <div className="text-center text-gray-600">
-                                                        <FaMapMarkerAlt className="text-4xl sm:text-6xl text-amarillo mx-auto mb-4 sm:mb-6" />
-                                                        <h3 className="font-serif text-xl sm:text-2xl font-light mb-3 sm:mb-4">No hay propiedades para mostrar</h3>
-                                                        <p className="font-light text-sm sm:text-base">Ajusta los filtros de búsqueda para ver propiedades en el mapa</p>
+                                                        <FaMapMarkerAlt className="text-3xl sm:text-4xl text-amarillo mx-auto mb-3 sm:mb-4" />
+                                                        <h3 className="font-serif text-lg sm:text-xl font-light mb-2 sm:mb-3">No hay propiedades para mostrar</h3>
+                                                        <p className="font-light text-sm">Ajusta los filtros de búsqueda para ver propiedades en el mapa</p>
                                                     </div>
                                                 </div>
                                             )}
