@@ -17,8 +17,8 @@ const Video = () => {
     const videoRef = useRef(null);
     const isInitializedRef = useRef(false);
 
-    // Estado inicial consistente para SSR
-    const [videoSrc, setVideoSrc] = useState("/api/video?file=video.mp4");
+    // Estado inicial consistente para SSR - usando rutas directas
+    const [videoSrc, setVideoSrc] = useState("/video.mp4");
     const [isClientHydrated, setIsClientHydrated] = useState(false);
     const [isVideoLoaded, setIsVideoLoaded] = useState(false);
     const [videoError, setVideoError] = useState(false);
@@ -60,13 +60,11 @@ const Video = () => {
         }
     };
 
-    // Función para intentar cargar video con fallbacks
+    // Función para intentar cargar video con fallbacks - usando rutas directas
     const loadVideoWithFallbacks = async () => {
         const videoSources = [
-            "/api/video?file=video.mp4", // Endpoint API como primera opción
-            "/video.mp4", // Directo desde public
-            "/api/video?file=videoExpIngles.mp4", // Fallback 1 via API
-            "/videoExpIngles.mp4", // Fallback 1 directo
+            "/video.mp4", // Video principal directo desde public
+            "/videoExpIngles.mp4", // Video secundario directo desde public
             "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny_mp4_640x360_SF.mp4" // Fallback externo
         ];
 
@@ -750,44 +748,44 @@ const Video = () => {
                         </a>
                     </motion.div>
 
-                    {/* Modal de resultados con diseño premium */}
+                    {/* Modal de resultados con diseño premium responsive mejorado */}
                     <AnimatePresence>
                         {showMap && (
                             <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4"
                                 onClick={() => setShowMap(false)}
                             >
                                 <motion.div
                                     initial={{ scale: 0.95, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
                                     exit={{ scale: 0.95, opacity: 0 }}
-                                    className="bg-white rounded-3xl max-w-7xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
+                                    className="bg-white rounded-2xl sm:rounded-3xl w-full max-w-7xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden shadow-2xl"
                                     onClick={(e) => e.stopPropagation()}
                                 >
-                                    <div className="flex justify-between items-center p-8 border-b border-gray-100">
+                                    <div className="flex justify-between items-center p-4 sm:p-6 lg:p-8 border-b border-gray-100">
                                         <div>
-                                            <h2 className="font-serif text-3xl font-light text-gray-900">
+                                            <h2 className="font-serif text-xl sm:text-2xl lg:text-3xl font-light text-gray-900">
                                                 Propiedades Encontradas
                                                 <span className="text-amarillo font-normal ml-2">({getFilteredProperties().length})</span>
                                             </h2>
-                                            <p className="text-gray-600 text-sm mt-2 font-light">
+                                            <p className="text-gray-600 text-xs sm:text-sm mt-2 font-light">
                                                 Haz clic en cualquier propiedad para ver su ubicación exacta en el mapa
                                             </p>
                                         </div>
                                         <button
                                             onClick={() => setShowMap(false)}
-                                            className="text-gray-400 hover:text-gray-600 text-2xl p-2 hover:bg-gray-100 rounded-full transition-colors"
+                                            className="text-gray-400 hover:text-gray-600 text-xl sm:text-2xl p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
                                         >
                                             <FaTimes />
                                         </button>
                                     </div>
                                     
-                                    <div className="grid grid-cols-1 lg:grid-cols-2 h-[75vh]">
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 h-[70vh] sm:h-[75vh]">
                                         {/* Lista de propiedades con diseño premium */}
-                                        <div className="overflow-y-auto p-8 space-y-6">
+                                        <div className="overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
                                             {propertiesLoading ? (
                                                 <div className="flex items-center justify-center py-16">
                                                     <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-amarillo"></div>
@@ -983,31 +981,33 @@ const Video = () => {
                                             )}
                                         </div>
                                         
-                                        {/* Google Maps con diseño premium */}
+                                        {/* Google Maps con diseño premium responsive */}
                                         <div className="relative bg-gray-50">
                                             {getFilteredProperties().length > 0 ? (
                                                 <div className="h-full flex flex-col">
-                                                    <div className="p-6 bg-white border-b border-gray-100">
-                                                        <h3 className="font-serif text-xl font-light text-gray-900 mb-2">
+                                                    <div className="p-4 sm:p-6 bg-white border-b border-gray-100">
+                                                        <h3 className="font-serif text-lg sm:text-xl font-light text-gray-900 mb-2">
                                                             {selectedProperty ? selectedProperty.title : `${getFilteredProperties().length} Propiedades en el Mapa`}
                                                         </h3>
-                                                        <p className="text-gray-600 flex items-center gap-2 font-light">
-                                                            <FaMapMarkerAlt className="text-amarillo" />
-                                                            {selectedProperty ? selectedProperty.location : 'Madrid, España'}
+                                                        <p className="text-gray-600 flex items-center gap-2 font-light text-sm sm:text-base">
+                                                            <FaMapMarkerAlt className="text-amarillo flex-shrink-0" />
+                                                            <span className="truncate">
+                                                                {selectedProperty ? selectedProperty.location : 'Madrid, España'}
+                                                            </span>
                                                         </p>
                                                         {!selectedProperty && (
-                                                            <p className="text-sm text-gray-500 mt-2">
+                                                            <p className="text-xs sm:text-sm text-gray-500 mt-2">
                                                                 Haz clic en una propiedad para centrar el mapa en su ubicación
                                                             </p>
                                                         )}
                                                     </div>
                                                     
-                                                    <div className="flex-1 relative">
+                                                    <div className="flex-1 relative min-h-0">
                                                         {mapLoading && (
                                                             <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center">
                                                                 <div className="flex items-center gap-3">
                                                                     <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-amarillo"></div>
-                                                                    <span className="text-gray-700 font-medium">Actualizando mapa...</span>
+                                                                    <span className="text-gray-700 font-medium text-sm sm:text-base">Actualizando mapa...</span>
                                                                 </div>
                                                             </div>
                                                         )}
@@ -1054,13 +1054,13 @@ const Video = () => {
                                                         )}
                                                     </div>
                                                     
-                                                    {/* Controles del mapa */}
-                                                    <div className="p-4 bg-white border-t border-gray-100">
-                                                        <div className="flex items-center justify-between">
-                                                            <div className="flex items-center gap-4">
+                                                    {/* Controles del mapa responsivos */}
+                                                    <div className="p-3 sm:p-4 bg-white border-t border-gray-100">
+                                                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+                                                            <div className="flex items-center gap-3 sm:gap-4">
                                                                 <button
                                                                     onClick={() => setSelectedProperty(null)}
-                                                                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                                                    className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
                                                                         !selectedProperty 
                                                                             ? 'bg-amarillo text-white' 
                                                                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -1068,43 +1068,45 @@ const Video = () => {
                                                                 >
                                                                     Ver Todas
                                                                 </button>
-                                                                <span className="text-sm text-gray-500">
+                                                                <span className="text-xs sm:text-sm text-gray-500">
                                                                     {getFilteredProperties().length} propiedades
                                                                 </span>
                                                             </div>
                                                             
-                                                                                                                         <div className="flex items-center gap-2">
-                                                                 {selectedProperty ? (
-                                                                     <a
-                                                                         href={`https://www.google.com/maps/dir/?api=1&destination=${selectedProperty.coordinates.lat},${selectedProperty.coordinates.lng}`}
-                                                                         target="_blank"
-                                                                         rel="noopener noreferrer"
-                                                                         className="flex items-center gap-2 bg-amarillo text-white px-4 py-2 rounded-lg hover:bg-amarillo/90 transition-colors text-sm font-medium"
-                                                                     >
-                                                                         <FaMapMarkerAlt />
-                                                                         Cómo llegar
-                                                                     </a>
-                                                                 ) : (
-                                                                     <a
-                                                                         href="https://www.google.com/maps/place/Madrid,+Spain"
-                                                                         target="_blank"
-                                                                         rel="noopener noreferrer"
-                                                                         className="flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium"
-                                                                     >
-                                                                         <FaMapMarkerAlt />
-                                                                         Ver Madrid
-                                                                     </a>
-                                                                 )}
-                                                             </div>
+                                                            <div className="flex items-center gap-2">
+                                                                {selectedProperty ? (
+                                                                    <a
+                                                                        href={`https://www.google.com/maps/dir/?api=1&destination=${selectedProperty.coordinates.lat},${selectedProperty.coordinates.lng}`}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        className="flex items-center gap-2 bg-amarillo text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-amarillo/90 transition-colors text-xs sm:text-sm font-medium"
+                                                                    >
+                                                                        <FaMapMarkerAlt />
+                                                                        <span className="hidden sm:inline">Cómo llegar</span>
+                                                                        <span className="sm:hidden">Ruta</span>
+                                                                    </a>
+                                                                ) : (
+                                                                    <a
+                                                                        href="https://www.google.com/maps/place/Madrid,+Spain"
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        className="flex items-center gap-2 bg-gray-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-xs sm:text-sm font-medium"
+                                                                    >
+                                                                        <FaMapMarkerAlt />
+                                                                        <span className="hidden sm:inline">Ver Madrid</span>
+                                                                        <span className="sm:hidden">Madrid</span>
+                                                                    </a>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <div className="h-full flex items-center justify-center">
+                                                <div className="h-full flex items-center justify-center p-4">
                                                     <div className="text-center text-gray-600">
-                                                        <FaMapMarkerAlt className="text-6xl text-amarillo mx-auto mb-6" />
-                                                        <h3 className="font-serif text-2xl font-light mb-4">No hay propiedades para mostrar</h3>
-                                                        <p className="font-light">Ajusta los filtros de búsqueda para ver propiedades en el mapa</p>
+                                                        <FaMapMarkerAlt className="text-4xl sm:text-6xl text-amarillo mx-auto mb-4 sm:mb-6" />
+                                                        <h3 className="font-serif text-xl sm:text-2xl font-light mb-3 sm:mb-4">No hay propiedades para mostrar</h3>
+                                                        <p className="font-light text-sm sm:text-base">Ajusta los filtros de búsqueda para ver propiedades en el mapa</p>
                                                     </div>
                                                 </div>
                                             )}
