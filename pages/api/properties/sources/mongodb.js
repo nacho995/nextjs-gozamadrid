@@ -7,6 +7,7 @@ import config from '@/config/config';
 
 // Configuración robusta con fallbacks - URLs a probar
 const POSSIBLE_URLS = [
+  'https://nextjs-gozamadrid-qrfk.onrender.com', // URL principal del backend
   'https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com',
   'https://goza-madrid.onrender.com',
   'https://api.realestategozamadrid.com',

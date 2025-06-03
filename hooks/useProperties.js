@@ -80,90 +80,72 @@ export const useProperties = (source = 'all', limit = 10, page = 1, skipInitialL
     const requestId = Date.now(); 
     currentRequestRef.current = requestId;
 
-    let allProperties = [];
-    let sourcesMeta = { mongodb: 0, woocommerce: 0 };
-    let hasRealData = false;
-
     try {
-      const fetchWithFallback = async (apiEndpoint, cacheKey, sourceName, fallbackData = []) => {
-        const cached = getFromCache(cacheKey);
-        if (cached) {
-          sourcesMeta[sourceName.toLowerCase()] = cached.length;
-          hasRealData = true;
-          return cached;
-        }
-
-        try {
-          const response = await fetch(`${apiEndpoint}?page=${pageNum}&limit=${limitNum}`);
-          if (!response.ok) throw new Error(`Error ${response.status} en ${sourceName}`);
-          const data = await response.json();
-          
-          if (currentRequestRef.current !== requestId) { 
-            return []; 
-          }
-
-          const validProperties = Array.isArray(data) ? data : (data.properties || []);
-          setToCache(cacheKey, validProperties);
-          sourcesMeta[sourceName.toLowerCase()] = validProperties.length;
-          hasRealData = true;
-          return validProperties;
-        } catch (fetchError) {
-          if (fallbackData.length > 0) {
-             sourcesMeta[sourceName.toLowerCase()] = fallbackData.length;
-             return fallbackData;
-          }
-          throw fetchError;
-        }
-      };
-
-      if (sourceType === 'all' || sourceType === 'mongodb') {
-        const mongoProperties = await fetchWithFallback('/api/properties/sources/mongodb', getCacheKey(pageNum, limitNum, 'mongodb'), 'MongoDB', []);
-        const normalizedMongodb = mongoProperties.map(property => 
-          normalizePropertyPrice({
-            ...property,
-            source: 'mongodb'
-          })
-        );
-        allProperties = allProperties.concat(normalizedMongodb);
-      }
-
-      if (sourceType === 'all' || sourceType === 'woocommerce') {
-        const wooProperties = await fetchWithFallback('/api/properties/sources/woocommerce', getCacheKey(pageNum, limitNum, 'woocommerce'), 'WooCommerce', []);
-        const normalizedWoocommerce = wooProperties.map(property => 
-          normalizePropertyPrice({
-            ...property,
-            source: 'woocommerce'
-          })
-        );
-        allProperties = allProperties.concat(normalizedWoocommerce);
-      }
-
-      if (allProperties.length === 0 && !hasRealData) {
-        allProperties = EXAMPLE_PROPERTIES.map(p => ({ ...p, id: `${p.id}_${Date.now()}` }));
+      console.log(`[useProperties] Cargando desde API principal: page=${pageNum}, limit=${limitNum}, source=${sourceType}`);
+      
+      // Usar la API principal que combina todas las fuentes
+      const response = await fetch(`/api/properties?page=${pageNum}&limit=${limitNum}&source=${sourceType}`);
+      
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
       }
       
+      const data = await response.json();
+      
+      if (currentRequestRef.current !== requestId) { 
+        return; 
+      }
+
+      // Extraer propiedades y metadatos
+      const properties = data.properties || [];
+      const meta = data.meta || {};
+      
+      console.log(`[useProperties] ✅ Recibidas ${properties.length} propiedades`);
+      console.log(`[useProperties] Fuentes: MongoDB(${meta.sources?.mongodb || 0}), WooCommerce(${meta.sources?.woocommerce || 0}), Fallback(${meta.sources?.fallback || 0})`);
+      
+      // Normalizar precios
+      const normalizedProperties = properties.map(property => 
+        normalizePropertyPrice({
+          ...property,
+          id: property.id || property._id || `prop_${Math.random().toString(36).substr(2, 9)}`
+        })
+      );
+
       if (currentRequestRef.current !== requestId) {
         setLoading(false);
         return;
       }
 
-      setProperties(prev => pageNum === 1 ? allProperties : [...prev, ...allProperties]);
-      setHasMore(allProperties.length === limitNum);
+      setProperties(prev => pageNum === 1 ? normalizedProperties : [...prev, ...normalizedProperties]);
+      setHasMore(meta.hasMore || false);
       setMeta(prev => ({
         ...prev,
-        total: (prev.total || 0) + allProperties.length,
-        sources: sourcesMeta,
+        total: meta.total || normalizedProperties.length,
+        sources: meta.sources || {},
         page: pageNum,
         limit: limitNum,
-        hasMore: allProperties.length === limitNum
+        hasMore: meta.hasMore || false
       }));
 
     } catch (e) {
+      console.error('[useProperties] Error:', e);
+      
       if (currentRequestRef.current === requestId) {
         setError(e);
-        setProperties(EXAMPLE_PROPERTIES.map(p => ({ ...p, id: `${p.id}_${Date.now()}` })));
+        // En caso de error, usar datos de ejemplo
+        const fallbackProps = EXAMPLE_PROPERTIES.map(p => ({ 
+          ...p, 
+          id: `${p.id}_${Date.now()}` 
+        }));
+        setProperties(prev => pageNum === 1 ? fallbackProps : [...prev, ...fallbackProps]);
         setHasMore(false);
-        setMeta(prev => ({ ...prev, sources: sourcesMeta, page: pageNum, hasMore: false }));
+        setMeta(prev => ({ 
+          ...prev, 
+          sources: { fallback: fallbackProps.length }, 
+          page: pageNum, 
+          hasMore: false,
+          error: e.message
+        }));
       }
     } finally {
       if (currentRequestRef.current === requestId) {
