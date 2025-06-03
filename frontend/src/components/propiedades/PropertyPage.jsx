@@ -9,7 +9,7 @@ import LoadingFallback from './LoadingFallback';
 import Head from 'next/head';
 import config from '@/config/config';
 import axios from 'axios';
-import { wooCommerceCache } from '@/services/woocommerce-cache';
+// import { wooCommerceCache } from '@/services/woocommerce-cache'; // COMENTADO - WooCommerce eliminado
 import { useProperties } from '@/hooks/useProperties';
 
 // Estilos consistentes con el resto de la web

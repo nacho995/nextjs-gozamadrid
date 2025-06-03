@@ -1,94 +1,117 @@
-// Script de diagnóstico optimizado para verificar archivos de video
+// Script de diagnóstico para detectar problemas de Fast Refresh y hidratación
 (function() {
-    // Solo ejecutar en producción y limitar la frecuencia
-    if (window.location.hostname !== 'www.realestategozamadrid.com') {
-        return;
-    }
+    'use strict';
     
-    // Verificar si ya se ejecutó en los últimos 5 minutos
-    const lastRun = localStorage.getItem('videoDiagnosticLastRun');
-    const now = Date.now();
-    if (lastRun && (now - parseInt(lastRun)) < 5 * 60 * 1000) {
-        console.log('🔍 [Video Diagnostic] Saltando diagnóstico - ejecutado recientemente');
-        return;
-    }
+    console.log('🔍 [Diagnóstico] Script de diagnóstico iniciado');
     
-    console.log('🔍 [Video Diagnostic] Iniciando diagnóstico de archivos de video...');
+    let refreshCount = 0;
+    let lastRefreshTime = Date.now();
+    let hydrationErrors = [];
+    let apiErrors = [];
     
-    const videoFiles = [
-        '/video.mp4',
-        '/videoExpIngles.mp4',
-        '/madrid.jpg',
-        '/manifest.json'
-    ];
+    // Detectar recargas rápidas (posible Fast Refresh infinito)
+    const originalReload = window.location.reload;
+    window.location.reload = function(...args) {
+        refreshCount++;
+        const now = Date.now();
+        const timeSinceLastRefresh = now - lastRefreshTime;
+        
+        console.warn(`🔄 [Diagnóstico] Recarga detectada #${refreshCount} (${timeSinceLastRefresh}ms desde la anterior)`);
+        
+        if (timeSinceLastRefresh < 2000 && refreshCount > 3) {
+            console.error('🚨 [Diagnóstico] POSIBLE FAST REFRESH INFINITO DETECTADO');
+            console.error('🚨 Recargas muy frecuentes:', refreshCount, 'en', now - (lastRefreshTime - timeSinceLastRefresh * refreshCount), 'ms');
+            
+            // Intentar detener el ciclo
+            if (confirm('Se detectó un posible ciclo de recarga infinita. ¿Desea detener las recargas automáticas?')) {
+                return; // No recargar
+            }
+        }
+        
+        lastRefreshTime = now;
+        return originalReload.apply(this, args);
+    };
     
-    async function checkFile(url) {
-        try {
-            const response = await fetch(url, { 
-                method: 'HEAD',
-                signal: AbortSignal.timeout(3000) // Timeout de 3 segundos
+    // Detectar errores de hidratación
+    const originalError = console.error;
+    console.error = function(...args) {
+        const message = args.join(' ');
+        
+        // Detectar errores específicos de hidratación
+        if (message.includes('Hydration') || 
+            message.includes('server') && message.includes('client') ||
+            message.includes('disabled') && message.includes('attribute')) {
+            
+            hydrationErrors.push({
+                message: message,
+                timestamp: new Date().toISOString(),
+                stack: new Error().stack
             });
             
-            const result = {
-                url: url,
-                status: response.status,
-                ok: response.ok,
-                contentType: response.headers.get('content-type'),
-                contentLength: response.headers.get('content-length'),
-                lastModified: response.headers.get('last-modified')
-            };
+            console.warn('🚨 [Diagnóstico] Error de hidratación detectado:', message);
+        }
+        
+        // Detectar errores de API
+        if (message.includes('404') || message.includes('500') || message.includes('Failed to fetch')) {
+            apiErrors.push({
+                message: message,
+                timestamp: new Date().toISOString()
+            });
             
-            if (response.ok) {
-                console.log(`✅ [Video Diagnostic] ${url} - OK`, result);
-            } else {
-                console.error(`❌ [Video Diagnostic] ${url} - FAILED`, result);
+            console.warn('🚨 [Diagnóstico] Error de API detectado:', message);
+        }
+        
+        return originalError.apply(this, args);
+    };
+    
+    // Monitorear cambios en el DOM que puedan indicar re-renders
+    let renderCount = 0;
+    const observer = new MutationObserver(function(mutations) {
+        renderCount++;
+        
+        if (renderCount > 100) {
+            console.warn('🚨 [Diagnóstico] Muchos cambios en el DOM detectados:', renderCount);
+            console.warn('🚨 Esto podría indicar re-renders excesivos');
+        }
+    });
+    
+    // Observar cambios en el body
+    if (document.body) {
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true
+        });
+    }
+    
+    // Reporte cada 30 segundos
+    setInterval(() => {
+        if (hydrationErrors.length > 0 || apiErrors.length > 0 || refreshCount > 0) {
+            console.group('📊 [Diagnóstico] Reporte de estado');
+            console.log('🔄 Recargas detectadas:', refreshCount);
+            console.log('💧 Errores de hidratación:', hydrationErrors.length);
+            console.log('🌐 Errores de API:', apiErrors.length);
+            console.log('🔄 Cambios en DOM:', renderCount);
+            
+            if (hydrationErrors.length > 0) {
+                console.warn('💧 Últimos errores de hidratación:', hydrationErrors.slice(-3));
             }
             
-            return result;
-        } catch (error) {
-            console.error(`❌ [Video Diagnostic] ${url} - ERROR:`, error.message);
-            return {
-                url: url,
-                error: error.message,
-                ok: false
-            };
+            if (apiErrors.length > 0) {
+                console.warn('🌐 Últimos errores de API:', apiErrors.slice(-3));
+            }
+            
+            console.groupEnd();
         }
-    }
+    }, 30000);
     
-    async function runDiagnostic() {
-        console.log('🌐 [Video Diagnostic] Información del entorno:');
-        console.log('- Hostname:', window.location.hostname);
-        console.log('- Protocol:', window.location.protocol);
-        console.log('- Port:', window.location.port);
-        console.log('- Origin:', window.location.origin);
-        console.log('- User Agent:', navigator.userAgent);
-        
-        const results = [];
-        for (const file of videoFiles) {
-            const result = await checkFile(file);
-            results.push(result);
-        }
-        
-        console.log('📊 [Video Diagnostic] Resumen de resultados:', results);
-        
-        // Guardar resultados y timestamp
-        localStorage.setItem('videoDiagnosticLastRun', now.toString());
-        localStorage.setItem('videoDiagnostic', JSON.stringify({
-            timestamp: new Date().toISOString(),
-            hostname: window.location.hostname,
-            results: results
-        }));
-        
-        return results;
-    }
+    // Detectar si la página está hidratada
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            const isHydrated = document.documentElement.getAttribute('data-hydrated') === 'true';
+            console.log('💧 [Diagnóstico] Estado de hidratación:', isHydrated ? '✅ Hidratado' : '❌ No hidratado');
+        }, 1000);
+    });
     
-    // Ejecutar diagnóstico cuando el DOM esté listo
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', runDiagnostic);
-    } else {
-        runDiagnostic();
-    }
-    
-    // Exponer función globalmente para debugging manual
-    window.videoDiagnostic = runDiagnostic;
+    console.log('✅ [Diagnóstico] Script de diagnóstico configurado correctamente');
 })(); 

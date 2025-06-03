@@ -556,7 +556,7 @@ const Video = () => {
                                                                 console.error('❌ Error al abrir el mapa:', error);
                                                             }
                                                         }}
-                                                        disabled={propertiesLoading}
+                                                        disabled={Boolean(propertiesLoading)}
                                                         type="button"
                                                         className="w-full bg-amarillo hover:bg-amarillo/90 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium px-6 py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02] disabled:transform-none"
                                                     >
@@ -567,7 +567,7 @@ const Video = () => {
                                                             </div>
                                                         ) : (
                                                             <div className="flex items-center justify-center gap-2">
-                                                                <FaMapMarkerAlt className="text-sm" />
+                                                                <span className="text-sm">📍</span>
                                                                 <span className="hidden sm:inline">Ver en Mapa</span>
                                                                 <span className="sm:hidden">Mapa</span>
                                                             </div>
