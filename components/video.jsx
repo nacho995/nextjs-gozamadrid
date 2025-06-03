@@ -1037,7 +1037,29 @@ const Video = () => {
             </AnimatedOnScroll>
 
             {/* Barra inferior premium minimalista - Justo debajo del video */}
-            <div className="relative w-full bg-gradient-to-r from-gray-900 via-black to-gray-900 border-t border-amarillo/20">
+            <div 
+                className="relative w-full bg-gradient-to-r from-black via-black to-gray-900"
+                style={{
+                    '::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: '2px',
+                        background: 'linear-gradient(to right, black, rgba(251, 191, 36, 0.2))',
+                        zIndex: 1
+                    }
+                }}
+            >
+                {/* Border superior con gradiente usando pseudo-elemento */}
+                <div 
+                    className="absolute top-0 left-0 right-0 h-0.5 z-10"
+                    style={{
+                        background: 'linear-gradient(to right, black, rgba(251, 191, 36, 0.2))'
+                    }}
+                ></div>
+                
                 <div className="relative w-full py-8 flex items-center justify-center px-6">
                     <motion.div 
                         initial={{ opacity: 0, y: 20 }}

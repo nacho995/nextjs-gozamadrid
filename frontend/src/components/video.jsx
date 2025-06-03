@@ -1092,7 +1092,7 @@ const Video = () => {
             </AnimatedOnScroll>
 
             {/* Barra inferior premium minimalista - Justo debajo del video */}
-            <div className="relative w-full bg-gradient-to-r from-gray-900 via-black to-gray-900 border-t border-amarillo/20">
+            <div className="relative w-full bg-gradient-to-r from-black via-black to-gray-900 border-t border-amarillo/20">
                 <div className="relative w-full py-8 flex items-center justify-center px-6">
                     <motion.div 
                         initial={{ opacity: 0, y: 20 }}
