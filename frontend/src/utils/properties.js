@@ -6,57 +6,39 @@ export const fetchAllProperties = async () => {
     console.log('[Properties] Iniciando peticiones a las APIs...');
     console.log('[Properties] Intentando conectar con el backend en puerto 8081...');
     
-    // Llamar a las APIs del backend que se encargan de obtener datos de MongoDB y WooCommerce
-    const [mongoResponse, wooResponse] = await Promise.allSettled([
-      axios.get('/api/properties/sources/mongodb', { timeout: 30000 }).catch(err => {
-        console.error('[Properties] Error API MongoDB:', err.response?.data || err.message);
-        if (err.code === 'ECONNREFUSED') {
-          console.error('[Properties] No se puede conectar al backend. ¿Está corriendo en el puerto 8081?');
-        }
-        throw err; // Lanzar el error para que Promise.allSettled lo capture
-      }),
-      axios.get('/api/properties/sources/woocommerce', { timeout: 30000 }).catch(err => {
-        console.error('[Properties] Error API WooCommerce:', err.response?.data || err.message);
-        if (err.code === 'ECONNREFUSED') {
-          console.error('[Properties] No se puede conectar al backend. ¿Está corriendo en el puerto 8081?');
-        }
-        throw err; // Lanzar el error para que Promise.allSettled lo capture
-      })
-    ]);
+    // Llamar solo a la API de MongoDB
+    try {
+      const mongoResponse = await axios.get('/api/properties/sources/mongodb', { timeout: 30000 });
+      const mongoProperties = mongoResponse?.data || [];
+      
+      console.log('[Properties] Respuesta de MongoDB recibida:', mongoResponse.status);
+      console.log('[Properties] Propiedades extraídas:', {
+        mongo: mongoProperties.length
+      });
+      
+      // Asegurarse de que sean arrays válidos
+      const safeMongoProps = Array.isArray(mongoProperties) ? mongoProperties : [];
 
-    console.log('[Properties] Respuestas recibidas:', {
-      mongo: mongoResponse.status,
-      woo: wooResponse.status
-    });
+      // Marcar la fuente explícitamente
+      const taggedMongoProps = safeMongoProps.map(p => ({ ...p, source: p.source || 'mongodb' }));
 
-    // Solo procesar respuestas exitosas
-    const mongoProperties = mongoResponse.status === 'fulfilled' ? (mongoResponse.value?.data || []) : [];
-    const wooCommerceProperties = wooResponse.status === 'fulfilled' ? (wooResponse.value?.data || []) : [];
-    
-    console.log('[Properties] Propiedades extraídas:', {
-      mongo: mongoProperties.length,
-      woo: wooCommerceProperties.length
-    });
-    
-    // Asegurarse de que sean arrays válidos
-    const safeMongoProps = Array.isArray(mongoProperties) ? mongoProperties : [];
-    const safeWooProps = Array.isArray(wooCommerceProperties) ? wooCommerceProperties : [];
-
-    // Marcar la fuente explícitamente
-    const taggedMongoProps = safeMongoProps.map(p => ({ ...p, source: p.source || 'mongodb' }));
-    const taggedWooProps = safeWooProps.map(p => ({ ...p, source: p.source || 'woocommerce' }));
-
-    const allProperties = [...taggedMongoProps, ...taggedWooProps];
-
-    console.log(`[Properties] Se obtuvieron ${allProperties.length} propiedades en total (MongoDB: ${taggedMongoProps.length}, WooCommerce: ${taggedWooProps.length})`);
-    
-    // Si no hay propiedades de ninguna fuente, devolver array vacío
-    if (allProperties.length === 0) {
-      console.warn('[Properties] No se encontraron propiedades en ninguna API');
+      console.log(`[Properties] Se obtuvieron ${taggedMongoProps.length} propiedades en total (MongoDB: ${taggedMongoProps.length})`);
+      
+      // Si no hay propiedades, devolver array vacío
+      if (taggedMongoProps.length === 0) {
+        console.warn('[Properties] No se encontraron propiedades en MongoDB');
+        return [];
+      }
+      
+      return taggedMongoProps;
+      
+    } catch (mongoError) {
+      console.error('[Properties] Error API MongoDB:', mongoError.response?.data || mongoError.message);
+      if (mongoError.code === 'ECONNREFUSED') {
+        console.error('[Properties] No se puede conectar al backend. ¿Está corriendo en el puerto 8081?');
+      }
       return [];
     }
-    
-    return allProperties;
     
   } catch (error) {
     console.error('[Properties] Error al obtener propiedades:', error);
@@ -93,7 +75,7 @@ export const normalizeProperty = (property) => {
     if (prop.images && Array.isArray(prop.images) && prop.images.length > 0) {
       const firstImage = prop.images[0];
       if (typeof firstImage === 'string') return firstImage;
-      if (firstImage.url) return firstImage.url; // WooCommerce usa .url
+      if (firstImage.url) return firstImage.url;
       if (firstImage.src) return firstImage.src;
     }
     if (prop.featured_image) return prop.featured_image;
@@ -120,7 +102,7 @@ export const normalizeProperty = (property) => {
     if (prop.meta && prop.meta.location) return prop.meta.location;
     if (prop.meta && prop.meta.address) return prop.meta.address;
     
-    // Buscar en meta_data de WooCommerce
+    // Buscar en meta_data
     if (prop.meta_data && Array.isArray(prop.meta_data)) {
       const addressMeta = prop.meta_data.find(meta => 
         meta.key === 'address' || meta.key === 'direccion' || meta.key === 'ubicacion' || meta.key === 'Ubicación'
@@ -148,14 +130,13 @@ export const normalizeProperty = (property) => {
 
   // Función auxiliar para obtener número de habitaciones
   const getBedrooms = (prop) => {
-    // Priorizar datos de features (WooCommerce)
     if (prop.features && prop.features.bedrooms) return parseInt(prop.features.bedrooms);
     if (prop.bedrooms) return parseInt(prop.bedrooms);
     if (prop.rooms) return parseInt(prop.rooms);
     if (prop.meta && prop.meta.bedrooms) return parseInt(prop.meta.bedrooms);
     if (prop.meta && prop.meta.rooms) return parseInt(prop.meta.rooms);
     
-    // Buscar en meta_data de WooCommerce
+    // Buscar en meta_data
     if (prop.meta_data && Array.isArray(prop.meta_data)) {
       const bedroomMeta = prop.meta_data.find(meta => 
         meta.key === 'bedrooms' || meta.key === 'habitaciones' || meta.key === 'dormitorios'
@@ -174,14 +155,13 @@ export const normalizeProperty = (property) => {
 
   // Función auxiliar para obtener número de baños
   const getBathrooms = (prop) => {
-    // Priorizar datos de features (WooCommerce)
     if (prop.features && prop.features.bathrooms) return parseInt(prop.features.bathrooms);
     if (prop.bathrooms) return parseInt(prop.bathrooms);
     if (prop.baths) return parseInt(prop.baths);
     if (prop.meta && prop.meta.bathrooms) return parseInt(prop.meta.bathrooms);
     if (prop.meta && prop.meta.baths) return parseInt(prop.meta.baths);
     
-    // Buscar en meta_data de WooCommerce
+    // Buscar en meta_data
     if (prop.meta_data && Array.isArray(prop.meta_data)) {
       const bathroomMeta = prop.meta_data.find(meta => 
         meta.key === 'baños' || meta.key === 'banos' || meta.key === 'bathrooms' || meta.key === 'wc'

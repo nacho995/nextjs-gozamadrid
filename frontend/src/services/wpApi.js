@@ -118,37 +118,41 @@ class BlogApiService {
 
     console.log('[BlogAPI] 🔄 Iniciando obtención de blogs...');
 
-    // ESTRATEGIA 1: WordPress directo con retry
+    // ESTRATEGIA 1: WordPress directo con retry - TEMPORALMENTE DESACTIVADO
     try {
-      const wpBlogs = await this.withRetry(async () => {
-        const response = await fetch('/api/wordpress-proxy', {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'User-Agent': 'GozaMadrid-BlogAPI/2.0',
-            'Cache-Control': 'no-cache'
-          },
-          signal: AbortSignal.timeout(15000) // 15 segundos más generoso
-        });
+      console.log('[BlogAPI] ⚠️ WordPress API temporalmente desactivada para Fast Refresh');
+      // COMENTADO TEMPORALMENTE: const wpBlogs = await this.withRetry(async () => {
+      // COMENTADO TEMPORALMENTE:   const response = await fetch('/api/wordpress-proxy', {
+      // COMENTADO TEMPORALMENTE:     method: 'GET',
+      // COMENTADO TEMPORALMENTE:     headers: {
+      // COMENTADO TEMPORALMENTE:       'Accept': 'application/json',
+      // COMENTADO TEMPORALMENTE:       'User-Agent': 'GozaMadrid-BlogAPI/2.0',
+      // COMENTADO TEMPORALMENTE:       'Cache-Control': 'no-cache'
+      // COMENTADO TEMPORALMENTE:     },
+      // COMENTADO TEMPORALMENTE:     signal: AbortSignal.timeout(15000) // 15 segundos más generoso
+      // COMENTADO TEMPORALMENTE:   });
+      // COMENTADO TEMPORALMENTE: 
+      // COMENTADO TEMPORALMENTE:   if (!response.ok) {
+      // COMENTADO TEMPORALMENTE:     throw new Error(`WordPress API failed: ${response.status}`);
+      // COMENTADO TEMPORALMENTE:   }
+      // COMENTADO TEMPORALMENTE: 
+      // COMENTADO TEMPORALMENTE:   const data = await response.json();
+      // COMENTADO TEMPORALMENTE:   if (!Array.isArray(data) || data.length === 0) {
+      // COMENTADO TEMPORALMENTE:     throw new Error('WordPress returned empty data');
+      // COMENTADO TEMPORALMENTE:   }
+      // COMENTADO TEMPORALMENTE: 
+      // COMENTADO TEMPORALMENTE:   return data;
+      // COMENTADO TEMPORALMENTE: });
 
-        if (!response.ok) {
-          throw new Error(`WordPress API failed: ${response.status}`);
-        }
-
-        const data = await response.json();
-        if (!Array.isArray(data) || data.length === 0) {
-          throw new Error('WordPress returned empty data');
-        }
-
-        return data;
-      });
-
-      if (wpBlogs && wpBlogs.length > 0) {
-        console.log(`[BlogAPI] ✅ WordPress exitoso: ${wpBlogs.length} blogs`);
-        const result = { posts: wpBlogs, source: 'wordpress' };
-        this.setCache(cacheKey, result);
-        return result;
-      }
+      // COMENTADO TEMPORALMENTE: if (wpBlogs && wpBlogs.length > 0) {
+      // COMENTADO TEMPORALMENTE:   console.log(`[BlogAPI] ✅ WordPress exitoso: ${wpBlogs.length} blogs`);
+      // COMENTADO TEMPORALMENTE:   const result = { posts: wpBlogs, source: 'wordpress' };
+      // COMENTADO TEMPORALMENTE:   this.setCache(cacheKey, result);
+      // COMENTADO TEMPORALMENTE:   return result;
+      // COMENTADO TEMPORALMENTE: }
+      
+      // Simular que WordPress falló para ir directo a fallback
+      throw new Error('WordPress API temporalmente desactivada');
     } catch (wpError) {
       console.log(`[BlogAPI] ⚠️ WordPress falló: ${wpError.message}`);
     }

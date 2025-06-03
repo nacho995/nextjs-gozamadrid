@@ -1,90 +1,26 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-  images: {
-    unoptimized: true,
-    domains: ['images.unsplash.com', 'realestategozamadrid.com', 'www.realestategozamadrid.com'],
-    loader: 'default',
-    path: '/',
-    formats: ['image/webp', 'image/avif'],
-  },
-  trailingSlash: false,
-  assetPrefix: process.env.NODE_ENV === 'production' ? '' : '',
-  experimental: {
-    optimizePackageImports: ['framer-motion'],
-  },
-  publicRuntimeConfig: {
-    staticFolder: '/public',
-  },
-  async headers() {
-    return [
-      {
-        source: '/video.mp4',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'video/mp4',
-          },
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000',
-          },
-          {
-            key: 'Accept-Ranges',
-            value: 'bytes',
-          },
-        ],
-      },
-      {
-        source: '/:path*.(mp4|webm|ogg)',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'video/mp4',
-          },
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000',
-          },
-          {
-            key: 'Accept-Ranges',
-            value: 'bytes',
-          },
-        ],
-      },
-      {
-        source: '/:path*.(png|jpg|jpeg|gif|webp|svg|ico)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-      {
-        source: '/manifest.json',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'application/manifest+json',
-          },
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=86400',
-          },
-        ],
-      },
-      {
-        source: '/:path*.(css|js)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-    ];
-  },
+  // reactStrictMode: false,
+  // images: {
+  //   unoptimized: true,
+  //   domains: ['images.unsplash.com', 'realestategozamadrid.com', 'www.realestategozamadrid.com'],
+  // },
+  // experimental: {},
+  // webpack: (config, { dev }) => {
+  //   if (dev) {
+  //     config.watchOptions = {
+  //       poll: 1000,
+  //       aggregateTimeout: 600,
+  //       ignored: [
+  //         '**/.git/**',
+  //         '**/node_modules/**',
+  //         '**/.next/**',
+  //         'next.config.js',
+  //       ],
+  //     };
+  //   }
+  //   return config;
+  // },
 };
 
-module.exports = nextConfig;
+module.exports = nextConfig; 

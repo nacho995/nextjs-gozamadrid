@@ -2,127 +2,39 @@
 const path = require('path');
 
 const nextConfig = {
-  reactStrictMode: true,
-  images: {
-    unoptimized: true,
-    domains: ['images.unsplash.com', 'realestategozamadrid.com', 'www.realestategozamadrid.com'],
-    loader: 'default',
-    path: '/',
-    formats: ['image/webp', 'image/avif'],
-  },
-  trailingSlash: false,
-  assetPrefix: process.env.NODE_ENV === 'production' ? '' : '',
-  experimental: {
-    optimizePackageImports: ['framer-motion'],
-  },
-  publicRuntimeConfig: {
-    staticFolder: '/public',
-  },
-  webpack: (config) => {
-    config.resolve.alias['@'] = path.resolve(__dirname, 'src');
+  reactStrictMode: false,
+  
+  // Configuración minimal para desarrollo estable
+  webpack: (config, { dev, isServer }) => {
+    // Solo alias básicos
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': path.resolve(__dirname, '.'),
+    };
+
+    // No watchOptions que pueden causar conflictos con Turbopack
+    if (dev && config.watchOptions) {
+      delete config.watchOptions;
+    }
+
     return config;
   },
-  async rewrites() {
-    return [
-      {
-        source: '/api/proxy/:path*',
-        destination: '/api/proxy/:path*',
-      },
-    ];
+
+  // Configuración básica de imágenes
+  images: {
+    unoptimized: true,
+    domains: ['localhost', 'placekitten.com', 'commondatastorage.googleapis.com'],
   },
+
+  // Headers básicos
   async headers() {
     return [
       {
-        source: '/video.mp4',
+        source: '/(.*)',
         headers: [
-          {
-            key: 'Content-Type',
-            value: 'video/mp4',
-          },
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000',
-          },
-          {
-            key: 'Accept-Ranges',
-            value: 'bytes',
-          },
           {
             key: 'X-Content-Type-Options',
             value: 'nosniff',
-          },
-        ],
-      },
-      {
-        source: '/videoExpIngles.mp4',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'video/mp4',
-          },
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000',
-          },
-          {
-            key: 'Accept-Ranges',
-            value: 'bytes',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-        ],
-      },
-      {
-        source: '/:path*.(mp4|webm|ogg)',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'video/mp4',
-          },
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000',
-          },
-          {
-            key: 'Accept-Ranges',
-            value: 'bytes',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-        ],
-      },
-      {
-        source: '/:path*.(png|jpg|jpeg|gif|webp|svg|ico)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-      {
-        source: '/manifest.json',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'application/manifest+json',
-          },
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=86400',
-          },
-        ],
-      },
-      {
-        source: '/:path*.(css|js)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
           },
         ],
       },

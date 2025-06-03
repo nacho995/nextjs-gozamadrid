@@ -3,7 +3,7 @@ import { usePathname } from 'next/navigation';
 import Image from "next/legacy/image";
 import Link from "next/link";
 import Head from 'next/head';
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useNavbar } from './context/navBarContext';
 import { 
   FaFacebook, 
@@ -22,19 +22,21 @@ import {
   FaAngleUp
 } from "react-icons/fa";
 
-// Componente para renderizar iconos con Suspense
-const MenuIcon = ({ icon: Icon, ...props }) => {
+// Componente para renderizar iconos - Con nombre explícito para Fast Refresh
+function MenuIcon({ icon: Icon, ...props }) {
   if (!Icon) return null;
   return <Icon {...props} />;
-};
+}
 
-// Configuración SEO - Schema.org para la organización
+// SEO Schema.org optimizado - Movido fuera del componente para evitar re-renders
 const ORGANIZATION_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "RealEstateAgent",
-  "name": "Goza Madrid",
+  "name": "Goza Madrid - Agencia Inmobiliaria",
+  "alternateName": "GozaMadrid",
   "url": "https://realestategozamadrid.com",
-  "logo": "https://realestategozamadrid.com/logo.png",
+  "logo": "https://realestategozamadrid.com/api/images/logonuevo.png",
+  "image": "https://realestategozamadrid.com/api/images/logonuevo.png",
   "sameAs": [
     "https://www.facebook.com/GozaMadridAI",
     "https://www.instagram.com/Gozamadrid54"
@@ -43,256 +45,326 @@ const ORGANIZATION_SCHEMA = {
     "@type": "PostalAddress",
     "streetAddress": "Calle de Alcalá, 96",
     "addressLocality": "Madrid",
+    "addressRegion": "Comunidad de Madrid",
     "postalCode": "28009",
     "addressCountry": "ES"
   },
-  "telephone": "+34919012103",
-  "description": "Agencia inmobiliaria especializada en Madrid, ofreciendo servicios de compra, venta y alquiler de propiedades.",
-  "areaServed": {
-    "@type": "City",
-    "name": "Madrid"
-  },
-  "openingHours": "Mo-Fr 09:00-20:00",
-  "priceRange": "€€€"
-};
-
-// Configuración de navegación
-const NAVIGATION_ITEMS = {
-  main: [
-    { name: "Inicio", href: "/", ariaLabel: "Ir a la página principal" },
-    { name: "Vende tu propiedad", href: "/vender", ariaLabel: "Información sobre venta de propiedades" },
-    { name: "eXp Realty", href: "/exp-realty", ariaLabel: "Información sobre eXp Realty" },
-    { name: "Reformas", href: "/reformas", ariaLabel: "Servicios de reformas" },
-    { name: "Blog", href: "/blog", ariaLabel: "Acceder al blog" },
-    { name: "Contacto", href: "/contacto", ariaLabel: "Contactar con nosotros" }
-  ],
-  servicios: {
-    residentes_espana: {
-      name: "Residentes en España",
-      href: "/servicios/residentes-espana",
-      ariaLabel: "Servicios para residentes en España",
-      subItems: [
-        { name: "Alquiler", href: "/servicios/residentes-espana/alquiler", ariaLabel: "Servicios de alquiler" },
-        { name: "Guía de compra", href: "/servicios/residentes-espana/guia-compra", ariaLabel: "Guía para comprar propiedades" }
-      ]
+  "telephone": ["+34608136529", "+34919012103"],
+  "email": "info@realestategozamadrid.com",
+  "description": "Agencia inmobiliaria especializada en Madrid, ofreciendo servicios profesionales de compra, venta y alquiler de propiedades residenciales y comerciales.",
+  "areaServed": [
+    {
+      "@type": "City",
+      "name": "Madrid",
+      "addressCountry": "ES"
     },
-    residentes_extranjero: {
-      name: "Residentes en el extranjero",
-      href: "/servicios/residentes-extranjero",
-      ariaLabel: "Servicios para residentes en el extranjero",
-      subItems: [
-        { name: "Impuesto no residentes", href: "/servicios/residentes-extranjero/impuesto-renta", ariaLabel: "Información sobre impuestos" },
-        { name: "Guía de compra", href: "/servicios/residentes-extranjero/guia-compra", ariaLabel: "Guía para comprar desde el extranjero" }
-      ]
+    {
+      "@type": "AdministrativeArea",
+      "name": "Comunidad de Madrid",
+      "addressCountry": "ES"
     }
+  ],
+  "openingHours": ["Mo-Fr 09:00-20:00", "Sa 10:00-18:00"],
+  "priceRange": "€€€",
+  "serviceType": ["Real Estate Sales", "Real Estate Rental", "Property Management", "Real Estate Consultation"],
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Propiedades Disponibles",
+    "itemListElement": [
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Venta de Propiedades",
+          "description": "Servicios profesionales de venta de propiedades en Madrid"
+        }
+      },
+      {
+        "@type": "Offer", 
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Alquiler de Propiedades",
+          "description": "Gestión y alquiler de propiedades residenciales y comerciales"
+        }
+      }
+    ]
   }
 };
 
-export default function ControlMenu() {
+// Rutas estáticas para evitar re-renders
+const ROUTES = {
+  residentes_espana: "/servicios/residentes-espana",
+  residentes_espana_alquiler: "/servicios/residentes-espana/alquiler",
+  residentes_espana_guia: "/servicios/residentes-espana/guia-compra",
+  residentes_extranjero: "/servicios/residentes-extranjero",
+  residentes_extranjero_impuesto: "/servicios/residentes-extranjero/impuesto-renta",
+  residentes_extranjero_guia: "/servicios/residentes-extranjero/guia-compra"
+};
+
+// Componente principal con nombre explícito
+function ControlMenu() {
   const [mounted, setMounted] = useState(false);
   const { menuVisible, toggleMenu, dropdownVisible, toggleDropdown } = useNavbar();
   const pathname = usePathname();
-  const isExpRealty = pathname === '/exp-realty';
   const isHomePage = pathname === '/';
 
-  const extraLinksRef = useRef(null);
-  const [extraWidth, setExtraWidth] = useState(0);
   const venderRef = useRef(null);
   const [previousPath, setPreviousPath] = useState(pathname);
+  const [focusedElement, setFocusedElement] = useState(null);
 
-  // Memoización de funciones de callback
-  const handleMenuToggle = useCallback(() => {
-    toggleMenu();
-  }, [toggleMenu]);
+  // Memoización del schema para evitar recalculos
+  const memoizedSchema = useMemo(() => {
+    try {
+      return JSON.stringify(ORGANIZATION_SCHEMA);
+    } catch (e) {
+      console.error("Error serializando ORGANIZATION_SCHEMA:", e);
+      return JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "RealEstateAgent",
+        "name": "Goza Madrid",
+        "url": "https://realestategozamadrid.com"
+      });
+    }
+  }, []);
 
-  const handleDropdownToggle = useCallback((type, value) => {
-    toggleDropdown(type, value);
-  }, [toggleDropdown]);
-
-  // Optimización de efectos
+  // Efecto para manejo de rutas
   useEffect(() => {
     if (previousPath !== pathname) {
-      if (menuVisible && window.innerWidth < 1024) {
-        handleMenuToggle();
-      }
       setPreviousPath(pathname);
+      // Si el menú está visible en móvil cuando cambia la ruta, cerrarlo
+      if (menuVisible && typeof window !== 'undefined' && window.innerWidth < 1024) {
+        toggleMenu();
+      }
     }
-  }, [pathname, menuVisible, handleMenuToggle, previousPath]);
+  }, [pathname, previousPath, menuVisible, toggleMenu]);
 
+  // Efecto para marcar como montado
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  // Intersection Observer para animaciones
   useEffect(() => {
-    if (extraLinksRef.current) {
-      const resizeObserver = new ResizeObserver((entries) => {
-        for (let entry of entries) {
-          setExtraWidth(entry.target.scrollWidth);
-        }
-      });
-      resizeObserver.observe(extraLinksRef.current);
-      return () => resizeObserver.disconnect();
-    }
-  }, []);
-
-  useEffect(() => {
-    if (menuVisible && extraLinksRef.current) {
-      setExtraWidth(extraLinksRef.current.scrollWidth);
-    }
-  }, [menuVisible, mounted]);
-
-  useEffect(() => {
+    if (!venderRef.current) return;
+    
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
-            // Los iconos de React Icons no tienen método preload()
-            // Simplemente cargamos los componentes cuando son visibles
-            // No es necesario hacer nada especial aquí
+            entry.target.classList.add('animate-fade-in');
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.1, rootMargin: '20px' }
     );
 
-    if (venderRef.current) {
-      observer.observe(venderRef.current);
-    }
-
+    observer.observe(venderRef.current);
     return () => observer.disconnect();
   }, []);
 
-  if (!mounted) return null;
+  // Manejo de teclado para accesibilidad
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && menuVisible) {
+        toggleMenu();
+      }
+      if (e.key === 'Tab') {
+        // Gestión del foco para accesibilidad
+        setFocusedElement(document.activeElement);
+      }
+    };
 
-  const routes = {
-    residentes_espana: "/servicios/residentes-espana",
-    residentes_espana_alquiler: "/servicios/residentes-espana/alquiler",
-    residentes_espana_guia: "/servicios/residentes-espana/guia-compra",
-    residentes_extranjero: "/servicios/residentes-extranjero",
-    residentes_extranjero_impuesto: "/servicios/residentes-extranjero/impuesto-renta",
-    residentes_extranjero_guia: "/servicios/residentes-extranjero/guia-compra"
-  };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [menuVisible, toggleMenu]);
+
+  if (!mounted) return null;
 
   return (
     <>
       <Head>
+        {/* Preloads optimizados */}
         <link 
           rel="preload" 
-          href="/logo.png" 
+          href="/api/images/logonuevo.png" 
           as="image" 
           type="image/png"
+          crossOrigin="anonymous"
         />
-        <script type="application/ld+json">
-          {(() => {
-            try {
-              return JSON.stringify(ORGANIZATION_SCHEMA);
-            } catch (e) {
-              console.error("Error serializando ORGANIZATION_SCHEMA:", e);
-              return JSON.stringify({
-                "@context": "https://schema.org",
-                "@type": "RealEstateAgent",
-                "name": "Goza Madrid",
-                "url": "https://realestategozamadrid.com"
-              });
-            }
-          })()}
-        </script>
+        <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossOrigin="anonymous" />
+        
+        {/* Meta tags SEO optimizados */}
+        <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+        <meta name="googlebot" content="index, follow" />
+        <meta name="theme-color" content="#000000" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        
+        {/* Schema.org optimizado */}
+        <script 
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: memoizedSchema
+          }}
+        />
+        
+        {/* Breadcrumb Schema cuando sea apropiado */}
+        {pathname !== '/' && (
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Inicio",
+                  "item": "https://realestategozamadrid.com"
+                },
+                {
+                  "@type": "ListItem", 
+                  "position": 2,
+                  "name": pathname.split('/').pop()?.replace(/-/g, ' ') || "Página actual",
+                  "item": `https://realestategozamadrid.com${pathname}`
+                }
+              ]
+            })}
+          </script>
+        )}
       </Head>
 
-      <header className={`w-full z-[9999] ${isHomePage ? 'absolute top-0 left-0' : 'relative'}`}>
+      <header 
+        className={`w-full z-[9999] ${isHomePage ? 'absolute top-0 left-0' : 'relative'}`}
+        role="banner"
+        aria-label="Navegación principal de Goza Madrid"
+      >
         {/* Gradiente de integración sutil */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-transparent pointer-events-none"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-transparent pointer-events-none" aria-hidden="true"></div>
         
-        {/* Botón de menú para móviles */}
+        {/* Botón de menú para móviles - Mejorado para accesibilidad */}
         {!menuVisible && (
           <div className="lg:hidden fixed right-4 top-4 z-[9999] text-white">
             <button 
-              onClick={handleMenuToggle} 
-              className="text-white hover:text-amarillo flex items-center justify-center bg-black/30 backdrop-blur-md p-3 rounded-full shadow-lg hover:shadow-amarillo/30 transition-all duration-300 border border-white/10"
+              onClick={toggleMenu} 
+              className="text-white hover:text-amarillo focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 flex items-center justify-center bg-black/30 backdrop-blur-md p-3 rounded-full shadow-lg hover:shadow-amarillo/30 transition-all duration-300 border border-white/10"
               aria-expanded={menuVisible}
               aria-controls="mobile-menu"
-              aria-label={menuVisible ? "Cerrar menú" : "Abrir menú"}
+              aria-label={menuVisible ? "Cerrar menú de navegación" : "Abrir menú de navegación"}
+              type="button"
             >
-              {menuVisible ? <FaTimes size={24} /> : <FaEllipsisH size={24} />}
+              {menuVisible ? <FaTimes size={24} aria-hidden="true" /> : <FaEllipsisH size={24} aria-hidden="true" />}
             </button>
           </div>
         )}
 
-        {/* Menú Principal Desktop */}
+        {/* Menú Principal Desktop - Mejorado para SEO y Accesibilidad */}
         <nav 
           className={`${isHomePage ? 'mt-6 mb-0' : 'mb-6'} relative z-[9999] flex-col items-center px-24 p-4 w-max mx-auto rounded-full shadow-2xl hidden lg:flex backdrop-blur-xl border border-white/10 ${
-            isHomePage ? 'bg-black/15' : isExpRealty ? 'bg-black/20' : 'bg-black/20'
+            isHomePage ? 'bg-black/15' : 'bg-black/20'
           }`}
           role="navigation"
-          aria-label="Menú principal"
+          aria-label="Menú principal de navegación"
         >
-          {/* Botón Ver más/menos */}
-          <div className="absolute left-1/4 top-1/2 flex space-x-4 mt-4 ml-4">
-            <button 
-              onClick={handleMenuToggle} 
-              className={`${isExpRealty ? 'text-white' : 'text-white'} hover:text-amarillo transition-all duration-300 flex items-center space-x-2 bg-black/30 backdrop-blur-md px-4 py-2 rounded-full shadow-lg hover:shadow-amarillo/30 group border border-white/10`}
-              aria-label={menuVisible ? "Ver menos opciones" : "Ver más opciones"}
+          {/* BOTÓN DESTACADO - COMPRAR PROPIEDADES */}
+          <div className="absolute left-6 top-1/2 transform -translate-y-1/2">
+            <Link
+              href="/vender/comprar"
+              className="bg-gradient-to-r from-amarillo to-yellow-400 hover:from-yellow-400 hover:to-amarillo text-black font-bold px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amarillo/50 text-lg border-2 border-yellow-300/50"
+              title="Comprar propiedades - Servicio destacado"
+              aria-label="Acceso rápido para comprar propiedades"
             >
-              <span className="hidden lg:block font-medium">{menuVisible ? "Ver menos" : "Ver más"}</span>
-              <div className="relative w-6 h-6 flex items-center justify-center overflow-hidden">
-                <div className={`absolute transition-all duration-500 transform ${menuVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
-                  <FaAngleUp size={24} className="text-amarillo group-hover:scale-110 transition-transform duration-300" />
-                </div>
-                <div className={`absolute transition-all duration-500 transform ${menuVisible ? 'translate-y-8 opacity-0' : 'translate-y-0 opacity-100'}`}>
-                  <FaEllipsisH size={24} className="text-amarillo group-hover:scale-110 transition-transform duration-300" />
-                </div>
-              </div>
-            </button>
+              🏠 Comprar Propiedades
+            </Link>
           </div>
 
-          {/* Redes sociales y teléfono */}
-          <div className="absolute top-5 right-10 flex space-x-4 mt-4 mr-4">
-            <Link href="https://www.facebook.com/GozaMadridAI" target="_blank" rel="noopener noreferrer" aria-label="Visitar nuestro Facebook">
-              <FaFacebook size={25} className="hover:text-gray-300 text-blue-600" />
+          {/* Redes sociales y teléfono - Mejoradas para SEO */}
+          <div className="absolute top-5 right-10 flex space-x-4 mt-4 mr-4" role="complementary" aria-label="Información de contacto y redes sociales">
+            <Link 
+              href="https://www.facebook.com/GozaMadridAI" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              aria-label="Visitar nuestra página de Facebook (se abre en nueva ventana)"
+              title="Facebook - Goza Madrid Inmobiliaria"
+              className="hover:scale-110 transition-transform duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 rounded"
+            >
+              <FaFacebook size={25} className="hover:text-gray-300 text-blue-600" aria-hidden="true" />
             </Link>
-            <Link href="https://www.instagram.com/Gozamadrid54" target="_blank" rel="noopener noreferrer" aria-label="Visitar nuestro Instagram">
-              <FaInstagram size={25} className="hover:text-gray-300 text-pink-600" />
+            <Link 
+              href="https://www.instagram.com/Gozamadrid54" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              aria-label="Visitar nuestro perfil de Instagram (se abre en nueva ventana)"
+              title="Instagram - Goza Madrid Inmobiliaria"
+              className="hover:scale-110 transition-transform duration-200 focus:outline-none focus:ring-2 focus:ring-pink-500/50 rounded"
+            >
+              <FaInstagram size={25} className="hover:text-gray-300 text-pink-600" aria-hidden="true" />
             </Link>
-            <a href="tel:+34608136529" className="flex items-center space-x-2" aria-label="Llamar a nuestro teléfono">
-              <FaPhone size={25} className={`hover:text-gray-300 ${isExpRealty ? 'text-white' : 'text-white'}`} />
-              <span className={`hover:text-gray-300 ${isExpRealty ? 'text-white' : 'text-white'} text-2xl`}>
+            <a 
+              href="tel:+34608136529" 
+              className="flex items-center space-x-2 hover:scale-105 transition-transform duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 rounded px-2" 
+              aria-label="Llamar al teléfono +34 608 136 529"
+              title="Llamar ahora - Goza Madrid"
+            >
+              <FaPhone size={25} className="hover:text-gray-300 text-white" aria-hidden="true" />
+              <span className="hover:text-gray-300 text-white text-2xl">
                 +34 608 136 529
               </span>
             </a>
           </div>
 
-          {/* Logo */}
+          {/* Logo - Optimizado para SEO */}
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-amarillo/20 rounded-3xl"></div>
-            <Link href="/" aria-label="Ir a la página principal">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-amarillo/20 rounded-3xl" aria-hidden="true"></div>
+            <Link 
+              href="/" 
+              aria-label="Ir a la página principal de Goza Madrid Inmobiliaria"
+              title="Goza Madrid - Inicio"
+              className="focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded-3xl"
+            >
               <Image 
                 src="/api/images/logonuevo.png" 
-                alt="Logo de Goza Madrid" 
+                alt="Goza Madrid - Agencia Inmobiliaria en Madrid, especialistas en compra, venta y alquiler de propiedades" 
                 width={120} 
                 height={120} 
                 layout="intrinsic"
                 className="relative z-10 m-0"
                 priority
+                loading="eager"
               />
             </Link>
           </div>
 
-          {/* Enlaces de navegación */}
-          <div className={`${isExpRealty ? 'text-white' : 'text-white'} flex items-center space-x-14 mt-4 text-2xl font-bold`}>
-            <Link href="/" className={`${isExpRealty ? 'text-white' : 'text-white'} hover:text-gray-300`}>
+          {/* Enlaces de navegación principales - Todos visibles */}
+          <div className="text-white flex items-center space-x-12 mt-4 text-2xl font-bold" role="menubar">
+            <Link 
+              href="/" 
+              className="text-white hover:text-gray-300 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200"
+              role="menuitem"
+              title="Página principal - Goza Madrid"
+            >
               Inicio
             </Link>
 
-            {/* Vende tu propiedad con dropdown */}
+            {/* Vende tu propiedad con dropdown mejorado */}
             <div
               ref={venderRef}
               className="relative whitespace-nowrap group"
-              onMouseEnter={() => handleDropdownToggle('vender', true)}
+              onMouseEnter={() => toggleDropdown('vender', true)}
+              role="menuitem"
+              aria-haspopup="true"
+              aria-expanded={dropdownVisible.vender}
             >
-              <Link href="/vender" className={`${isExpRealty ? 'text-white' : 'text-white'} hover:text-gray-300 flex items-center gap-2`}>
+              <Link 
+                href="/vender" 
+                className="text-white hover:text-gray-300 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200 flex items-center gap-2"
+                title="Servicios de venta de propiedades"
+              >
                 Vende tu propiedad
                 <FaChevronDown
                   className={`transition-transform duration-300 ${dropdownVisible.vender ? 'rotate-180' : ''}`}
+                  aria-hidden="true"
                 />
               </Link>
               {dropdownVisible.vender && (
@@ -306,13 +378,17 @@ export default function ControlMenu() {
                       transform: "translateX(-50%)",
                       minWidth: "300px"
                     }}
-                    onMouseLeave={() => handleDropdownToggle('vender', false)}
+                    onMouseLeave={() => toggleDropdown('vender', false)}
+                    role="menu"
+                    aria-label="Submenu de venta de propiedades"
                   >
                     <Link
                       href="/vender/comprar"
-                      className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200"
+                      className="flex items-center px-6 py-3 text-white hover:bg-white/10 focus:bg-white/20 focus:outline-none transition-colors duration-200"
+                      role="menuitem"
+                      title="Información sobre compra de propiedades"
                     >
-                      <MenuIcon icon={FaHome} className="mr-3 text-amarillo" />
+                      <MenuIcon icon={FaHome} className="mr-3 text-amarillo" aria-hidden="true" />
                       Compra tu propiedad
                     </Link>
                   </div>
@@ -320,66 +396,62 @@ export default function ControlMenu() {
               )}
             </div>
 
-            <Link href="/exp-realty" className={`${isExpRealty ? 'text-white' : 'text-white'} hover:text-gray-300`}>
+            {/* eXp Realty - COMENTADO TEMPORALMENTE
+            <Link 
+              href="/exp-realty" 
+              className="text-white hover:text-gray-300 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200"
+              role="menuitem"
+              title="eXp Realty - Red inmobiliaria global"
+            >
               eXp Realty
             </Link>
+            */}
 
-            {/* Enlaces extra */}
-            <div
-              className="inline-block overflow-hidden transition-all duration-500 ease-in-out"
-              style={{
-                width: menuVisible ? `${extraWidth}px` : "0px",
-                marginLeft: menuVisible ? "3rem" : "0rem",
-              }}
+            {/* Reformas - Ahora siempre visible */}
+            <Link 
+              href="/reformas" 
+              className="text-white hover:text-gray-300 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200 whitespace-nowrap"
+              role="menuitem"
+              title="Servicios de reformas inmobiliarias"
             >
-              <div ref={extraLinksRef} className="inline-flex gap-11">
-                <Link href="/reformas" className={`${isExpRealty ? 'text-white' : 'text-white'} hover:text-gray-300 whitespace-nowrap`}>
-                  Reformas
-                </Link>
-                <Link 
-                  href="/blog" 
-                  className={`${isExpRealty ? 'text-white' : 'text-white'} hover:text-gray-300`}
-                  onClick={(e) => {
-                    // Asegurarse de que el enlace funcione correctamente
-                    e.stopPropagation();
-                    // Si el menú está visible en móvil, cerrarlo
-                    if (menuVisible && window.innerWidth < 1024) {
-                      handleMenuToggle();
-                    }
-                  }}
-                >
-                  Blog
-                </Link>
-              </div>
-            </div>
+              Reformas
+            </Link>
 
-            {/* Servicios con submenú */}
+            {/* Blog - Ahora siempre visible */}
+            <Link 
+              href="/blog" 
+              className="text-white hover:text-gray-300 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200"
+              role="menuitem"
+              title="Blog inmobiliario - Consejos y noticias"
+            >
+              Blog
+            </Link>
+
+            {/* Servicios con submenú mejorado */}
             <div 
               className="relative group/servicios" 
-              onMouseEnter={() => handleDropdownToggle('servicios', true)}
+              onMouseEnter={() => toggleDropdown('servicios', true)}
+              role="menuitem"
+              aria-haspopup="true"
+              aria-expanded={dropdownVisible.servicios}
             >
               <div className="flex items-center gap-2">
                 <Link
                   href="/servicios"
-                  className={`${isExpRealty ? 'text-white' : 'text-white'} hover:text-gray-300`}
+                  className="text-white hover:text-gray-300 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200"
                   onClick={(e) => e.stopPropagation()}
+                  title="Servicios inmobiliarios especializados"
                 >
                   Servicios
                 </Link>
                 <FaChevronDown
                   className={`transition-transform duration-300 ${dropdownVisible.servicios ? 'rotate-180' : ''}`}
+                  aria-hidden="true"
                 />
               </div>
               {dropdownVisible.servicios && (
                 <>
-                  {/* Área invisible para mantener el menú abierto */}
-                  <div
-                    className="absolute h-[20px] w-full"
-                    style={{
-                      top: "100%",
-                      left: 0
-                    }}
-                  />
+                  <div className="absolute h-[20px] w-full" style={{ top: "100%", left: 0 }} />
                   <div 
                     className="absolute bg-black/30 backdrop-blur-xl rounded-lg shadow-lg flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold z-[9998] border border-white/10"
                     style={{
@@ -388,11 +460,13 @@ export default function ControlMenu() {
                       transform: "translateX(-50%)",
                       minWidth: "300px"
                     }}
-                    onMouseLeave={() => handleDropdownToggle('servicios', false)}
+                    onMouseLeave={() => toggleDropdown('servicios', false)}
+                    role="menu"
+                    aria-label="Servicios inmobiliarios"
                   >
                     <div className="relative group/espana">
                       <Link
-                        href={routes.residentes_espana}
+                        href={ROUTES.residentes_espana}
                         className="w-[25vw] flex items-center justify-between px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200 border-b border-white/10"
                       >
                         <div className="flex items-center">
@@ -413,14 +487,14 @@ export default function ControlMenu() {
                           className="absolute -left-5 top-0 w-5 h-full"
                         />
                         <Link
-                          href={routes.residentes_espana_alquiler}
+                          href={ROUTES.residentes_espana_alquiler}
                           className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200 border-b border-white/10"
                         >
                           <MenuIcon icon={FaHome} className="mr-3 text-amarillo" />
                           Alquiler
                         </Link>
                         <Link
-                          href={routes.residentes_espana_guia}
+                          href={ROUTES.residentes_espana_guia}
                           className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200"
                         >
                           <MenuIcon icon={FaHandshake} className="mr-3 text-amarillo" />
@@ -431,7 +505,7 @@ export default function ControlMenu() {
 
                     <div className="relative group/extranjero">
                       <Link
-                        href={routes.residentes_extranjero}
+                        href={ROUTES.residentes_extranjero}
                         className="w-[25vw] flex items-center justify-between px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200"
                       >
                         <div className="flex items-center">
@@ -452,14 +526,14 @@ export default function ControlMenu() {
                           className="absolute -left-5 top-0 w-5 h-full"
                         />
                         <Link
-                          href={routes.residentes_extranjero_impuesto}
+                          href={ROUTES.residentes_extranjero_impuesto}
                           className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200 border-b border-white/10"
                         >
                           <MenuIcon icon={FaChartLine} className="mr-3 text-amarillo" />
                           Impuesto no residentes
                         </Link>
                         <Link
-                          href={routes.residentes_extranjero_guia}
+                          href={ROUTES.residentes_extranjero_guia}
                           className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200"
                         >
                           <MenuIcon icon={FaHandshake} className="mr-3 text-amarillo" />
@@ -472,13 +546,18 @@ export default function ControlMenu() {
               )}
             </div>
 
-            <Link href="/contacto" className={`${isExpRealty ? 'text-white' : 'text-white'} hover:text-gray-300`}>
+            <Link 
+              href="/contacto" 
+              className="text-white hover:text-gray-300 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200" 
+              role="menuitem" 
+              title="Contacto - Goza Madrid Inmobiliaria"
+            >
               Contacto
             </Link>
           </div>
         </nav>
 
-        {/* Menú móvil */}
+        {/* Menú móvil optimizado para accesibilidad y performance */}
         <div 
           id="mobile-menu"
           className={`fixed inset-0 bg-black z-[9999] lg:hidden transition-all duration-300 ease-in-out ${
@@ -487,9 +566,10 @@ export default function ControlMenu() {
           role="dialog"
           aria-modal="true"
           aria-label="Menú de navegación móvil"
+          aria-hidden={!menuVisible}
           onClick={(e) => {
             if (e.target === e.currentTarget) {
-              handleMenuToggle();
+              toggleMenu();
             }
           }}
         >
@@ -497,108 +577,236 @@ export default function ControlMenu() {
             className={`bg-gradient-to-tr from-black/30 via-amarillo/40 to-transparent backdrop-blur-md w-64 max-h-screen shadow-lg flex flex-col p-4 fixed top-0 right-0 h-full transition-all duration-300 ease-in-out transform ${
               menuVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
             }`}
+            role="navigation"
+            aria-label="Menú de navegación móvil"
           >
             <div className="flex justify-between items-center">
               <div className="mb-8 text-center">
-                <Link href="/" className="inline-block" aria-label="Ir a la página principal">
-                  <Image src="/api/images/logonuevo.png" alt="Logo de Goza Madrid" width={80} height={80} layout="intrinsic" />
+                <Link 
+                  href="/" 
+                  className="inline-block focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded" 
+                  aria-label="Ir a la página principal de Goza Madrid"
+                  title="Goza Madrid - Inicio"
+                  onClick={() => toggleMenu()}
+                >
+                  <Image 
+                    src="/api/images/logonuevo.png" 
+                    alt="Goza Madrid - Logo" 
+                    width={80} 
+                    height={80} 
+                    layout="intrinsic" 
+                    loading="lazy"
+                  />
                 </Link>
               </div>
               <button 
-                onClick={handleMenuToggle} 
-                className="text-white hover:text-amarillo bg-black/20 backdrop-blur-sm p-2 rounded-full transition-all duration-300"
-                aria-label="Cerrar menú"
+                onClick={toggleMenu} 
+                className="text-white hover:text-amarillo focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 bg-black/20 backdrop-blur-sm p-2 rounded-full transition-all duration-300"
+                aria-label="Cerrar menú de navegación"
+                type="button"
               >
-                <FaTimes size={24} />
+                <FaTimes size={24} aria-hidden="true" />
               </button>
             </div>
 
-            <nav className="mt-8 flex flex-col space-y-4 text-xl font-bold">
-              <Link href="/" className="text-white hover:text-gray-700">Inicio</Link>
-              
-              {/* Vende tu propiedad móvil */}
-              <div className="relative whitespace-nowrap flex items-center">
-                <Link href="/vender" className="text-white hover:text-gray-700">
-                  Vende tu propiedad
-                </Link>
-                <button
-                  onClick={() => handleDropdownToggle('vender', !dropdownVisible.vender)}
-                  className="ml-2 text-white hover:text-gray-700"
-                  aria-expanded={dropdownVisible.vender}
-                >
-                  <FaChevronDown
-                    className={`transition-transform duration-300 ${dropdownVisible.vender ? 'rotate-180' : ''}`}
-                    size={20}
-                  />
-                </button>
-              </div>
-              
-              {dropdownVisible.vender && (
-                <div className="ml-4">
-                  <Link
-                    href="/vender/comprar"
-                    className="flex items-center px-4 py-3 text-white hover:bg-white/10 transition-colors duration-200 rounded-lg"
-                  >
-                    <MenuIcon icon={FaHome} className="mr-2 text-amarillo" />
-                    Compra tu propiedad
-                  </Link>
-                </div>
-              )}
+            <nav className="mt-8 flex flex-col space-y-4 text-xl font-bold" role="menu">
+              <Link 
+                href="/" 
+                className="text-white hover:text-gray-700 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200"
+                role="menuitem"
+                title="Página principal"
+                onClick={() => toggleMenu()}
+              >
+                Inicio
+              </Link>
 
-              <Link href="/exp-realty" className="text-white hover:text-gray-700">eXp Realty</Link>
-              <Link href="/reformas" className="text-white hover:text-gray-700">Reformas</Link>
+              {/* COMPRAR PROPIEDADES DESTACADO EN MÓVIL */}
+              <Link 
+                href="/vender/comprar" 
+                className="bg-gradient-to-r from-amarillo to-yellow-400 hover:from-yellow-400 hover:to-amarillo text-black font-bold px-4 py-3 rounded-lg shadow-lg transition-all duration-200 text-center"
+                role="menuitem"
+                title="Comprar propiedades - Servicio destacado"
+                onClick={() => toggleMenu()}
+              >
+                🏠 Comprar Propiedades
+              </Link>
+              
+              {/* Vende tu propiedad móvil optimizado */}
+              <div className="relative whitespace-nowrap flex flex-col" role="menuitem">
+                <div className="flex items-center justify-between">
+                  <Link 
+                    href="/vender" 
+                    className="text-white hover:text-gray-700 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200 flex-1"
+                    title="Servicios de venta de propiedades"
+                    onClick={() => toggleMenu()}
+                  >
+                    Vende tu propiedad
+                  </Link>
+                  <button
+                    onClick={() => toggleDropdown('vender', !dropdownVisible.vender)}
+                    className="ml-2 text-white hover:text-gray-700 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded p-1 transition-all duration-200"
+                    aria-expanded={dropdownVisible.vender}
+                    aria-label={dropdownVisible.vender ? "Ocultar opciones de venta" : "Mostrar opciones de venta"}
+                    type="button"
+                  >
+                    <FaChevronDown
+                      className={`transition-transform duration-300 ${dropdownVisible.vender ? 'rotate-180' : ''}`}
+                      size={20}
+                      aria-hidden="true"
+                    />
+                  </button>
+                </div>
+                
+                {dropdownVisible.vender && (
+                  <div className="ml-4 mt-2" role="menu" aria-label="Opciones de venta">
+                    <Link
+                      href="/vender/comprar"
+                      className="flex items-center px-4 py-3 text-white hover:bg-white/10 focus:bg-white/20 focus:outline-none transition-colors duration-200 rounded-lg"
+                      role="menuitem"
+                      title="Información sobre compra de propiedades"
+                      onClick={() => toggleMenu()}
+                    >
+                      <MenuIcon icon={FaHome} className="mr-2 text-amarillo" aria-hidden="true" />
+                      Compra tu propiedad
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* eXp Realty - COMENTADO TEMPORALMENTE
+              <Link 
+                href="/exp-realty" 
+                className="text-white hover:text-gray-700 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200"
+                role="menuitem"
+                title="eXp Realty - Red inmobiliaria global"
+                onClick={() => handleMenuToggle()}
+              >
+                eXp Realty
+              </Link>
+              */}
+              
+              <Link 
+                href="/reformas" 
+                className="text-white hover:text-gray-700 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200"
+                role="menuitem"
+                title="Servicios de reformas"
+                onClick={() => toggleMenu()}
+              >
+                Reformas
+              </Link>
+              
               <Link 
                 href="/blog" 
-                className="text-white hover:text-gray-700"
+                className="text-white hover:text-gray-700 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200"
+                role="menuitem"
+                title="Blog inmobiliario"
                 onClick={(e) => {
-                  // Asegurarse de que el enlace funcione correctamente
                   e.stopPropagation();
-                  // Cerrar el menú móvil después de hacer clic
-                  handleMenuToggle();
+                  toggleMenu();
                 }}
               >
                 Blog
               </Link>
               
-              {/* Servicios móvil */}
-              <div className="relative whitespace-nowrap flex flex-col">
+              {/* Servicios móvil optimizado */}
+              <div className="relative whitespace-nowrap flex flex-col" role="menuitem">
                 <div className="flex items-center justify-between">
-                  <Link href="/servicios" className="text-white hover:text-gray-700">
+                  <Link 
+                    href="/servicios" 
+                    className="text-white hover:text-gray-700 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200 flex-1"
+                    title="Servicios inmobiliarios"
+                    onClick={() => toggleMenu()}
+                  >
                     Servicios
                   </Link>
                   <button
-                    onClick={() => handleDropdownToggle('servicios', !dropdownVisible.servicios)}
-                    className="ml-2 text-white hover:text-gray-700"
+                    onClick={() => toggleDropdown('servicios', !dropdownVisible.servicios)}
+                    className="ml-2 text-white hover:text-gray-700 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded p-1 transition-all duration-200"
                     aria-expanded={dropdownVisible.servicios}
+                    aria-label={dropdownVisible.servicios ? "Ocultar servicios" : "Mostrar servicios"}
+                    type="button"
                   >
                     <FaChevronDown
                       className={`transition-transform duration-300 ${dropdownVisible.servicios ? 'rotate-180' : ''}`}
                       size={20}
+                      aria-hidden="true"
                     />
                   </button>
                 </div>
                 
                 {dropdownVisible.servicios && (
-                  <div className="ml-4 mt-2 flex flex-col space-y-2">
+                  <div className="ml-4 mt-2 flex flex-col space-y-2" role="menu" aria-label="Servicios disponibles">
                     <Link
-                      href={routes.residentes_espana}
-                      className="text-white hover:text-gray-700 flex items-center"
+                      href={ROUTES.residentes_espana}
+                      className="text-white hover:text-gray-700 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200 flex items-center"
+                      role="menuitem"
+                      title="Servicios para residentes en España"
+                      onClick={() => toggleMenu()}
                     >
-                      <MenuIcon icon={FaHandshake} className="mr-2 text-amarillo" />
+                      <MenuIcon icon={FaHandshake} className="mr-2 text-amarillo" aria-hidden="true" />
                       Residentes en España
                     </Link>
                     <Link
-                      href={routes.residentes_extranjero}
-                      className="text-white hover:text-gray-700 flex items-center"
+                      href={ROUTES.residentes_extranjero}
+                      className="text-white hover:text-gray-700 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200 flex items-center"
+                      role="menuitem"
+                      title="Servicios para residentes en el extranjero"
+                      onClick={() => toggleMenu()}
                     >
-                      <MenuIcon icon={FaChartLine} className="mr-2 text-amarillo" />
+                      <MenuIcon icon={FaChartLine} className="mr-2 text-amarillo" aria-hidden="true" />
                       Residentes en el extranjero
                     </Link>
                   </div>
                 )}
               </div>
 
-              <Link href="/contacto" className="text-white hover:text-gray-700">Contacto</Link>
+              <Link 
+                href="/contacto" 
+                className="text-white hover:text-gray-700 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200"
+                role="menuitem"
+                title="Contacto"
+                onClick={() => toggleMenu()}
+              >
+                Contacto
+              </Link>
+
+              {/* Información de contacto en móvil */}
+              <div className="mt-8 pt-4 border-t border-white/20" role="complementary" aria-label="Información de contacto">
+                <div className="flex flex-col space-y-3">
+                  <a 
+                    href="tel:+34608136529" 
+                    className="flex items-center space-x-3 text-white hover:text-amarillo focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200" 
+                    aria-label="Llamar al teléfono"
+                    title="Llamar ahora"
+                  >
+                    <FaPhone size={20} className="text-amarillo" aria-hidden="true" />
+                    <span className="text-lg">+34 608 136 529</span>
+                  </a>
+                  
+                  <div className="flex space-x-4 mt-2">
+                    <Link 
+                      href="https://www.facebook.com/GozaMadridAI" 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      aria-label="Visitar Facebook (nueva ventana)"
+                      title="Facebook"
+                      className="hover:scale-110 focus:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500/50 rounded transition-transform duration-200"
+                    >
+                      <FaFacebook size={24} className="text-blue-600" aria-hidden="true" />
+                    </Link>
+                    <Link 
+                      href="https://www.instagram.com/Gozamadrid54" 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      aria-label="Visitar Instagram (nueva ventana)"
+                      title="Instagram"
+                      className="hover:scale-110 focus:scale-110 focus:outline-none focus:ring-2 focus:ring-pink-500/50 rounded transition-transform duration-200"
+                    >
+                      <FaInstagram size={24} className="text-pink-600" aria-hidden="true" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </nav>
           </div>
         </div>
@@ -606,3 +814,5 @@ export default function ControlMenu() {
     </>
   );
 }
+
+export default ControlMenu;
