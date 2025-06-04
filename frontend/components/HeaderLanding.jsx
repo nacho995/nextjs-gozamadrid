@@ -14,7 +14,7 @@ const HeaderLanding = () => {
           <Link href="/" className="relative z-10">
             <div className="flex items-center" style={{ maxHeight: '8rem' }}> 
               <img 
-                src="/api/images/logonuevo.png" 
+                src="/logonuevo.png" 
                 alt="Real Estate Goza Madrid" 
                 width={150} 
                 height={200}

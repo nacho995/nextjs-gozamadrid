@@ -123,55 +123,88 @@ export default async function handler(req, res) {
 
     console.log(`[API MongoDB] 📊 Encontradas ${properties.length} propiedades de ${totalCount} total`);
 
-    // Normalizar las propiedades para el frontend
+    // Normalizar cada propiedad para que tenga la estructura consistente
     const normalizedProperties = properties.map(property => {
-      // Procesar el precio correctamente según los datos reales de MongoDB
-      let normalizedPrice = property.price || 0;
+      // Lógica inteligente para el precio
+      let normalizedPrice = property.price;
+      let priceNumeric = 0;
       
-      if (property.price) {
-        // Convertir a string primero para procesamiento consistente
-        const priceStr = String(property.price);
+      if (typeof normalizedPrice === 'string') {
+        // Remover caracteres no numéricos excepto punto y coma
+        const cleanPrice = normalizedPrice.replace(/[^\d.,]/g, '');
         
-        // Casos específicos basados en los datos reales:
-        if (priceStr.includes('.')) {
-          // Precios como "2.069", "1.299" = 2,069,000€, 1,299,000€
-          const cleanPrice = priceStr.replace('.', '');
-          normalizedPrice = parseInt(cleanPrice) * 1000;
-          console.log(`[MongoDB] Precio con punto: ${property.price} → ${normalizedPrice}€`);
-        } else if (priceStr.length >= 7) {
-          // Precios como "3000000" ya están completos
-          normalizedPrice = parseInt(priceStr);
-          console.log(`[MongoDB] Precio completo: ${property.price} → ${normalizedPrice}€`);
+        if (cleanPrice.includes('.') && !cleanPrice.includes(',')) {
+          // Precio con punto como separador de miles: "1.299" → "1299000"
+          const priceValue = parseInt(cleanPrice.replace('.', ''));
+          if (priceValue < 10000) { // Si es menor que 10.000, asumir que está en miles
+            normalizedPrice = (priceValue * 1000).toLocaleString('es-ES');
+            priceNumeric = priceValue * 1000;
+            console.log(`[MongoDB] Precio con punto: ${property.price} → ${priceNumeric}€`);
+          } else {
+            normalizedPrice = priceValue.toLocaleString('es-ES');
+            priceNumeric = priceValue;
+            console.log(`[MongoDB] Precio directo: ${property.price} → ${priceNumeric}€`);
+          }
+        } else if (!cleanPrice.includes('.') && !cleanPrice.includes(',')) {
+          // Precio simple sin separadores: "725" → "725000"
+          const priceValue = parseInt(cleanPrice);
+          if (priceValue < 10000) { // Si es menor que 10.000, asumir que está en miles
+            normalizedPrice = (priceValue * 1000).toLocaleString('es-ES');
+            priceNumeric = priceValue * 1000;
+            console.log(`[MongoDB] Precio en miles: ${property.price} → ${priceNumeric}€`);
+          } else {
+            normalizedPrice = priceValue.toLocaleString('es-ES');
+            priceNumeric = priceValue;
+            console.log(`[MongoDB] Precio completo: ${property.price} → ${priceNumeric}€`);
+          }
         } else {
-          // Precios como "725", "819", "919" = 725,000€, 819,000€, 919,000€
-          normalizedPrice = parseInt(priceStr) * 1000;
-          console.log(`[MongoDB] Precio en miles: ${property.price} → ${normalizedPrice}€`);
+          // Otros casos, usar valor original
+          priceNumeric = parseInt(cleanPrice.replace(/[.,]/g, ''));
+          normalizedPrice = priceNumeric.toLocaleString('es-ES');
         }
-        
-        // Verificación de seguridad
-        if (isNaN(normalizedPrice) || normalizedPrice <= 0) {
-          console.warn(`[MongoDB] Precio inválido para ${property.title}: ${property.price}`);
-          normalizedPrice = 0;
-        }
+      } else if (typeof normalizedPrice === 'number') {
+        priceNumeric = normalizedPrice;
+        normalizedPrice = normalizedPrice.toLocaleString('es-ES');
+      }
+
+      // Generar imágenes a partir del array de images si existe
+      let propertyImages = [];
+      if (property.images && Array.isArray(property.images) && property.images.length > 0) {
+        propertyImages = property.images.map((img, index) => ({
+          url: img,
+          alt: `${property.title || 'Propiedad'} - Imagen ${index + 1}`
+        }));
+      } else {
+        // Imagen por defecto si no hay imágenes
+        propertyImages = [{
+          url: '/default-property.jpg',
+          alt: property.title || 'Imagen de propiedad'
+        }];
       }
 
       return {
-        ...property,
-        id: property._id.toString(), // Asegurar que hay un ID como string
-        source: 'mongodb',
-        price: normalizedPrice, // Usar el precio normalizado
-        // Asegurar que las imágenes tienen el formato correcto
-        images: property.images || [{ src: '/img/default-property.jpg', alt: property.title || 'Propiedad' }],
-        // Asegurar que las coordenadas existen
-        coordinates: property.coordinates || { lat: 40.4168, lng: -3.7038 }, // Centro de Madrid por defecto
-        // Asegurar campos requeridos
+        _id: property._id,
+        id: property._id?.toString(),
         title: property.title || 'Propiedad sin título',
-        description: property.description || 'Sin descripción disponible',
-        bedrooms: property.bedrooms || 0,
-        bathrooms: property.bathrooms || 0,
-        area: property.area || property.size || 0,
+        description: property.description || '',
+        price: normalizedPrice,
+        priceNumeric: priceNumeric,
         location: property.location || property.address || 'Madrid',
-        address: property.address || property.location || 'Dirección no disponible'
+        address: property.address || property.location || 'Madrid',
+        coordinates: property.coordinates || null, // ✅ Incluir coordenadas
+        bedrooms: property.bedrooms || property.rooms || '0',
+        bathrooms: property.bathrooms || property.wc || '0',
+        area: property.area || property.m2 || '0',
+        size: property.area || property.m2 || '0',
+        propertyType: property.propertyType || property.typeProperty || 'Propiedad',
+        status: property.status || 'Disponible',
+        featured: property.featured || false,
+        images: propertyImages,
+        image: propertyImages[0]?.url || '/default-property.jpg',
+        features: property.features || [],
+        source: 'mongodb',
+        createdAt: property.createdAt || new Date().toISOString(),
+        updatedAt: property.updatedAt || new Date().toISOString()
       };
     });
 

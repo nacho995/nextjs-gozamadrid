@@ -64,11 +64,11 @@ const OrganizationStructuredData = () => {
       "telephone": "+34 919 012 103",
       "email": "marta@gozamadrid.com",
       "sameAs": [
-        "https://www.facebook.com/GozaMadridAI",
-        "https://instagram.com/Gozamadrid54",
+        "https://www.facebook.com/MBLP66/",
+        "https://www.instagram.com/gozamadrid54/",
         "https://x.com/Marta12857571",
-        "https://www.linkedin.com/in/marta-lópez-55516099/",
-        "https://www.youtube.com/@gozamadrid2410"
+        "https://www.linkedin.com/in/marta-l%C3%B3pez-55516099/",
+        "https://www.youtube.com/@martalopez1039"
       ]
     };
 
