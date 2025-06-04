@@ -1,0 +1,29 @@
+{
+  "name": "nextjs-gozamadrid",
+  "version": "1.0.0",
+  "private": true,
+  "description": "GozaMadrid - Real Estate Platform",
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "scripts": {
+    "dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "start": "cd frontend && npm run start",
+    "install": "cd frontend && npm install",
+    "lint": "cd frontend && npm run lint",
+    "postbuild": "cd frontend && npm run postbuild"
+  },
+  "workspaces": [
+    "frontend"
+  ],
+  "keywords": [
+    "nextjs",
+    "real-estate",
+    "madrid",
+    "properties",
+    "mongodb"
+  ],
+  "author": "GozaMadrid",
+  "license": "MIT"
+} 
