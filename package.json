@@ -2,7 +2,7 @@
   "name": "nextjs-gozamadrid",
   "version": "1.0.0",
   "private": true,
-  "description": "GozaMadrid - Real Estate Platform",
+  "description": "GozaMadrid - Real Estate Platform - Ready for Vercel",
   "engines": {
     "node": ">=18.17.0"
   },
