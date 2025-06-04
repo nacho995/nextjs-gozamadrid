@@ -17,8 +17,8 @@ const Video = () => {
     const videoRef = useRef(null);
     const isInitializedRef = useRef(false);
 
-    // Estado inicial consistente para SSR - usando rutas directas
-    const [videoSrc, setVideoSrc] = useState("/video.mp4");
+    // Estado inicial consistente para SSR - usando video externo confiable
+    const [videoSrc, setVideoSrc] = useState("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes_mp4_640x360_SF.mp4");
     const [isClientHydrated, setIsClientHydrated] = useState(false);
     const [isVideoLoaded, setIsVideoLoaded] = useState(false);
     const [videoError, setVideoError] = useState(false);
@@ -46,55 +46,15 @@ const Video = () => {
         }
     }, []);
 
-    // Función para verificar si el video está disponible
-    const checkVideoAvailability = async (src) => {
-        try {
-            console.log(`[Video] 🔍 Verificando disponibilidad de: ${src}`);
-            const response = await fetch(src, { method: 'HEAD' });
-            const isAvailable = response.ok;
-            console.log(`[Video] 📊 Video ${src} disponible: ${isAvailable} (status: ${response.status})`);
-            return isAvailable;
-        } catch (error) {
-            console.error(`[Video] ❌ Error verificando video ${src}:`, error);
-            return false;
-        }
-    };
-
-    // Función para intentar cargar video con fallbacks - usando rutas directas
-    const loadVideoWithFallbacks = async () => {
-        const videoSources = [
-            "/video.mp4", // Video principal directo desde public
-            "/videoExpIngles.mp4", // Video secundario directo desde public
-            "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny_mp4_640x360_SF.mp4" // Fallback externo
-        ];
-
-        for (let i = 0; i < videoSources.length; i++) {
-            const src = videoSources[i];
-            console.log(`[Video] 🔄 Intentando cargar: ${src} (intento ${i + 1}/${videoSources.length})`);
-            
-            const isAvailable = await checkVideoAvailability(src);
-            if (isAvailable) {
-                console.log(`[Video] ✅ Video encontrado: ${src}`);
-                setVideoSrc(src);
-                return src;
-            }
-        }
-
-        console.error('[Video] ❌ Ningún video disponible, usando imagen de fallback');
-        setVideoError(true);
-        setVideoErrorMessage('Videos no disponibles temporalmente');
-        return null;
-    };
-
-    // Efecto mejorado para la configuración del video
+    // Efecto simplificado para la configuración del video
     useEffect(() => {
         if (!isClientHydrated || !videoRef.current) return;
 
         const videoElement = videoRef.current;
-        console.log('[Video] 🎬 Configurando elemento video...');
+        console.log('[Video] 🎬 Configurando elemento video con src:', videoSrc);
         
         videoElement.loop = true;
-        videoElement.muted = true; // Asegurar que esté muteado para autoplay
+        videoElement.muted = true;
         videoElement.playsInline = true;
         
         const handleLoadedData = () => {
@@ -110,20 +70,23 @@ const Video = () => {
             setVideoError(true);
             setIsVideoLoaded(false);
             
-            // Intentar retry con diferentes fuentes
-            if (retryCount < 2) {
-                console.log(`[Video] 🔄 Reintentando carga (${retryCount + 1}/2)...`);
-                setRetryCount(prev => prev + 1);
-                
-                const newSrc = await loadVideoWithFallbacks();
-                if (newSrc && newSrc !== videoSrc) {
-                    setVideoSrc(newSrc);
-                    // El efecto se disparará de nuevo con el nuevo src
-                    return;
-                }
+            // Solo intentar fallback si es el video principal
+            if (retryCount === 0 && videoSrc === "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes_mp4_640x360_SF.mp4") {
+                console.log(`[Video] 🔄 Intentando video secundario...`);
+                setRetryCount(1);
+                setVideoSrc("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny_mp4_640x360_SF.mp4");
+                return;
             }
             
-            setVideoErrorMessage('Error cargando video');
+            // Si el secundario también falla, intentar externo
+            if (retryCount === 1) {
+                console.log(`[Video] 🔄 Intentando video externo...`);
+                setRetryCount(2);
+                setVideoSrc("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes_mp4_640x360_SF.mp4");
+                return;
+            }
+            
+            setVideoErrorMessage('Video no disponible temporalmente');
         };
 
         const handleCanPlay = () => {
@@ -145,39 +108,21 @@ const Video = () => {
         videoElement.addEventListener('error', handleError);
         videoElement.addEventListener('loadstart', handleLoadStart);
         
-        // Inicializar carga del video
-        const initializeVideo = async () => {
-            // Si es el primer intento, verificar si el video actual está disponible
-            if (retryCount === 0) {
-                const isCurrentAvailable = await checkVideoAvailability(videoSrc);
-                if (!isCurrentAvailable) {
-                    console.log('[Video] ⚠️ Video principal no disponible, buscando alternativas...');
-                    const newSrc = await loadVideoWithFallbacks();
-                    if (newSrc && newSrc !== videoSrc) {
-                        setVideoSrc(newSrc);
-                        return; // El efecto se disparará de nuevo
-                    }
-                }
-            }
+        // Cargar y reproducir directamente
+        try {
+            videoElement.load();
+            const playPromise = videoElement.play();
             
-            // Cargar y reproducir
-            try {
-                videoElement.load();
-                const playPromise = videoElement.play();
-                
-                if (playPromise !== undefined) {
-                    playPromise.catch(error => {
-                        console.log("[Video] ⚠️ Autoplay bloqueado:", error.message);
-                        // No es un error crítico, el usuario puede hacer click para reproducir
-                    });
-                }
-            } catch (error) {
-                console.error("[Video] ❌ Error iniciando reproducción:", error);
-                handleError(error);
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.log("[Video] ⚠️ Autoplay bloqueado:", error.message);
+                    // No es un error crítico, el usuario puede hacer click para reproducir
+                });
             }
-        };
-
-        initializeVideo();
+        } catch (error) {
+            console.error("[Video] ❌ Error iniciando reproducción:", error);
+            handleError(error);
+        }
 
         return () => {
             videoElement.removeEventListener('loadeddata', handleLoadedData);
