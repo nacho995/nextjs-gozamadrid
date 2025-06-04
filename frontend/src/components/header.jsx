@@ -9,17 +9,17 @@ import {
   FaFacebook, 
   FaInstagram, 
   FaPhone, 
-  FaBars, 
+
   FaTimes, 
   FaChevronDown, 
   FaChevronRight,
   FaHome,
-  FaBuilding,
+  
   FaHandshake,
   FaChartLine,
   FaEllipsisH,
-  FaAngleDown,
-  FaAngleUp
+ 
+  FaCalculator
 } from "react-icons/fa";
 
 // Componente para renderizar iconos - Con nombre explícito para Fast Refresh
@@ -111,6 +111,12 @@ function ControlMenu() {
   const venderRef = useRef(null);
   const [previousPath, setPreviousPath] = useState(pathname);
   const [focusedElement, setFocusedElement] = useState(null);
+  
+  // Referencias para manejar timeouts de hover
+  const hoverTimeouts = useRef({
+    vender: null,
+    servicios: null
+  });
 
   // Memoización del schema para evitar recalculos
   const memoizedSchema = useMemo(() => {
@@ -178,6 +184,35 @@ function ControlMenu() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [menuVisible, toggleMenu]);
 
+  // Función mejorada para manejar hover de entrada
+  const handleMouseEnter = useCallback((key) => {
+    // Limpiar cualquier timeout pendiente
+    if (hoverTimeouts.current[key]) {
+      clearTimeout(hoverTimeouts.current[key]);
+      hoverTimeouts.current[key] = null;
+    }
+    // Mostrar dropdown inmediatamente
+    toggleDropdown(key, true);
+  }, [toggleDropdown]);
+
+  // Función mejorada para manejar hover de salida
+  const handleMouseLeave = useCallback((key) => {
+    // Añadir un pequeño retraso antes de cerrar
+    hoverTimeouts.current[key] = setTimeout(() => {
+      toggleDropdown(key, false);
+      hoverTimeouts.current[key] = null;
+    }, 150); // 150ms de retraso
+  }, [toggleDropdown]);
+
+  // Limpiar timeouts al desmontar el componente
+  useEffect(() => {
+    return () => {
+      Object.values(hoverTimeouts.current).forEach(timeout => {
+        if (timeout) clearTimeout(timeout);
+      });
+    };
+  }, []);
+
   if (!mounted) return null;
 
   return (
@@ -189,7 +224,7 @@ function ControlMenu() {
           href="/api/images/logonuevo.png" 
           as="image" 
           type="image/png"
-          crossOrigin="anonymous"
+          fetchpriority="high"
         />
         <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossOrigin="anonymous" />
@@ -212,26 +247,29 @@ function ControlMenu() {
         
         {/* Breadcrumb Schema cuando sea apropiado */}
         {pathname !== '/' && (
-          <script type="application/ld+json">
-            {JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "BreadcrumbList",
-              "itemListElement": [
-                {
-                  "@type": "ListItem",
-                  "position": 1,
-                  "name": "Inicio",
-                  "item": "https://realestategozamadrid.com"
-                },
-                {
-                  "@type": "ListItem", 
-                  "position": 2,
-                  "name": pathname.split('/').pop()?.replace(/-/g, ' ') || "Página actual",
-                  "item": `https://realestategozamadrid.com${pathname}`
-                }
-              ]
-            })}
-          </script>
+          <script 
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                  {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Inicio",
+                    "item": "https://realestategozamadrid.com"
+                  },
+                  {
+                    "@type": "ListItem", 
+                    "position": 2,
+                    "name": pathname.split('/').pop()?.replace(/-/g, ' ') || "Página actual",
+                    "item": `https://realestategozamadrid.com${pathname}`
+                  }
+                ]
+              })
+            }}
+          />
         )}
       </Head>
 
@@ -240,8 +278,8 @@ function ControlMenu() {
         role="banner"
         aria-label="Navegación principal de Goza Madrid"
       >
-        {/* Gradiente de integración sutil */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-transparent pointer-events-none" aria-hidden="true"></div>
+        {/* Gradiente de integración más sutil para mostrar el video */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-transparent pointer-events-none" aria-hidden="true"></div>
         
         {/* Botón de menú para móviles - Mejorado para accesibilidad */}
         {!menuVisible && (
@@ -259,37 +297,77 @@ function ControlMenu() {
           </div>
         )}
 
-        {/* Menú Principal Desktop - Mejorado para SEO y Accesibilidad */}
+        {/* Menú Principal Desktop - Diseño Ultra Premium con Backdrop Blur */}
         <nav 
-          className={`${isHomePage ? 'mt-6 mb-0' : 'mb-6'} relative z-[9999] flex-col items-center px-24 p-4 w-max mx-auto rounded-full shadow-2xl hidden lg:flex backdrop-blur-xl border border-white/10 ${
-            isHomePage ? 'bg-black/15' : 'bg-black/20'
-          }`}
+          className={`${isHomePage ? 'mt-8 mb-0' : 'mb-8'} relative flex-col items-center px-16 py-8 w-max mx-auto rounded-2xl shadow-2xl hidden lg:flex backdrop-blur-2xl border-2 ${
+            isHomePage 
+              ? 'shadow-xl' 
+              : 'shadow-2xl'
+          } relative overflow-visible`}
           role="navigation"
           aria-label="Menú principal de navegación"
+          style={{
+            zIndex: 50,
+            background: `linear-gradient(135deg, 
+              rgba(0, 0, 0, 0.4) 0%, 
+              rgba(30, 30, 30, 0.5) 25%,
+              rgba(45, 45, 45, 0.4) 50%, 
+              rgba(30, 30, 30, 0.5) 75%,
+              rgba(0, 0, 0, 0.4) 100%)`,
+            borderColor: 'rgba(255, 215, 0, 0.8)',
+            borderWidth: '3px',
+            borderStyle: 'solid',
+            boxShadow: `
+              0 0 40px rgba(255, 215, 0, 0.4),
+              0 0 80px rgba(255, 215, 0, 0.2),
+              inset 0 0 60px rgba(255, 215, 0, 0.1),
+              0 10px 40px rgba(0, 0, 0, 0.3)`,
+            backdropFilter: 'blur(20px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(180%)'
+          }}
         >
-          {/* BOTÓN DESTACADO - COMPRAR PROPIEDADES */}
-          <div className="absolute left-6 top-1/2 transform -translate-y-1/2">
-            <Link
-              href="/vender/comprar"
-              className="bg-gradient-to-r from-amarillo to-yellow-400 hover:from-yellow-400 hover:to-amarillo text-black font-bold px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amarillo/50 text-lg border-2 border-yellow-300/50"
-              title="Comprar propiedades - Servicio destacado"
-              aria-label="Acceso rápido para comprar propiedades"
-            >
-              🏠 Comprar Propiedades
-            </Link>
-          </div>
+          {/* Efecto de brillo interno premium más sutil */}
+          <div 
+            className="absolute inset-0 opacity-20 pointer-events-none rounded-2xl"
+            style={{
+              background: `radial-gradient(ellipse at center top, 
+                rgba(255, 215, 0, 0.1) 0%, 
+                rgba(255, 223, 0, 0.05) 30%, 
+                rgba(255, 215, 0, 0.02) 50%,
+                transparent 70%)`
+            }}
+            aria-hidden="true"
+          ></div>
 
-          {/* Redes sociales y teléfono - Mejoradas para SEO */}
-          <div className="absolute top-5 right-10 flex space-x-4 mt-4 mr-4" role="complementary" aria-label="Información de contacto y redes sociales">
+          {/* Líneas decorativas doradas */}
+          <div 
+            className="absolute top-0 left-0 right-0 h-1 opacity-60"
+            style={{
+              background: `linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 215, 0, 0.8) 25%, 
+                rgba(255, 223, 0, 1) 50%, 
+                rgba(255, 215, 0, 0.8) 75%, 
+                transparent 100%)`
+            }}
+            aria-hidden="true"
+          ></div>
+
+          {/* Redes sociales y teléfono - Ultra Premium */}
+          <div className="absolute top-8 right-16 flex space-x-8 mt-2 mr-2" role="complementary" aria-label="Información de contacto y redes sociales">
             <Link 
               href="https://www.facebook.com/GozaMadridAI" 
               target="_blank" 
               rel="noopener noreferrer" 
               aria-label="Visitar nuestra página de Facebook (se abre en nueva ventana)"
               title="Facebook - Goza Madrid Inmobiliaria"
-              className="hover:scale-110 transition-transform duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 rounded"
+              className="hover:scale-125 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-full p-2 hover:shadow-2xl"
+              style={{
+                background: `radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%)`,
+                boxShadow: '0 0 20px rgba(59, 130, 246, 0.3)'
+              }}
             >
-              <FaFacebook size={25} className="hover:text-gray-300 text-blue-600" aria-hidden="true" />
+              <FaFacebook size={32} className="text-blue-400 hover:text-blue-300 drop-shadow-xl" aria-hidden="true" />
             </Link>
             <Link 
               href="https://www.instagram.com/Gozamadrid54" 
@@ -297,248 +375,415 @@ function ControlMenu() {
               rel="noopener noreferrer" 
               aria-label="Visitar nuestro perfil de Instagram (se abre en nueva ventana)"
               title="Instagram - Goza Madrid Inmobiliaria"
-              className="hover:scale-110 transition-transform duration-200 focus:outline-none focus:ring-2 focus:ring-pink-500/50 rounded"
+              className="hover:scale-125 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-full p-2 hover:shadow-2xl"
+              style={{
+                background: `radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%)`,
+                boxShadow: '0 0 20px rgba(236, 72, 153, 0.3)'
+              }}
             >
-              <FaInstagram size={25} className="hover:text-gray-300 text-pink-600" aria-hidden="true" />
+              <FaInstagram size={32} className="text-pink-400 hover:text-pink-300 drop-shadow-xl" aria-hidden="true" />
             </Link>
             <a 
               href="tel:+34608136529" 
-              className="flex items-center space-x-2 hover:scale-105 transition-transform duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 rounded px-2" 
+              className="flex items-center space-x-4 hover:scale-110 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-full px-6 py-3 border-2" 
               aria-label="Llamar al teléfono +34 608 136 529"
               title="Llamar ahora - Goza Madrid"
+              style={{
+                background: `linear-gradient(135deg, 
+                  rgba(0, 0, 0, 0.8) 0%, 
+                  rgba(30, 30, 30, 0.9) 100%)`,
+                borderColor: 'rgba(255, 215, 0, 0.8)',
+                boxShadow: `
+                  0 0 30px rgba(255, 215, 0, 0.4),
+                  inset 0 0 20px rgba(255, 215, 0, 0.1)`
+              }}
             >
-              <FaPhone size={25} className="hover:text-gray-300 text-white" aria-hidden="true" />
-              <span className="hover:text-gray-300 text-white text-2xl">
+              <FaPhone size={28} className="text-yellow-400 hover:text-yellow-300 drop-shadow-xl" aria-hidden="true" />
+              <span 
+                className="text-yellow-100 hover:text-white text-2xl font-bold tracking-wide"
+                style={{
+                  textShadow: '0 0 15px rgba(255, 215, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.8)'
+                }}
+              >
                 +34 608 136 529
               </span>
             </a>
           </div>
 
-          {/* Logo - Optimizado para SEO */}
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-amarillo/20 rounded-3xl" aria-hidden="true"></div>
+          {/* Logo - Marco dorado ultra premium */}
+          <div className="relative mb-6">
+            <div 
+              className="absolute inset-0 rounded-full border-4 shadow-2xl"
+              style={{
+                borderColor: 'rgba(255, 215, 0, 0.9)',
+                background: `radial-gradient(circle, 
+                  rgba(255, 215, 0, 0.15) 0%, 
+                  rgba(255, 223, 0, 0.1) 30%, 
+                  rgba(255, 215, 0, 0.05) 60%, 
+                  transparent 100%)`,
+                boxShadow: `
+                  0 0 50px rgba(255, 215, 0, 0.5),
+                  inset 0 0 30px rgba(255, 215, 0, 0.2),
+                  0 0 100px rgba(255, 215, 0, 0.2)`
+              }}
+              aria-hidden="true"
+            ></div>
             <Link 
               href="/" 
               aria-label="Ir a la página principal de Goza Madrid Inmobiliaria"
               title="Goza Madrid - Inicio"
-              className="focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded-3xl"
+              className="focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-full relative z-10 block"
             >
               <Image 
                 src="/api/images/logonuevo.png" 
                 alt="Goza Madrid - Agencia Inmobiliaria en Madrid, especialistas en compra, venta y alquiler de propiedades" 
-                width={120} 
-                height={120} 
+                width={160} 
+                height={160} 
                 layout="intrinsic"
-                className="relative z-10 m-0"
+                className="relative z-10 m-0 drop-shadow-2xl hover:scale-105 transition-transform duration-500"
                 priority
                 loading="eager"
               />
             </Link>
           </div>
 
-          {/* Enlaces de navegación principales - Todos visibles */}
-          <div className="text-white flex items-center space-x-12 mt-4 text-2xl font-bold" role="menubar">
+          {/* Enlaces de navegación principales - Texto ultra legible */}
+          <div 
+            className="flex items-center space-x-12 text-2xl font-bold tracking-wide" 
+            role="menubar"
+            style={{
+              fontFamily: 'system-ui, -apple-system, sans-serif'
+            }}
+          >
             <Link 
               href="/" 
-              className="text-white hover:text-gray-300 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200"
+              className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-4 py-3 transition-all duration-300 hover:scale-110 relative"
               role="menuitem"
               title="Página principal - Goza Madrid"
+              style={{
+                textShadow: '0 0 20px rgba(255, 215, 0, 0.8), 0 2px 6px rgba(0, 0, 0, 0.9)',
+                background: `linear-gradient(135deg, 
+                  rgba(255, 215, 0, 0.1) 0%, 
+                  rgba(255, 223, 0, 0.05) 100%)`,
+                border: '1px solid rgba(255, 215, 0, 0.3)',
+                boxShadow: '0 0 15px rgba(255, 215, 0, 0.2)'
+              }}
             >
               Inicio
             </Link>
 
-            {/* Vende tu propiedad con dropdown mejorado */}
+            <Link 
+              href="/vender/comprar" 
+              className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-4 py-3 transition-all duration-300 hover:scale-110 relative"
+              role="menuitem"
+              title="Catálogo de propiedades en Madrid"
+              style={{
+                textShadow: '0 0 20px rgba(255, 215, 0, 0.8), 0 2px 6px rgba(0, 0, 0, 0.9)',
+                background: `linear-gradient(135deg, 
+                  rgba(255, 215, 0, 0.1) 0%, 
+                  rgba(255, 223, 0, 0.05) 100%)`,
+                border: '1px solid rgba(255, 215, 0, 0.3)',
+                boxShadow: '0 0 15px rgba(255, 215, 0, 0.2)'
+              }}
+            >
+              Propiedades
+            </Link>
+
+            {/* Servicios de Venta - Ultra Premium */}
             <div
               ref={venderRef}
               className="relative whitespace-nowrap group"
-              onMouseEnter={() => toggleDropdown('vender', true)}
+              onMouseEnter={() => handleMouseEnter('vender')}
+              onMouseLeave={() => handleMouseLeave('vender')}
               role="menuitem"
               aria-haspopup="true"
               aria-expanded={dropdownVisible.vender}
+              style={{ position: 'relative' }}
             >
               <Link 
                 href="/vender" 
-                className="text-white hover:text-gray-300 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200 flex items-center gap-2"
+                className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-4 py-3 transition-all duration-300 hover:scale-110 relative flex items-center gap-3"
                 title="Servicios de venta de propiedades"
+                style={{
+                  textShadow: '0 0 20px rgba(255, 215, 0, 0.8), 0 2px 6px rgba(0, 0, 0, 0.9)',
+                  background: `linear-gradient(135deg, 
+                    rgba(255, 215, 0, 0.1) 0%, 
+                    rgba(255, 223, 0, 0.05) 100%)`,
+                  border: '1px solid rgba(255, 215, 0, 0.3)',
+                  boxShadow: '0 0 15px rgba(255, 215, 0, 0.2)'
+                }}
               >
                 Vende tu propiedad
                 <FaChevronDown
-                  className={`transition-transform duration-300 ${dropdownVisible.vender ? 'rotate-180' : ''}`}
+                  className={`transition-all duration-300 text-yellow-400 drop-shadow-lg ${dropdownVisible.vender ? 'rotate-180 text-yellow-300' : ''}`}
                   aria-hidden="true"
                 />
               </Link>
               {dropdownVisible.vender && (
                 <>
-                  <div className="absolute h-[20px] w-full" style={{ top: "100%", left: 0 }} />
-                  <div
-                    className="absolute bg-black/30 backdrop-blur-xl rounded-lg shadow-lg flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold z-[9998] border border-white/10"
-                    style={{
-                      top: "calc(100% + 18px)",
-                      left: "50%",
-                      transform: "translateX(-50%)",
-                      minWidth: "300px"
-                    }}
-                    onMouseLeave={() => toggleDropdown('vender', false)}
-                    role="menu"
-                    aria-label="Submenu de venta de propiedades"
+                  {/* Portal para el dropdown que aparece fuera del contenedor */}
+                  <div 
+                    className="fixed inset-0 pointer-events-none"
+                    style={{ zIndex: 999999 }}
                   >
-                    <Link
-                      href="/vender/comprar"
-                      className="flex items-center px-6 py-3 text-white hover:bg-white/10 focus:bg-white/20 focus:outline-none transition-colors duration-200"
-                      role="menuitem"
-                      title="Información sobre compra de propiedades"
+                    <div
+                      className="absolute backdrop-blur-3xl rounded-2xl shadow-2xl flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold border-2 pointer-events-auto"
+                      style={{
+                        top: `calc(${venderRef.current?.getBoundingClientRect().bottom || 0}px + 20px)`,
+                        left: `calc(${venderRef.current?.getBoundingClientRect().left || 0}px + ${venderRef.current?.getBoundingClientRect().width || 0}px / 2)`,
+                        transform: "translateX(-50%)",
+                        minWidth: "450px",
+                        zIndex: 999999,
+                        background: `linear-gradient(135deg, 
+                          rgba(0, 0, 0, 0.98) 0%, 
+                          rgba(30, 30, 30, 0.99) 50%,
+                          rgba(0, 0, 0, 0.98) 100%)`,
+                        borderColor: 'rgba(255, 215, 0, 0.8)',
+                        boxShadow: `
+                          0 25px 60px rgba(0, 0, 0, 0.8),
+                          0 0 50px rgba(255, 215, 0, 0.4),
+                          inset 0 0 30px rgba(255, 215, 0, 0.1)`
+                      }}
+                      role="menu"
+                      aria-label="Servicios de venta inmobiliaria"
                     >
-                      <MenuIcon icon={FaHome} className="mr-3 text-amarillo" aria-hidden="true" />
-                      Compra tu propiedad
-                    </Link>
+                      <Link
+                        href="https://valuation.lystos.com?clientId=cd55b10c-5ba6-4f65-854e-5c8adaf88a34"
+                        className="flex items-center px-8 py-5 text-yellow-200 hover:text-white hover:scale-105 focus:outline-none transition-all duration-300 rounded-xl mx-2 my-2"
+                        role="menuitem"
+                        title="Valoración gratuita de tu propiedad"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          textShadow: '0 0 15px rgba(255, 215, 0, 0.7), 0 2px 4px rgba(0, 0, 0, 0.8)',
+                          background: `linear-gradient(135deg, 
+                            rgba(255, 215, 0, 0.1) 0%, 
+                            rgba(255, 223, 0, 0.05) 100%)`,
+                          border: '1px solid rgba(255, 215, 0, 0.3)',
+                          boxShadow: '0 0 20px rgba(255, 215, 0, 0.2)'
+                        }}
+                      >
+                        <MenuIcon icon={FaCalculator} className="mr-4 text-yellow-400 text-3xl drop-shadow-xl" aria-hidden="true" />
+                        Valoración gratuita
+                      </Link>
+                    </div>
                   </div>
                 </>
               )}
             </div>
 
-            {/* eXp Realty - COMENTADO TEMPORALMENTE
-            <Link 
-              href="/exp-realty" 
-              className="text-white hover:text-gray-300 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200"
-              role="menuitem"
-              title="eXp Realty - Red inmobiliaria global"
-            >
-              eXp Realty
-            </Link>
-            */}
-
-            {/* Reformas - Ahora siempre visible */}
             <Link 
               href="/reformas" 
-              className="text-white hover:text-gray-300 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200 whitespace-nowrap"
+              className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-4 py-3 transition-all duration-300 hover:scale-110 relative whitespace-nowrap"
               role="menuitem"
               title="Servicios de reformas inmobiliarias"
+              style={{
+                textShadow: '0 0 20px rgba(255, 215, 0, 0.8), 0 2px 6px rgba(0, 0, 0, 0.9)',
+                background: `linear-gradient(135deg, 
+                  rgba(255, 215, 0, 0.1) 0%, 
+                  rgba(255, 223, 0, 0.05) 100%)`,
+                border: '1px solid rgba(255, 215, 0, 0.3)',
+                boxShadow: '0 0 15px rgba(255, 215, 0, 0.2)'
+              }}
             >
               Reformas
             </Link>
 
-            {/* Blog - Ahora siempre visible */}
-            <Link 
-              href="/blog" 
-              className="text-white hover:text-gray-300 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200"
-              role="menuitem"
-              title="Blog inmobiliario - Consejos y noticias"
-            >
-              Blog
-            </Link>
-
-            {/* Servicios con submenú mejorado */}
+            {/* Servicios con submenú ultra premium */}
             <div 
-              className="relative group/servicios" 
-              onMouseEnter={() => toggleDropdown('servicios', true)}
+              className="relative group/servicios"
+              onMouseEnter={() => handleMouseEnter('servicios')}
+              onMouseLeave={() => handleMouseLeave('servicios')}
               role="menuitem"
               aria-haspopup="true"
               aria-expanded={dropdownVisible.servicios}
+              style={{ position: 'relative' }}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <Link
                   href="/servicios"
-                  className="text-white hover:text-gray-300 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200"
+                  className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-4 py-3 transition-all duration-300 hover:scale-110 relative"
                   onClick={(e) => e.stopPropagation()}
                   title="Servicios inmobiliarios especializados"
+                  style={{
+                    textShadow: '0 0 20px rgba(255, 215, 0, 0.8), 0 2px 6px rgba(0, 0, 0, 0.9)',
+                    background: `linear-gradient(135deg, 
+                      rgba(255, 215, 0, 0.1) 0%, 
+                      rgba(255, 223, 0, 0.05) 100%)`,
+                    border: '1px solid rgba(255, 215, 0, 0.3)',
+                    boxShadow: '0 0 15px rgba(255, 215, 0, 0.2)'
+                  }}
                 >
                   Servicios
                 </Link>
                 <FaChevronDown
-                  className={`transition-transform duration-300 ${dropdownVisible.servicios ? 'rotate-180' : ''}`}
+                  className={`transition-all duration-300 text-yellow-400 drop-shadow-lg ${dropdownVisible.servicios ? 'rotate-180 text-yellow-300' : ''}`}
                   aria-hidden="true"
                 />
               </div>
               {dropdownVisible.servicios && (
                 <>
-                  <div className="absolute h-[20px] w-full" style={{ top: "100%", left: 0 }} />
+                  {/* Portal para el dropdown que aparece fuera del contenedor */}
                   <div 
-                    className="absolute bg-black/30 backdrop-blur-xl rounded-lg shadow-lg flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold z-[9998] border border-white/10"
-                    style={{
-                      top: "calc(100% + 18px)",
-                      left: "50%",
-                      transform: "translateX(-50%)",
-                      minWidth: "300px"
-                    }}
-                    onMouseLeave={() => toggleDropdown('servicios', false)}
-                    role="menu"
-                    aria-label="Servicios inmobiliarios"
+                    className="fixed inset-0 pointer-events-none"
+                    style={{ zIndex: 999999 }}
                   >
-                    <div className="relative group/espana">
-                      <Link
-                        href={ROUTES.residentes_espana}
-                        className="w-[25vw] flex items-center justify-between px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200 border-b border-white/10"
-                      >
-                        <div className="flex items-center">
-                          <MenuIcon icon={FaHandshake} className="mr-3 text-amarillo" />
-                          Residentes en España
+                    <div 
+                      className="absolute backdrop-blur-3xl rounded-2xl shadow-2xl flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold border-2 pointer-events-auto"
+                      style={{
+                        top: `calc(${venderRef.current?.getBoundingClientRect().bottom || 0}px + 20px)`,
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        minWidth: "500px",
+                        zIndex: 999999,
+                        background: `linear-gradient(135deg, 
+                          rgba(0, 0, 0, 0.98) 0%, 
+                          rgba(30, 30, 30, 0.99) 50%,
+                          rgba(0, 0, 0, 0.98) 100%)`,
+                        borderColor: 'rgba(255, 215, 0, 0.8)',
+                        boxShadow: `
+                          0 25px 60px rgba(0, 0, 0, 0.8),
+                          0 0 50px rgba(255, 215, 0, 0.4),
+                          inset 0 0 30px rgba(255, 215, 0, 0.1)`
+                      }}
+                      onMouseLeave={() => handleMouseLeave('servicios')}
+                      role="menu"
+                      aria-label="Servicios inmobiliarios"
+                    >
+                      <div className="relative group/espana">
+                        <Link
+                          href={ROUTES.residentes_espana}
+                          className="w-full flex items-center justify-between px-8 py-5 text-yellow-200 hover:text-white hover:scale-105 transition-all duration-300 border-b border-yellow-400/30 rounded-t-xl mx-2 mt-2"
+                          style={{
+                            textShadow: '0 0 15px rgba(255, 215, 0, 0.7), 0 2px 4px rgba(0, 0, 0, 0.8)',
+                            background: `linear-gradient(135deg, 
+                              rgba(255, 215, 0, 0.1) 0%, 
+                              rgba(255, 223, 0, 0.05) 100%)`,
+                            border: '1px solid rgba(255, 215, 0, 0.3)',
+                            boxShadow: '0 0 20px rgba(255, 215, 0, 0.2)'
+                          }}
+                        >
+                          <div className="flex items-center">
+                            <MenuIcon icon={FaHandshake} className="mr-4 text-yellow-400 text-3xl drop-shadow-xl" />
+                            Residentes en España
+                          </div>
+                          <MenuIcon icon={FaChevronRight} className="ml-3 group-hover/espana:rotate-90 transition-transform duration-200 text-yellow-400 drop-shadow-lg" />
+                        </Link>
+
+                        {/* Submenú de España con portal */}
+                        <div className="absolute left-full top-0 hidden group-hover/espana:block pointer-events-none" style={{ zIndex: 999999 }}>
+                          <div className="pointer-events-auto backdrop-blur-3xl rounded-2xl shadow-2xl min-w-[350px] border-2 ml-2"
+                            style={{
+                              zIndex: 999999,
+                              background: `linear-gradient(135deg, 
+                                rgba(0, 0, 0, 0.98) 0%, 
+                                rgba(30, 30, 30, 0.99) 100%)`,
+                              borderColor: 'rgba(255, 215, 0, 0.8)',
+                              boxShadow: `
+                                0 25px 60px rgba(0, 0, 0, 0.8),
+                                0 0 50px rgba(255, 215, 0, 0.4)`
+                            }}
+                          >
+                            <Link
+                              href={ROUTES.residentes_espana_alquiler}
+                              className="flex items-center px-6 py-4 text-yellow-200 hover:text-white hover:scale-105 transition-all duration-300 border-b border-yellow-400/30 rounded-t-xl mx-1 mt-1"
+                              style={{
+                                textShadow: '0 0 12px rgba(255, 215, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.8)',
+                                background: `linear-gradient(135deg, 
+                                  rgba(255, 215, 0, 0.08) 0%, 
+                                  rgba(255, 223, 0, 0.04) 100%)`,
+                                border: '1px solid rgba(255, 215, 0, 0.2)',
+                                boxShadow: '0 0 15px rgba(255, 215, 0, 0.15)'
+                              }}
+                            >
+                              <MenuIcon icon={FaHome} className="mr-3 text-yellow-400 text-2xl drop-shadow-lg" />
+                              Alquiler
+                            </Link>
+                            <Link
+                              href={ROUTES.residentes_espana_guia}
+                              className="flex items-center px-6 py-4 text-yellow-200 hover:text-white hover:scale-105 transition-all duration-300 rounded-b-xl mx-1 mb-1"
+                              style={{
+                                textShadow: '0 0 12px rgba(255, 215, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.8)',
+                                background: `linear-gradient(135deg, 
+                                  rgba(255, 215, 0, 0.08) 0%, 
+                                  rgba(255, 223, 0, 0.04) 100%)`,
+                                border: '1px solid rgba(255, 215, 0, 0.2)',
+                                boxShadow: '0 0 15px rgba(255, 215, 0, 0.15)'
+                              }}
+                            >
+                              <MenuIcon icon={FaHandshake} className="mr-3 text-yellow-400 text-2xl drop-shadow-lg" />
+                              Guía de compra
+                            </Link>
+                          </div>
                         </div>
-                        <MenuIcon icon={FaChevronRight} className="ml-2 group-hover/espana:rotate-90 transition-transform duration-200" />
-                      </Link>
-
-                      {/* Área invisible para el submenú */}
-                      <div 
-                        className="absolute top-0 -right-5 w-5 h-full"
-                      />
-
-                      <div className="absolute left-full top-0 hidden group-hover/espana:block bg-black bg-opacity-50 backdrop-blur-sm rounded-lg shadow-lg min-w-[200px] z-[9997]">
-                        {/* Área invisible para el submenú */}
-                        <div 
-                          className="absolute -left-5 top-0 w-5 h-full"
-                        />
-                        <Link
-                          href={ROUTES.residentes_espana_alquiler}
-                          className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200 border-b border-white/10"
-                        >
-                          <MenuIcon icon={FaHome} className="mr-3 text-amarillo" />
-                          Alquiler
-                        </Link>
-                        <Link
-                          href={ROUTES.residentes_espana_guia}
-                          className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200"
-                        >
-                          <MenuIcon icon={FaHandshake} className="mr-3 text-amarillo" />
-                          Guía de compra
-                        </Link>
                       </div>
-                    </div>
 
-                    <div className="relative group/extranjero">
-                      <Link
-                        href={ROUTES.residentes_extranjero}
-                        className="w-[25vw] flex items-center justify-between px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200"
-                      >
-                        <div className="flex items-center">
-                          <MenuIcon icon={FaChartLine} className="mr-3 text-amarillo" />
-                          Residentes en el extranjero
+                      <div className="relative group/extranjero">
+                        <Link
+                          href={ROUTES.residentes_extranjero}
+                          className="w-full flex items-center justify-between px-8 py-5 text-yellow-200 hover:text-white hover:scale-105 transition-all duration-300 rounded-b-xl mx-2 mb-2"
+                          style={{
+                            textShadow: '0 0 15px rgba(255, 215, 0, 0.7), 0 2px 4px rgba(0, 0, 0, 0.8)',
+                            background: `linear-gradient(135deg, 
+                              rgba(255, 215, 0, 0.1) 0%, 
+                              rgba(255, 223, 0, 0.05) 100%)`,
+                            border: '1px solid rgba(255, 215, 0, 0.3)',
+                            boxShadow: '0 0 20px rgba(255, 215, 0, 0.2)'
+                          }}
+                        >
+                          <div className="flex items-center">
+                            <MenuIcon icon={FaChartLine} className="mr-4 text-yellow-400 text-3xl drop-shadow-xl" />
+                            Residentes en el extranjero
+                          </div>
+                          <MenuIcon icon={FaChevronRight} className="ml-3 group-hover/extranjero:rotate-90 transition-transform duration-200 text-yellow-400 drop-shadow-lg" />
+                        </Link>
+
+                        {/* Submenú de Extranjero con portal */}
+                        <div className="absolute left-full top-0 hidden group-hover/extranjero:block pointer-events-none" style={{ zIndex: 999999 }}>
+                          <div className="pointer-events-auto backdrop-blur-3xl rounded-2xl shadow-2xl min-w-[350px] border-2 ml-2"
+                            style={{
+                              zIndex: 999999,
+                              background: `linear-gradient(135deg, 
+                                rgba(0, 0, 0, 0.98) 0%, 
+                                rgba(30, 30, 30, 0.99) 100%)`,
+                              borderColor: 'rgba(255, 215, 0, 0.8)',
+                              boxShadow: `
+                                0 25px 60px rgba(0, 0, 0, 0.8),
+                                0 0 50px rgba(255, 215, 0, 0.4)`
+                            }}
+                          >
+                            <Link
+                              href={ROUTES.residentes_extranjero_impuesto}
+                              className="flex items-center px-6 py-4 text-yellow-200 hover:text-white hover:scale-105 transition-all duration-300 border-b border-yellow-400/30 rounded-t-xl mx-1 mt-1"
+                              style={{
+                                textShadow: '0 0 12px rgba(255, 215, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.8)',
+                                background: `linear-gradient(135deg, 
+                                  rgba(255, 215, 0, 0.08) 0%, 
+                                  rgba(255, 223, 0, 0.04) 100%)`,
+                                border: '1px solid rgba(255, 215, 0, 0.2)',
+                                boxShadow: '0 0 15px rgba(255, 215, 0, 0.15)'
+                              }}
+                            >
+                              <MenuIcon icon={FaChartLine} className="mr-3 text-yellow-400 text-2xl drop-shadow-lg" />
+                              Impuesto no residentes
+                            </Link>
+                            <Link
+                              href={ROUTES.residentes_extranjero_guia}
+                              className="flex items-center px-6 py-4 text-yellow-200 hover:text-white hover:scale-105 transition-all duration-300 rounded-b-xl mx-1 mb-1"
+                              style={{
+                                textShadow: '0 0 12px rgba(255, 215, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.8)',
+                                background: `linear-gradient(135deg, 
+                                  rgba(255, 215, 0, 0.08) 0%, 
+                                  rgba(255, 223, 0, 0.04) 100%)`,
+                                border: '1px solid rgba(255, 215, 0, 0.2)',
+                                boxShadow: '0 0 15px rgba(255, 215, 0, 0.15)'
+                              }}
+                            >
+                              <MenuIcon icon={FaHandshake} className="mr-3 text-yellow-400 text-2xl drop-shadow-lg" />
+                              Guía de compra
+                            </Link>
+                          </div>
                         </div>
-                        <MenuIcon icon={FaChevronRight} className="ml-2 group-hover/extranjero:rotate-90 transition-transform duration-200" />
-                      </Link>
-
-                      {/* Área invisible para el submenú */}
-                      <div 
-                        className="absolute top-0 -right-5 w-5 h-full"
-                      />
-
-                      <div className="absolute left-full top-0 hidden group-hover/extranjero:block bg-black bg-opacity-50 backdrop-blur-sm rounded-lg shadow-lg min-w-[200px] z-[9997]">
-                        {/* Área invisible para el submenú */}
-                        <div 
-                          className="absolute -left-5 top-0 w-5 h-full"
-                        />
-                        <Link
-                          href={ROUTES.residentes_extranjero_impuesto}
-                          className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200 border-b border-white/10"
-                        >
-                          <MenuIcon icon={FaChartLine} className="mr-3 text-amarillo" />
-                          Impuesto no residentes
-                        </Link>
-                        <Link
-                          href={ROUTES.residentes_extranjero_guia}
-                          className="flex items-center px-6 py-3 text-white hover:bg-white/10 transition-colors duration-200"
-                        >
-                          <MenuIcon icon={FaHandshake} className="mr-3 text-amarillo" />
-                          Guía de compra
-                        </Link>
                       </div>
                     </div>
                   </div>
@@ -548,21 +793,49 @@ function ControlMenu() {
 
             <Link 
               href="/contacto" 
-              className="text-white hover:text-gray-300 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200" 
+              className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-4 py-3 transition-all duration-300 hover:scale-110 relative" 
               role="menuitem" 
               title="Contacto - Goza Madrid Inmobiliaria"
+              style={{
+                textShadow: '0 0 20px rgba(255, 215, 0, 0.8), 0 2px 6px rgba(0, 0, 0, 0.9)',
+                background: `linear-gradient(135deg, 
+                  rgba(255, 215, 0, 0.1) 0%, 
+                  rgba(255, 223, 0, 0.05) 100%)`,
+                border: '1px solid rgba(255, 215, 0, 0.3)',
+                boxShadow: '0 0 15px rgba(255, 215, 0, 0.2)'
+              }}
             >
               Contacto
+            </Link>
+
+            <Link 
+              href="/blog" 
+              className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-4 py-3 transition-all duration-300 hover:scale-110 relative"
+              role="menuitem"
+              title="Blog inmobiliario - Consejos y noticias"
+              style={{
+                textShadow: '0 0 20px rgba(255, 215, 0, 0.8), 0 2px 6px rgba(0, 0, 0, 0.9)',
+                background: `linear-gradient(135deg, 
+                  rgba(255, 215, 0, 0.1) 0%, 
+                  rgba(255, 223, 0, 0.05) 100%)`,
+                border: '1px solid rgba(255, 215, 0, 0.3)',
+                boxShadow: '0 0 15px rgba(255, 215, 0, 0.2)'
+              }}
+            >
+              Blog
             </Link>
           </div>
         </nav>
 
-        {/* Menú móvil optimizado para accesibilidad y performance */}
+        {/* Menú móvil ultra premium */}
         <div 
           id="mobile-menu"
-          className={`fixed inset-0 bg-black z-[9999] lg:hidden transition-all duration-300 ease-in-out ${
-            menuVisible ? 'bg-opacity-50 pointer-events-auto' : 'bg-opacity-0 pointer-events-none'
+          className={`fixed inset-0 z-[9999] lg:hidden transition-all duration-300 ease-in-out ${
+            menuVisible ? 'pointer-events-auto' : 'pointer-events-none'
           }`}
+          style={{
+            background: menuVisible ? 'linear-gradient(135deg, rgba(0,0,0,0.85) 0%, rgba(30, 30, 30, 0.9) 100%)' : 'transparent'
+          }}
           role="dialog"
           aria-modal="true"
           aria-label="Menú de navegación móvil"
@@ -574,59 +847,112 @@ function ControlMenu() {
           }}
         >
           <div 
-            className={`bg-gradient-to-tr from-black/30 via-amarillo/40 to-transparent backdrop-blur-md w-64 max-h-screen shadow-lg flex flex-col p-4 fixed top-0 right-0 h-full transition-all duration-300 ease-in-out transform ${
+            className={`w-96 max-h-screen shadow-2xl flex flex-col p-8 fixed top-0 right-0 h-full transition-all duration-300 ease-in-out transform ${
               menuVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
-            }`}
+            } backdrop-blur-3xl border-l-4`}
+            style={{
+              background: `linear-gradient(160deg, 
+                rgba(0, 0, 0, 0.95) 0%, 
+                rgba(30, 30, 30, 0.98) 50%,
+                rgba(0, 0, 0, 0.95) 100%)`,
+              borderColor: 'rgba(255, 215, 0, 0.8)',
+              boxShadow: `
+                -30px 0 60px rgba(0, 0, 0, 0.5),
+                0 0 50px rgba(255, 215, 0, 0.3),
+                inset 2px 0 20px rgba(255, 215, 0, 0.1)`
+            }}
             role="navigation"
             aria-label="Menú de navegación móvil"
           >
-            <div className="flex justify-between items-center">
-              <div className="mb-8 text-center">
+            <div className="flex justify-between items-center mb-10">
+              <div className="text-center">
                 <Link 
                   href="/" 
-                  className="inline-block focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded" 
+                  className="inline-block focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-full" 
                   aria-label="Ir a la página principal de Goza Madrid"
                   title="Goza Madrid - Inicio"
                   onClick={() => toggleMenu()}
                 >
-                  <Image 
-                    src="/api/images/logonuevo.png" 
-                    alt="Goza Madrid - Logo" 
-                    width={80} 
-                    height={80} 
-                    layout="intrinsic" 
-                    loading="lazy"
-                  />
+                  <div 
+                    className="p-3 rounded-full border-3"
+                    style={{
+                      background: `radial-gradient(circle, 
+                        rgba(255, 215, 0, 0.15) 0%, 
+                        rgba(255, 223, 0, 0.1) 50%, 
+                        transparent 100%)`,
+                      borderColor: 'rgba(255, 215, 0, 0.8)',
+                      boxShadow: '0 0 30px rgba(255, 215, 0, 0.4)'
+                    }}
+                  >
+                    <Image 
+                      src="/api/images/logonuevo.png" 
+                      alt="Goza Madrid - Logo" 
+                      width={100} 
+                      height={100} 
+                      layout="intrinsic" 
+                      loading="lazy"
+                      className="drop-shadow-2xl"
+                    />
+                  </div>
                 </Link>
               </div>
               <button 
                 onClick={toggleMenu} 
-                className="text-white hover:text-amarillo focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 bg-black/20 backdrop-blur-sm p-2 rounded-full transition-all duration-300"
+                className="text-yellow-200 hover:text-white focus:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400/50 backdrop-blur-sm p-4 rounded-full transition-all duration-300 border-2"
                 aria-label="Cerrar menú de navegación"
                 type="button"
+                style={{
+                  background: `radial-gradient(circle, 
+                    rgba(255, 215, 0, 0.1) 0%, 
+                    rgba(255, 223, 0, 0.05) 100%)`,
+                  borderColor: 'rgba(255, 215, 0, 0.6)',
+                  boxShadow: '0 0 25px rgba(255, 215, 0, 0.3)'
+                }}
               >
-                <FaTimes size={24} aria-hidden="true" />
+                <FaTimes size={28} aria-hidden="true" className="drop-shadow-xl" />
               </button>
             </div>
 
-            <nav className="mt-8 flex flex-col space-y-4 text-xl font-bold" role="menu">
+            <nav className="flex flex-col space-y-6 text-xl font-bold" role="menu">
               <Link 
                 href="/" 
-                className="text-white hover:text-gray-700 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200"
+                className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-6 py-4 transition-all duration-300 hover:scale-105"
                 role="menuitem"
                 title="Página principal"
                 onClick={() => toggleMenu()}
+                style={{
+                  textShadow: '0 0 15px rgba(255, 215, 0, 0.7), 0 2px 4px rgba(0, 0, 0, 0.8)',
+                  background: `linear-gradient(135deg, 
+                    rgba(255, 215, 0, 0.1) 0%, 
+                    rgba(255, 223, 0, 0.05) 100%)`,
+                  border: '1px solid rgba(255, 215, 0, 0.3)',
+                  boxShadow: '0 0 20px rgba(255, 215, 0, 0.2)'
+                }}
               >
                 Inicio
               </Link>
 
-              {/* COMPRAR PROPIEDADES DESTACADO EN MÓVIL */}
+              {/* COMPRAR PROPIEDADES DESTACADO EN MÓVIL - Ultra Premium */}
               <Link 
                 href="/vender/comprar" 
-                className="bg-gradient-to-r from-amarillo to-yellow-400 hover:from-yellow-400 hover:to-amarillo text-black font-bold px-4 py-3 rounded-lg shadow-lg transition-all duration-200 text-center"
+                className="text-black font-bold px-8 py-5 rounded-2xl shadow-2xl transition-all duration-300 text-center hover:scale-105 border-3"
                 role="menuitem"
                 title="Comprar propiedades - Servicio destacado"
                 onClick={() => toggleMenu()}
+                style={{
+                  background: `linear-gradient(135deg, 
+                    rgba(255, 215, 0, 1) 0%, 
+                    rgba(255, 223, 0, 0.95) 25%,
+                    rgba(255, 235, 59, 0.9) 50%, 
+                    rgba(255, 223, 0, 0.95) 75%,
+                    rgba(255, 215, 0, 1) 100%)`,
+                  borderColor: 'rgba(180, 83, 9, 0.8)',
+                  boxShadow: `
+                    0 15px 40px rgba(255, 215, 0, 0.4),
+                    inset 0 2px 10px rgba(255, 235, 59, 0.3),
+                    0 0 30px rgba(255, 215, 0, 0.2)`,
+                  textShadow: '0 1px 3px rgba(0, 0, 0, 0.3)'
+                }}
               >
                 🏠 Comprar Propiedades
               </Link>
@@ -643,7 +969,7 @@ function ControlMenu() {
                     Vende tu propiedad
                   </Link>
                   <button
-                    onClick={() => toggleDropdown('vender', !dropdownVisible.vender)}
+                    onClick={() => handleMouseEnter('vender')}
                     className="ml-2 text-white hover:text-gray-700 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded p-1 transition-all duration-200"
                     aria-expanded={dropdownVisible.vender}
                     aria-label={dropdownVisible.vender ? "Ocultar opciones de venta" : "Mostrar opciones de venta"}
@@ -660,18 +986,22 @@ function ControlMenu() {
                 {dropdownVisible.vender && (
                   <div className="ml-4 mt-2" role="menu" aria-label="Opciones de venta">
                     <Link
-                      href="/vender/comprar"
+                      href="https://valuation.lystos.com?clientId=cd55b10c-5ba6-4f65-854e-5c8adaf88a34"
                       className="flex items-center px-4 py-3 text-white hover:bg-white/10 focus:bg-white/20 focus:outline-none transition-colors duration-200 rounded-lg"
                       role="menuitem"
-                      title="Información sobre compra de propiedades"
+                      title="Valoración gratuita de tu propiedad"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       onClick={() => toggleMenu()}
                     >
-                      <MenuIcon icon={FaHome} className="mr-2 text-amarillo" aria-hidden="true" />
-                      Compra tu propiedad
+                      <MenuIcon icon={FaCalculator} className="mr-2 text-amarillo" aria-hidden="true" />
+                      Valoración gratuita
                     </Link>
                   </div>
                 )}
               </div>
+
+             
 
               {/* eXp Realty - COMENTADO TEMPORALMENTE
               <Link 
@@ -695,19 +1025,6 @@ function ControlMenu() {
                 Reformas
               </Link>
               
-              <Link 
-                href="/blog" 
-                className="text-white hover:text-gray-700 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200"
-                role="menuitem"
-                title="Blog inmobiliario"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleMenu();
-                }}
-              >
-                Blog
-              </Link>
-              
               {/* Servicios móvil optimizado */}
               <div className="relative whitespace-nowrap flex flex-col" role="menuitem">
                 <div className="flex items-center justify-between">
@@ -720,7 +1037,7 @@ function ControlMenu() {
                     Servicios
                   </Link>
                   <button
-                    onClick={() => toggleDropdown('servicios', !dropdownVisible.servicios)}
+                    onClick={() => handleMouseEnter('servicios')}
                     className="ml-2 text-white hover:text-gray-700 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded p-1 transition-all duration-200"
                     aria-expanded={dropdownVisible.servicios}
                     aria-label={dropdownVisible.servicios ? "Ocultar servicios" : "Mostrar servicios"}

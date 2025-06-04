@@ -516,62 +516,20 @@ export default function PropertyPage() {
   const [retryCount, setRetryCount] = useState(0);
   const MAX_RETRIES = 3;
 
-  // Usar el hook useProperties para cargar PRIORITARIAMENTE de MongoDB
+  // Usar el hook useProperties para cargar de ambas fuentes
   const { 
-    properties: mongoProperties, 
-    loading: mongoLoading, 
-    error: mongoError,
-    meta: mongoMeta,
-    refresh: refreshMongo
+    properties: allProperties, 
+    loading: propertiesLoading, 
+    error: propertiesError,
+    meta,
+    refresh: refreshProperties
   } = useProperties({
     page: currentPage,
     limit: ITEMS_PER_PAGE,
-    source: 'mongodb', // PRIORIDAD A MONGODB para datos reales del backend
+    source: 'all', // Cargar de ambas fuentes: MongoDB y WooCommerce
     autoLoad: true,
     enableCache: true
   });
-
-  // Hook de fallback para todas las fuentes si MongoDB no está disponible
-  const { 
-    properties: fallbackProperties, 
-    loading: fallbackLoading, 
-    error: fallbackError,
-    meta: fallbackMeta,
-    refresh: refreshFallback
-  } = useProperties({
-    page: currentPage,
-    limit: ITEMS_PER_PAGE,
-    source: 'all', // Todas las fuentes como fallback
-    autoLoad: !mongoProperties.length && !mongoLoading, // Solo si MongoDB no tiene datos
-    enableCache: true
-  });
-
-  // Combinar propiedades con prioridad a MongoDB
-  const allProperties = useMemo(() => {
-    if (mongoProperties.length > 0) {
-      console.log(`[PropertyPage] 🎯 Usando ${mongoProperties.length} propiedades de MongoDB (datos reales)`);
-      return mongoProperties;
-    } else if (fallbackProperties.length > 0) {
-      console.log(`[PropertyPage] 🔄 Usando ${fallbackProperties.length} propiedades de fallback`);
-      return fallbackProperties;
-    }
-    console.log(`[PropertyPage] ⚠️ No hay propiedades disponibles`);
-    return [];
-  }, [mongoProperties, fallbackProperties]);
-
-  // Estados de carga y error combinados
-  const propertiesLoading = mongoLoading || fallbackLoading;
-  const propertiesError = mongoError || fallbackError;
-  const meta = mongoMeta || fallbackMeta;
-
-  // Función de recarga que da prioridad a MongoDB
-  const refreshProperties = useCallback(() => {
-    console.log('[PropertyPage] 🔄 Recargando propiedades...');
-    refreshMongo();
-    if (!mongoProperties.length) {
-      refreshFallback();
-    }
-  }, [refreshMongo, refreshFallback, mongoProperties.length]);
 
   // Actualizar el efecto para usar las propiedades del hook
   useEffect(() => {

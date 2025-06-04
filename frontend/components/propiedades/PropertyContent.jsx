@@ -1097,43 +1097,38 @@ export default function DefaultPropertyContent({ property }) {
     // Si es un string, intentar convertirlo a número para formatear
     if (typeof priceValue === 'string') {
       // Eliminar cualquier carácter que no sea número o punto
-      const cleanPrice = priceValue.replace(/[^\\d.-]/g, '');
+      const cleanPrice = priceValue.replace(/[^\d.-]/g, '');
       
       // Convertir a número
       const numericPrice = parseFloat(cleanPrice);
       
       if (!isNaN(numericPrice)) {
-        // Los precios de MongoDB ya vienen corregidos desde la API
-        // Solo aplicar corrección para propiedades que no sean de MongoDB y tengan precios muy bajos
-        const isFromMongoDB = propertyState?.source === 'mongodb' || propertyState?._id;
-        const adjustedPrice = (!isFromMongoDB && numericPrice < 10000 && numericPrice > 100) 
-          ? numericPrice * 1000 
-          : numericPrice;
-
+        // Si el precio parece ser un precio reducido (menos de 10000), multiplicarlo por 1000
+        // Esto es para corregir casos donde el precio se guarda como "350" en lugar de "350000"
+        const adjustedPrice = numericPrice < 10000 ? numericPrice * 1000 : numericPrice;
+        
+        // Formatear con separador de miles
         formattedPrice = new Intl.NumberFormat('es-ES', {
           style: 'currency',
           currency: 'EUR',
           minimumFractionDigits: 0,
           maximumFractionDigits: 0
         }).format(adjustedPrice);
-        
-        return formattedPrice;
+      } else {
+        // Si no se puede convertir a número, usar el string original
+        formattedPrice = priceValue;
       }
     } else if (typeof priceValue === 'number') {
-      // Si ya es un número, verificar si necesita corrección solo para propiedades no-MongoDB
-      const isFromMongoDB = propertyState?.source === 'mongodb' || propertyState?._id;
-      const adjustedPrice = (!isFromMongoDB && priceValue < 10000 && priceValue > 100) 
-        ? priceValue * 1000 
-        : priceValue;
-
+      // Si ya es un número, formatear directamente
+      // Si el precio parece ser un precio reducido (menos de 10000), multiplicarlo por 1000
+      const adjustedPrice = priceValue < 10000 ? priceValue * 1000 : priceValue;
+      
       formattedPrice = new Intl.NumberFormat('es-ES', {
         style: 'currency',
         currency: 'EUR',
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
       }).format(adjustedPrice);
-      
-      return formattedPrice;
     }
   }
   

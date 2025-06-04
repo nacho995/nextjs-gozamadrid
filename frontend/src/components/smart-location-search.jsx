@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { FaMapMarkerAlt, FaTimes, FaSearch } from 'react-icons/fa';
 
 // Función para calcular similitud entre strings (algoritmo de Levenshtein simplificado)
@@ -100,6 +100,19 @@ const SmartLocationSearch = ({
     }
   }, [properties]);
   
+  // Memoizar el conteo de propiedades por ubicación para evitar recalculos
+  const locationPropertyCount = useMemo(() => {
+    const countMap = new Map();
+    availableLocations.forEach(location => {
+      const count = properties.filter(p => 
+        p.location?.toLowerCase().includes(location.toLowerCase()) ||
+        p.title?.toLowerCase().includes(location.toLowerCase())
+      ).length;
+      countMap.set(location, count);
+    });
+    return countMap;
+  }, [availableLocations, properties]);
+  
   // Generar sugerencias cuando cambie el valor
   useEffect(() => {
     if (!value || value.length < 2) {
@@ -113,10 +126,7 @@ const SmartLocationSearch = ({
       .map(location => ({
         location,
         similarity: calculateSimilarity(location, value),
-        propertiesCount: properties.filter(p => 
-          p.location?.toLowerCase().includes(location.toLowerCase()) ||
-          p.title?.toLowerCase().includes(location.toLowerCase())
-        ).length
+        propertiesCount: locationPropertyCount.get(location) || 0
       }))
       .filter(match => match.similarity > 0.3) // Solo mostrar coincidencias relevantes
       .sort((a, b) => {
@@ -131,7 +141,7 @@ const SmartLocationSearch = ({
     setSuggestions(matches);
     setShowSuggestions(matches.length > 0);
     setSelectedIndex(-1);
-  }, [value, availableLocations, properties]);
+  }, [value, availableLocations, locationPropertyCount]);
   
   // Manejar teclas de navegación
   const handleKeyDown = (e) => {

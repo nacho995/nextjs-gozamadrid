@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 
 export async function GET(request, { params }) {
-  const { slug } = params;
+  const { slug } = await params;
   
   // Lista de imágenes permitidas para seguridad
   const allowedImages = [

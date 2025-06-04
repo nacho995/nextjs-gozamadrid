@@ -94,46 +94,9 @@ const setCache = (key, data) => {
   propertiesCache.set(key, { data, timestamp: Date.now() });
 };
 
-// Hook principal optimizado
-export const useProperties = (source = 'all', limit = 10, page = 1, skipInitialLoad = false) => {
-  const [properties, setProperties] = useState([]);
-  const [loading, setLoading] = useState(!skipInitialLoad);
-  const [error, setError] = useState(null);
-  const [hasMore, setHasMore] = useState(true);
-  const [stats, setStats] = useState({
-    total: 0,
-    sources: { mongodb: 0, ejemplo: 0 }
-  });
-
-  // Datos de ejemplo para desarrollo
-  const exampleData = [
-    {
-      id: 'ejemplo-1',
-      title: 'Apartamento en el Centro',
-      description: 'Hermoso apartamento en el corazón de Madrid',
-      price: 350000,
-      source: 'ejemplo',
-      images: [{ url: '/api/images/default-property.jpg', alt: 'Apartamento ejemplo' }],
-      features: { bedrooms: 2, bathrooms: 1, area: 75 },
-      location: 'Centro, Madrid',
-      address: 'Calle Gran Vía, 28',
-      createdAt: new Date().toISOString()
-    },
-    {
-      id: 'ejemplo-2', 
-      title: 'Casa en las Afueras',
-      description: 'Casa familiar con jardín en zona residencial',
-      price: 450000,
-      source: 'ejemplo',
-      images: [{ url: '/api/images/default-property.jpg', alt: 'Casa ejemplo' }],
-      features: { bedrooms: 3, bathrooms: 2, area: 120 },
-      location: 'Pozuelo, Madrid',
-      address: 'Calle de la Paz, 15',
-      createdAt: new Date().toISOString()
-    }
-  ];
-
-  // Función para obtener el caché del navegador
+// Hook para manejo de caché del navegador
+const useBrowserCache = () => {
+  // Función para obtener del caché del navegador
   const getBrowserCache = useCallback((key) => {
     if (typeof window === 'undefined') return null;
     try {
@@ -169,11 +132,81 @@ export const useProperties = (source = 'all', limit = 10, page = 1, skipInitialL
     }
   }, []);
 
+  return { getBrowserCache, setBrowserCache };
+};
+
+// Función para limpiar caché expirado
+const clearExpiredCache = () => {
+  if (typeof window === 'undefined') return;
+  
+  try {
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('properties_')) {
+        try {
+          const cached = localStorage.getItem(key);
+          if (cached) {
+            const parsedCache = JSON.parse(cached);
+            const isExpired = Date.now() - parsedCache.timestamp > 5 * 60 * 1000; // 5 minutos
+            
+            if (isExpired) {
+              keysToRemove.push(key);
+            }
+          }
+        } catch (error) {
+          // Si hay error parseando, eliminar la entrada
+          keysToRemove.push(key);
+        }
+      }
+    }
+    
+    // Eliminar las entradas expiradas
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+    
+    if (keysToRemove.length > 0) {
+      console.log(`🧹 Limpiadas ${keysToRemove.length} entradas de caché expiradas`);
+    }
+  } catch (error) {
+    console.error('Error limpiando caché expirado:', error);
+  }
+};
+
+// Hook principal para propiedades con cache
+export const useProperties = (config = {}) => {
+  // Extraer configuraciones del objeto pasado como parámetro
+  const {
+    source = 'all',
+    limit = 10,
+    page = 1,
+    skipInitialLoad = false,
+    autoLoad = true,
+    enableCache = true
+  } = config;
+
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [stats, setStats] = useState({
+    total: 0,
+    sources: { mongodb: 0, ejemplo: 0 }
+  });
+
+  const { getBrowserCache, setBrowserCache } = useBrowserCache();
+
+  // Limpiar caché al montar el componente por primera vez
+  useEffect(() => {
+    clearExpiredCache();
+  }, []);
+
   // Función para obtener propiedades del caché
-  const getCachedProperties = useCallback((source) => {
-    const cached = getBrowserCache(`properties_${source}_${limit}_${page}`);
+  const getCachedProperties = useCallback((sourceType) => {
+    if (!enableCache) return null;
+    
+    const cached = getBrowserCache(`properties_${sourceType}_${limit}_${page}`);
     if (cached) {
-      console.log(`🚀 Cache HIT para ${source}: ${cached.length} propiedades`);
+      console.log(`🚀 Cache HIT para ${sourceType}: ${cached.length} propiedades`);
       setStats(prevStats => ({
         ...prevStats,
         total: cached.length,
@@ -199,27 +232,43 @@ export const useProperties = (source = 'all', limit = 10, page = 1, skipInitialL
       
       return cached;
     }
-    console.log(`💨 Cache MISS para ${source}`);
+    console.log(`💨 Cache MISS para ${sourceType}`);
     return null;
-  }, [getBrowserCache, limit, page]);
+  }, [getBrowserCache, limit, page, enableCache]);
 
   // Función para obtener propiedades de todas las fuentes
   const loadAllSources = useCallback(async () => {
     console.log('🚀 Iniciando carga de propiedades');
     const allProperties = [];
     
-    // Función para obtener propiedades de MongoDB - TEMPORALMENTE DESACTIVADA
+    // Función para obtener propiedades de MongoDB - REACTIVADA
     const fetchMongoDB = async () => {
       try {
-        console.log('🔄 MongoDB: API temporalmente desactivada para Fast Refresh');
-        // COMENTADO TEMPORALMENTE: const response = await fetch(`/api/properties/sources/mongodb?page=${page}&limit=${limit}`);
-        // COMENTADO TEMPORALMENTE: if (response.ok) {
-        // COMENTADO TEMPORALMENTE:   const data = await response.json();
-        // COMENTADO TEMPORALMENTE:   console.log(`✅ MongoDB: ${data.length} propiedades cargadas`);
-        // COMENTADO TEMPORALMENTE:   return data || [];
-        // COMENTADO TEMPORALMENTE: }
-        // COMENTADO TEMPORALMENTE: throw new Error(`HTTP ${response.status}`);
-        return []; // Devuelve array vacío temporalmente
+        console.log('🔄 Cargando propiedades desde MongoDB...');
+        const response = await fetch(`/api/properties/sources/mongodb?page=${page}&limit=${limit}`);
+        if (response.ok) {
+          const data = await response.json();
+          
+          // Manejar nueva estructura de respuesta
+          if (data.properties && Array.isArray(data.properties)) {
+            console.log(`✅ MongoDB: ${data.properties.length} propiedades cargadas (fuente: ${data.source})`);
+            return data.properties.map(prop => ({
+              ...prop,
+              source: 'mongodb'
+            }));
+          } else if (Array.isArray(data)) {
+            // Fallback para estructura antigua
+            console.log(`✅ MongoDB: ${data.length} propiedades cargadas`);
+            return data.map(prop => ({
+              ...prop,
+              source: 'mongodb'
+            }));
+          } else {
+            console.warn('⚠️ MongoDB: Estructura de respuesta inesperada', data);
+            return [];
+          }
+        }
+        throw new Error(`HTTP ${response.status}`);
       } catch (error) {
         console.warn('⚠️ MongoDB no disponible:', error.message);
         return [];
@@ -249,14 +298,36 @@ export const useProperties = (source = 'all', limit = 10, page = 1, skipInitialL
     switch (sourceType) {
       case 'mongodb':
         try {
-          console.log('🔄 MongoDB: API temporalmente desactivada para Fast Refresh');
-          // COMENTADO TEMPORALMENTE: const response = await fetch(`/api/properties/sources/mongodb?page=${page}&limit=${limit}`);
-          // COMENTADO TEMPORALMENTE: if (response.ok) {
-          // COMENTADO TEMPORALMENTE:   const data = await response.json();
-          // COMENTADO TEMPORALMENTE:   return data || [];
-          // COMENTADO TEMPORALMENTE: }
-          // COMENTADO TEMPORALMENTE: throw new Error(`HTTP ${response.status}`);
-          return []; // Devuelve array vacío temporalmente
+          console.log('🔄 Cargando propiedades específicamente desde MongoDB...');
+          const response = await fetch(`/api/properties/sources/mongodb?page=${page}&limit=${limit}`);
+          if (response.ok) {
+            const data = await response.json();
+            
+            // Manejar nueva estructura de respuesta
+            if (data.properties && Array.isArray(data.properties)) {
+              console.log(`✅ MongoDB específico: ${data.properties.length} propiedades cargadas (fuente: ${data.source})`);
+              // Mostrar información de paginación si está disponible
+              if (data.pagination) {
+                console.log(`📊 MongoDB pagination: ${data.pagination.currentPage}/${data.pagination.totalPages} (${data.pagination.totalCount} total)`);
+                setHasMore(data.pagination.hasMore);
+              }
+              return data.properties.map(prop => ({
+                ...prop,
+                source: 'mongodb'
+              }));
+            } else if (Array.isArray(data)) {
+              // Fallback para estructura antigua
+              console.log(`✅ MongoDB específico: ${data.length} propiedades cargadas`);
+              return data.map(prop => ({
+                ...prop,
+                source: 'mongodb'
+              }));
+            } else {
+              console.warn('⚠️ MongoDB: Estructura de respuesta inesperada', data);
+              return [];
+            }
+          }
+          throw new Error(`HTTP ${response.status}`);
         } catch (error) {
           console.error('Error cargando MongoDB:', error);
           return [];
@@ -359,6 +430,7 @@ export const useProperties = (source = 'all', limit = 10, page = 1, skipInitialL
     error,
     hasMore,
     stats,
+    meta: stats,
     refresh,
     loadProperties
   };
