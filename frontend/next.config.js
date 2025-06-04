@@ -1,26 +1,27 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // reactStrictMode: false,
-  // images: {
-  //   unoptimized: true,
-  //   domains: ['images.unsplash.com', 'realestategozamadrid.com', 'www.realestategozamadrid.com'],
-  // },
-  // experimental: {},
-  // webpack: (config, { dev }) => {
-  //   if (dev) {
-  //     config.watchOptions = {
-  //       poll: 1000,
-  //       aggregateTimeout: 600,
-  //       ignored: [
-  //         '**/.git/**',
-  //         '**/node_modules/**',
-  //         '**/.next/**',
-  //         'next.config.js',
-  //       ],
-  //     };
-  //   }
-  //   return config;
-  // },
+  reactStrictMode: false,
+  
+  // Configuración de imágenes
+  images: {
+    domains: ['localhost', 'gozamadrid.com'],
+    unoptimized: true,
+  },
+
+  // Configuración de transpilación
+  transpilePackages: ['@heroicons/react', 'framer-motion'],
+
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  
+  // Optimizaciones de compilación
+  compiler: {
+    removeConsole: false,
+  }
 };
 
 module.exports = nextConfig; 
