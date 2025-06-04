@@ -17,13 +17,14 @@ const Video = () => {
     const videoRef = useRef(null);
     const isInitializedRef = useRef(false);
 
-    // Estado inicial consistente para SSR - usando video externo confiable
-    const [videoSrc, setVideoSrc] = useState("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes_mp4_640x360_SF.mp4");
+    // Estado inicial consistente para SSR - usando video responsivo
+    const [videoSrc, setVideoSrc] = useState("/video.mp4");
     const [isClientHydrated, setIsClientHydrated] = useState(false);
     const [isVideoLoaded, setIsVideoLoaded] = useState(false);
     const [videoError, setVideoError] = useState(false);
     const [videoErrorMessage, setVideoErrorMessage] = useState('');
     const [retryCount, setRetryCount] = useState(0);
+    const [isMobile, setIsMobile] = useState(false);
 
     // Un solo useEffect para la inicialización del cliente
     useEffect(() => {
@@ -32,7 +33,22 @@ const Video = () => {
         setIsClientHydrated(true);
         isInitializedRef.current = true;
         
-        console.log('[Video] (Cliente Hidratado) Iniciando configuración del video con src:', videoSrc);
+        // Detectar si es móvil para usar video optimizado
+        const checkIsMobile = () => {
+            const userAgent = navigator.userAgent.toLowerCase();
+            const isMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+            const isSmallScreen = window.innerWidth <= 768;
+            return isMobileDevice || isSmallScreen;
+        };
+        
+        const mobile = checkIsMobile();
+        setIsMobile(mobile);
+        
+        // Seleccionar video según dispositivo
+        const selectedVideo = mobile ? "/video-mobile.mp4" : "/video.mp4";
+        setVideoSrc(selectedVideo);
+        
+        console.log(`[Video] 📱 Dispositivo: ${mobile ? 'Móvil' : 'Desktop'}, Video: ${selectedVideo}`);
         
         // Cargar script de diagnóstico solo en producción y una vez
         if (window.location.hostname === 'www.realestategozamadrid.com') {
@@ -71,10 +87,10 @@ const Video = () => {
             setIsVideoLoaded(false);
             
             // Solo intentar fallback si es el video principal
-            if (retryCount === 0 && videoSrc === "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes_mp4_640x360_SF.mp4") {
+            if (retryCount === 0 && videoSrc === "/video.mp4") {
                 console.log(`[Video] 🔄 Intentando video secundario...`);
                 setRetryCount(1);
-                setVideoSrc("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny_mp4_640x360_SF.mp4");
+                setVideoSrc("/video-mobile.mp4");
                 return;
             }
             
@@ -82,7 +98,7 @@ const Video = () => {
             if (retryCount === 1) {
                 console.log(`[Video] 🔄 Intentando video externo...`);
                 setRetryCount(2);
-                setVideoSrc("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes_mp4_640x360_SF.mp4");
+                setVideoSrc("/video.mp4");
                 return;
             }
             
@@ -301,6 +317,50 @@ const Video = () => {
             console.error('❌ Error generando URL del mapa individual:', error);
             return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42287922!2d-3.8196207!3d40.4378698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1ses!2ses!4v1638360000000';
         }
+    };
+
+    // Función para intentar cargar video con fallbacks responsivos
+    const loadVideoWithFallbacks = async () => {
+        const videoSources = isMobile ? [
+            `/video-mobile.mp4?v=${Date.now()}`, // Video móvil optimizado
+            '/video-mobile.mp4', // Fallback sin cache busting
+            '/video.mp4', // Fallback a video normal
+            '/videoExpIngles.mp4' // Último recurso
+        ] : [
+            `/video.mp4?v=${Date.now()}`, // Video desktop con cache busting
+            '/video.mp4', // Fallback sin cache busting
+            '/video-mobile.mp4', // Fallback a móvil (más pequeño)
+            '/videoExpIngles.mp4' // Último recurso
+        ];
+
+        for (const source of videoSources) {
+            try {
+                console.log(`[Video] 🎬 Intentando cargar video desde: ${source}`);
+                const videoElement = document.createElement('video');
+                videoElement.src = source;
+                videoElement.loop = true;
+                videoElement.muted = true;
+                videoElement.playsInline = true;
+                
+                await new Promise((resolve, reject) => {
+                    videoElement.addEventListener('canplaythrough', () => resolve(videoElement));
+                    videoElement.addEventListener('error', () => reject(new Error(`Error al cargar video desde: ${source}`)));
+                });
+
+                console.log(`[Video] ✅ Video cargado exitosamente desde: ${source}`);
+                setVideoSrc(source);
+                setIsVideoLoaded(true);
+                setVideoError(false);
+                setVideoErrorMessage('');
+                return;
+            } catch (error) {
+                console.error(`[Video] ❌ Error al cargar video desde: ${source}:`, error);
+            }
+        }
+
+        setVideoError(true);
+        setIsVideoLoaded(false);
+        setVideoErrorMessage('Video no disponible temporalmente');
     };
 
     return (

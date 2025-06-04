@@ -35,8 +35,8 @@ const ORGANIZATION_SCHEMA = {
   "name": "Goza Madrid - Agencia Inmobiliaria",
   "alternateName": "GozaMadrid",
   "url": "https://realestategozamadrid.com",
-  "logo": "https://realestategozamadrid.com/api/images/logonuevo.png",
-  "image": "https://realestategozamadrid.com/api/images/logonuevo.png",
+  "logo": "https://realestategozamadrid.com/logonuevo.png",
+  "image": "https://realestategozamadrid.com/logonuevo.png",
   "sameAs": [
     "https://www.facebook.com/GozaMadridAI",
     "https://www.instagram.com/Gozamadrid54"
@@ -221,7 +221,7 @@ function ControlMenu() {
         {/* Preloads optimizados */}
         <link 
           rel="preload" 
-          href="/api/images/logonuevo.png" 
+          href="/logonuevo.png" 
           as="image" 
           type="image/png"
           fetchpriority="high"
@@ -435,7 +435,7 @@ function ControlMenu() {
               className="focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-full relative z-10 block"
             >
               <Image 
-                src="/api/images/logonuevo.png" 
+                src="/logonuevo.png" 
                 alt="Goza Madrid - Agencia Inmobiliaria en Madrid, especialistas en compra, venta y alquiler de propiedades" 
                 width={160} 
                 height={160} 
@@ -885,7 +885,7 @@ function ControlMenu() {
                     }}
                   >
                     <Image 
-                      src="/api/images/logonuevo.png" 
+                      src="/logonuevo.png" 
                       alt="Goza Madrid - Logo" 
                       width={100} 
                       height={100} 
