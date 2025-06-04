@@ -17,7 +17,7 @@ const Video = () => {
     const videoRef = useRef(null);
     const isInitializedRef = useRef(false);
 
-    // Estado inicial consistente para SSR - usando video responsivo
+    // Estado inicial consistente para SSR - usando detección de dispositivo
     const [videoSrc, setVideoSrc] = useState("/video.mp4");
     const [isClientHydrated, setIsClientHydrated] = useState(false);
     const [isVideoLoaded, setIsVideoLoaded] = useState(false);
@@ -26,6 +26,29 @@ const Video = () => {
     const [retryCount, setRetryCount] = useState(0);
     const [isMobile, setIsMobile] = useState(false);
 
+    // Función para detectar dispositivos móviles
+    const detectMobileDevice = () => {
+        if (typeof window === 'undefined') return false;
+        
+        const userAgent = window.navigator.userAgent;
+        const mobileKeywords = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+        const screenWidth = window.innerWidth;
+        const isTouchDevice = 'ontouchstart' in window;
+        
+        const isMobileUA = mobileKeywords.test(userAgent);
+        const isSmallScreen = screenWidth <= 768;
+        
+        console.log('[Video] 📱 Detección móvil:', {
+            userAgent: userAgent.substring(0, 50) + '...',
+            isMobileUA,
+            screenWidth,
+            isSmallScreen,
+            isTouchDevice
+        });
+        
+        return isMobileUA || (isSmallScreen && isTouchDevice);
+    };
+
     // Un solo useEffect para la inicialización del cliente
     useEffect(() => {
         if (isInitializedRef.current) return;
@@ -33,22 +56,16 @@ const Video = () => {
         setIsClientHydrated(true);
         isInitializedRef.current = true;
         
-        // Detectar si es móvil para usar video optimizado
-        const checkIsMobile = () => {
-            const userAgent = navigator.userAgent.toLowerCase();
-            const isMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
-            const isSmallScreen = window.innerWidth <= 768;
-            return isMobileDevice || isSmallScreen;
-        };
-        
-        const mobile = checkIsMobile();
+        // Detectar dispositivo móvil
+        const mobile = detectMobileDevice();
         setIsMobile(mobile);
         
-        // Seleccionar video según dispositivo
-        const selectedVideo = mobile ? "/video-mobile.mp4" : "/video.mp4";
-        setVideoSrc(selectedVideo);
+        // Seleccionar video apropiado
+        const appropriateVideo = mobile ? "/video-mobile.mp4" : "/video.mp4";
+        setVideoSrc(appropriateVideo);
         
-        console.log(`[Video] 📱 Dispositivo: ${mobile ? 'Móvil' : 'Desktop'}, Video: ${selectedVideo}`);
+        console.log('[Video] (Cliente Hidratado) Dispositivo:', mobile ? 'MÓVIL' : 'DESKTOP');
+        console.log('[Video] (Cliente Hidratado) Video seleccionado:', appropriateVideo);
         
         // Cargar script de diagnóstico solo en producción y una vez
         if (window.location.hostname === 'www.realestategozamadrid.com') {
@@ -62,15 +79,61 @@ const Video = () => {
         }
     }, []);
 
-    // Efecto simplificado para la configuración del video
+    // Función para verificar si el video está disponible
+    const checkVideoAvailability = async (src) => {
+        try {
+            console.log(`[Video] 🔍 Verificando disponibilidad de: ${src}`);
+            const response = await fetch(src, { method: 'HEAD' });
+            const isAvailable = response.ok;
+            console.log(`[Video] 📊 Video ${src} disponible: ${isAvailable} (status: ${response.status})`);
+            return isAvailable;
+        } catch (error) {
+            console.error(`[Video] ❌ Error verificando video ${src}:`, error);
+            return false;
+        }
+    };
+
+    // Función para intentar cargar video con fallbacks - usando detección de dispositivos
+    const loadVideoWithFallbacks = async () => {
+        const videoSources = isMobile ? [
+            "/video-mobile.mp4", // Video móvil optimizado
+            "/video.mp4", // Video desktop como fallback
+            "/videoExpIngles.mp4", // Video secundario
+            "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny_mp4_640x360_SF.mp4" // Fallback externo
+        ] : [
+            "/video.mp4", // Video desktop optimizado
+            "/video-mobile.mp4", // Video móvil como fallback
+            "/videoExpIngles.mp4", // Video secundario
+            "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny_mp4_640x360_SF.mp4" // Fallback externo
+        ];
+
+        for (let i = 0; i < videoSources.length; i++) {
+            const src = videoSources[i];
+            console.log(`[Video] 🔄 Intentando cargar: ${src} (intento ${i + 1}/${videoSources.length})`);
+            
+            const isAvailable = await checkVideoAvailability(src);
+            if (isAvailable) {
+                console.log(`[Video] ✅ Video encontrado: ${src}`);
+                setVideoSrc(src);
+                return src;
+            }
+        }
+
+        console.error('[Video] ❌ Ningún video disponible, usando imagen de fallback');
+        setVideoError(true);
+        setVideoErrorMessage('Videos no disponibles temporalmente');
+        return null;
+    };
+
+    // Efecto mejorado para la configuración del video
     useEffect(() => {
         if (!isClientHydrated || !videoRef.current) return;
 
         const videoElement = videoRef.current;
-        console.log('[Video] 🎬 Configurando elemento video con src:', videoSrc);
+        console.log('[Video] 🎬 Configurando elemento video...');
         
         videoElement.loop = true;
-        videoElement.muted = true;
+        videoElement.muted = true; // Asegurar que esté muteado para autoplay
         videoElement.playsInline = true;
         
         const handleLoadedData = () => {
@@ -86,23 +149,20 @@ const Video = () => {
             setVideoError(true);
             setIsVideoLoaded(false);
             
-            // Solo intentar fallback si es el video principal
-            if (retryCount === 0 && videoSrc === "/video.mp4") {
-                console.log(`[Video] 🔄 Intentando video secundario...`);
-                setRetryCount(1);
-                setVideoSrc("/video-mobile.mp4");
-                return;
+            // Intentar retry con diferentes fuentes
+            if (retryCount < 2) {
+                console.log(`[Video] 🔄 Reintentando carga (${retryCount + 1}/2)...`);
+                setRetryCount(prev => prev + 1);
+                
+                const newSrc = await loadVideoWithFallbacks();
+                if (newSrc && newSrc !== videoSrc) {
+                    setVideoSrc(newSrc);
+                    // El efecto se disparará de nuevo con el nuevo src
+                    return;
+                }
             }
             
-            // Si el secundario también falla, intentar externo
-            if (retryCount === 1) {
-                console.log(`[Video] 🔄 Intentando video externo...`);
-                setRetryCount(2);
-                setVideoSrc("/video.mp4");
-                return;
-            }
-            
-            setVideoErrorMessage('Video no disponible temporalmente');
+            setVideoErrorMessage('Error cargando video');
         };
 
         const handleCanPlay = () => {
@@ -124,21 +184,39 @@ const Video = () => {
         videoElement.addEventListener('error', handleError);
         videoElement.addEventListener('loadstart', handleLoadStart);
         
-        // Cargar y reproducir directamente
-        try {
-            videoElement.load();
-            const playPromise = videoElement.play();
-            
-            if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    console.log("[Video] ⚠️ Autoplay bloqueado:", error.message);
-                    // No es un error crítico, el usuario puede hacer click para reproducir
-                });
+        // Inicializar carga del video
+        const initializeVideo = async () => {
+            // Si es el primer intento, verificar si el video actual está disponible
+            if (retryCount === 0) {
+                const isCurrentAvailable = await checkVideoAvailability(videoSrc);
+                if (!isCurrentAvailable) {
+                    console.log('[Video] ⚠️ Video principal no disponible, buscando alternativas...');
+                    const newSrc = await loadVideoWithFallbacks();
+                    if (newSrc && newSrc !== videoSrc) {
+                        setVideoSrc(newSrc);
+                        return; // El efecto se disparará de nuevo
+                    }
+                }
             }
-        } catch (error) {
-            console.error("[Video] ❌ Error iniciando reproducción:", error);
-            handleError(error);
-        }
+            
+            // Cargar y reproducir
+            try {
+                videoElement.load();
+                const playPromise = videoElement.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.log("[Video] ⚠️ Autoplay bloqueado:", error.message);
+                        // No es un error crítico, el usuario puede hacer click para reproducir
+                    });
+                }
+            } catch (error) {
+                console.error("[Video] ❌ Error iniciando reproducción:", error);
+                handleError(error);
+            }
+        };
+
+        initializeVideo();
 
         return () => {
             videoElement.removeEventListener('loadeddata', handleLoadedData);
@@ -319,50 +397,6 @@ const Video = () => {
         }
     };
 
-    // Función para intentar cargar video con fallbacks responsivos
-    const loadVideoWithFallbacks = async () => {
-        const videoSources = isMobile ? [
-            `/video-mobile.mp4?v=${Date.now()}`, // Video móvil optimizado
-            '/video-mobile.mp4', // Fallback sin cache busting
-            '/video.mp4', // Fallback a video normal
-            '/videoExpIngles.mp4' // Último recurso
-        ] : [
-            `/video.mp4?v=${Date.now()}`, // Video desktop con cache busting
-            '/video.mp4', // Fallback sin cache busting
-            '/video-mobile.mp4', // Fallback a móvil (más pequeño)
-            '/videoExpIngles.mp4' // Último recurso
-        ];
-
-        for (const source of videoSources) {
-            try {
-                console.log(`[Video] 🎬 Intentando cargar video desde: ${source}`);
-                const videoElement = document.createElement('video');
-                videoElement.src = source;
-                videoElement.loop = true;
-                videoElement.muted = true;
-                videoElement.playsInline = true;
-                
-                await new Promise((resolve, reject) => {
-                    videoElement.addEventListener('canplaythrough', () => resolve(videoElement));
-                    videoElement.addEventListener('error', () => reject(new Error(`Error al cargar video desde: ${source}`)));
-                });
-
-                console.log(`[Video] ✅ Video cargado exitosamente desde: ${source}`);
-                setVideoSrc(source);
-                setIsVideoLoaded(true);
-                setVideoError(false);
-                setVideoErrorMessage('');
-                return;
-            } catch (error) {
-                console.error(`[Video] ❌ Error al cargar video desde: ${source}:`, error);
-            }
-        }
-
-        setVideoError(true);
-        setIsVideoLoaded(false);
-        setVideoErrorMessage('Video no disponible temporalmente');
-    };
-
     return (
         <>
             {/* Header superpuesto solo en la página home */}
@@ -440,20 +474,7 @@ const Video = () => {
                             </video>
                         )}
 
-                        {/* Botón de reproducción visible cuando hay autoplay bloqueado */}
-                        {isVideoLoaded && !videoError && videoRef.current?.paused && (
-                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                <button 
-                                    onClick={handleVideoClick}
-                                    className="pointer-events-auto bg-black/50 hover:bg-black/70 rounded-full p-4 transition-all duration-300 text-white"
-                                    aria-label="Reproducir video"
-                                >
-                                    <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                                    </svg>
-                                </button>
-                            </div>
-                        )}
+
 
                         {/* Overlay elegante y sutil con transición suave */}
                         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/5 to-black/40"></div>

@@ -18,7 +18,7 @@ const LogoFooter = ({ src, alt, url }) => {
         }}
       >
         <Image
-          src={src || "/api/images/logonuevo.png"}
+          src={src || "/logonuevo.png"}
           alt={alt || "Goza Madrid - Agencia Inmobiliaria"}
           layout="fill"
           objectFit="contain"

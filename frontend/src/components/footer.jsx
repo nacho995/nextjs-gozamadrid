@@ -35,11 +35,11 @@ const SCHEMA_DATA = {
   "telephone": "+34 919 012 103",
   "email": "marta@gozamadrid.com",
   "sameAs": [
-    "https://www.facebook.com/GozaMadridAI",
-    "https://instagram.com/Gozamadrid54",
+    "https://www.facebook.com/MBLP66/",
+    "https://www.instagram.com/gozamadrid54/",
     "https://x.com/Marta12857571",
-    "https://www.linkedin.com/in/marta-lópez-55516099/",
-    "https://www.youtube.com/@gozamadrid2410"
+    "https://www.linkedin.com/in/marta-l%C3%B3pez-55516099/",
+    "https://www.youtube.com/@martalopez1039"
   ],
   "openingHoursSpecification": [
     {
@@ -79,7 +79,7 @@ const SCHEMA_DATA = {
 const footerData = {
   logo: {
     url: "/",
-    src: "/api/images/logonuevo.png",
+    src: "/logonuevo.png",
     alt: "Goza Madrid - Agencia Inmobiliaria en Madrid",
     width: 100,
     height: 100
@@ -124,13 +124,13 @@ const footerData = {
   social: [
     { 
       name: "Facebook",
-      url: "https://www.facebook.com/GozaMadridAI?locale=es_ES", 
+      url: "https://www.facebook.com/MBLP66/", 
       icon: <FaFacebookSquare className="size-6" />,
       ariaLabel: "Visitar nuestro Facebook"
     },
     { 
       name: "Instagram",
-      url: "https://instagram.com/Gozamadrid54", 
+      url: "https://www.instagram.com/gozamadrid54/", 
       icon: <FaInstagram className="size-6" />,
       ariaLabel: "Seguirnos en Instagram"
     },
@@ -142,13 +142,13 @@ const footerData = {
     },
     { 
       name: "LinkedIn",
-      url: "https://www.linkedin.com/in/marta-lópez-55516099/", 
+      url: "https://www.linkedin.com/in/marta-l%C3%B3pez-55516099/", 
       icon: <FaLinkedin className="size-6" />,
       ariaLabel: "Conectar en LinkedIn"
     },
     { 
       name: "YouTube",
-      url: "https://www.youtube.com/@gozamadrid2410", 
+      url: "https://www.youtube.com/@martalopez1039", 
       icon: <FaYoutube className="size-6" />,
       ariaLabel: "Ver nuestro canal de YouTube"
     }

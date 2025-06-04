@@ -608,15 +608,25 @@ export default function DefaultPropertyContent({ property }) {
       if (!propertyState) return { lat: 40.4167, lng: -3.7037 }; // Coordenadas por defecto de Madrid
       
       try {
-        // Primero buscar en metadatos específicos de coordenadas
+        console.log('[PropertyContent] 🗺️ Extrayendo coordenadas para:', propertyState.title);
+        console.log('[PropertyContent] 📍 Datos de propiedad disponibles:', {
+          coordinates: propertyState.coordinates,
+          location: propertyState.location,
+          address: propertyState.address,
+          source: propertyState.source
+        });
+
+        // ✅ PRIORIDAD 1: Buscar coordenadas directas de MongoDB (estructura normalizada)
         if (propertyState.coordinates) {
           const { lat, lng } = propertyState.coordinates;
           if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
-            return { lat: parseFloat(lat), lng: parseFloat(lng) };
+            const coordinates = { lat: parseFloat(lat), lng: parseFloat(lng) };
+            console.log(`[PropertyContent] ✅ Coordenadas de MongoDB encontradas: ${coordinates.lat}, ${coordinates.lng}`);
+            return coordinates;
           }
         }
-        
-        // Buscar en meta_data si es de WooCommerce
+
+        // ✅ PRIORIDAD 2: Buscar en meta_data si es de WooCommerce
         if (propertyState.meta_data && Array.isArray(propertyState.meta_data)) {
           // Buscar coordenadas en meta_data
           const coordinatesMeta = propertyState.meta_data.find(
@@ -630,6 +640,7 @@ export default function DefaultPropertyContent({ property }) {
             if (typeof value === 'string' && value.includes(',')) {
               const [lat, lng] = value.split(',').map(num => parseFloat(num.trim()));
               if (!isNaN(lat) && !isNaN(lng)) {
+                console.log(`[PropertyContent] ✅ Coordenadas de meta_data (string): ${lat}, ${lng}`);
                 return { lat, lng };
               }
             }
@@ -639,16 +650,58 @@ export default function DefaultPropertyContent({ property }) {
               const lat = parseFloat(value.lat);
               const lng = parseFloat(value.lng);
               if (!isNaN(lat) && !isNaN(lng)) {
+                console.log(`[PropertyContent] ✅ Coordenadas de meta_data (objeto): ${lat}, ${lng}`);
                 return { lat, lng };
               }
             }
           }
         }
+
+        // ✅ PRIORIDAD 3: Coordenadas por defecto basadas en la ubicación conocida
+        const location = propertyState.location || propertyState.address || '';
         
-        // Ubicación por defecto (Madrid)
+        // Mapeo de ubicaciones conocidas de Madrid a coordenadas aproximadas
+        const madridLocations = {
+          'la latina': { lat: 40.4086, lng: -3.7097 },
+          'salamanca': { lat: 40.4359, lng: -3.6774 },
+          'malasaña': { lat: 40.4254, lng: -3.7031 },
+          'chueca': { lat: 40.4254, lng: -3.6976 },
+          'chamberí': { lat: 40.4459, lng: -3.7026 },
+          'retiro': { lat: 40.4153, lng: -3.6844 },
+          'centro': { lat: 40.4168, lng: -3.7038 },
+          'sol': { lat: 40.4168, lng: -3.7038 },
+          'moncloa': { lat: 40.4378, lng: -3.7169 },
+          'tetuán': { lat: 40.4647, lng: -3.6986 },
+          // Calles específicas que hemos mapeado
+          'antonia merce': { lat: 40.4231, lng: -3.6836 },
+          'padilla': { lat: 40.4284, lng: -3.6787 },
+          'diego de león': { lat: 40.4403, lng: -3.6774 },
+          'general pardiñas': { lat: 40.4326, lng: -3.6798 },
+          'ortega y gasset': { lat: 40.4368, lng: -3.6829 },
+          'general díaz porlier': { lat: 40.4392, lng: -3.6742 },
+          'ayala': { lat: 40.4315, lng: -3.6775 },
+          'montera': { lat: 40.4186, lng: -3.7018 },
+          'isabel la católica': { lat: 40.4136, lng: -3.7053 },
+          'principe de vergara': { lat: 40.4251, lng: -3.6836 },
+          'ventura de la vega': { lat: 40.4153, lng: -3.6984 },
+          'hermosilla': { lat: 40.4346, lng: -3.6756 }
+        };
+
+        // Buscar coincidencia en ubicaciones conocidas
+        const locationLower = location.toLowerCase();
+        for (const [key, coords] of Object.entries(madridLocations)) {
+          if (locationLower.includes(key)) {
+            console.log(`[PropertyContent] ✅ Coordenadas estimadas para '${key}': ${coords.lat}, ${coords.lng}`);
+            return coords;
+          }
+        }
+
+        // Ubicación por defecto (Centro de Madrid)
+        console.log('[PropertyContent] ⚠️ Usando coordenadas por defecto de Madrid centro');
         return { lat: 40.4167, lng: -3.7037 };
+      
       } catch (error) {
-        console.error("Error al extraer ubicación para el mapa:", error);
+        console.error("[PropertyContent] ❌ Error al extraer ubicación para el mapa:", error);
         return { lat: 40.4167, lng: -3.7037 }; // Coordenadas por defecto de Madrid
       }
     };

@@ -13,34 +13,20 @@ const OptimizedImage = ({
   const [imgSrc, setImgSrc] = useState(src);
   const [hasError, setHasError] = useState(false);
 
-  // Lista de imágenes críticas que deben usar la API
-  const criticalImages = ['logonuevo.png', 'logo.png', 'favicon.ico'];
-  
-  const getImageSrc = (originalSrc) => {
-    // Si es una imagen crítica, usar la API directamente
-    const imageName = originalSrc.split('/').pop();
-    if (criticalImages.includes(imageName)) {
-      return `/api/images/${imageName}`;
-    }
-    return originalSrc;
-  };
-
   const handleError = () => {
     if (!hasError) {
       setHasError(true);
-      // Intentar con la API si la imagen original falla
+      // Como fallback, intentar con la imagen por defecto
       const imageName = src.split('/').pop();
-      if (criticalImages.includes(imageName)) {
-        setImgSrc(`/api/images/${imageName}`);
+      if (imageName === 'logonuevo.png') {
+        setImgSrc('/logo.png'); // Fallback al logo alternativo
       }
     }
   };
 
-  const finalSrc = hasError ? getImageSrc(src) : imgSrc;
-
   return (
     <Image
-      src={finalSrc}
+      src={imgSrc}
       alt={alt}
       width={width}
       height={height}

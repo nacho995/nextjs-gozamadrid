@@ -13,6 +13,9 @@ export NEXT_DISABLE_HMR=true
 export CHOKIDAR_USEPOLLING=false
 export WATCHPACK_POLLING=false
 export NEXT_TELEMETRY_DISABLED=1
+# Limitar generación de páginas en desarrollo
+export NEXT_BUILD_EXPERIMENTAL_PAGE_MEMORY_LIMIT=50
+export NEXT_BUILD_EXPERIMENTAL_INCREMENTAL_CACHE_LIMIT=10
 
 # Verificar que estamos en el directorio correcto
 if [ ! -f "package.json" ]; then
@@ -31,6 +34,7 @@ echo "   - Fast Refresh: DESACTIVADO"
 echo "   - HMR: DESACTIVADO"
 echo "   - ESLint Plugin: DESACTIVADO"
 echo "   - Polling: DESACTIVADO"
+echo "   - Generación de páginas: LIMITADA"
 echo ""
 echo "🌐 La aplicación estará disponible en:"
 echo "   - Local: http://localhost:3000"
@@ -40,5 +44,8 @@ echo "⚠️  Si ves errores de webpack en el navegador, recarga la página."
 echo "💡 Para detener: Ctrl+C"
 echo ""
 
+# Usar configuración de desarrollo específica
+export NEXT_CONFIG_FILE="./next.config.dev.js"
+
 # Ejecutar Next.js
-exec ./node_modules/.bin/next dev 
+exec npx next dev 

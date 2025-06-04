@@ -466,20 +466,7 @@ const Video = () => {
                             </video>
                         )}
 
-                        {/* Botón de reproducción visible cuando hay autoplay bloqueado */}
-                        {isVideoLoaded && !videoError && videoRef.current?.paused && (
-                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                <button 
-                                    onClick={handleVideoClick}
-                                    className="pointer-events-auto bg-black/50 hover:bg-black/70 rounded-full p-4 transition-all duration-300 text-white"
-                                    aria-label="Reproducir video"
-                                >
-                                    <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                                    </svg>
-                                </button>
-                            </div>
-                        )}
+
 
                         {/* Overlay elegante y sutil con transición suave */}
                         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/5 to-black/40"></div>

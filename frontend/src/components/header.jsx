@@ -37,10 +37,10 @@ const ORGANIZATION_SCHEMA = {
   "url": "https://realestategozamadrid.com",
   "logo": "https://realestategozamadrid.com/logonuevo.png",
   "image": "https://realestategozamadrid.com/logonuevo.png",
-  "sameAs": [
-    "https://www.facebook.com/GozaMadridAI",
-    "https://www.instagram.com/Gozamadrid54"
-  ],
+              "sameAs": [
+                "https://www.facebook.com/MBLP66/",
+                    "https://www.instagram.com/gozamadrid54/"
+            ],
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "Calle de Alcalá, 96",
@@ -286,13 +286,27 @@ function ControlMenu() {
           <div className="lg:hidden fixed right-4 top-4 z-[9999] text-white">
             <button 
               onClick={toggleMenu} 
-              className="text-white hover:text-amarillo focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 flex items-center justify-center bg-black/30 backdrop-blur-md p-3 rounded-full shadow-lg hover:shadow-amarillo/30 transition-all duration-300 border border-white/10"
+              className="group relative text-white hover:text-amarillo focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 flex items-center justify-center bg-black/40 backdrop-blur-md p-4 rounded-2xl shadow-xl hover:shadow-amarillo/30 transition-all duration-300 border border-white/20 hover:border-amarillo/40 hover:scale-105"
               aria-expanded={menuVisible}
               aria-controls="mobile-menu"
               aria-label={menuVisible ? "Cerrar menú de navegación" : "Abrir menú de navegación"}
               type="button"
             >
-              {menuVisible ? <FaTimes size={24} aria-hidden="true" /> : <FaEllipsisH size={24} aria-hidden="true" />}
+              {/* Icono del menú hamburger animado */}
+              <div className="relative w-6 h-6 flex flex-col justify-center items-center">
+                <div className={`w-6 h-0.5 bg-white group-hover:bg-amarillo transition-all duration-300 rounded-full ${menuVisible ? 'rotate-45 translate-y-2' : ''}`}></div>
+                <div className={`w-6 h-0.5 bg-white group-hover:bg-amarillo transition-all duration-300 rounded-full my-1 ${menuVisible ? 'opacity-0' : ''}`}></div>
+                <div className={`w-6 h-0.5 bg-white group-hover:bg-amarillo transition-all duration-300 rounded-full ${menuVisible ? '-rotate-45 -translate-y-2' : ''}`}></div>
+              </div>
+              
+              {/* Etiqueta animada "MENÚ" */}
+              <span className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs font-medium bg-black/80 backdrop-blur-sm text-white px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap border border-white/20">
+                MENÚ
+                <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-black/80 rotate-45 border-l border-t border-white/20"></div>
+              </span>
+              
+              {/* Efecto de pulsación */}
+              <div className="absolute inset-0 rounded-2xl bg-amarillo/20 scale-0 group-active:scale-100 transition-transform duration-150"></div>
             </button>
           </div>
         )}
@@ -356,7 +370,7 @@ function ControlMenu() {
           {/* Redes sociales y teléfono - Ultra Premium */}
           <div className="absolute top-8 right-16 flex space-x-8 mt-2 mr-2" role="complementary" aria-label="Información de contacto y redes sociales">
             <Link 
-              href="https://www.facebook.com/GozaMadridAI" 
+              href="https://www.facebook.com/MBLP66/" 
               target="_blank" 
               rel="noopener noreferrer" 
               aria-label="Visitar nuestra página de Facebook (se abre en nueva ventana)"
@@ -370,7 +384,7 @@ function ControlMenu() {
               <FaFacebook size={32} className="text-blue-400 hover:text-blue-300 drop-shadow-xl" aria-hidden="true" />
             </Link>
             <Link 
-              href="https://www.instagram.com/Gozamadrid54" 
+              href="https://www.instagram.com/gozamadrid54/" 
               target="_blank" 
               rel="noopener noreferrer" 
               aria-label="Visitar nuestro perfil de Instagram (se abre en nueva ventana)"
@@ -1102,7 +1116,7 @@ function ControlMenu() {
                   
                   <div className="flex space-x-4 mt-2">
                     <Link 
-                      href="https://www.facebook.com/GozaMadridAI" 
+                      href="https://www.facebook.com/MBLP66/" 
                       target="_blank" 
                       rel="noopener noreferrer" 
                       aria-label="Visitar Facebook (nueva ventana)"
@@ -1112,7 +1126,7 @@ function ControlMenu() {
                       <FaFacebook size={24} className="text-blue-600" aria-hidden="true" />
                     </Link>
                     <Link 
-                      href="https://www.instagram.com/Gozamadrid54" 
+                      href="https://www.instagram.com/gozamadrid54/" 
                       target="_blank" 
                       rel="noopener noreferrer" 
                       aria-label="Visitar Instagram (nueva ventana)"
