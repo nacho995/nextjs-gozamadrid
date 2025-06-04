@@ -197,11 +197,11 @@ function ControlMenu() {
 
   // Función mejorada para manejar hover de salida
   const handleMouseLeave = useCallback((key) => {
-    // Añadir un pequeño retraso antes de cerrar
+    // Añadir un retraso más generoso antes de cerrar
     hoverTimeouts.current[key] = setTimeout(() => {
       toggleDropdown(key, false);
       hoverTimeouts.current[key] = null;
-    }, 150); // 150ms de retraso
+    }, 500); // 500ms de retraso - MÁS TIEMPO para navegar a submenús
   }, [toggleDropdown]);
 
   // Limpiar timeouts al desmontar el componente

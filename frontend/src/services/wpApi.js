@@ -157,7 +157,8 @@ class BlogApiService {
       console.log(`[BlogAPI] ⚠️ WordPress falló: ${wpError.message}`);
     }
 
-    // ESTRATEGIA 2: AWS Backend con retry
+    // ESTRATEGIA 2: AWS Backend con retry - TEMPORALMENTE DESACTIVADO
+    /*
     try {
       const awsBlogs = await this.withRetry(async () => {
         const response = await fetch('https://gw.estateinsight.zone/api/estates/blogs?limit=100', {
@@ -206,6 +207,8 @@ class BlogApiService {
     } catch (awsError) {
       console.log(`[BlogAPI] ⚠️ AWS falló: ${awsError.message}`);
     }
+    */
+    console.log(`[BlogAPI] ⚠️ AWS API temporalmente desactivada`);
 
     // ESTRATEGIA 3: Respaldo local - SIEMPRE FUNCIONA
     try {
