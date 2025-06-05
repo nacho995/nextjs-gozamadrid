@@ -1,18 +1,11 @@
-import axios from 'axios';
+/**
+ * API para obtener una propiedad específica por ID desde MongoDB
+ */
 
-const EXTERNAL_API_URL = 'https://api.realestategozamadrid.com';
+import { getPropertiesCollection, handleMongoError } from '../../../lib/mongodb.js';
+import { ObjectId } from 'mongodb';
 
 export default async function handler(req, res) {
-  // Configurar CORS
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Cache-Control');
-
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Método no permitido' });
   }
@@ -20,66 +13,141 @@ export default async function handler(req, res) {
   const { id } = req.query;
 
   if (!id) {
-    return res.status(400).json({ error: 'ID no proporcionado' });
+    return res.status(400).json({ error: 'ID de propiedad requerido' });
   }
 
-  try {
-    // Primero intentar con MongoDB
-    try {
-      console.log(`[API Properties] Intentando obtener propiedad de MongoDB con ID: ${id}`);
-      const mongoResponse = await axios.get(`${EXTERNAL_API_URL}/api/properties/sources/mongodb/${id}`, {
-        timeout: 15000,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      });
+  console.log(`[API] Buscando propiedad con ID: ${id}`);
 
-      if (mongoResponse.data) {
-        console.log('[API Properties] Propiedad encontrada en MongoDB');
-        return res.status(200).json({
-          ...mongoResponse.data,
-          source: 'mongodb'
-        });
+  try {
+    // Conectar a MongoDB
+    const collection = await getPropertiesCollection();
+    
+    // Buscar la propiedad por ID
+    let query;
+    try {
+      // Intentar buscar como ObjectId si es un ID válido de MongoDB
+      if (ObjectId.isValid(id)) {
+        query = { _id: new ObjectId(id) };
+      } else {
+        // Si no es un ObjectId válido, buscar por string
+        query = { _id: id };
       }
-    } catch (mongoError) {
-      console.log('[API Properties] No se encontró en MongoDB, intentando endpoint general');
+    } catch (error) {
+      // Si falla la conversión a ObjectId, buscar como string
+      query = { _id: id };
     }
 
-    // Si no se encuentra en MongoDB, intentar con el endpoint general
-    const response = await axios.get(`${EXTERNAL_API_URL}/api/properties/${id}`, {
-      timeout: 15000,
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    });
+    console.log(`[API] Ejecutando query:`, query);
+    
+    const property = await collection.findOne(query);
 
-    if (!response.data) {
+    if (!property) {
+      console.log(`[API] Propiedad no encontrada con ID: ${id}`);
       return res.status(404).json({ error: 'Propiedad no encontrada' });
     }
 
-    console.log('[API Properties] Propiedad encontrada en endpoint general');
-    return res.status(200).json({
-      ...response.data,
-      source: 'general'
+    console.log(`[API] Propiedad encontrada: ${property.title}`);
+
+    // Procesar el precio de la misma manera que en la API de listado
+    let normalizedPrice = property.price;
+    let priceNumeric = 0;
+    
+    if (typeof normalizedPrice === 'string') {
+      // Remover caracteres no numéricos excepto punto y coma
+      const cleanPrice = normalizedPrice.replace(/[^\d.,]/g, '');
+      
+      if (cleanPrice.includes('.') && !cleanPrice.includes(',')) {
+        // Precio con punto como separador de miles: "1.299" → "1299000"
+        const priceValue = parseInt(cleanPrice.replace('.', ''));
+        if (priceValue < 10000) { // Si es menor que 10.000, asumir que está en miles
+          normalizedPrice = (priceValue * 1000).toLocaleString('es-ES');
+          priceNumeric = priceValue * 1000;
+          console.log(`[API Individual] Precio con punto: ${property.price} → ${priceNumeric}€`);
+        } else {
+          normalizedPrice = priceValue.toLocaleString('es-ES');
+          priceNumeric = priceValue;
+          console.log(`[API Individual] Precio directo: ${property.price} → ${priceNumeric}€`);
+        }
+      } else if (!cleanPrice.includes('.') && !cleanPrice.includes(',')) {
+        // Precio simple sin separadores: "725" → "725000"
+        const priceValue = parseInt(cleanPrice);
+        if (priceValue < 10000) { // Si es menor que 10.000, asumir que está en miles
+          normalizedPrice = (priceValue * 1000).toLocaleString('es-ES');
+          priceNumeric = priceValue * 1000;
+          console.log(`[API Individual] Precio en miles: ${property.price} → ${priceNumeric}€`);
+        } else {
+          normalizedPrice = priceValue.toLocaleString('es-ES');
+          priceNumeric = priceValue;
+          console.log(`[API Individual] Precio completo: ${property.price} → ${priceNumeric}€`);
+        }
+      } else {
+        // Otros casos, usar valor original
+        priceNumeric = parseInt(cleanPrice.replace(/[.,]/g, ''));
+        normalizedPrice = priceNumeric.toLocaleString('es-ES');
+      }
+    } else if (typeof normalizedPrice === 'number') {
+      priceNumeric = normalizedPrice;
+      normalizedPrice = normalizedPrice.toLocaleString('es-ES');
+    }
+
+    // Normalizar los datos de la propiedad
+    const normalizedProperty = {
+      _id: property._id,
+      id: property._id?.toString(),
+      title: property.title || 'Propiedad sin título',
+      description: property.description || '',
+      price: normalizedPrice,
+      priceNumeric: priceNumeric,
+      location: property.location || property.address || 'Madrid',
+      address: property.address || property.location || 'Madrid',
+      coordinates: property.coordinates || null,
+      bedrooms: property.bedrooms || property.rooms || '0',
+      bathrooms: property.bathrooms || property.wc || '0',
+      area: property.area || property.m2 || '0',
+      size: property.area || property.m2 || '0',
+      propertyType: property.propertyType || property.typeProperty || 'Propiedad',
+      status: property.status || 'Disponible',
+      featured: property.featured || false,
+      images: property.images && Array.isArray(property.images) ? 
+        property.images.map((img, index) => {
+          // Si es un objeto con src
+          if (typeof img === 'object' && img.src) {
+            return {
+              url: img.src,
+              src: img.src,
+              alt: img.alt || `${property.title || 'Propiedad'} - Imagen ${index + 1}`
+            };
+          }
+          
+          // Si es un string (formato legacy)
+          if (typeof img === 'string') {
+            return {
+              url: img,
+              src: img,
+              alt: `${property.title || 'Propiedad'} - Imagen ${index + 1}`
+            };
+          }
+          
+          return null;
+        }).filter(Boolean) : [],
+      source: 'mongodb',
+      createdAt: property.createdAt || new Date().toISOString(),
+      updatedAt: property.updatedAt || new Date().toISOString()
+    };
+
+    res.status(200).json({
+      success: true,
+      property: normalizedProperty
     });
 
   } catch (error) {
-    console.error('[API Properties] Error al obtener propiedad:', error.message);
+    console.error('[API] Error al obtener propiedad:', error);
+    const mongoError = handleMongoError(error);
     
-    // Si es un error 404, devolver ese estado específico
-    if (error.response && error.response.status === 404) {
-      return res.status(404).json({
-        error: 'Propiedad no encontrada',
-        details: error.message
-      });
-    }
-
-    // Para otros errores, devolver 500
-    return res.status(500).json({
-      error: 'Error al obtener propiedad',
-      details: error.message
+    res.status(500).json({
+      success: false,
+      error: 'Error al obtener la propiedad',
+      details: mongoError.error
     });
   }
 } 

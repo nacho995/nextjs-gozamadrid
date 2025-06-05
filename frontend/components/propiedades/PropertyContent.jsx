@@ -11,7 +11,7 @@ import es from "date-fns/locale/es";
 import { toast } from "sonner";
 import { sendPropertyEmail } from '@/services/api';
 import Head from "next/head";
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+// Removed Google Maps API imports - using iframe embeds instead
 import Image from "next/legacy/image";
 import CountryPrefix from "../CountryPrefix";
 
@@ -319,8 +319,9 @@ export default function DefaultPropertyContent({ property }) {
   const [phone, setPhone] = useState("");
   const [cleanedContent, setCleanedContent] = useState("");
   const [propertyUrl, setPropertyUrl] = useState("");
-  const [imageLoading, setImageLoading] = useState(true);
+  const [imageLoading, setImageLoading] = useState(false);
   const [loadedImages, setLoadedImages] = useState({});
+  const [imageTimeout, setImageTimeout] = useState(null);
   const [propertyData, setPropertyData] = useState({
     livingArea: 0,
     bedrooms: 0,
@@ -423,83 +424,108 @@ export default function DefaultPropertyContent({ property }) {
     
   }, [propertyState]);
 
-  // Actualizar el manejo de errores de imágenes
+  // Función para manejar errores de imagen
   const handleImageError = (e) => {
-    console.error("Error al cargar imagen:", e.target.src);
+    console.warn('[PropertyContent] Error loading image:', e.target.src);
     
-    // Verificar si ya hemos reintentado con esta imagen
-    const isRetried = e.target.getAttribute('data-retried');
-    if (isRetried === 'true') {
-      // console.log("El proxy también falló, mostrando mensaje de no disponible");
-      // Reemplazar la imagen con un div
-      const parentElement = e.target.parentNode;
-      if (parentElement) {
-        const noImageDiv = document.createElement('div');
-        noImageDiv.className = "w-full h-full flex items-center justify-center bg-gray-800";
-        
-        const textElement = document.createElement('p');
-        textElement.className = "text-2xl text-gray-400";
-        textElement.textContent = "Imagen no disponible";
-        
-        noImageDiv.appendChild(textElement);
-        parentElement.replaceChild(noImageDiv, e.target);
-      }
-      return;
+    // SIEMPRE ocultar el loader cuando hay un error
+    setImageLoading(false);
+    
+    // Limpiar timeout si existe
+    if (imageTimeout) {
+      clearTimeout(imageTimeout);
+      setImageTimeout(null);
     }
-    
-    // Marcar como reintentada para no entrar en un bucle infinito
-    e.target.setAttribute('data-retried', 'true');
-    
-    // Intentar usar el proxy de imágenes si la URL original falló
-    if (e.target.src && !e.target.src.includes('images.weserv.nl') && e.target.src.startsWith('http')) {
-      // Usar un mejor servicio de proxy para las imágenes
-      const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(e.target.src)}&n=-1`;
-      // console.log("Reintentando con proxy:", proxyUrl);
-      e.target.src = proxyUrl;
-    } else {
-      // Si es una URL local o ya es proxy, mostrar mensaje de no disponible
-      // console.log("URL no es HTTP o ya es proxy, mostrando mensaje de no disponible");
-      // Reemplazar la imagen con un div
-      const parentElement = e.target.parentNode;
-      if (parentElement) {
-        const noImageDiv = document.createElement('div');
-        noImageDiv.className = "w-full h-full flex items-center justify-center bg-gray-800";
-        
-        const textElement = document.createElement('p');
-        textElement.className = "text-2xl text-gray-400";
-        textElement.textContent = "Imagen no disponible";
-        
-        noImageDiv.appendChild(textElement);
-        parentElement.replaceChild(noImageDiv, e.target);
-      }
-    }
-    
-    setImageLoading(false); // Ocultar el loader incluso si hay un error
     
     // Marcar la imagen actual como cargada (aunque sea la de error)
     setLoadedImages(prev => ({
       ...prev,
       [current]: true
     }));
+    
+    // Si la imagen es de Cloudinary y falla, intentar con proxy
+    const originalSrc = e.target.src;
+    if (originalSrc.includes('cloudinary') && !originalSrc.includes('/api/proxy-image')) {
+      console.log('[PropertyContent] Intentando cargar imagen via proxy...');
+      try {
+        const newSrc = `/api/proxy-image?url=${encodeURIComponent(originalSrc)}`;
+        e.target.src = newSrc;
+        return; // Salir para que intente cargar la nueva URL
+      } catch (error) {
+        console.error('[PropertyContent] Error al generar URL del proxy:', error);
+      }
+    } else {
+      // Reemplazar la imagen con un div de error
+      const parentElement = e.target.parentNode;
+      if (parentElement) {
+        const noImageDiv = document.createElement('div');
+        noImageDiv.className = "w-full h-full flex items-center justify-center bg-gray-800";
+        
+        const textElement = document.createElement('p');
+        textElement.className = "text-2xl text-gray-400";
+        textElement.textContent = "Imagen no disponible";
+        
+        noImageDiv.appendChild(textElement);
+        parentElement.replaceChild(noImageDiv, e.target);
+      }
+    }
   };
 
   // Función para avanzar a la siguiente imagen
   const nextImage = () => {
     const newIndex = (current + 1) % propertyImages.length;
+    
+    // Limpiar timeout anterior
+    if (imageTimeout) {
+      clearTimeout(imageTimeout);
+      setImageTimeout(null);
+    }
+    
     setCurrent(newIndex);
-    // Restablecer el estado de carga si la imagen no está en la caché
+    
+    // Solo mostrar loader si la imagen no está previamente cargada
     if (!loadedImages[newIndex]) {
       setImageLoading(true);
+      
+      // Timeout de seguridad para ocultar el loader después de 5 segundos
+      const timeout = setTimeout(() => {
+        console.warn('[PropertyContent] Timeout: Ocultando loader después de 5 segundos');
+        setImageLoading(false);
+        setLoadedImages(prev => ({ ...prev, [newIndex]: true }));
+      }, 5000);
+      
+      setImageTimeout(timeout);
+    } else {
+      setImageLoading(false);
     }
   };
 
   // Función para retroceder a la imagen anterior
   const prevImage = () => {
     const newIndex = (current - 1 + propertyImages.length) % propertyImages.length;
+    
+    // Limpiar timeout anterior
+    if (imageTimeout) {
+      clearTimeout(imageTimeout);
+      setImageTimeout(null);
+    }
+    
     setCurrent(newIndex);
-    // Restablecer el estado de carga si la imagen no está en la caché
+    
+    // Solo mostrar loader si la imagen no está previamente cargada
     if (!loadedImages[newIndex]) {
       setImageLoading(true);
+      
+      // Timeout de seguridad para ocultar el loader después de 5 segundos
+      const timeout = setTimeout(() => {
+        console.warn('[PropertyContent] Timeout: Ocultando loader después de 5 segundos');
+        setImageLoading(false);
+        setLoadedImages(prev => ({ ...prev, [newIndex]: true }));
+      }, 5000);
+      
+      setImageTimeout(timeout);
+    } else {
+      setImageLoading(false);
     }
   };
 
@@ -543,16 +569,40 @@ export default function DefaultPropertyContent({ property }) {
     return ranges;
   };
 
-  // Efecto para actualizar imageLoading cuando cambie current
+  // useEffect para manejar el estado inicial del loader  
   useEffect(() => {
-    // Si la imagen actual ya está en la caché de imágenes cargadas, no mostrar el loader
-    if (loadedImages[current]) {
-      setImageLoading(false);
-    } else {
-      // De lo contrario, mostrar el loader hasta que se cargue
+    if (propertyImages && propertyImages.length > 0) {
+      // Reiniciar estado cuando cambien las imágenes
+      setLoadedImages({});
+      setCurrent(0);
+      
+      // Solo mostrar loader para la primera imagen si no se ha cargado aún
       setImageLoading(true);
+      
+      // Timeout de seguridad inicial
+      const timeout = setTimeout(() => {
+        console.warn('[PropertyContent] Timeout inicial: Ocultando loader después de 5 segundos');
+        setImageLoading(false);
+        setLoadedImages(prev => ({ ...prev, [0]: true }));
+      }, 5000);
+      
+      setImageTimeout(timeout);
+    } else {
+      // Si no hay imágenes, no mostrar loader
+      setImageLoading(false);
+      if (imageTimeout) {
+        clearTimeout(imageTimeout);
+        setImageTimeout(null);
+      }
     }
-  }, [current, loadedImages]);
+    
+    // Cleanup al desmontar o cambiar
+    return () => {
+      if (imageTimeout) {
+        clearTimeout(imageTimeout);
+      }
+    };
+  }, [propertyImages]);
 
   // Efecto para pre-cargar las imágenes adyacentes
   useEffect(() => {
@@ -1143,45 +1193,34 @@ export default function DefaultPropertyContent({ property }) {
   const description = cleanedContent || propertyState.description || '';
   
   // Formatear el precio correctamente
-  let priceValue = propertyState.price;
+  const isFromMongoDB = propertyState?.source === 'mongodb' || propertyState?._id;
+  let priceValue = isFromMongoDB ? (propertyState.priceNumeric || propertyState.price) : propertyState.price;
   let formattedPrice = 'Consultar precio';
   
-  if (priceValue) {
-    // Si es un string, intentar convertirlo a número para formatear
-    if (typeof priceValue === 'string') {
-      // Eliminar cualquier carácter que no sea número o punto
-      const cleanPrice = priceValue.replace(/[^\d.-]/g, '');
-      
-      // Convertir a número
-      const numericPrice = parseFloat(cleanPrice);
-      
-      if (!isNaN(numericPrice)) {
-        // Si el precio parece ser un precio reducido (menos de 10000), multiplicarlo por 1000
-        // Esto es para corregir casos donde el precio se guarda como "350" en lugar de "350000"
-        const adjustedPrice = numericPrice < 10000 ? numericPrice * 1000 : numericPrice;
-        
-        // Formatear con separador de miles
-        formattedPrice = new Intl.NumberFormat('es-ES', {
-          style: 'currency',
-          currency: 'EUR',
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 0
-        }).format(adjustedPrice);
-      } else {
-        // Si no se puede convertir a número, usar el string original
-        formattedPrice = priceValue;
+  if (priceValue !== undefined && priceValue !== null && priceValue !== '') {
+    let price = typeof priceValue === 'number' 
+      ? priceValue 
+      : parseFloat(String(priceValue).replace(/[^\d.-]/g, ''));
+    
+    if (!isNaN(price) && isFinite(price) && price > 0) {
+      // Solo aplicar corrección para propiedades que no sean de MongoDB y tengan precios muy bajos
+      if (!isFromMongoDB && price < 10000 && price > 100) {
+        price = price * 1000;
       }
-    } else if (typeof priceValue === 'number') {
-      // Si ya es un número, formatear directamente
-      // Si el precio parece ser un precio reducido (menos de 10000), multiplicarlo por 1000
-      const adjustedPrice = priceValue < 10000 ? priceValue * 1000 : priceValue;
-      
+
       formattedPrice = new Intl.NumberFormat('es-ES', {
         style: 'currency',
         currency: 'EUR',
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
-      }).format(adjustedPrice);
+      }).format(price);
+    } else {
+      console.warn('PropertyContent: Precio inválido', {
+        priceNumeric: propertyState.priceNumeric,
+        price: propertyState.price,
+        convertedPrice: price,
+        title: propertyState.title
+      });
     }
   }
   
@@ -1322,11 +1361,14 @@ export default function DefaultPropertyContent({ property }) {
             {/* Imagen principal con marco elegante */}
             <div className="relative w-full h-[75vh] mb-8 rounded-[2rem] overflow-hidden shadow-2xl border border-amarillo/20 group">
               {/* Indicador de carga mejorado que solo aparece cuando la imagen actual está cargando */}
-              {imageLoading && !loadedImages[current] && propertyImages.length > 0 && (
+              {imageLoading && propertyImages && propertyImages.length > 0 && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/90">
-                  <div className="w-24 h-12 relative">
-                    <div className="absolute left-0 w-12 h-12 rounded-full border-4 border-amarillo animate-[spin_2s_linear_infinite]"></div>
-                    <div className="absolute right-0 w-12 h-12 rounded-full border-4 border-amarillo animate-[spin_2s_linear_infinite_reverse]"></div>
+                  <div className="flex flex-col items-center space-y-4">
+                    <div className="w-16 h-16 relative">
+                      <div className="absolute inset-0 rounded-full border-4 border-amarillo/20"></div>
+                      <div className="absolute inset-0 rounded-full border-4 border-amarillo border-t-transparent animate-spin"></div>
+                    </div>
+                    <p className="text-white text-sm font-light">Cargando imagen...</p>
                   </div>
                 </div>
               )}
@@ -1343,6 +1385,14 @@ export default function DefaultPropertyContent({ property }) {
                   transition={{ duration: 0.7 }}
                   onError={handleImageError}
                   onLoad={() => {
+                    console.log('[PropertyContent] Imagen cargada correctamente:', current);
+                    
+                    // Limpiar timeout si existe
+                    if (imageTimeout) {
+                      clearTimeout(imageTimeout);
+                      setImageTimeout(null);
+                    }
+                    
                     setImageLoading(false);
                     // Guardar en caché que esta imagen ya se ha cargado
                     setLoadedImages(prev => ({
@@ -1488,7 +1538,7 @@ export default function DefaultPropertyContent({ property }) {
             </div>
           </div>
 
-          {/* Mapa de Ubicación */}
+          {/* Mapa de Ubicación con manejo robusto de errores */}
           <div className="mt-12 mb-16 bg-black/80 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-amarillo/20 overflow-hidden">
             <div className="p-8 border-b border-amarillo/20 flex items-center">
               <FaMapMarkerAlt className="text-amarillo mr-4 text-4xl" />
@@ -1497,20 +1547,57 @@ export default function DefaultPropertyContent({ property }) {
             
             <div className="p-6">
               <div className="rounded-xl overflow-hidden shadow-2xl border border-amarillo/20" style={{ height: '400px' }}>
-                {/* Usar iframe básico de Google Maps sin API key y manejar diferentes formatos de dirección */}
-                <iframe 
-                  src={typeof formattedAddress === 'string' ? 
-                    `https://www.google.com/maps?q=${encodeURIComponent(formattedAddress)}&output=embed` : 
-                    `https://www.google.com/maps?q=${mapLocation.lat},${mapLocation.lng}&output=embed`
-                  }
-                  width="100%" 
-                  height="100%" 
-                  style={{ border: 0 }} 
-                  allowFullScreen="" 
-                  loading="lazy" 
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="Ubicación de la propiedad"
-                ></iframe>
+                {/* Mapa robusto con fallback */}
+                <div className="relative w-full h-full">
+                  <iframe 
+                    src={typeof formattedAddress === 'string' ? 
+                      `https://www.google.com/maps?q=${encodeURIComponent(formattedAddress)}&output=embed&z=16` : 
+                      `https://www.google.com/maps?q=${mapLocation.lat},${mapLocation.lng}&output=embed&z=16`
+                    }
+                    width="100%" 
+                    height="100%" 
+                    style={{ border: 0 }} 
+                    allowFullScreen="" 
+                    loading="lazy" 
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="Ubicación de la propiedad"
+                    onError={(e) => {
+                      console.warn('[PropertyContent] Error al cargar Google Maps, intentando solución alternativa');
+                      // Ocultar el iframe con error y mostrar mensaje alternativo
+                      e.target.style.display = 'none';
+                      const fallbackElement = e.target.nextElementSibling;
+                      if (fallbackElement) {
+                        fallbackElement.style.display = 'flex';
+                      }
+                    }}
+                    onLoad={() => {
+                      console.log('[PropertyContent] Google Maps cargado correctamente');
+                    }}
+                  ></iframe>
+                  
+                  {/* Fallback cuando Google Maps falla */}
+                  <div 
+                    className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 text-white"
+                    style={{ display: 'none' }}
+                  >
+                    <FaMapMarkerAlt className="text-amarillo text-6xl mb-4" />
+                    <h3 className="text-xl font-bold mb-2">Ubicación de la Propiedad</h3>
+                    <p className="text-gray-300 text-center mb-4 px-4">
+                      {typeof formattedAddress === 'string' ? formattedAddress : "Madrid, España"}
+                    </p>
+                    <a 
+                      href={typeof formattedAddress === 'string' ? 
+                        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(formattedAddress)}` : 
+                        `https://www.google.com/maps/search/?api=1&query=${mapLocation.lat},${mapLocation.lng}`
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer" 
+                      className="bg-amarillo text-black px-6 py-2 rounded-lg hover:bg-amarillo/90 transition-colors font-medium"
+                    >
+                      Ver en Google Maps
+                    </a>
+                  </div>
+                </div>
               </div>
               
               <div className="mt-6 text-center">

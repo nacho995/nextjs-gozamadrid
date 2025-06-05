@@ -825,58 +825,160 @@ const Video = () => {
                                                 >
                                                     {/* Layout responsivo: stack en móvil, horizontal en desktop */}
                                                     <div className="flex flex-col sm:flex-row gap-4 lg:gap-6">
-                                                        {/* Imagen responsive */}
+                                                        {/* Imagen responsive mejorada como en PropertyPage */}
                                                         <div className="relative w-full sm:w-32 lg:w-36 h-48 sm:h-24 lg:h-28 flex-shrink-0">
-                                                            <img
-                                                                src={(() => {
-                                                                    // Función para obtener la imagen con fallbacks
-                                                                    const getPropertyImage = (prop) => {
-                                                                        // Prioridad 1: Campo image normalizado
-                                                                        if (prop.image && prop.image !== "/analisis.png") {
-                                                                            return prop.image;
-                                                                        }
-                                                                        
-                                                                        // Prioridad 2: Array de imágenes (tomar la primera)
-                                                                        if (prop.images && Array.isArray(prop.images) && prop.images.length > 0) {
-                                                                            const firstImage = prop.images[0];
-                                                                            if (typeof firstImage === 'string') {
-                                                                                return firstImage;
-                                                                            }
-                                                                            if (firstImage.src) return firstImage.src;
-                                                                            if (firstImage.url) return firstImage.url;
-                                                                        }
-                                                                        
-                                                                        // Prioridad 3: Campo featured_image
-                                                                        if (prop.featured_image) {
-                                                                            return prop.featured_image;
-                                                                        }
-                                                                        
-                                                                        // Prioridad 4: Campos de imagen alternativos
-                                                                        if (prop.featuredImage) {
-                                                                            return prop.featuredImage;
-                                                                        }
-                                                                        
-                                                                        // Prioridad 5: Thumbnail
-                                                                        if (prop.thumbnail) {
-                                                                            return prop.thumbnail;
-                                                                        }
-                                                                        
-                                                                        // Fallback final: imagen por defecto
-                                                                        return "https://placekitten.com/400/300";
-                                                                    };
-                                                                    
-                                                                    return getPropertyImage(property);
-                                                                })()}
-                                                                alt={property.title || 'Imagen de propiedad'}
-                                                                className="w-full h-full object-cover rounded-xl"
-                                                                onError={(e) => {
-                                                                    // Fallback en caso de error de carga
-                                                                    if (e.target.src !== "https://placekitten.com/400/300") {
-                                                                        e.target.src = "https://placekitten.com/400/300";
+                                                            {(() => {
+                                                                // Función mejorada para obtener imagen como en PropertyPage
+                                                                const getProxiedImageUrl = (url) => {
+                                                                    if (!url) {
+                                                                        return '/img/default-property-image.jpg';
                                                                     }
-                                                                }}
-                                                                loading="lazy"
-                                                            />
+                                                                
+                                                                    try {
+                                                                        // Si es un array de imágenes (como en WooCommerce), usar la primera
+                                                                        if (Array.isArray(url)) {
+                                                                            if (url.length === 0) return '/img/default-property-image.jpg';
+                                                                            
+                                                                            const firstImage = url[0];
+                                                                            if (typeof firstImage === 'object') {
+                                                                                url = firstImage.src || firstImage.source_url || firstImage.url || '/img/default-property-image.jpg';
+                                                                            } else {
+                                                                                url = firstImage;
+                                                                            }
+                                                                        }
+                                                                        
+                                                                        // Si es un objeto (común en WordPress/WooCommerce)
+                                                                        if (typeof url === 'object') {
+                                                                            if (url.src) {
+                                                                                url = url.src;
+                                                                            } else if (url.url) {
+                                                                                url = url.url;
+                                                                            } else if (url.source_url) {
+                                                                                url = url.source_url;
+                                                                            } else {
+                                                                                return '/img/default-property-image.jpg';
+                                                                            }
+                                                                        }
+                                                                
+                                                                        if (typeof url !== 'string') {
+                                                                            return '/img/default-property-image.jpg';
+                                                                        }
+                                                                
+                                                                        // Si ya es una URL de proxy o Cloudinary, devolverla tal cual
+                                                                        if (url.includes('/api/proxy-image') || url.includes('cloudinary.com')) {
+                                                                            return url;
+                                                                        }
+                                                                
+                                                                        // Si es una URL relativa, convertirla a absoluta
+                                                                        if (url.startsWith('/')) {
+                                                                            const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+                                                                            return `${baseUrl}${url}`;
+                                                                        }
+                                                                
+                                                                        // Si es una URL de Cloudinary, devolverla tal cual
+                                                                        if (url.includes('cloudinary.com')) {
+                                                                            return url;
+                                                                        }
+                                                                
+                                                                        // Añadir proxy para URLs externas
+                                                                        const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(url)}`;
+                                                                        return proxyUrl;
+                                                                    } catch (error) {
+                                                                        console.error('[Video] Error en getProxiedImageUrl:', error);
+                                                                        return '/img/default-property-image.jpg';
+                                                                    }
+                                                                };
+
+                                                                // Función para obtener la imagen principal como en PropertyPage
+                                                                const getMainImage = (property) => {
+                                                                    console.log('[Video] 🖼️ Analizando imágenes para:', property.title);
+                                                                    console.log('[Video] 📊 Estructura de propiedad:', {
+                                                                        id: property.id || property._id,
+                                                                        source: property.source,
+                                                                        images: property.images,
+                                                                        image: property.image,
+                                                                        featured_image: property.featured_image,
+                                                                        featuredImage: property.featuredImage,
+                                                                        thumbnail: property.thumbnail
+                                                                    });
+                                                                    
+                                                                    const isMongoDBProperty = property.source === 'mongodb' || property._id;
+                                                                    let mainImage = '/img/default-property-image.jpg';
+                                                                    
+                                                                    // Verificar si la propiedad es de WooCommerce y tiene imágenes en formato WooCommerce
+                                                                    if (!isMongoDBProperty && property.images && Array.isArray(property.images) && property.images.length > 0) {
+                                                                        const firstImage = property.images[0];
+                                                                        console.log('[Video] 🎯 WooCommerce - Primera imagen:', firstImage);
+                                                                        
+                                                                        if (typeof firstImage === 'string') {
+                                                                            mainImage = firstImage;
+                                                                        } else if (typeof firstImage === 'object') {
+                                                                            mainImage = firstImage.src || firstImage.url || firstImage.source_url || '/img/default-property-image.jpg';
+                                                                        }
+                                                                    } 
+                                                                    // Si es propiedad de MongoDB, usar el formato de MongoDB
+                                                                    else if (property.images && Array.isArray(property.images) && property.images.length > 0) {
+                                                                        const firstImage = property.images[0];
+                                                                        console.log('[Video] 🎯 MongoDB - Primera imagen:', firstImage);
+                                                                        
+                                                                        if (typeof firstImage === 'string') {
+                                                                            mainImage = firstImage;
+                                                                        } else if (typeof firstImage === 'object') {
+                                                                            mainImage = firstImage.src || firstImage.url || firstImage.source_url || '/img/default-property-image.jpg';
+                                                                        }
+                                                                    }
+                                                                    // También intentar con campos alternativos
+                                                                    else if (property.image) {
+                                                                        console.log('[Video] 🎯 Campo image encontrado:', property.image);
+                                                                        mainImage = property.image;
+                                                                    } else if (property.featured_image) {
+                                                                        console.log('[Video] 🎯 Campo featured_image encontrado:', property.featured_image);
+                                                                        mainImage = property.featured_image;
+                                                                    } else if (property.featuredImage) {
+                                                                        console.log('[Video] 🎯 Campo featuredImage encontrado:', property.featuredImage);
+                                                                        mainImage = property.featuredImage;
+                                                                    } else if (property.thumbnail) {
+                                                                        console.log('[Video] 🎯 Campo thumbnail encontrado:', property.thumbnail);
+                                                                        mainImage = property.thumbnail;
+                                                                    } else {
+                                                                        console.log('[Video] ⚠️ No se encontró ninguna imagen válida para:', property.title);
+                                                                    }
+                                                                    
+                                                                    console.log('[Video] 🔄 Imagen seleccionada antes del proxy:', mainImage);
+                                                                    const finalUrl = getProxiedImageUrl(mainImage);
+                                                                    console.log('[Video] ✅ URL final después del proxy:', finalUrl);
+                                                                    
+                                                                    return finalUrl;
+                                                                };
+                                                                
+                                                                const imageUrl = getMainImage(property);
+                                                                const imageAlt = property.title || 'Imagen de propiedad';
+                                                                
+                                                                return (
+                                                                    <img
+                                                                        src={imageUrl}
+                                                                        alt={imageAlt}
+                                                                        className="w-full h-full object-cover rounded-xl"
+                                                                        onError={(e) => {
+                                                                            // Si la imagen falla al cargar, mostrar placeholder
+                                                                            e.target.style.display = 'none';
+                                                                            const placeholder = e.target.nextElementSibling;
+                                                                            if (placeholder) {
+                                                                                placeholder.style.display = 'flex';
+                                                                            }
+                                                                        }}
+                                                                        loading="lazy"
+                                                                    />
+                                                                );
+                                                            })()}
+                                                            
+                                                            {/* Placeholder de error oculto por defecto */}
+                                                            <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl items-center justify-center hidden">
+                                                                <div className="text-center text-gray-400">
+                                                                    <div className="text-2xl mb-1">🏠</div>
+                                                                    <div className="text-xs">Error cargando imagen</div>
+                                                                </div>
+                                                            </div>
                                                             
                                                             {/* Badge de estado si está seleccionado */}
                                                             {selectedProperty?.id === property.id && (
@@ -929,7 +1031,33 @@ const Video = () => {
                                                             {/* Footer responsive con precio y botón */}
                                                             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                                                                 <p className="text-xl lg:text-2xl font-light text-amarillo">
-                                                                    €{property.price}
+                                                                    {(() => {
+                                                                        try {
+                                                                            const isMongoDBProperty = property.source === 'mongodb' || property._id;
+                                                                            const priceToFormat = isMongoDBProperty 
+                                                                                ? (property.priceNumeric || property.price)
+                                                                                : property.price;
+                                                                            
+                                                                            if (priceToFormat !== undefined && priceToFormat !== null && priceToFormat !== '') {
+                                                                                let price = typeof priceToFormat === 'number' 
+                                                                                    ? priceToFormat
+                                                                                    : parseFloat(String(priceToFormat).replace(/[^\d.-]/g, ''));
+                                                                                
+                                                                                if (!isNaN(price) && isFinite(price) && price > 0) {
+                                                                                    return new Intl.NumberFormat('es-ES', {
+                                                                                        style: 'currency',
+                                                                                        currency: 'EUR',
+                                                                                        minimumFractionDigits: 0,
+                                                                                        maximumFractionDigits: 0
+                                                                                    }).format(price);
+                                                                                }
+                                                                            }
+                                                                            return 'Consultar precio';
+                                                                        } catch (error) {
+                                                                            console.error('Error al formatear precio:', error);
+                                                                            return 'Consultar precio';
+                                                                        }
+                                                                    })()}
                                                                 </p>
                                                                 <button
                                                                     onClick={(e) => {

@@ -212,25 +212,22 @@ export const useProperties = (source = 'all', limit = 10, page = 1, skipInitialL
     // Función para obtener propiedades de MongoDB
     const fetchMongoDB = async () => {
       try {
-        console.log('🔄 MongoDB: Usando datos estáticos para evitar Fast Refresh');
-        // COMENTADO TEMPORALMENTE para evitar Fast Refresh:
-        // const response = await fetch(`/api/properties/sources/mongodb?page=${page}&limit=${limit}`);
-        // if (response.ok) {
-        //   const data = await response.json();
-        //   console.log(`✅ MongoDB: ${data.length} propiedades cargadas`);
-        //   return data || [];
-        // }
-        // throw new Error(`HTTP ${response.status}`);
-        
-        // DATOS ESTÁTICOS para evitar Fast Refresh:
-        console.log(`✅ MongoDB estático: ${EXAMPLE_PROPERTIES.length} propiedades`);
-        const startIndex = (page - 1) * limit;
-        const endIndex = startIndex + limit;
-        return EXAMPLE_PROPERTIES.slice(startIndex, endIndex);
+        console.log('🔄 MongoDB: Cargando datos reales desde la API');
+        const response = await fetch(`/api/properties/sources/mongodb?page=${page}&limit=${limit}`);
+        if (response.ok) {
+          const data = await response.json();
+          console.log(`✅ MongoDB: ${data.length} propiedades cargadas`);
+          return data || [];
+        }
+        throw new Error(`HTTP ${response.status}`);
         
       } catch (error) {
         console.warn('⚠️ MongoDB no disponible:', error.message);
-        return [];
+        // Fallback a datos estáticos solo en caso de error
+        console.log(`📝 Fallback: ${EXAMPLE_PROPERTIES.length} propiedades de ejemplo`);
+        const startIndex = (page - 1) * limit;
+        const endIndex = startIndex + limit;
+        return EXAMPLE_PROPERTIES.slice(startIndex, endIndex);
       }
     };
 
@@ -257,23 +254,21 @@ export const useProperties = (source = 'all', limit = 10, page = 1, skipInitialL
     switch (sourceType) {
       case 'mongodb':
         try {
-          // COMENTADO TEMPORALMENTE para evitar Fast Refresh:
-          // const response = await fetch(`/api/properties/sources/mongodb?page=${page}&limit=${limit}`);
-          // if (response.ok) {
-          //   const data = await response.json();
-          //   return data || [];
-          // }
-          // throw new Error(`HTTP ${response.status}`);
-          
-          // DATOS ESTÁTICOS para evitar Fast Refresh:
-          console.log('🔄 MongoDB directo: Usando datos estáticos');
-          const startIndex = (page - 1) * limit;
-          const endIndex = startIndex + limit;
-          return EXAMPLE_PROPERTIES.slice(startIndex, endIndex);
+          console.log('🔄 MongoDB directo: Cargando datos reales desde la API');
+          const response = await fetch(`/api/properties/sources/mongodb?page=${page}&limit=${limit}`);
+          if (response.ok) {
+            const data = await response.json();
+            return data || [];
+          }
+          throw new Error(`HTTP ${response.status}`);
           
         } catch (error) {
           console.error('Error cargando MongoDB:', error);
-          return [];
+          // Fallback a datos estáticos solo en caso de error
+          console.log('📝 Fallback MongoDB: Usando datos de ejemplo');
+          const startIndex = (page - 1) * limit;
+          const endIndex = startIndex + limit;
+          return EXAMPLE_PROPERTIES.slice(startIndex, endIndex);
         }
 
       case 'ejemplo':

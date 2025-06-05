@@ -37,7 +37,7 @@ const SCHEMA_DATA = {
   "sameAs": [
     "https://www.facebook.com/MBLP66/",
     "https://www.instagram.com/gozamadrid54/",
-    "https://x.com/Marta12857571",
+    "https://www.twitter.com/gozamadrid",
     "https://www.linkedin.com/in/marta-l%C3%B3pez-55516099/",
     "https://www.youtube.com/@martalopez1039"
   ],
@@ -136,7 +136,7 @@ const footerData = {
     },
     { 
       name: "Twitter",
-      url: "https://x.com/Marta12857571", 
+      url: "https://www.twitter.com/gozamadrid", 
       icon: <FaTwitter className="size-6 p-0.5" />,
       ariaLabel: "Seguirnos en X/Twitter"
     },
@@ -177,7 +177,7 @@ const Footer = () => {
       </Head>
 
       <footer 
-        className="relative z-50 bg-gradient-to-r from-black to-amarillo dark:from-black dark:to-amarillo"
+        className="relative z-50 bg-gradient-to-r from-black via-black to-amarillo dark:from-black dark:via-black dark:to-amarillo"
         aria-label="Pie de página"
       >
         <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">

@@ -255,6 +255,7 @@ function CorporateCard({ card, index, cardId, onExpandChange }) {
 
 // Componente de botón flotante del valorador
 export function FloatingValoradorButton() {
+    const { menuVisible } = useNavbar(); // Detectar estado del menú global
     const [isHovered, setIsHovered] = useState(false);
     const [isPulsing, setIsPulsing] = useState(true);
   
@@ -266,6 +267,22 @@ export function FloatingValoradorButton() {
       }, 8000);
       return () => clearInterval(interval);
     }, []);
+
+    // Posición dinámica basada en el estado del menú global
+    const getPositionStyle = () => {
+      if (menuVisible) {
+        return {
+          right: '420px', // Se mueve fuera del área del menú hacia la izquierda
+          bottom: '32px'
+        };
+      }
+      return {
+        right: '32px', // Posición normal
+        bottom: '32px'
+      };
+    };
+
+    const positionStyle = getPositionStyle();
   
     return (
       <>
@@ -281,7 +298,8 @@ export function FloatingValoradorButton() {
             ease: "easeInOut",
             repeat: isPulsing ? 2 : 0
           }}
-          className="fixed bottom-8 right-8 z-40 pointer-events-none"
+          className="fixed z-40 pointer-events-none transition-all duration-300 ease-in-out"
+          style={positionStyle}
         >
           <div className="w-32 h-32 rounded-full bg-gradient-radial from-yellow-400/30 via-amber-500/20 to-transparent blur-xl"></div>
         </motion.div>
@@ -297,7 +315,8 @@ export function FloatingValoradorButton() {
             stiffness: 200,
             damping: 20
           }}
-          className="fixed bottom-8 right-8 z-50"
+          className="fixed z-50 transition-all duration-300 ease-in-out"
+          style={positionStyle}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >

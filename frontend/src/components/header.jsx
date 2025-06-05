@@ -263,8 +263,8 @@ function ControlMenu() {
                   {
                     "@type": "ListItem", 
                     "position": 2,
-                    "name": pathname.split('/').pop()?.replace(/-/g, ' ') || "Página actual",
-                    "item": `https://realestategozamadrid.com${pathname}`
+                    "name": pathname?.split('/').pop()?.replace(/-/g, ' ') || "Página actual",
+                    "item": `https://realestategozamadrid.com${pathname || ''}`
                   }
                 ]
               })
@@ -283,7 +283,7 @@ function ControlMenu() {
         
         {/* Botón de menú para móviles - Mejorado para accesibilidad */}
         {!menuVisible && (
-          <div className="lg:hidden fixed right-4 top-4 z-[9999] text-white">
+          <div className="xl:hidden fixed right-4 top-4 z-[9999] text-white">
             <button 
               onClick={toggleMenu} 
               className="group relative text-white hover:text-amarillo focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 flex items-center justify-center bg-black/40 backdrop-blur-md p-4 rounded-2xl shadow-xl hover:shadow-amarillo/30 transition-all duration-300 border border-white/20 hover:border-amarillo/40 hover:scale-105"
@@ -313,7 +313,7 @@ function ControlMenu() {
 
         {/* Menú Principal Desktop - Diseño Ultra Premium con Backdrop Blur */}
         <nav 
-          className={`${isHomePage ? 'mt-8 mb-0' : 'mb-8'} relative flex-col items-center px-16 py-8 w-max mx-auto rounded-2xl shadow-2xl hidden lg:flex backdrop-blur-2xl border-2 ${
+          className={`${isHomePage ? 'mt-8 mb-0' : 'mb-8'} relative flex-col items-center px-16 py-8 w-max mx-auto rounded-2xl shadow-2xl hidden xl:flex backdrop-blur-2xl border-2 ${
             isHomePage 
               ? 'shadow-xl' 
               : 'shadow-2xl'
@@ -844,7 +844,7 @@ function ControlMenu() {
         {/* Menú móvil ultra premium */}
         <div 
           id="mobile-menu"
-          className={`fixed inset-0 z-[9999] lg:hidden transition-all duration-300 ease-in-out ${
+          className={`fixed inset-0 z-[9999] xl:hidden transition-all duration-300 ease-in-out ${
             menuVisible ? 'pointer-events-auto' : 'pointer-events-none'
           }`}
           style={{
@@ -861,7 +861,7 @@ function ControlMenu() {
           }}
         >
           <div 
-            className={`w-96 max-h-screen shadow-2xl flex flex-col p-8 fixed top-0 right-0 h-full transition-all duration-300 ease-in-out transform ${
+            className={`w-96 shadow-2xl flex flex-col fixed top-0 right-0 h-full transition-all duration-300 ease-in-out transform ${
               menuVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
             } backdrop-blur-3xl border-l-4`}
             style={{
@@ -878,7 +878,8 @@ function ControlMenu() {
             role="navigation"
             aria-label="Menú de navegación móvil"
           >
-            <div className="flex justify-between items-center mb-10">
+            {/* Header fijo del menú */}
+            <div className="flex justify-between items-center p-8 flex-shrink-0">
               <div className="text-center">
                 <Link 
                   href="/" 
@@ -927,7 +928,9 @@ function ControlMenu() {
               </button>
             </div>
 
-            <nav className="flex flex-col space-y-6 text-xl font-bold" role="menu">
+            {/* Contenido scrolleable */}
+            <nav className="flex-1 overflow-y-auto overscroll-contain px-8 pb-8" role="menu">
+              <div className="flex flex-col space-y-6 text-xl font-bold">
               <Link 
                 href="/" 
                 className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-6 py-4 transition-all duration-300 hover:scale-105"
@@ -946,30 +949,148 @@ function ControlMenu() {
                 Inicio
               </Link>
 
-              {/* COMPRAR PROPIEDADES DESTACADO EN MÓVIL - Ultra Premium */}
-              <Link 
-                href="/vender/comprar" 
-                className="text-black font-bold px-8 py-5 rounded-2xl shadow-2xl transition-all duration-300 text-center hover:scale-105 border-3"
-                role="menuitem"
-                title="Comprar propiedades - Servicio destacado"
-                onClick={() => toggleMenu()}
-                style={{
-                  background: `linear-gradient(135deg, 
-                    rgba(255, 215, 0, 1) 0%, 
-                    rgba(255, 223, 0, 0.95) 25%,
-                    rgba(255, 235, 59, 0.9) 50%, 
-                    rgba(255, 223, 0, 0.95) 75%,
-                    rgba(255, 215, 0, 1) 100%)`,
-                  borderColor: 'rgba(180, 83, 9, 0.8)',
-                  boxShadow: `
-                    0 15px 40px rgba(255, 215, 0, 0.4),
-                    inset 0 2px 10px rgba(255, 235, 59, 0.3),
-                    0 0 30px rgba(255, 215, 0, 0.2)`,
-                  textShadow: '0 1px 3px rgba(0, 0, 0, 0.3)'
-                }}
-              >
-                🏠 Comprar Propiedades
-              </Link>
+              {/* BOTÓN ULTRA PREMIUM - PROPIEDADES DE LUJO MADRID */}
+              <div className="relative group mb-6 mx-2">
+                {/* Halo dorado animado */}
+                <div 
+                  className="absolute -inset-2 rounded-3xl opacity-40 group-hover:opacity-70 transition-all duration-700 animate-pulse"
+                  style={{
+                    background: `conic-gradient(from 0deg, 
+                      #FFD700, #FFA500, #FF8C00, #DAA520, 
+                      #B8860B, #DAA520, #FF8C00, #FFA500, #FFD700)`,
+                    filter: 'blur(8px)'
+                  }}
+                ></div>
+                
+                {/* Botón principal */}
+                <Link 
+                  href="/vender/comprar" 
+                  className="relative block w-full overflow-hidden rounded-3xl transform transition-all duration-500 hover:scale-[1.02] active:scale-95 group-hover:shadow-2xl"
+                  role="menuitem"
+                  title="Propiedades de Lujo Exclusivas en Madrid - Goza Madrid"
+                  onClick={() => toggleMenu()}
+                  style={{
+                    background: `linear-gradient(135deg, 
+                      #1a1a1a 0%, 
+                      #2d2d2d 25%,
+                      #1a1a1a 50%, 
+                      #2d2d2d 75%,
+                      #1a1a1a 100%)`,
+                    border: '3px solid',
+                    borderImage: `linear-gradient(45deg, 
+                      #FFD700 0%, 
+                      #FFA500 25%, 
+                      #FF8C00 50%, 
+                      #FFA500 75%, 
+                      #FFD700 100%) 1`,
+                    boxShadow: `
+                      0 25px 50px rgba(0, 0, 0, 0.5),
+                      0 15px 35px rgba(255, 215, 0, 0.3),
+                      inset 0 3px 15px rgba(255, 215, 0, 0.1),
+                      inset 0 -2px 10px rgba(0, 0, 0, 0.3)`
+                  }}
+                >
+                  {/* Contenido del botón */}
+                  <div className="px-8 py-6 relative z-10">
+                    {/* Icono premium con corona */}
+                    <div className="flex items-center justify-center mb-3">
+                      <div className="relative">
+                        <span 
+                          className="text-4xl filter drop-shadow-lg"
+                          style={{
+                            background: `linear-gradient(45deg, #FFD700, #FFA500)`,
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            backgroundClip: 'text'
+                          }}
+                        >
+                          🏛️
+                        </span>
+                        <span 
+                          className="absolute -top-2 -right-1 text-lg animate-bounce"
+                          style={{ color: '#FFD700' }}
+                        >
+                          👑
+                        </span>
+                        <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent rounded-full opacity-60"></div>
+                      </div>
+                    </div>
+                    
+                    {/* Texto principal */}
+                    <div className="text-center">
+                      <div 
+                        className="font-black text-xl mb-1 tracking-wider"
+                        style={{
+                          background: `linear-gradient(45deg, #FFD700 0%, #FFA500 50%, #FFD700 100%)`,
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                          backgroundClip: 'text',
+                          textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
+                          filter: 'drop-shadow(0 0 8px rgba(255, 215, 0, 0.3))'
+                        }}
+                      >
+                        PROPIEDADES DE LUJO
+                      </div>
+                      <div 
+                        className="font-bold text-sm tracking-widest opacity-90"
+                        style={{
+                          color: '#E6E6E6',
+                          textShadow: '0 1px 2px rgba(0, 0, 0, 0.8)'
+                        }}
+                      >
+                        EXCLUSIVAS EN MADRID
+                      </div>
+                    </div>
+                    
+                    {/* Indicador de premium */}
+                    <div className="flex justify-center mt-3">
+                      <div className="flex space-x-1">
+                        {[...Array(5)].map((_, i) => (
+                          <span 
+                            key={i}
+                            className="text-xs animate-pulse"
+                            style={{ 
+                              color: '#FFD700',
+                              animationDelay: `${i * 0.1}s`
+                            }}
+                          >
+                            ⭐
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Efecto de brillo deslizante */}
+                  <div 
+                    className="absolute inset-0 opacity-20 group-hover:opacity-40 transition-all duration-1000"
+                    style={{
+                      background: `linear-gradient(90deg, 
+                        transparent 0%, 
+                        rgba(255, 215, 0, 0.6) 45%, 
+                        rgba(255, 255, 255, 0.8) 50%, 
+                        rgba(255, 215, 0, 0.6) 55%, 
+                        transparent 100%)`,
+                      transform: 'translateX(-100%)',
+                      animation: 'shimmerLux 3s infinite'
+                    }}
+                  ></div>
+                  
+                  {/* Partículas decorativas */}
+                  <div className="absolute top-2 right-2 w-2 h-2 bg-yellow-400 rounded-full animate-ping opacity-75"></div>
+                  <div className="absolute bottom-2 left-2 w-1.5 h-1.5 bg-amber-500 rounded-full animate-ping opacity-60" style={{ animationDelay: '0.5s' }}></div>
+                  <div className="absolute top-1/2 left-2 w-1 h-1 bg-yellow-300 rounded-full animate-ping opacity-50" style={{ animationDelay: '1s' }}></div>
+                </Link>
+              </div>
+              
+              {/* Estilos CSS premium */}
+              <style jsx>{`
+                @keyframes shimmerLux {
+                  0% { transform: translateX(-100%); }
+                  50% { transform: translateX(-100%); }
+                  100% { transform: translateX(100%); }
+                }
+              `}</style>
               
               {/* Vende tu propiedad móvil optimizado */}
               <div className="relative whitespace-nowrap flex flex-col" role="menuitem">
@@ -1037,6 +1158,19 @@ function ControlMenu() {
                 onClick={() => toggleMenu()}
               >
                 Reformas
+              </Link>
+              
+              <Link 
+                href="/blog" 
+                className="text-white hover:text-gray-700 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200"
+                role="menuitem"
+                title="Blog inmobiliario"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleMenu();
+                }}
+              >
+                Blog
               </Link>
               
               {/* Servicios móvil optimizado */}
@@ -1137,6 +1271,7 @@ function ControlMenu() {
                     </Link>
                   </div>
                 </div>
+              </div>
               </div>
             </nav>
           </div>

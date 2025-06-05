@@ -170,16 +170,44 @@ export default async function handler(req, res) {
       // Generar imágenes a partir del array de images si existe
       let propertyImages = [];
       if (property.images && Array.isArray(property.images) && property.images.length > 0) {
-        propertyImages = property.images.map((img, index) => ({
-          url: img,
-          alt: `${property.title || 'Propiedad'} - Imagen ${index + 1}`
-        }));
-      } else {
-        // Imagen por defecto si no hay imágenes
-        propertyImages = [{
-          url: '/default-property.jpg',
-          alt: property.title || 'Imagen de propiedad'
-        }];
+        // Procesar imágenes según el formato (objetos con src/alt o strings)
+        const validImages = property.images.filter(img => {
+          if (!img) return false;
+          
+          // Si es un objeto con src
+          if (typeof img === 'object' && img.src && img.src.trim() !== '') {
+            return true;
+          }
+          
+          // Si es un string (formato legacy)
+          if (typeof img === 'string' && img.trim() !== '') {
+            return true;
+          }
+          
+          return false;
+        });
+        
+        if (validImages.length > 0) {
+          propertyImages = validImages.map((img, index) => {
+            // Si es un objeto con src
+            if (typeof img === 'object' && img.src) {
+              return {
+                url: img.src,
+                src: img.src, // Para compatibilidad
+                alt: img.alt || `${property.title || 'Propiedad'} - Imagen ${index + 1}`
+              };
+            }
+            
+            // Si es un string (formato legacy)
+            if (typeof img === 'string') {
+              return {
+                url: img,
+                src: img, // Para compatibilidad
+                alt: `${property.title || 'Propiedad'} - Imagen ${index + 1}`
+              };
+            }
+          }).filter(Boolean); // Eliminar elementos undefined
+        }
       }
 
       return {
@@ -200,7 +228,7 @@ export default async function handler(req, res) {
         status: property.status || 'Disponible',
         featured: property.featured || false,
         images: propertyImages,
-        image: propertyImages[0]?.url || '/default-property.jpg',
+        image: propertyImages.length > 0 ? propertyImages[0].url : null,
         features: property.features || [],
         source: 'mongodb',
         createdAt: property.createdAt || new Date().toISOString(),
