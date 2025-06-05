@@ -731,7 +731,7 @@ BlogDetail.getLayout = function getLayout(page) {
       <CookieConsent />
       
       {/* Botón flotante del valorador con reacción al menú */}
-      <FloatingValoradorButtonWrapper />
+      <SmartFloatingValoradorButton />
     </div>
   );
 };
