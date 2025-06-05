@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import Link from "next/link";
+import { motion, AnimatePresence } from 'framer-motion';
 import Footer3 from '@/components/footer';
 import CookieConsent from '@/components/CookieConsent';
 import { FloatingValoradorButton } from '@/components/cards';
