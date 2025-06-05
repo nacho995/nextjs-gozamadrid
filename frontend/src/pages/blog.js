@@ -81,7 +81,7 @@ export default function BlogPreview() {
 
         {/* Metadatos adicionales */}
         <meta name="keywords" content="blog inmobiliario madrid, noticias inmobiliarias, tendencias mercado inmobiliario, consejos compra venta, inversión inmobiliaria madrid" />
-        <meta property="article:publisher" content="https://www.facebook.com/gozamadrid" />
+                  <meta property="article:publisher" content="https://www.facebook.com/MBLP66/" />
         <meta name="author" content="Goza Madrid Inmobiliaria" />
 
         {/* Metadatos de compartir */}
@@ -90,17 +90,8 @@ export default function BlogPreview() {
         <meta property="og:locale" content="es_ES" />
       </Head>
 
-      <div className="min-h-screen">
-        <div className="relative text-black py-16">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 ">
-              Blog Inmobiliario
-            </h1>
-            <p className="text-lg md:text-xl opacity-80 max-w-3xl mx-auto">
-              Descubre las últimas tendencias, consejos y noticias sobre el mercado inmobiliario en Madrid.
-            </p>
-          </div>
-        </div>
+      <div className="min-h-screen text-black">
+        
         <div
           className="fixed inset-0 z-0 opacity-100"
           style={{

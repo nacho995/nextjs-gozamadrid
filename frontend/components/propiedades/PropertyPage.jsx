@@ -9,7 +9,7 @@ import LoadingFallback from './LoadingFallback';
 import Head from 'next/head';
 import config from '@/config/config';
 import axios from 'axios';
-// import { wooCommerceCache } from '@/services/woocommerce-cache'; // COMENTADO - WooCommerce eliminado
+// import { wooCommerceCache } from '@/services/woocommerce-cache';
 import { useProperties } from '@/hooks/useProperties';
 
 // Estilos consistentes con el resto de la web
@@ -731,7 +731,7 @@ export default function PropertyPage() {
         } else if (isMongoDBProperty && property.price) {
           // Los precios de MongoDB ya vienen corregidos desde la API
           const numericPrice = typeof property.price === 'string' 
-            ? parseFloat(property.price.replace(/[^\\d.-]/g, ''))
+            ? parseFloat(property.price.replace(/[^\d.-]/g, ''))
             : property.price;
           
           if (!isNaN(numericPrice) && numericPrice > 0) {
@@ -890,28 +890,38 @@ export default function PropertyPage() {
           // Obtener precio formateado
           let formattedPrice = 'Consultar';
           try {
-            if (property.price) {
-              // Convertir a número si es una cadena de texto
-              let price = typeof property.price === 'string' 
-                ? parseFloat(property.price.replace(/[^\\d.-]/g, '')) 
-                : property.price;
+            // Para propiedades de MongoDB, usar priceNumeric si está disponible
+            let priceToFormat = isMongoDBProperty 
+              ? (property.priceNumeric || property.price)
+              : property.price;
               
-              // Los precios de MongoDB ya vienen corregidos desde la API
-              // Solo aplicar corrección para propiedades de WordPress que tengan precios muy bajos
-              if (!isMongoDBProperty && price < 10000 && price > 100) {
-                price = price * 1000; // Solo para propiedades no-MongoDB
+            if (priceToFormat !== undefined && priceToFormat !== null && priceToFormat !== '') {
+              // Si ya es un número, usarlo directamente
+              let price = typeof priceToFormat === 'number' 
+                ? priceToFormat
+                : parseFloat(String(priceToFormat).replace(/[^\d.-]/g, ''));
+              
+              // Verificar que el precio es un número válido y mayor que 0
+              if (!isNaN(price) && isFinite(price) && price > 0) {
+                // Solo aplicar corrección para propiedades de WordPress que tengan precios muy bajos
+                if (!isMongoDBProperty && price < 10000 && price > 100) {
+                  price = price * 1000; // Solo para propiedades no-MongoDB
+                }
+                
+                formattedPrice = new Intl.NumberFormat('es-ES', {
+                  style: 'currency',
+                  currency: 'EUR',
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0
+                }).format(price);
+              } else {
+                console.warn('Precio inválido para propiedad:', property.title || 'Sin título', 'priceNumeric:', property.priceNumeric, 'price:', property.price);
+                formattedPrice = 'Consultar precio';
               }
-              
-              formattedPrice = new Intl.NumberFormat('es-ES', {
-                style: 'currency',
-                currency: 'EUR',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0
-              }).format(price);
             }
           } catch (error) {
-            console.error('Error al formatear precio:', error);
-            formattedPrice = 'Consultar';
+            console.error('Error al formatear precio:', error, 'Propiedad:', property.title || 'Sin título');
+            formattedPrice = 'Consultar precio';
           }
           
           // Obtener imagen principal - mejorado para WooCommerce

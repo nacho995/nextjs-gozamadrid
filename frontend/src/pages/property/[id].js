@@ -172,11 +172,9 @@ export async function getServerSideProps(context) {
 
   console.log(`[getServerSideProps] Obteniendo propiedad ID: ${id}, Fuente: ${source}`);
 
-  const MONGO_API_URL =
-    process.env.MONGO_PROPERTY_API_URL ||
-    process.env.NEXT_PUBLIC_API_PROPERTIES_URL ||
-    process.env.NEXT_PUBLIC_API_URL;
-  const TIMEOUT = parseInt(process.env.API_TIMEOUT || process.env.NEXT_PUBLIC_API_TIMEOUT || '15000');
+  // Usar la URL base local directamente ya que estamos en getServerSideProps
+  const MONGO_API_URL = 'http://localhost:3000';
+  const TIMEOUT = 15000;
 
 
   let apiUrl = '';
@@ -184,18 +182,11 @@ export async function getServerSideProps(context) {
   let params = {};
 
   if (source === 'mongodb') {
-      if (!MONGO_API_URL) {
-            console.error('[getServerSideProps] Falta variable de entorno para API MongoDB (MONGO_PROPERTY_API_URL, NEXT_PUBLIC_API_PROPERTIES_URL o NEXT_PUBLIC_API_URL)');
-            return { props: { propertyData: null, error: 'Error de configuración del servidor (MongoDB)', source } };
-       }
-       // Log qué variable se está usando finalmente
-       if (process.env.MONGO_PROPERTY_API_URL) console.log('[getServerSideProps] Usando MONGO_PROPERTY_API_URL');
-       else if (process.env.NEXT_PUBLIC_API_PROPERTIES_URL) console.log('[getServerSideProps] Usando NEXT_PUBLIC_API_PROPERTIES_URL');
-       else console.log('[getServerSideProps] Usando NEXT_PUBLIC_API_URL como fallback final');
+      console.log('[getServerSideProps] Usando API MongoDB local');
 
-      // La ruta correcta para obtener una propiedad por ID (sea cual sea la fuente) es /api/properties/:id
+      // La ruta correcta para obtener una propiedad por ID desde MongoDB
       apiUrl = `${MONGO_API_URL}/api/properties/${id}`;
-      console.log(`[getServerSideProps] Intentando fetch a MongoDB API: ${apiUrl}`); // Log de la URL final
+      console.log(`[getServerSideProps] Intentando fetch a MongoDB API: ${apiUrl}`);
   } else {
       console.error(`[getServerSideProps] Fuente desconocida: ${source}`);
       return { props: { propertyData: null, error: 'Fuente de datos no válida', source } };
@@ -215,16 +206,19 @@ export async function getServerSideProps(context) {
           throw new Error(`API devolvió estado ${response.status}`);
       }
 
-      // Aquí podrías normalizar los datos si es necesario antes de pasarlos como props
-      const propertyData = response.data;
-
-      // ¡Importante! Asegúrate de que la estructura de propertyData
-      // sea la que espera tu componente DefaultPropertyContent.
-      // Si no, aplica normalizeMongoData aquí.
+      // Extraer los datos de la propiedad de la respuesta de la API
+      const responseData = response.data;
+      
+      if (!responseData.success || !responseData.property) {
+          throw new Error('No se encontraron datos de la propiedad en la respuesta');
+      }
+      
+      const propertyData = responseData.property;
+      console.log(`[getServerSideProps] Propiedad cargada: ${propertyData.title}`);
 
       return {
           props: {
-              propertyData: propertyData, // O pasa normalizedData si lo usas
+              propertyData: propertyData,
               error: null,
               source: source,
           },

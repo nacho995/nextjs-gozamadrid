@@ -100,14 +100,16 @@ export default async function handler(req, res) {
 
   if (!url) {
     console.log('[proxy-image] No se proporcionó URL, redirigiendo a fallback');
-    return res.redirect(307, FALLBACK_IMAGES[0]);
+    res.redirect(307, FALLBACK_IMAGES[0]);
+    return;
   }
 
   // Limpiar y validar la URL
   const cleanUrl = cleanImageUrl(url);
   if (!cleanUrl) {
     console.log('[proxy-image] URL inválida o problemática:', url);
-    return res.redirect(307, FALLBACK_IMAGES[0]);
+    res.redirect(307, FALLBACK_IMAGES[0]);
+    return;
   }
 
   // Validar que la URL sea válida
@@ -115,14 +117,16 @@ export default async function handler(req, res) {
     new URL(cleanUrl);
   } catch (error) {
     console.error('[proxy-image] URL malformada:', cleanUrl);
-    return res.redirect(307, FALLBACK_IMAGES[0]);
+    res.redirect(307, FALLBACK_IMAGES[0]);
+    return;
   }
 
   try {
     // Si es una imagen de Unsplash, servirla directamente
     if (cleanUrl.includes('unsplash.com') || cleanUrl.includes('images.unsplash.com')) {
       console.log('[proxy-image] Imagen de Unsplash, sirviendo directamente');
-      return res.redirect(307, cleanUrl);
+      res.redirect(307, cleanUrl);
+      return;
     }
 
     // Para imágenes de WordPress, intentar acceso directo primero
@@ -137,7 +141,8 @@ export default async function handler(req, res) {
 
         if (directResponse.ok) {
           console.log('[proxy-image] Acceso directo exitoso, redirigiendo');
-          return res.redirect(307, cleanUrl);
+          res.redirect(307, cleanUrl);
+          return;
         }
       } catch (directError) {
         console.log('[proxy-image] Acceso directo falló, usando proxy:', directError.message);
@@ -153,13 +158,15 @@ export default async function handler(req, res) {
     res.setHeader('X-Original-URL', cleanUrl);
 
     console.log('[proxy-image] Redirigiendo a:', proxyUrl);
-    return res.redirect(307, proxyUrl);
+    res.redirect(307, proxyUrl);
+    return;
 
   } catch (error) {
     console.error('[proxy-image] Error general:', error);
     
     // En caso de error, devolver imagen de fallback
     res.setHeader('X-Proxy-Error', error.message);
-    return res.redirect(307, FALLBACK_IMAGES[Math.floor(Math.random() * FALLBACK_IMAGES.length)]);
+    res.redirect(307, FALLBACK_IMAGES[Math.floor(Math.random() * FALLBACK_IMAGES.length)]);
+    return;
   }
 } 

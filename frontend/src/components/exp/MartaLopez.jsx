@@ -31,7 +31,7 @@ export default function MartaLopez() {
                 <meta property="og:locale" content="es_ES" />
                 <meta property="og:site_name" content="Goza Madrid eXp" />
                 <meta property="fb:app_id" content="966242223397117" />
-                <meta property="article:publisher" content="https://www.facebook.com/GozaMadrid" />
+                <meta property="article:publisher" content="https://www.facebook.com/MBLP66/" />
 
                 {/* Twitter */}
                 <meta name="twitter:card" content="summary_large_image" />

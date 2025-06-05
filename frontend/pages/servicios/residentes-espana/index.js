@@ -78,11 +78,11 @@ export default function ResidentesEspaña() {
                                 }
                             ]
                         },
-                        "sameAs": [
-                            "https://www.facebook.com/gozamadrid",
-                            "https://www.instagram.com/gozamadrid",
-                            "https://www.linkedin.com/company/gozamadrid"
-                        ]
+                                                  "sameAs": [
+                             "https://www.facebook.com/MBLP66/",
+                             "https://www.instagram.com/gozamadrid54/",
+                             "https://www.linkedin.com/in/marta-l%C3%B3pez-55516099/"
+                          ]
                     })}
                 </script>
 

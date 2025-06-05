@@ -20,6 +20,7 @@ import {
   FaCrown,
   FaGem
 } from 'react-icons/fa';
+import { useNavbar } from './context/navBarContext';
 
 const cardData = [
     {
@@ -255,6 +256,7 @@ function CorporateCard({ card, index, cardId, onExpandChange }) {
 
 // Componente de botón flotante del valorador
 export function FloatingValoradorButton() {
+  const { menuVisible } = useNavbar(); // Detectar estado del menú global
   const [isHovered, setIsHovered] = useState(false);
   const [isPulsing, setIsPulsing] = useState(true);
   const [cookieBannerVisible, setCookieBannerVisible] = useState(false);
@@ -316,7 +318,13 @@ export function FloatingValoradorButton() {
 
   // Calcular la posición dinámica del botón
   const getButtonPosition = () => {
-    if (cookieBannerVisible) {
+    if (menuVisible) {
+      // Cuando el menú hamburguesa está abierto, mover fuera del área del menú
+      return {
+        bottom: cookieBannerVisible ? '120px' : '32px',
+        right: '420px' // Se mueve fuera del área del menú hacia la izquierda
+      };
+    } else if (cookieBannerVisible) {
       // Cuando hay banner de cookies, posicionar encima del banner
       return {
         bottom: '120px', // 96px del banner + 24px de margen

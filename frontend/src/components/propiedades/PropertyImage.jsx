@@ -261,7 +261,7 @@ export default function PropertyImage({
           onLoad={() => setLoaded(true)}
           loading={priority ? "eager" : "lazy"}
           decoding="async"
-          fetchPriority={priority ? "high" : "auto"}
+          fetchpriority={priority ? "high" : "auto"}
           style={{ objectPosition }}
           itemProp="contentUrl"
         />
