@@ -1,67 +1,76 @@
-import { connectToDatabase } from '../../../lib/mongodb';
+// Reutilizamos el endpoint proxy de contacto para aprovechar la configuración existente
+import handler from '../proxy/backend/contact';
 
-export default async function handler(req, res) {
-  // Solo permitir método POST
+export default async function offerHandler(req, res) {
+  // Asegurarnos de que es un POST
   if (req.method !== 'POST') {
     console.error('Método no permitido:', req.method);
     return res.status(405).json({ error: 'Método no permitido' });
   }
 
   try {
+    // Extraer los campos del formulario
     const { 
-      propertyId, 
-      propertyTitle, 
-      name, 
-      email, 
-      phone, 
-      offerAmount
+      property, // ID de propiedad
+      propertyAddress, // Título de propiedad
+      name,
+      email,
+      phone,
+      offerPrice, // Precio ofertado
+      offerPercentage, // Porcentaje del precio original (opcional)
+      message
     } = req.body;
 
-    // Validar datos requeridos
-    if (!propertyId || !email || !offerAmount) {
-      console.error('Faltan datos requeridos');
-      return res.status(400).json({ error: 'Faltan datos requeridos' });
+    // Validar datos mínimos requeridos
+    if (!email) {
+      console.error('Email requerido', req.body);
+      return res.status(400).json({ error: 'Email requerido' });
     }
 
-    // Registrar la oferta en MongoDB
-    try {
-      const { db } = await connectToDatabase();
-      
-      // Crear un documento de oferta
-      const offer = {
-        propertyId,
-        propertyTitle,
-        name,
-        email,
-        phone,
-        offerAmount,
-        status: 'pending',
-        createdAt: new Date(),
-      };
-
-      // Insertar en la colección de ofertas
-      await db.collection('property_offers').insertOne(offer);
-      console.log('Oferta guardada en MongoDB:', offer);
-    } catch (dbError) {
-      console.error('Error al guardar oferta en MongoDB:', dbError);
-      // Continuamos aunque falle la BD para dar buena experiencia al usuario
+    // Formatear precio para presentación
+    let formattedPrice = '';
+    if (typeof offerPrice === 'number') {
+      formattedPrice = new Intl.NumberFormat('es-ES', {
+        style: 'currency',
+        currency: 'EUR'
+      }).format(offerPrice);
+    } else {
+      // Si no es un número, lo dejamos como está
+      formattedPrice = offerPrice;
     }
 
-    // Enviar correo si está configurado
-    try {
-      // Si tienes configurado nodemailer o algún otro servicio de correos
-      // Código para enviar email aquí
-      console.log('Email de oferta enviado correctamente');
-    } catch (emailError) {
-      console.error('Error al enviar email:', emailError);
-      // Continuamos aunque falle el envío del correo
-    }
+    // Reformatear para el formato esperado por el proxy de contacto
+    const formattedBody = {
+      ...req.body,
+      type: 'offer',
+      propertyId: property,
+      propertyTitle: propertyAddress,
+      offerAmount: formattedPrice,
+      offerLabel: offerPercentage,
+      name,
+      email,
+      phone,
+      message
+    };
 
-    // Responder exitosamente
-    return res.status(200).json({ success: true, message: 'Oferta recibida correctamente' });
+    // Adaptar la solicitud al formato esperado por el handler de contacto
+    req.body = formattedBody;
+    
+    // Registrar para diagnóstico
+    console.log('Oferta recibida:', {
+      propertyId: property,
+      propertyAddress,
+      offerPrice: formattedPrice,
+      offerPercentage,
+      email
+    });
+
+    // Usar el handler existente que ya tiene toda la lógica de envío
+    // y servicios de respaldo configurados
+    return handler(req, res);
     
   } catch (error) {
-    console.error('Error al procesar la oferta:', error);
+    console.error('Error al procesar oferta:', error);
     return res.status(500).json({ error: 'Error al procesar la oferta' });
   }
 }

@@ -1248,24 +1248,31 @@ export default function DefaultPropertyContent({ property }) {
     
     // Verificar que el precio sea válido y razonable
     if (!isNaN(price) && isFinite(price) && price > 0) {
-      // Corrección para precios demasiado bajos (posible error de formato)
-      if (price === 1) {
-        console.log('PropertyContent - Precio sospechoso de 1€ detectado, buscando precio real');
-        // Si el precio es exactamente 1, podría ser un error. Intenta buscar el precio en otros campos
+      // Corrección para precios extremadamente bajos (posible error de formato)
+      if (price <= 10) {
+        console.log(`PropertyContent - Precio sospechoso de ${price}€ detectado, buscando precio real`);
+        
+        // Primero intentamos buscar en campos alternativos
         const posiblePrecioReal = propertyState.originalPrice || propertyState.regular_price || propertyState.price_html;
         
-        if (posiblePrecioReal && posiblePrecioReal !== 1) {
+        if (posiblePrecioReal && posiblePrecioReal !== price) {
           // Intentar extraer un número del posible precio real
           const precioExtraido = parseFloat(String(posiblePrecioReal).replace(/[^\d.-]/g, ''));
           if (!isNaN(precioExtraido) && precioExtraido > 100) {
             price = precioExtraido;
-            console.log('PropertyContent - Precio corregido de valor 1 a:', price);
+            console.log(`PropertyContent - Precio corregido de valor ${price} a:`, price);
           }
         }
+        
+        // Si sigue siendo extremadamente bajo después de la corrección anterior
+        if (price <= 10) {
+          // Asumimos que es una notación incorrecta (por ejemplo 1 = 100.000€)
+          price = price * 100000;
+          console.log('PropertyContent - Precio muy bajo corregido (multiplicado por 100000):', price);
+        }
       }
-      
-      // Solo aplicar corrección para propiedades que no sean de MongoDB y tengan precios muy bajos
-      if (!isFromMongoDB && price < 10000 && price > 100) {
+      // Caso para precios bajos pero no extremadamente bajos
+      else if (!isFromMongoDB && price < 10000 && price > 100) {
         price = price * 1000;
         console.log('PropertyContent - Precio corregido (multiplicado por 1000):', price);
       }
