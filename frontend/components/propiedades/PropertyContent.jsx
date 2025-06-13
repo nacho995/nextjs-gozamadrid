@@ -1227,7 +1227,7 @@ export default function DefaultPropertyContent({ property }) {
     fuente: isFromMongoDB ? 'MongoDB' : 'Otra' 
   });
   
-  // Procesamiento robusto del precio
+  // Procesamiento robusto del precio - MEJORADO PARA CONSISTENCIA CON PROPERTYPAGE
   if (priceValue !== undefined && priceValue !== null && priceValue !== '') {
     // Variable para almacenar el precio numérico limpio
     let price;
@@ -1244,38 +1244,28 @@ export default function DefaultPropertyContent({ property }) {
       price = parseFloat(priceStr);
     }
     
-    console.log('PropertyContent - Precio procesado:', price);
+    console.log('PropertyContent - Precio procesado inicial:', price, 'Tipo:', typeof price);
     
-    // Verificar que el precio sea válido y razonable
+    // Verificar que el precio es un número válido y mayor que 0
     if (!isNaN(price) && isFinite(price) && price > 0) {
-      // Corrección para precios extremadamente bajos (posible error de formato)
+      // CORRECCIÓN CRÍTICA: Detectar y corregir precios extremadamente bajos
       if (price <= 10) {
-        console.log(`PropertyContent - Precio sospechoso de ${price}€ detectado, buscando precio real`);
-        
-        // Primero intentamos buscar en campos alternativos
-        const posiblePrecioReal = propertyState.originalPrice || propertyState.regular_price || propertyState.price_html;
-        
-        if (posiblePrecioReal && posiblePrecioReal !== price) {
-          // Intentar extraer un número del posible precio real
-          const precioExtraido = parseFloat(String(posiblePrecioReal).replace(/[^\d.-]/g, ''));
-          if (!isNaN(precioExtraido) && precioExtraido > 100) {
-            price = precioExtraido;
-            console.log(`PropertyContent - Precio corregido de valor ${price} a:`, price);
-          }
-        }
-        
-        // Si sigue siendo extremadamente bajo después de la corrección anterior
-        if (price <= 10) {
-          // Asumimos que es una notación incorrecta (por ejemplo 1 = 100.000€)
-          price = price * 100000;
-          console.log('PropertyContent - Precio muy bajo corregido (multiplicado por 100000):', price);
-        }
+        // Si el precio es ridículamente bajo (1, 2, etc.), multiplicar por 100,000
+        price = price * 100000;
+        console.log('PropertyContent - Precio extremadamente bajo corregido:', price);
       }
-      // Caso para precios bajos pero no extremadamente bajos
-      else if (!isFromMongoDB && price < 10000 && price > 100) {
+      // Precios bajos pero no extremadamente bajos (casos intermedios)
+      else if (price < 10000 && price > 100) {
         price = price * 1000;
-        console.log('PropertyContent - Precio corregido (multiplicado por 1000):', price);
+        console.log('PropertyContent - Precio bajo corregido:', price);
+      } 
+      // Casos especiales adicionales
+      else if (price < 100 && price > 10) {
+        price = price * 10000;
+        console.log('PropertyContent - Precio muy bajo corregido:', price);
       }
+      
+      console.log('PropertyContent - Precio final a formatear:', price);
 
       // CORRECCIÓN CLAVE: Usar Intl.NumberFormat sin style: 'currency' para evitar duplicar el símbolo
       formattedPrice = new Intl.NumberFormat('es-ES', {
