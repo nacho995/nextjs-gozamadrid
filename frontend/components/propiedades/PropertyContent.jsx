@@ -1207,34 +1207,70 @@ export default function DefaultPropertyContent({ property }) {
     price: propertyState.price
   });
   
-  let priceValue = isFromMongoDB ? (propertyState.priceNumeric || propertyState.price) : propertyState.price;
+  // Extraer el valor numérico del precio con mayor robustez
+  let priceValue;
+  if (isFromMongoDB) {
+    // Para propiedades MongoDB, intentar usar priceNumeric primero
+    priceValue = propertyState.priceNumeric || propertyState.price;
+  } else {
+    // Para otras fuentes, usar directamente el precio
+    priceValue = propertyState.price;
+  }
+  
+  // Valor formateado por defecto si no hay precio
   let formattedPrice = 'Consultar precio';
   
+  // Log detallado del valor inicial
+  console.log('PropertyContent - Precio original:', { 
+    valor: priceValue, 
+    tipo: typeof priceValue, 
+    fuente: isFromMongoDB ? 'MongoDB' : 'Otra' 
+  });
+  
+  // Procesamiento robusto del precio
   if (priceValue !== undefined && priceValue !== null && priceValue !== '') {
-    // Convertir a string y limpiar para asegurar que solo queden números
-    let priceStr = String(priceValue).trim();
-    console.log('Precio antes de limpiar:', priceStr);
-    
-    // Convertir a número correctamente
+    // Variable para almacenar el precio numérico limpio
     let price;
+    
+    // Manejar según el tipo de dato
     if (typeof priceValue === 'number') {
+      // Si ya es número, usarlo directamente
       price = priceValue;
     } else {
+      // Si es string u otro tipo, convertirlo primero a string y limpiarlo
+      let priceStr = String(priceValue).trim();
       // Eliminar cualquier caracter que no sea dígito, punto o guión
       priceStr = priceStr.replace(/[^\d.-]/g, '');
       price = parseFloat(priceStr);
     }
     
-    console.log('Precio después de convertir:', price);
+    console.log('PropertyContent - Precio procesado:', price);
     
+    // Verificar que el precio sea válido y razonable
     if (!isNaN(price) && isFinite(price) && price > 0) {
+      // Corrección para precios demasiado bajos (posible error de formato)
+      if (price === 1) {
+        console.log('PropertyContent - Precio sospechoso de 1€ detectado, buscando precio real');
+        // Si el precio es exactamente 1, podría ser un error. Intenta buscar el precio en otros campos
+        const posiblePrecioReal = propertyState.originalPrice || propertyState.regular_price || propertyState.price_html;
+        
+        if (posiblePrecioReal && posiblePrecioReal !== 1) {
+          // Intentar extraer un número del posible precio real
+          const precioExtraido = parseFloat(String(posiblePrecioReal).replace(/[^\d.-]/g, ''));
+          if (!isNaN(precioExtraido) && precioExtraido > 100) {
+            price = precioExtraido;
+            console.log('PropertyContent - Precio corregido de valor 1 a:', price);
+          }
+        }
+      }
+      
       // Solo aplicar corrección para propiedades que no sean de MongoDB y tengan precios muy bajos
       if (!isFromMongoDB && price < 10000 && price > 100) {
         price = price * 1000;
-        console.log('Precio corregido (multiplicado por 1000):', price);
+        console.log('PropertyContent - Precio corregido (multiplicado por 1000):', price);
       }
 
-      // Usar Intl.NumberFormat sin style: 'currency' para evitar duplicar el símbolo
+      // CORRECCIÓN CLAVE: Usar Intl.NumberFormat sin style: 'currency' para evitar duplicar el símbolo
       formattedPrice = new Intl.NumberFormat('es-ES', {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
