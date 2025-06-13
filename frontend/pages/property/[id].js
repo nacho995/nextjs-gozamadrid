@@ -172,8 +172,7 @@ export async function getServerSideProps(context) {
 
   console.log(`[getServerSideProps] Obteniendo propiedad ID: ${id}, Fuente: ${source}`);
 
-  // Usar la URL base local directamente ya que estamos en getServerSideProps
-  const MONGO_API_URL = 'http://localhost:3000';
+  // Usar la URL relativa para que funcione tanto en desarrollo como en producción
   const TIMEOUT = 15000;
 
 
@@ -184,8 +183,8 @@ export async function getServerSideProps(context) {
   if (source === 'mongodb') {
       console.log('[getServerSideProps] Usando API MongoDB local');
 
-      // La ruta correcta para obtener una propiedad por ID desde MongoDB
-      apiUrl = `${MONGO_API_URL}/api/properties/${id}`;
+      // Usar ruta relativa para que funcione en todos los entornos
+      apiUrl = `/api/properties/${id}`;
       console.log(`[getServerSideProps] Intentando fetch a MongoDB API: ${apiUrl}`);
   } else {
       console.error(`[getServerSideProps] Fuente desconocida: ${source}`);
