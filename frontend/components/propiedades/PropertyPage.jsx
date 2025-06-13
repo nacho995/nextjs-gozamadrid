@@ -908,12 +908,11 @@ export default function PropertyPage() {
                   price = price * 1000; // Solo para propiedades no-MongoDB
                 }
                 
+                // Formatear sin style: 'currency' para evitar duplicación del símbolo del euro
                 formattedPrice = new Intl.NumberFormat('es-ES', {
-                  style: 'currency',
-                  currency: 'EUR',
                   minimumFractionDigits: 0,
                   maximumFractionDigits: 0
-                }).format(price);
+                }).format(price) + ' €';
               } else {
                 console.warn('Precio inválido para propiedad:', property.title || 'Sin título', 'priceNumeric:', property.priceNumeric, 'price:', property.price);
                 formattedPrice = 'Consultar precio';
