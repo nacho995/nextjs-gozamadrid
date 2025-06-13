@@ -1150,6 +1150,13 @@ export default function PropertyPage() {
                   </div>
                 </div>
 
+                {/* Mostrar el ID de la propiedad */}
+                <div className="px-6 pb-2">
+                  <p className="text-xs text-gray-500 font-mono truncate">
+                    ID: {property._id || property.id}
+                  </p>
+                </div>
+
                 {/* Botón elegante "Ver detalles" con Link para mejor navegación */}
                 <div className="px-6 pb-6">
                   <Link 
