@@ -1220,11 +1220,12 @@ export default function DefaultPropertyContent({ property }) {
         // Convertir a string para analizar
         const priceStr = String(priceNum);
         
-        // Verificar si tiene formato de precio español incorrectamente almacenado (1.299 debe ser 1299)
+        // Verificar si tiene formato de precio español incorrectamente almacenado (1.299 debe ser 1.299.000)
         if (priceNum < 10 && priceStr.includes('.')) {
-          // Exttraer los dígitos y multiplicar por 1000
-          const cleanPrice = parseFloat(priceStr.replace(/[^\d.-]/g, '')) * 1000;
-          console.log('PropertyContent MongoDB - Corrigiendo precio en formato incorrecto:', priceNum, ' a ', cleanPrice);
+          // CORRECCIÓN CRUCIAL: Multiplicar por 1,000,000 para obtener el precio real en euros
+          // 1.299 → 1,299,000 euros (un millón doscientos noventa y nueve mil euros)
+          const cleanPrice = parseFloat(priceStr.replace(/[^\d.-]/g, '')) * 1000000;
+          console.log('PropertyContent MongoDB - Corrigiendo precio en formato millón euros:', priceNum, ' a ', cleanPrice);
           price = cleanPrice;
         } else {
           price = priceNum;
