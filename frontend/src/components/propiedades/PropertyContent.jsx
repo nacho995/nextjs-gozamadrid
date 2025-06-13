@@ -1188,28 +1188,59 @@ export default function DefaultPropertyContent({ property }) {
   const title = propertyState.title || propertyState.name || 'Propiedad sin título';
   const description = cleanedContent || propertyState.description || '';
   
-  // Formatear el precio correctamente
+  // Formatear el precio correctamente para MongoDB y WordPress
   const isFromMongoDB = propertyState?.source === 'mongodb' || propertyState?._id;
-  let priceValue = isFromMongoDB ? (propertyState.priceNumeric || propertyState.price) : propertyState.price;
   let formattedPrice = 'Consultar precio';
+  let price; // Variable para usar en el render
   
-  if (priceValue !== undefined && priceValue !== null && priceValue !== '') {
-    let price = typeof priceValue === 'number' 
-      ? priceValue 
-      : parseFloat(String(priceValue).replace(/[^\d.-]/g, ''));
-    
-    if (!isNaN(price) && isFinite(price) && price > 0) {
-      // Solo aplicar corrección para propiedades que no sean de MongoDB y tengan precios muy bajos
-      if (!isFromMongoDB && price < 10000 && price > 100) {
-        price = price * 1000;
+  try {
+    // MONGO DB: Usar precio exactamente como viene de MongoDB sin correcciones
+    if (isFromMongoDB) {
+      // Si hay priceNumeric, usarlo directamente sin ninguna modificación
+      if (propertyState.priceNumeric !== undefined && propertyState.priceNumeric !== null) {
+        price = propertyState.priceNumeric;
+        console.log('PropertyContent MongoDB - Usando precio exacto de MongoDB (priceNumeric):', price);
+      } 
+      // Si no hay priceNumeric, intentar con price
+      else if (propertyState.price !== undefined && propertyState.price !== null) {
+        // Si es número, usar directamente
+        if (typeof propertyState.price === 'number') {
+          price = propertyState.price;
+        } 
+        // Si es string, quitar cualquier símbolo no numérico
+        else if (typeof propertyState.price === 'string') {
+          price = parseFloat(propertyState.price.replace(/[^\d.-]/g, ''));
+        }
+        console.log('PropertyContent MongoDB - Usando precio exacto de MongoDB (price):', price);
       }
-
+    } 
+    // WORDPRESS: Aplicar correcciones solo para datos de WordPress
+    else {
+      let priceToFormat = propertyState.price;
+      if (priceToFormat !== undefined && priceToFormat !== null && priceToFormat !== '') {
+        // Convertir a número si es necesario
+        price = typeof priceToFormat === 'number' 
+          ? priceToFormat
+          : parseFloat(String(priceToFormat).replace(/[^\d.-]/g, ''));
+        
+        // Solo para WordPress, aplicar correcciones
+        if (!isNaN(price) && isFinite(price) && price > 0) {
+          if (price < 10000 && price > 100) {
+            price = price * 1000;
+            console.log('PropertyContent WordPress - Precio corregido:', price);
+          }
+        }
+      }
+    }
+    
+    // Verificar que tenemos un precio válido y formatearlo
+    if (!isNaN(price) && isFinite(price) && price > 0) {
+      // Formatear sin style: 'currency' para evitar duplicación del símbolo del euro
       formattedPrice = new Intl.NumberFormat('es-ES', {
-        style: 'currency',
-        currency: 'EUR',
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
-      }).format(price);
+      }).format(price) + ' €';
+      console.log('PropertyContent - Precio final formateado:', formattedPrice);
     } else {
       console.warn('PropertyContent: Precio inválido', {
         priceNumeric: propertyState.priceNumeric,
@@ -1218,6 +1249,8 @@ export default function DefaultPropertyContent({ property }) {
         title: propertyState.title
       });
     }
+  } catch (error) {
+    console.error('Error al formatear precio:', error);
   }
   
   const location = propertyState.location || 'Madrid, España';
