@@ -172,8 +172,26 @@ export async function getServerSideProps(context) {
 
   console.log(`[getServerSideProps] Obteniendo propiedad ID: ${id}, Fuente: ${source}`);
 
-  // Usar la URL relativa para que funcione tanto en desarrollo como en producción
+  // Obtener la URL base correcta para el entorno actual
+  const isProduction = process.env.NODE_ENV === 'production';
+  let API_BASE_URL;
+  
+  if (isProduction) {
+    // En producción, siempre usar HTTPS y el dominio principal
+    API_BASE_URL = 'https://www.realestategozamadrid.com';
+    
+    // Alternativa usando el host de la solicitud actual
+    // const host = context.req.headers.host || 'realestategozamadrid.com';
+    // const protocol = 'https'; // Forzar HTTPS en producción
+    // API_BASE_URL = `${protocol}://${host}`;
+  } else {
+    // En desarrollo, usar localhost
+    API_BASE_URL = 'http://localhost:3000';
+  }
+  
   const TIMEOUT = 15000;
+  
+  console.log(`[getServerSideProps] Usando API base: ${API_BASE_URL}`);
 
 
   let apiUrl = '';
@@ -183,8 +201,8 @@ export async function getServerSideProps(context) {
   if (source === 'mongodb') {
       console.log('[getServerSideProps] Usando API MongoDB local');
 
-      // Usar ruta relativa para que funcione en todos los entornos
-      apiUrl = `/api/properties/${id}`;
+      // Usar URL absoluta completa con la base correcta
+      apiUrl = `${API_BASE_URL}/api/properties/${id}`;
       console.log(`[getServerSideProps] Intentando fetch a MongoDB API: ${apiUrl}`);
   } else {
       console.error(`[getServerSideProps] Fuente desconocida: ${source}`);
