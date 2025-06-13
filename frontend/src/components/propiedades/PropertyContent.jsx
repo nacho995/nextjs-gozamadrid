@@ -1188,30 +1188,45 @@ export default function DefaultPropertyContent({ property }) {
   const title = propertyState.title || propertyState.name || 'Propiedad sin título';
   const description = cleanedContent || propertyState.description || '';
   
-  // Formatear el precio correctamente para MongoDB y WordPress
+  // SOLUCIÓN DEFINITIVA: No formatear precios de MongoDB, mostrarlos exactamente como vienen
   const isFromMongoDB = propertyState?.source === 'mongodb' || propertyState?._id;
   let formattedPrice = 'Consultar precio';
   let price; // Variable para usar en el render
   
   try {
-    // MONGO DB: Usar precio exactamente como viene de MongoDB sin correcciones
+    // ***** IMPLEMENTACIÓN CRÍTICA *****
+    // Para propiedades de MongoDB: NUNCA modificar el precio, usar EXACTAMENTE como viene
     if (isFromMongoDB) {
-      // Si hay priceNumeric, usarlo directamente sin ninguna modificación
-      if (propertyState.priceNumeric !== undefined && propertyState.priceNumeric !== null) {
-        price = propertyState.priceNumeric;
-        console.log('PropertyContent MongoDB - Usando precio exacto de MongoDB (priceNumeric):', price);
-      } 
-      // Si no hay priceNumeric, intentar con price
-      else if (propertyState.price !== undefined && propertyState.price !== null) {
-        // Si es número, usar directamente
-        if (typeof propertyState.price === 'number') {
-          price = propertyState.price;
-        } 
-        // Si es string, quitar cualquier símbolo no numérico
-        else if (typeof propertyState.price === 'string') {
-          price = parseFloat(propertyState.price.replace(/[^\d.-]/g, ''));
+      // Acceder directamente al campo que viene en el objeto original sin manipulación
+      if (propertyState._original && propertyState._original.price) {
+        // Log para debug - original sin manipulación
+        console.log('PropertyContent - PRECIO ORIGINAL DE MONGODB:', propertyState._original.price);
+        
+        // Si _original.price ya es un número formateado como string (ej. "2.500.000 €"), usarlo directamente
+        if (typeof propertyState._original.price === 'string') {
+          formattedPrice = propertyState._original.price;
+          console.log('PropertyContent - Usando precio original string de MongoDB:', formattedPrice);
+          return; // No procesar más, usar exactamente como viene
         }
-        console.log('PropertyContent MongoDB - Usando precio exacto de MongoDB (price):', price);
+        
+        price = propertyState._original.price;
+      } 
+      // Si no hay _original, intentar con priceNumeric (sin manipular)
+      else if (propertyState.priceNumeric !== undefined && propertyState.priceNumeric !== null) {
+        price = propertyState.priceNumeric;
+        console.log('PropertyContent MongoDB - Usando precio exacto priceNumeric:', price);
+      } 
+      // Último recurso: usar el precio sin ninguna manipulación
+      else if (propertyState.price !== undefined && propertyState.price !== null) {
+        console.log('PropertyContent MongoDB - Usando price sin manipular:', propertyState.price);
+        
+        // Si ya es una cadena formateada, usarla directamente
+        if (typeof propertyState.price === 'string' && propertyState.price.includes('€')) {
+          formattedPrice = propertyState.price;
+          return; // No procesar más
+        } else {
+          price = propertyState.price;
+        }
       }
     } 
     // WORDPRESS: Aplicar correcciones solo para datos de WordPress
