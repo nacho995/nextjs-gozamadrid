@@ -64,7 +64,13 @@ const allowedOrigins = process.env.CORS_ORIGIN
       'http://www.realestategozamadrid.com',
       'https://blog.realestategozamadrid.com',
       'http://blog.realestategozamadrid.com',
+      'https://blogs.realestategozamadrid.com',
+      'http://blogs.realestategozamadrid.com',
       'https://subir.realestategozamadrid.com',
+      'https://nextjs-gozamadrid-qrfk.onrender.com',
+      'https://gozamadrid-backend-778f.onrender.com',
+      'https://api.realestategozamadrid.com',
+      'https://backend.realestategozamadrid.com',
       'https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com',
       'http://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com',
       'https://gozamadrid.pages.dev',
@@ -100,7 +106,7 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With']
+  allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Cache-Control', 'Accept', 'Accept-Version', 'Content-Length', 'Content-MD5', 'Date', 'X-Api-Version']
 }));
 
 // <<< LOG INICIAL >>>
