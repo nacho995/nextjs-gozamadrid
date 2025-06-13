@@ -22,18 +22,32 @@ export default async function handler(req, res) {
     // Conectar a MongoDB
     const collection = await getPropertiesCollection();
     
+    // Registrar información para depuración
+    console.log(`[API][PROPERTIES] ID recibido: ${id}, tipo: ${typeof id}`);
+    
     // Buscar la propiedad por ID
     let query;
+    let isValidObjectId = false;
+    
     try {
-      // Intentar buscar como ObjectId si es un ID válido de MongoDB
-      if (ObjectId.isValid(id)) {
+      // Verificar si el ID es un ObjectId válido
+      isValidObjectId = ObjectId.isValid(id);
+      console.log(`[API][PROPERTIES] ¿Es un ObjectId válido?: ${isValidObjectId}`);
+      
+      if (isValidObjectId) {
         query = { _id: new ObjectId(id) };
       } else {
-        // Si no es un ObjectId válido, buscar por string
-        query = { _id: id };
+        // Probar diferentes campos de búsqueda
+        query = {
+          $or: [
+            { _id: id },
+            { id: id },
+            { slug: id }
+          ]
+        };
       }
     } catch (error) {
-      // Si falla la conversión a ObjectId, buscar como string
+      console.error(`[API][PROPERTIES] Error al procesar ID: ${error.message}`);
       query = { _id: id };
     }
 

@@ -213,6 +213,8 @@ export async function getServerSideProps(context) {
   // console.log('[getServerSideProps] Params:', params); // No loguear el secret
 
   try {
+      console.log(`[getServerSideProps] Intentando obtener datos con axios desde: ${apiUrl}`);
+      
       const response = await axios.get(apiUrl, {
           params: params,
           headers: headers,
@@ -220,18 +222,21 @@ export async function getServerSideProps(context) {
       });
 
       if (response.status !== 200) {
+          console.error(`[getServerSideProps] API devolvió estado ${response.status}`);
           throw new Error(`API devolvió estado ${response.status}`);
       }
 
       // Extraer los datos de la propiedad de la respuesta de la API
       const responseData = response.data;
+      console.log(`[getServerSideProps] Respuesta recibida:`, JSON.stringify(responseData).substring(0, 200) + '...');
       
       if (!responseData.success || !responseData.property) {
+          console.error(`[getServerSideProps] Datos inválidos en respuesta:`, responseData);
           throw new Error('No se encontraron datos de la propiedad en la respuesta');
       }
       
       const propertyData = responseData.property;
-      console.log(`[getServerSideProps] Propiedad cargada: ${propertyData.title}`);
+      console.log(`[getServerSideProps] Propiedad cargada: ${propertyData.title || 'Sin título'}`);
 
       return {
           props: {
