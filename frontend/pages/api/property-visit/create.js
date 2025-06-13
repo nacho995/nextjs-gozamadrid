@@ -1,69 +1,67 @@
-import { connectToDatabase } from '../../../lib/mongodb';
+// Reutilizamos el endpoint proxy de contacto para aprovechar la configuración existente
+import handler from '../proxy/backend/contact';
 
-export default async function handler(req, res) {
-  // Solo permitir método POST
+export default async function visitHandler(req, res) {
+  // Asegurarnos de que es un POST
   if (req.method !== 'POST') {
     console.error('Método no permitido:', req.method);
     return res.status(405).json({ error: 'Método no permitido' });
   }
 
   try {
+    // Extraer los campos del formulario
     const { 
-      propertyId, 
-      propertyTitle, 
+      property, // ID de propiedad
+      propertyAddress, // Título de propiedad 
       name, 
       email, 
       phone, 
-      visitDate, 
-      visitTime 
+      date, // Fecha de visita
+      time, // Hora de visita
+      message
     } = req.body;
 
-    // Validar datos requeridos
-    if (!propertyId || !email) {
-      console.error('Faltan datos requeridos');
-      return res.status(400).json({ error: 'Faltan datos requeridos' });
+    // Validar datos mínimos requeridos
+    if (!email) {
+      console.error('Email requerido', req.body);
+      return res.status(400).json({ error: 'Email requerido' });
     }
 
-    // Registrar la visita en MongoDB
-    try {
-      const { db } = await connectToDatabase();
-      
-      // Crear un documento de visita
-      const visit = {
-        propertyId,
-        propertyTitle,
-        name,
-        email,
-        phone,
-        visitDate,
-        visitTime,
-        status: 'pending',
-        createdAt: new Date(),
-      };
+    // Reformatear para el formato esperado por el proxy de contacto
+    const formattedBody = {
+      ...req.body,
+      type: 'visit',
+      propertyId: property,
+      propertyTitle: propertyAddress,
+      visitDate: date,
+      visitTime: time,
+      name,
+      email,
+      phone,
+      message
+    };
 
-      // Insertar en la colección de visitas
-      await db.collection('property_visits').insertOne(visit);
-      console.log('Visita guardada en MongoDB:', visit);
-    } catch (dbError) {
-      console.error('Error al guardar en MongoDB:', dbError);
-      // Continuamos aunque falle la BD para dar buena experiencia al usuario
-    }
+    // Guardar la petición original para referencia
+    const originalReqBody = req.body;
+    
+    // Adaptar la solicitud al formato esperado por el handler de contacto
+    req.body = formattedBody;
+    
+    // Registrar para diagnóstico
+    console.log('Solicitud de visita recibida:', {
+      propertyId: property,
+      propertyAddress,
+      date,
+      time,
+      email
+    });
 
-    // Enviar correo si está configurado
-    try {
-      // Si tienes configurado nodemailer o algún otro servicio de correos
-      // Código para enviar email aquí
-      console.log('Email de visita enviado correctamente');
-    } catch (emailError) {
-      console.error('Error al enviar email:', emailError);
-      // Continuamos aunque falle el envío del correo
-    }
-
-    // Responder exitosamente
-    return res.status(200).json({ success: true, message: 'Solicitud de visita recibida correctamente' });
+    // Usar el handler existente que ya tiene toda la lógica de envío
+    // y servicios de respaldo configurados
+    return handler(req, res);
     
   } catch (error) {
-    console.error('Error al procesar la solicitud de visita:', error);
+    console.error('Error al procesar solicitud de visita:', error);
     return res.status(500).json({ error: 'Error al procesar la solicitud' });
   }
 }
