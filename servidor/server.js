@@ -90,24 +90,52 @@ app.use((req, res, next) => {
   }
 });
 
-// Configuración de CORS
+// Configuración// <<< CORS >>>  
 app.use(cors({
-  origin: function(origin, callback) {
-    // Permitir solicitudes sin origen (como aplicaciones móviles o curl)
+  origin: function (origin, callback) {
     if (!origin) return callback(null, true);
-    
-    // Verificar si el origen está en la lista de permitidos
-    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes('*')) {
-      callback(null, true);
-    } else {
-      console.warn(`Origen bloqueado por CORS: ${origin}`);
-      callback(null, true); // Permitir todos los orígenes en producción por ahora
+    if (allowedOrigins.indexOf(origin) === -1) {
+      // Permitir todas las solicitudes sin origen (en desarrollo, las llamadas directas a la API, etc.)
+      if (!origin) return callback(null, true);
+      
+      // Comprobar patrón de wildcard
+      const wildcardOrigin = allowedOrigins.find(allowed => {
+        if (allowed.includes('*')) {
+          const prefix = allowed.split('*')[0];
+          return origin.indexOf(prefix) === 0;
+        }
+        return false;
+      });
+      
+      if (wildcardOrigin) {
+        return callback(null, true);
+      }
+      
+      // En modo desarrollo, permitir todos los orígenes
+      if (process.env.NODE_ENV === 'development') {
+        return callback(null, true);
+      }
+      
+      console.log(`Origin bloqueado: ${origin}`);
+      return callback(null, true); // Temporalmente permitir todos los orígenes mientras solucionamos el problema
     }
+    callback(null, true);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Cache-Control', 'Accept', 'Accept-Version', 'Content-Length', 'Content-MD5', 'Date', 'X-Api-Version']
+  allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Cache-Control', 'cache-control', 'Accept', 'Accept-Version', 'Content-Length', 'Content-MD5', 'Date', 'X-Api-Version'],
+  exposedHeaders: ['Content-Type', 'Authorization', 'Cache-Control']
 }));
+
+// Middleware específico para manejar peticiones OPTIONS
+app.options('*', (req, res) => {
+  // Establecer los encabezados CORS manualmente para asegurarnos que funcionan los preflight
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cache-Control, cache-control, Accept, Accept-Version, Content-Length, Content-MD5, Date, X-Api-Version, Origin, X-Requested-With');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.sendStatus(200);
+});
 
 // <<< LOG INICIAL >>>
 app.use((req, res, next) => {
