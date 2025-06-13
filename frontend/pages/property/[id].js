@@ -172,13 +172,57 @@ export async function getServerSideProps(context) {
 
   console.log(`[getServerSideProps] Obteniendo propiedad ID: ${id}, Fuente: ${source}`);
 
+  // Importando directamente la conexión a MongoDB para acceso directo en caso de fallo de la API
+  // Nota: Estos módulos solo se cargan en el servidor
+  const { getPropertiesCollection } = require('../../../lib/mongodb');
+  const { ObjectId } = require('mongodb');
+  
+  // Función para intentar obtener la propiedad directamente desde MongoDB
+  const getPropertyDirectlyFromDb = async (id) => {
+    try {
+      console.log(`[getServerSideProps] Intentando acceso directo a MongoDB para ID: ${id}`);
+      const collection = await getPropertiesCollection();
+      
+      let property = null;
+      
+      // Intentar varias estrategias de búsqueda
+      if (ObjectId.isValid(id)) {
+        property = await collection.findOne({ _id: new ObjectId(id) });
+        if (property) {
+          console.log(`[getServerSideProps] Propiedad encontrada por ObjectId: ${property.title || 'Sin título'}`);
+        }
+      }
+      
+      // Si no se encuentra por ObjectId, buscar por campo id
+      if (!property) {
+        property = await collection.findOne({ id: id });
+        if (property) {
+          console.log(`[getServerSideProps] Propiedad encontrada por campo id: ${property.title || 'Sin título'}`);
+        }
+      }
+      
+      // Si todavía no se encuentra, buscar por slug
+      if (!property) {
+        property = await collection.findOne({ slug: id });
+        if (property) {
+          console.log(`[getServerSideProps] Propiedad encontrada por slug: ${property.title || 'Sin título'}`);
+        }
+      }
+      
+      return property;
+    } catch (error) {
+      console.error(`[getServerSideProps] Error al acceder directamente a MongoDB:`, error.message);
+      return null;
+    }
+  };
+  
   // Función para crear datos mínimos de la propiedad cuando hay error
   const createFallbackProperty = (id) => {
     return {
       _id: id,
       id: id,
       title: 'Propiedad en Madrid',
-      description: 'Detalles completos de esta propiedad no disponibles en este momento.',
+      description: 'Detalles completos de esta propiedad no disponibles en este momento. Por favor, contacta con nosotros para más información.',
       price: 'Contactar',
       location: 'Madrid',
       address: 'Madrid',
@@ -281,8 +325,61 @@ export async function getServerSideProps(context) {
     }
   }
   
-  // Si llegamos aquí, ambos intentos fallaron o estamos en desarrollo
-  // Devolver datos mínimos para al menos mostrar algo en la página
+  // Si las APIs fallaron, intentar acceso directo a la base de datos
+  console.log('[getServerSideProps] Las APIs fallaron, intentando acceso directo a MongoDB');
+  
+  try {
+    const dbProperty = await getPropertyDirectlyFromDb(id);
+    
+    if (dbProperty) {
+      console.log(`[getServerSideProps] Propiedad recuperada directamente de MongoDB: ${dbProperty.title || 'Sin título'}`);
+      
+      // Normalizar los datos según el formato que espera la aplicación
+      const normalizedProperty = {
+        _id: dbProperty._id?.toString() || id,
+        id: dbProperty._id?.toString() || dbProperty.id || id,
+        title: dbProperty.title || dbProperty.name || 'Propiedad sin título',
+        description: dbProperty.description || '',
+        price: dbProperty.price || 'Consultar',
+        location: dbProperty.location || dbProperty.address || 'Madrid',
+        address: dbProperty.address || dbProperty.location || 'Madrid',
+        coordinates: dbProperty.coordinates || null,
+        bedrooms: dbProperty.bedrooms || dbProperty.rooms || '0',
+        bathrooms: dbProperty.bathrooms || dbProperty.wc || '0',
+        area: dbProperty.area || dbProperty.m2 || '0',
+        propertyType: dbProperty.propertyType || dbProperty.typeProperty || 'Propiedad',
+        status: dbProperty.status || 'Disponible',
+        images: Array.isArray(dbProperty.images) ? 
+          dbProperty.images.map((img, index) => {
+            if (typeof img === 'string') {
+              return { url: img, src: img, alt: `${dbProperty.title || 'Propiedad'} - Imagen ${index + 1}` };
+            } else if (typeof img === 'object') {
+              return { 
+                url: img.url || img.src || '', 
+                src: img.url || img.src || '',
+                alt: img.alt || `${dbProperty.title || 'Propiedad'} - Imagen ${index + 1}`
+              };
+            }
+            return null;
+          }).filter(Boolean) : [],
+        source: 'mongodb_direct',
+        createdAt: dbProperty.createdAt || new Date().toISOString(),
+        updatedAt: dbProperty.updatedAt || new Date().toISOString()
+      };
+      
+      return {
+        props: {
+          propertyData: normalizedProperty,
+          error: null,
+          source: 'mongodb_direct',
+        },
+      };
+    }
+  } catch (error) {
+    console.error('[getServerSideProps] Error al acceder directamente a MongoDB:', error);
+  }
+  
+  // Si todo lo anterior falla, usar datos de respaldo
   console.warn(`[getServerSideProps] Todos los intentos fallaron, usando datos de respaldo`);
   
   return {

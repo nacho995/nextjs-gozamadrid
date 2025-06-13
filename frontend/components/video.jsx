@@ -1059,6 +1059,10 @@ const Video = () => {
                                                                         }
                                                                     })()}
                                                                 </p>
+                                                                {/* Mostrar ID de propiedad */}
+                                                                <p className="text-xs text-gray-500 font-mono mb-2 truncate">
+                                                                    ID: {property._id || property.id}
+                                                                </p>
                                                                 <button
                                                                     onClick={(e) => {
                                                                         e.stopPropagation(); // Evitar que se active selectProperty
@@ -1171,6 +1175,12 @@ const Video = () => {
                                                                 >
                                                                     Ver Todas
                                                                 </button>
+                                                                <p className="text-sm text-gray-600 mb-2">
+                                                                    {property.address || property.location || 'Madrid'}
+                                                                </p>
+                                                                <p className="text-xs text-gray-500 font-mono mb-3 truncate">
+                                                                    ID: {property._id || property.id}
+                                                                </p>
                                                                 <span className="text-xs sm:text-sm text-gray-500">
                                                                     {getFilteredProperties().length} propiedades
                                                                 </span>
