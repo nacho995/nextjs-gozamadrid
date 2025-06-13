@@ -1411,8 +1411,14 @@ export default function DefaultPropertyContent({ property }) {
               <div className="mt-8 lg:mt-0">
                 <div className="bg-amarillo py-4 px-8 rounded-2xl inline-flex items-center shadow-xl transform hover:scale-105 transition-all duration-500 group">
                   <p className="text-3xl font-bold text-black tracking-wide" itemProp="offers" itemScope itemType="https://schema.org/Offer">
-                    {/* IMPORTANTE: Solo mostramos el precio formateado sin ninguna otra palabra */}
-                    <span itemProp="price">{formattedPrice}</span>
+                    {/* SOLUCIÓN RADICAL: Formateo manual para evitar duplicación */}
+                    <span itemProp="price">
+                      {typeof price === 'number' && !isNaN(price) ? 
+                        new Intl.NumberFormat('es-ES', {
+                          minimumFractionDigits: 0,
+                          maximumFractionDigits: 0
+                        }).format(price) + ' €' : 'Consultar precio'}
+                    </span>
                     <meta itemProp="priceCurrency" content="EUR" />
                     <meta itemProp="availability" content="https://schema.org/InStock" />
                   </p>
