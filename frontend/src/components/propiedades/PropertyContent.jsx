@@ -1211,10 +1211,26 @@ export default function DefaultPropertyContent({ property }) {
         
         price = propertyState._original.price;
       } 
-      // Si no hay _original, intentar con priceNumeric (sin manipular)
+      // Si no hay _original, intentar con priceNumeric aplicando corrección especial para punto decimal
       else if (propertyState.priceNumeric !== undefined && propertyState.priceNumeric !== null) {
-        price = propertyState.priceNumeric;
-        console.log('PropertyContent MongoDB - Usando precio exacto priceNumeric:', price);
+        // CORRECCIÓN CRUCIAL: Detectar si el número tiene forma de precio español con formato americano
+        // Si es menor que 10 y tiene decimales, probablemente sea un precio en miles con punto decimal
+        let priceNum = propertyState.priceNumeric;
+        
+        // Convertir a string para analizar
+        const priceStr = String(priceNum);
+        
+        // Verificar si tiene formato de precio español incorrectamente almacenado (1.299 debe ser 1299)
+        if (priceNum < 10 && priceStr.includes('.')) {
+          // Exttraer los dígitos y multiplicar por 1000
+          const cleanPrice = parseFloat(priceStr.replace(/[^\d.-]/g, '')) * 1000;
+          console.log('PropertyContent MongoDB - Corrigiendo precio en formato incorrecto:', priceNum, ' a ', cleanPrice);
+          price = cleanPrice;
+        } else {
+          price = priceNum;
+        }
+        
+        console.log('PropertyContent MongoDB - Precio final tras análisis:', price);
       } 
       // Último recurso: usar el precio sin ninguna manipulación
       else if (propertyState.price !== undefined && propertyState.price !== null) {
