@@ -172,18 +172,44 @@ export async function getServerSideProps(context) {
 
   console.log(`[getServerSideProps] Obteniendo propiedad ID: ${id}, Fuente: ${source}`);
 
+  // Función para crear datos mínimos de la propiedad cuando hay error
+  const createFallbackProperty = (id) => {
+    return {
+      _id: id,
+      id: id,
+      title: 'Propiedad en Madrid',
+      description: 'Detalles completos de esta propiedad no disponibles en este momento.',
+      price: 'Contactar',
+      location: 'Madrid',
+      address: 'Madrid',
+      bedrooms: '0',
+      bathrooms: '0',
+      area: '0',
+      propertyType: 'Propiedad',
+      status: 'Disponible',
+      images: [],
+      source: 'fallback',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+  };
+
   // Obtener la URL base correcta para el entorno actual
   const isProduction = process.env.NODE_ENV === 'production';
   let API_BASE_URL;
   
   if (isProduction) {
-    // En producción, siempre usar HTTPS y el dominio principal
+    // En producción intentamos ambas opciones
+    // 1. URL base fija conocida
     API_BASE_URL = 'https://www.realestategozamadrid.com';
     
-    // Alternativa usando el host de la solicitud actual
-    // const host = context.req.headers.host || 'realestategozamadrid.com';
-    // const protocol = 'https'; // Forzar HTTPS en producción
-    // API_BASE_URL = `${protocol}://${host}`;
+    // 2. URL basada en el encabezado host (como respaldo)
+    const host = context.req?.headers?.host;
+    if (host) {
+      const protocol = 'https';
+      const hostApiUrl = `${protocol}://${host}`;
+      console.log(`[getServerSideProps] URL alternativa disponible: ${hostApiUrl}`);
+    }
   } else {
     // En desarrollo, usar localhost
     API_BASE_URL = 'http://localhost:3000';
@@ -193,68 +219,77 @@ export async function getServerSideProps(context) {
   
   console.log(`[getServerSideProps] Usando API base: ${API_BASE_URL}`);
 
-
-  let apiUrl = '';
-  let headers = { 'Accept': 'application/json' };
-  let params = {};
-
-  if (source === 'mongodb') {
-      console.log('[getServerSideProps] Usando API MongoDB local');
-
-      // Usar URL absoluta completa con la base correcta
-      apiUrl = `${API_BASE_URL}/api/properties/${id}`;
-      console.log(`[getServerSideProps] Intentando fetch a MongoDB API: ${apiUrl}`);
-  } else {
-      console.error(`[getServerSideProps] Fuente desconocida: ${source}`);
-      return { props: { propertyData: null, error: 'Fuente de datos no válida', source } };
-  }
-
-  console.log(`[getServerSideProps] URL final: ${apiUrl}`);
-  // console.log('[getServerSideProps] Params:', params); // No loguear el secret
-
-  try {
-      console.log(`[getServerSideProps] Intentando obtener datos con axios desde: ${apiUrl}`);
-      
+  // Función para intentar obtener datos de la API
+  const fetchFromApi = async (baseUrl) => {
+    const apiUrl = `${baseUrl}/api/properties/${id}`;
+    console.log(`[getServerSideProps] Intentando obtener datos desde: ${apiUrl}`);
+    
+    try {
       const response = await axios.get(apiUrl, {
-          params: params,
-          headers: headers,
-          timeout: TIMEOUT,
+        timeout: TIMEOUT,
+        headers: { 'Accept': 'application/json' }
       });
-
-      if (response.status !== 200) {
-          console.error(`[getServerSideProps] API devolvió estado ${response.status}`);
-          throw new Error(`API devolvió estado ${response.status}`);
-      }
-
-      // Extraer los datos de la propiedad de la respuesta de la API
-      const responseData = response.data;
-      console.log(`[getServerSideProps] Respuesta recibida:`, JSON.stringify(responseData).substring(0, 200) + '...');
       
-      if (!responseData.success || !responseData.property) {
-          console.error(`[getServerSideProps] Datos inválidos en respuesta:`, responseData);
-          throw new Error('No se encontraron datos de la propiedad en la respuesta');
+      if (response.status === 200 && response.data.success && response.data.property) {
+        console.log(`[getServerSideProps] Datos obtenidos correctamente de: ${apiUrl}`);
+        return {
+          success: true,
+          data: response.data.property
+        };
       }
       
-      const propertyData = responseData.property;
-      console.log(`[getServerSideProps] Propiedad cargada: ${propertyData.title || 'Sin título'}`);
+      console.log(`[getServerSideProps] Respuesta inválida de: ${apiUrl}`, response.status);
+      return { success: false };
+    } catch (error) {
+      console.error(`[getServerSideProps] Error al obtener datos de: ${apiUrl}`, error.message);
+      return { success: false };
+    }
+  };
 
-      return {
-          props: {
-              propertyData: propertyData,
-              error: null,
-              source: source,
-          },
-      };
-
-  } catch (error) {
-      console.error(`[getServerSideProps] Error al obtener datos de ${source} para ID ${id}:`, error.response?.data || error.message);
-      // Devuelve un error genérico al cliente por seguridad
-      return {
-          props: {
-              propertyData: null,
-              error: `No se pudo cargar la propiedad (${error.response?.status || 'Network Error'}). Inténtalo más tarde.`,
-              source: source,
-          },
-      };
+  // Intentar obtener datos de la API principal
+  const primaryResult = await fetchFromApi(API_BASE_URL);
+  
+  // Si tuvimos éxito con la API principal
+  if (primaryResult.success) {
+    return {
+      props: {
+        propertyData: primaryResult.data,
+        error: null,
+        source: source,
+      },
+    };
   }
+  
+  // Si la API principal falló y estamos en producción, intentar con una URL alternativa
+  if (isProduction) {
+    const host = context.req?.headers?.host;
+    if (host) {
+      const alternativeUrl = `https://${host}`;
+      console.log(`[getServerSideProps] Intentando URL alternativa: ${alternativeUrl}`);
+      
+      const alternativeResult = await fetchFromApi(alternativeUrl);
+      
+      if (alternativeResult.success) {
+        return {
+          props: {
+            propertyData: alternativeResult.data,
+            error: null,
+            source: source,
+          },
+        };
+      }
+    }
+  }
+  
+  // Si llegamos aquí, ambos intentos fallaron o estamos en desarrollo
+  // Devolver datos mínimos para al menos mostrar algo en la página
+  console.warn(`[getServerSideProps] Todos los intentos fallaron, usando datos de respaldo`);
+  
+  return {
+    props: {
+      propertyData: createFallbackProperty(id),
+      error: "La información completa de esta propiedad no está disponible en este momento.",
+      source: 'fallback',
+    },
+  };
 }
