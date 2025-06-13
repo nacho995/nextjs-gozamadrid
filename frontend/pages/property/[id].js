@@ -174,7 +174,7 @@ export async function getServerSideProps(context) {
 
   // Importando directamente la conexión a MongoDB para acceso directo en caso de fallo de la API
   // Nota: Estos módulos solo se cargan en el servidor
-  const { getPropertiesCollection } = require('../../../lib/mongodb');
+  const { getPropertiesCollection } = require('../../lib/mongodb');
   const { ObjectId } = require('mongodb');
   
   // Función para intentar obtener la propiedad directamente desde MongoDB
