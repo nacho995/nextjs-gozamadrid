@@ -1200,26 +1200,45 @@ export default function DefaultPropertyContent({ property }) {
   
   // Formatear el precio correctamente
   const isFromMongoDB = propertyState?.source === 'mongodb' || propertyState?._id;
+  // Para debugging
+  console.log('Datos de precio originales:', {
+    isFromMongoDB,
+    priceNumeric: propertyState.priceNumeric,
+    price: propertyState.price
+  });
+  
   let priceValue = isFromMongoDB ? (propertyState.priceNumeric || propertyState.price) : propertyState.price;
   let formattedPrice = 'Consultar precio';
   
   if (priceValue !== undefined && priceValue !== null && priceValue !== '') {
-    let price = typeof priceValue === 'number' 
-      ? priceValue 
-      : parseFloat(String(priceValue).replace(/[^\d.-]/g, ''));
+    // Convertir a string y limpiar para asegurar que solo queden números
+    let priceStr = String(priceValue).trim();
+    console.log('Precio antes de limpiar:', priceStr);
+    
+    // Convertir a número correctamente
+    let price;
+    if (typeof priceValue === 'number') {
+      price = priceValue;
+    } else {
+      // Eliminar cualquier caracter que no sea dígito, punto o guión
+      priceStr = priceStr.replace(/[^\d.-]/g, '');
+      price = parseFloat(priceStr);
+    }
+    
+    console.log('Precio después de convertir:', price);
     
     if (!isNaN(price) && isFinite(price) && price > 0) {
       // Solo aplicar corrección para propiedades que no sean de MongoDB y tengan precios muy bajos
       if (!isFromMongoDB && price < 10000 && price > 100) {
         price = price * 1000;
+        console.log('Precio corregido (multiplicado por 1000):', price);
       }
 
+      // Usar Intl.NumberFormat sin style: 'currency' para evitar duplicar el símbolo
       formattedPrice = new Intl.NumberFormat('es-ES', {
-        style: 'currency',
-        currency: 'EUR',
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
-      }).format(price);
+      }).format(price) + ' €';
     } else {
       console.warn('PropertyContent: Precio inválido', {
         priceNumeric: propertyState.priceNumeric,

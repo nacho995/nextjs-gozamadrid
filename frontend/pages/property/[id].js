@@ -334,13 +334,37 @@ export async function getServerSideProps(context) {
     if (dbProperty) {
       console.log(`[getServerSideProps] Propiedad recuperada directamente de MongoDB: ${dbProperty.title || 'Sin título'}`);
       
+      // Procesar el precio para evitar problemas de formato
+      let propertyPrice = dbProperty.price;
+      let priceNumeric = null;
+      
+      // Intentar extraer valor numérico del precio
+      if (propertyPrice !== undefined && propertyPrice !== null) {
+        // Si ya es un número, guardarlo directamente
+        if (typeof propertyPrice === 'number') {
+          priceNumeric = propertyPrice;
+          propertyPrice = String(propertyPrice); // Convertir a string para consistencia
+        } 
+        // Si es string, intentar extraer el valor numérico
+        else if (typeof propertyPrice === 'string') {
+          // Limpiar el string de precio de caracteres no numéricos
+          const cleanPrice = propertyPrice.replace(/[^\d.-]/g, '');
+          if (cleanPrice) {
+            priceNumeric = parseFloat(cleanPrice);
+          }
+        }
+      }
+      
+      console.log(`[getServerSideProps] Precio procesado: original=${dbProperty.price}, numérico=${priceNumeric}`);
+      
       // Normalizar los datos según el formato que espera la aplicación
       const normalizedProperty = {
         _id: dbProperty._id?.toString() || id,
         id: dbProperty._id?.toString() || dbProperty.id || id,
         title: dbProperty.title || dbProperty.name || 'Propiedad sin título',
         description: dbProperty.description || '',
-        price: dbProperty.price || 'Consultar',
+        price: propertyPrice || 'Consultar',
+        priceNumeric: priceNumeric, // Añadir el precio numérico para facilitar el formato correcto
         location: dbProperty.location || dbProperty.address || 'Madrid',
         address: dbProperty.address || dbProperty.location || 'Madrid',
         coordinates: dbProperty.coordinates || null,
