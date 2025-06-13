@@ -1208,6 +1208,7 @@ export default function DefaultPropertyContent({ property }) {
   });
   
   // Extraer el valor numérico del precio con mayor robustez
+  // *** PROCESAMIENTO DE PRECIO - REFORMULADO PARA EVITAR DUPLICACIONES DE SÍMBOLO ***
   let priceValue;
   if (isFromMongoDB) {
     // Para propiedades MongoDB, intentar usar priceNumeric primero
@@ -1217,17 +1218,23 @@ export default function DefaultPropertyContent({ property }) {
     priceValue = propertyState.price;
   }
   
+  // Si el precio ya contiene un símbolo de euro, quitarlo para evitar duplicación
+  if (typeof priceValue === 'string' && priceValue.includes('€')) {
+    priceValue = priceValue.replace(/€/g, '').trim();
+    console.log('PropertyContent - Se ha eliminado el símbolo € del precio original');
+  }
+  
   // Valor formateado por defecto si no hay precio
   let formattedPrice = 'Consultar precio';
   
   // Log detallado del valor inicial
-  console.log('PropertyContent - Precio original:', { 
+  console.log('PropertyContent - Precio original procesado:', { 
     valor: priceValue, 
     tipo: typeof priceValue, 
     fuente: isFromMongoDB ? 'MongoDB' : 'Otra' 
   });
   
-  // Procesamiento robusto del precio - MEJORADO PARA CONSISTENCIA CON PROPERTYPAGE
+  // Procesamiento robusto del precio - REFORMULADO PARA COMPATIBILIDAD TOTAL
   if (priceValue !== undefined && priceValue !== null && priceValue !== '') {
     // Variable para almacenar el precio numérico limpio
     let price;
@@ -1239,12 +1246,12 @@ export default function DefaultPropertyContent({ property }) {
     } else {
       // Si es string u otro tipo, convertirlo primero a string y limpiarlo
       let priceStr = String(priceValue).trim();
-      // Eliminar cualquier caracter que no sea dígito, punto o guión
+      // Eliminar cualquier texto que no sea dígito (incluidos símbolos de moneda)
       priceStr = priceStr.replace(/[^\d.-]/g, '');
       price = parseFloat(priceStr);
     }
     
-    console.log('PropertyContent - Precio procesado inicial:', price, 'Tipo:', typeof price);
+    console.log('PropertyContent - Precio numérico extraido:', price, 'Tipo:', typeof price);
     
     // Verificar que el precio es un número válido y mayor que 0
     if (!isNaN(price) && isFinite(price) && price > 0) {
@@ -1267,7 +1274,7 @@ export default function DefaultPropertyContent({ property }) {
       
       console.log('PropertyContent - Precio final a formatear:', price);
 
-      // Formatear sin style: 'currency' para evitar duplicación del símbolo del euro
+      // EXACTAMENTE como en PropertyPage: Sin style currency para evitar duplicaciones
       formattedPrice = new Intl.NumberFormat('es-ES', {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
@@ -1404,6 +1411,7 @@ export default function DefaultPropertyContent({ property }) {
               <div className="mt-8 lg:mt-0">
                 <div className="bg-amarillo py-4 px-8 rounded-2xl inline-flex items-center shadow-xl transform hover:scale-105 transition-all duration-500 group">
                   <p className="text-3xl font-bold text-black tracking-wide" itemProp="offers" itemScope itemType="https://schema.org/Offer">
+                    {/* IMPORTANTE: Solo mostramos el precio formateado sin ninguna otra palabra */}
                     <span itemProp="price">{formattedPrice}</span>
                     <meta itemProp="priceCurrency" content="EUR" />
                     <meta itemProp="availability" content="https://schema.org/InStock" />
