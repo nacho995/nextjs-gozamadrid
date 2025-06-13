@@ -209,11 +209,14 @@ const processPropertyImages = (propertyState) => {
       if (propertyState.images && Array.isArray(propertyState.images)) {
         propertyState.images.forEach((img, index) => {
           let imageUrl = '';
+          let imageAlt = '';
           
           if (typeof img === 'string') {
             imageUrl = img;
           } else if (typeof img === 'object') {
             imageUrl = img.src || img.url || img.source_url || '';
+            // Usar alt personalizado si existe
+            imageAlt = img.alt || '';
           }
           
           if (imageUrl) {
@@ -223,7 +226,7 @@ const processPropertyImages = (propertyState) => {
             images.push({
               id: index,
               src: processedUrl,
-              alt: propertyState.title || propertyState.name || 'Imagen de propiedad',
+              alt: imageAlt || propertyState.title || propertyState.name || 'Imagen de propiedad',
               original: imageUrl
             });
           }
@@ -235,11 +238,14 @@ const processPropertyImages = (propertyState) => {
       if (propertyState.images && Array.isArray(propertyState.images)) {
         propertyState.images.forEach((img, index) => {
           let imageUrl = '';
+          let imageAlt = '';
           
           if (typeof img === 'string') {
             imageUrl = img;
           } else if (typeof img === 'object') {
             imageUrl = img.url || img.src || '';
+            // Usar alt personalizado si existe
+            imageAlt = img.alt || '';
           }
           
           if (imageUrl) {
@@ -249,7 +255,7 @@ const processPropertyImages = (propertyState) => {
             images.push({
               id: index,
               src: processedUrl,
-              alt: propertyState.title || 'Imagen de propiedad',
+              alt: imageAlt || propertyState.title || 'Imagen de propiedad',
               original: imageUrl
             });
           }
@@ -1438,9 +1444,9 @@ export default function DefaultPropertyContent({ property }) {
             {/* Miniaturas con efecto premium */}
             {propertyImages.length > 0 ? (
               <div className="bg-black/80 backdrop-blur-xl p-6 rounded-[2rem] border border-amarillo/20 shadow-2xl hidden sm:block">
-                <h3 className="text-xl text-white mb-4 font-light text-center">
+                <h2 className="text-xl text-white mb-4 font-light text-center">
                   {propertyImages.length} imágenes disponibles
-                </h3>
+                </h2>
                 
                 <div className="flex flex-wrap justify-center gap-4">
                   {propertyImages.map((image, index) => (
@@ -1472,9 +1478,9 @@ export default function DefaultPropertyContent({ property }) {
               </div>
             ) : (
               <div className="bg-black/80 backdrop-blur-xl p-6 rounded-[2rem] border border-amarillo/20 shadow-2xl hidden sm:block">
-                <h3 className="text-xl text-white mb-4 font-light text-center">
+                <h2 className="text-xl text-white mb-4 font-light text-center">
                   No hay imágenes disponibles
-                </h3>
+                </h2>
               </div>
             )}
           </section>
@@ -1581,7 +1587,7 @@ export default function DefaultPropertyContent({ property }) {
                     style={{ display: 'none' }}
                   >
                     <FaMapMarkerAlt className="text-amarillo text-6xl mb-4" />
-                    <h3 className="text-xl font-bold mb-2">Ubicación de la Propiedad</h3>
+                    <h2 className="text-xl font-bold mb-2">Ubicación de la Propiedad</h2>
                     <p className="text-gray-300 text-center mb-4 px-4">
                       {typeof formattedAddress === 'string' ? formattedAddress : "Madrid, España"}
                     </p>
@@ -1680,7 +1686,7 @@ export default function DefaultPropertyContent({ property }) {
             {/* Efecto de brillo */}
             <div className="absolute inset-0 bg-gradient-to-r from-amarillo/5 via-amarillo/10 to-amarillo/5 animate-shimmer"></div>
             
-            <h3 className="text-3xl font-semibold text-white mb-8 tracking-wide relative z-10">¿Desea más información sobre esta propiedad exclusiva?</h3>
+            <h2 className="text-3xl font-semibold text-white mb-8 tracking-wide relative z-10">¿Desea más información sobre esta propiedad exclusiva?</h2>
             <Link href="/contacto">
               <button className="group relative inline-flex items-center gap-3 overflow-hidden rounded-2xl bg-amarillo px-8 py-6 transition-all duration-500 hover:bg-amarillo/90 shadow-2xl hover:scale-105" aria-label="Contactar para más información">
                 <FaEnvelope className="text-2xl text-black" />
@@ -1700,7 +1706,7 @@ export default function DefaultPropertyContent({ property }) {
               className="bg-black/95 rounded-[2rem] p-10 max-w-xl w-full mx-auto shadow-2xl border border-amarillo/20 animate-scaleIn backdrop-blur-xl my-4"
             >
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-2xl font-bold text-white">Agenda una visita</h3>
+                <h2 className="text-2xl font-bold text-white">Agenda una visita</h2>
                 <button
                   onClick={() => setShowCalendar(false)}
                   className="text-gray-400 hover:text-white transition-colors duration-300 p-2 rounded-full hover:bg-white/10"
@@ -1763,10 +1769,10 @@ export default function DefaultPropertyContent({ property }) {
 
                 {selectedDate && selectedTime && (
                   <div className="bg-gray-800/70 p-5 rounded-lg border border-gray-700">
-                    <h3 className="text-lg font-semibold mb-4 flex items-center text-white">
+                    <h2 className="text-lg font-semibold mb-4 flex items-center text-white">
                       <FaUser className="mr-2 text-amarillo" />
                       Datos de contacto
-                    </h3>
+                    </h2>
                     <div className="space-y-4">
                       <input
                         type="email"
@@ -1882,7 +1888,7 @@ export default function DefaultPropertyContent({ property }) {
               className="bg-black/95 rounded-[2rem] p-10 max-w-xl w-full mx-auto shadow-2xl overflow-y-auto max-h-[90vh] border border-amarillo/20 animate-scaleIn backdrop-blur-xl"
             >
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-2xl font-bold text-white">Hacer una oferta</h3>
+                <h2 className="text-2xl font-bold text-white">Hacer una oferta</h2>
                 <button
                   onClick={() => setShowOfferPanel(false)}
                   className="text-gray-400 hover:text-white transition-colors duration-300 p-2 rounded-full hover:bg-white/10"
