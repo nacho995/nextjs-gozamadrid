@@ -1267,7 +1267,7 @@ export default function DefaultPropertyContent({ property }) {
       
       console.log('PropertyContent - Precio final a formatear:', price);
 
-      // CORRECCIÓN CLAVE: Usar Intl.NumberFormat sin style: 'currency' para evitar duplicar el símbolo
+      // Formatear sin style: 'currency' para evitar duplicación del símbolo del euro
       formattedPrice = new Intl.NumberFormat('es-ES', {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
@@ -1403,7 +1403,6 @@ export default function DefaultPropertyContent({ property }) {
               
               <div className="mt-8 lg:mt-0">
                 <div className="bg-amarillo py-4 px-8 rounded-2xl inline-flex items-center shadow-xl transform hover:scale-105 transition-all duration-500 group">
-                  <FaEuroSign className="text-3xl text-black mr-3" />
                   <p className="text-3xl font-bold text-black tracking-wide" itemProp="offers" itemScope itemType="https://schema.org/Offer">
                     <span itemProp="price">{formattedPrice}</span>
                     <meta itemProp="priceCurrency" content="EUR" />
