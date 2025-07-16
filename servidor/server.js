@@ -80,53 +80,14 @@ const allowedOrigins = process.env.CORS_ORIGIN
       'http://localhost:3000',
       'http://localhost:5174'
     ];
-
-// Middleware para normalizar rutas (eliminar barras finales)
-app.use((req, res, next) => {
-  if (req.path.length > 1 && req.path.endsWith('/')) {
-    // Mantener la ruta original para que las rutas con barra final también funcionen
-    next();
-  } else {
-    next();
-  }
-});
-
-// Configuración// <<< CORS >>>  
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      // Permitir todas las solicitudes sin origen (en desarrollo, las llamadas directas a la API, etc.)
-      if (!origin) return callback(null, true);
-      
-      // Comprobar patrón de wildcard
-      const wildcardOrigin = allowedOrigins.find(allowed => {
-        if (allowed.includes('*')) {
-          const prefix = allowed.split('*')[0];
-          return origin.indexOf(prefix) === 0;
-        }
-        return false;
-      });
-      
-      if (wildcardOrigin) {
-        return callback(null, true);
-      }
-      
-      // En modo desarrollo, permitir todos los orígenes
-      if (process.env.NODE_ENV === 'development') {
-        return callback(null, true);
-      }
-      
-      console.log(`Origin bloqueado: ${origin}`);
-      return callback(null, true); // Temporalmente permitir todos los orígenes mientras solucionamos el problema
-    }
-    callback(null, true);
-  },
+const corsOptions = {
+  origin: '*', // Permitir cualquier origen para depuración
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Cache-Control', 'Pragma', 'Expires'],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Amz-Date', 'X-Api-Key', 'X-Amz-Security-Token', 'Cache-Control', 'X-Requested-With', 'Cache-Control', 'cache-control', 'Accept', 'Accept-Version', 'Content-Length', 'Content-MD5', 'Date', 'X-Api-Version', 'Pragma', 'Expires'],
   exposedHeaders: ['Content-Type', 'Authorization', 'Cache-Control', 'Pragma', 'Expires']
-}));
+};
+app.use(cors(corsOptions));
 
 // Middleware específico para manejar peticiones OPTIONS
 app.options('*', (req, res) => {
