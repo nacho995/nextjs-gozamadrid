@@ -77,7 +77,8 @@ const allowedOrigins = process.env.CORS_ORIGIN
       'https://*.gozamadrid.pages.dev',
       'https://gozamadrid-frontend.pages.dev',
       'https://gozamadrid-frontend-hzb50dzj9-nacho995s-projects.vercel.app',
-      'http://localhost:3000'
+      'http://localhost:3000',
+      'http://localhost:5174'
     ];
 
 // Middleware para normalizar rutas (eliminar barras finales)
@@ -123,8 +124,8 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Cache-Control', 'cache-control', 'Accept', 'Accept-Version', 'Content-Length', 'Content-MD5', 'Date', 'X-Api-Version'],
-  exposedHeaders: ['Content-Type', 'Authorization', 'Cache-Control']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Amz-Date', 'X-Api-Key', 'X-Amz-Security-Token', 'Cache-Control', 'X-Requested-With', 'Cache-Control', 'cache-control', 'Accept', 'Accept-Version', 'Content-Length', 'Content-MD5', 'Date', 'X-Api-Version', 'Pragma'],
+  exposedHeaders: ['Content-Type', 'Authorization', 'Cache-Control', 'Pragma']
 }));
 
 // Middleware específico para manejar peticiones OPTIONS
@@ -195,7 +196,7 @@ app.use('/api/properties', propertyRoutes);
 app.use('/api', notificationRouter);
 app.use("/prefix", prefixRouter);
 app.use("/api/blogs", blogRouter);
-app.use("/user", userRouter);
+app.use('/api/user', userRouter);
 app.use('/api/cloudinary', cloudinaryRouter);
 
 // Rutas específicas para ofertas y visitas de propiedades
