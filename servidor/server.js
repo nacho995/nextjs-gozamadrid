@@ -58,35 +58,28 @@ const PORT = process.env.PORT || 8081;
 const allowedOrigins = process.env.CORS_ORIGIN 
   ? process.env.CORS_ORIGIN.split(',') 
   : [
-      'https://realestategozamadrid.com',
-      'http://realestategozamadrid.com',
-      'https://www.realestategozamadrid.com',
-      'http://www.realestategozamadrid.com',
-      'https://blog.realestategozamadrid.com',
-      'http://blog.realestategozamadrid.com',
       'https://blogs.realestategozamadrid.com',
-      'http://blogs.realestategozamadrid.com',
-      'https://subir.realestategozamadrid.com',
       'https://nextjs-gozamadrid-qrfk.onrender.com',
-      'https://gozamadrid-backend-778f.onrender.com',
-      'https://api.realestategozamadrid.com',
-      'https://backend.realestategozamadrid.com',
-      'https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com',
-      'http://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com',
-      'https://gozamadrid.pages.dev',
-      'https://*.gozamadrid.pages.dev',
-      'https://gozamadrid-frontend.pages.dev',
-      'https://gozamadrid-frontend-hzb50dzj9-nacho995s-projects.vercel.app',
-      'http://localhost:3000',
-      'http://localhost:5174'
+      'https://realestategozamadrid.com',
+      'http://localhost:5173',
+      'http://localhost:5174',
+      'http://localhost:5175'
     ];
+
 const corsOptions = {
-  origin: '*', // Permitir cualquier origen para depuración
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Cache-Control', 'Pragma', 'Expires'],
-  credentials: true,
   exposedHeaders: ['Content-Type', 'Authorization', 'Cache-Control', 'Pragma', 'Expires']
 };
+
 app.use(cors(corsOptions));
 
 // Middleware específico para manejar peticiones OPTIONS
