@@ -34,7 +34,7 @@ export default async function handler(req, res) {
   const MONGO_URLS = [
     'http://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com', // URL que funciona
     process.env.NEXT_PUBLIC_API_URL,
-    'http://api.realestategozamadrid.com', // HTTP en lugar de HTTPS
+    'https://nextjs-gozamadrid-qrfk.onrender.com', // HTTP en lugar de HTTPS
     'http://localhost:8081'
   ].filter(Boolean);
 

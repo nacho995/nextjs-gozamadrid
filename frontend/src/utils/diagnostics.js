@@ -28,9 +28,9 @@ const ENDPOINTS = {
     }
   },
   BACKEND: {
-    BASE: config.API_ROUTES?.BEANSTALK || 'https://api.realestategozamadrid.com/api',
-    HEALTH: `${config.API_ROUTES?.BEANSTALK || 'https://api.realestategozamadrid.com/api'}/health`,
-    ROOT: (config.API_ROUTES?.BEANSTALK || 'https://api.realestategozamadrid.com/api').replace('/api', ''),
+    BASE: config.API_ROUTES?.BEANSTALK || 'https://nextjs-gozamadrid-qrfk.onrender.com',
+    HEALTH: `${config.API_ROUTES?.BEANSTALK || 'https://nextjs-gozamadrid-qrfk.onrender.com'}/health`,
+    ROOT: (config.API_ROUTES?.BEANSTALK || 'https://nextjs-gozamadrid-qrfk.onrender.com').replace('/api', ''),
     ALTERNATE: {
       BASE: 'https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api',
       HEALTH: 'https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api/health',
