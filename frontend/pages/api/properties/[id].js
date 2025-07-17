@@ -2,7 +2,7 @@
  * API para obtener una propiedad específica por ID desde MongoDB
  */
 
-import { connectToDatabase } from '@/lib/mongodb';
+import { connectToDatabase } from '../../../lib/mongodb';
 import { ObjectId } from 'mongodb';
 
 export default async function handler(req, res) {
