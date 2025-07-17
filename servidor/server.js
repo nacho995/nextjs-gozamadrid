@@ -55,42 +55,37 @@ const app = express();
 const PORT = process.env.PORT || 8081;
 
 // Configurar CORS con opciones avanzadas
-const allowedOrigins = process.env.CORS_ORIGIN 
-  ? process.env.CORS_ORIGIN.split(',') 
-  : [
-      'https://blogs.realestategozamadrid.com',
-      'https://nextjs-gozamadrid-qrfk.onrender.com',
-      'https://realestategozamadrid.com',
-      'http://localhost:5173',
-      'http://localhost:5174',
-      'http://localhost:5175'
-    ];
+const defaultOrigins = [
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://localhost:5175',
+    'https://blogs.realestategozamadrid.com',
+    'https://realestategozamadrid.com',
+    'https://www.realestategozamadrid.com',
+    'https://api.realestategozamadrid.com',
+    'https://nextjs-gozamadrid-qrfk.onrender.com'
+];
+
+const allowedOrigins = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : defaultOrigins;
 
 const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Cache-Control', 'Pragma', 'Expires'],
-  exposedHeaders: ['Content-Type', 'Authorization', 'Cache-Control', 'Pragma', 'Expires']
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            console.error(`CORS error: Origin ${origin} not allowed.`);
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Cache-Control', 'Pragma', 'Expires'],
+    exposedHeaders: ['Content-Type', 'Authorization', 'Cache-Control', 'Pragma', 'Expires']
 };
 
 app.use(cors(corsOptions));
-
-// Middleware específico para manejar peticiones OPTIONS
-app.options('*', (req, res) => {
-  // Establecer los encabezados CORS manualmente para asegurarnos que funcionan los preflight
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cache-Control, cache-control, Accept, Accept-Version, Content-Length, Content-MD5, Date, X-Api-Version, Origin, X-Requested-With');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.sendStatus(200);
-});
+app.options('*', cors(corsOptions)); // Let cors middleware handle OPTIONS requests
 
 // <<< LOG INICIAL >>>
 app.use((req, res, next) => {
