@@ -71,15 +71,34 @@ const allowedOrigins = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split('
 
 const corsOptions = {
     origin: function (origin, callback) {
+        console.log(`🔍 CORS Check: Origin recibido: "${origin}"`);
+        console.log('🔍 CORS Check: Allowed origins:', allowedOrigins);
+        
         // Permitir requests sin origin (como desde aplicaciones móviles)
-        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-            console.log(`✅ CORS: Origin ${origin || 'null'} permitido`);
+        if (!origin) {
+            console.log(`✅ CORS: Request sin origin permitido`);
             callback(null, true);
-        } else {
-            console.error(`❌ CORS error: Origin ${origin} not allowed.`);
-            console.log('Allowed origins:', allowedOrigins);
-            callback(new Error('Not allowed by CORS'));
+            return;
         }
+        
+        // Verificar si el origin está en la lista permitida
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            console.log(`✅ CORS: Origin ${origin} permitido`);
+            callback(null, true);
+            return;
+        }
+        
+        // Para debug en producción, permitir temporalmente todos los orígenes de realestategozamadrid
+        if (origin.includes('realestategozamadrid.com')) {
+            console.log(`✅ CORS: Origin ${origin} permitido (dominio realestategozamadrid)`);
+            callback(null, true);
+            return;
+        }
+        
+        console.error(`❌ CORS error: Origin ${origin} not allowed.`);
+        console.log('Allowed origins:', allowedOrigins);
+        // En lugar de enviar un error, rechazar silenciosamente
+        callback(null, false);
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
@@ -209,6 +228,30 @@ app.use('/api/user', (req, res, next) => {
     if (req.method === 'OPTIONS') {
         console.log('🔄 User route OPTIONS handled');
         return res.sendStatus(200);
+    }
+    
+    next();
+});
+
+// Middleware específico para rutas de usuario con CORS mejorado
+app.use('/api/user', (req, res, next) => {
+    console.log(`🔐 User API: ${req.method} ${req.url} from origin: ${req.headers.origin || 'null'}`);
+    
+    // Configurar headers CORS específicos para user API
+    const origin = req.headers.origin;
+    if (origin && (allowedOrigins.includes(origin) || origin.includes('realestategozamadrid.com'))) {
+        res.header('Access-Control-Allow-Origin', origin);
+        res.header('Access-Control-Allow-Credentials', 'true');
+    }
+    
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Cache-Control, Pragma, Expires, Accept, Origin, X-CSRF-Token');
+    
+    // Manejar preflight requests
+    if (req.method === 'OPTIONS') {
+        console.log('✅ User API: Handling OPTIONS preflight request');
+        res.status(200).end();
+        return;
     }
     
     next();
