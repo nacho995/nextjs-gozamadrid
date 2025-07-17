@@ -55,7 +55,7 @@ const PropiedadesLujo = () => {
   };
   
   // Enlace a la valoración
-  const valorationLink = "https://valuation.lystos.com?clientId=cd55b10c-5ba6-4f65-854e-5c8adaf88a34";
+  const valorationLink = "https://betterplaceapp.com/valorar/personal-de-momento/u/34300?locale=es";
   
   // Animación para el fadeIn de las secciones
   const fadeIn = {
