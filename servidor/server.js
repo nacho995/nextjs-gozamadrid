@@ -73,9 +73,10 @@ const corsOptions = {
     origin: function (origin, callback) {
         // Permitir requests sin origin (como desde aplicaciones móviles)
         if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            console.log(`✅ CORS: Origin ${origin || 'null'} permitido`);
             callback(null, true);
         } else {
-            console.error(`CORS error: Origin ${origin} not allowed.`);
+            console.error(`❌ CORS error: Origin ${origin} not allowed.`);
             console.log('Allowed origins:', allowedOrigins);
             callback(new Error('Not allowed by CORS'));
         }
@@ -100,7 +101,8 @@ const corsOptions = {
         'Pragma', 
         'Expires',
         'X-Total-Count'
-    ]
+    ],
+    optionsSuccessStatus: 200 // Para soportar navegadores legacy
 };
 
 app.use(cors(corsOptions));
@@ -110,14 +112,25 @@ app.options('*', cors(corsOptions));
 // Middleware adicional para manejar CORS manualmente si es necesario
 app.use((req, res, next) => {
     const origin = req.headers.origin;
+    
+    // Log para debugging
+    console.log(`🔍 CORS Middleware: ${req.method} ${req.url} from origin: ${origin || 'null'}`);
+    
     if (origin && allowedOrigins.includes(origin)) {
         res.header('Access-Control-Allow-Origin', origin);
+        console.log(`✅ CORS Header set for origin: ${origin}`);
+    } else if (!origin) {
+        // Para requests sin origin (como desde Postman o aplicaciones móviles)
+        res.header('Access-Control-Allow-Origin', '*');
+        console.log('✅ CORS Header set to * for no-origin request');
     }
+    
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS,PATCH');
     res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With,Cache-Control,Pragma,Expires,Accept,Origin,X-CSRF-Token');
     
     if (req.method === 'OPTIONS') {
+        console.log('🔄 Handling OPTIONS preflight request');
         res.sendStatus(200);
     } else {
         next();
@@ -175,6 +188,30 @@ app.use((req, res, next) => {
     console.log(`[BEFORE PROPERTY ROUTER] ${req.method} ${req.url}`);
   }
   next();
+});
+
+// Middleware específico para rutas de usuario (login)
+app.use('/api/user', (req, res, next) => {
+    console.log(`🔐 User route middleware: ${req.method} ${req.url}`);
+    
+    // Asegurar headers de CORS para rutas de usuario
+    const origin = req.headers.origin;
+    if (origin && allowedOrigins.includes(origin)) {
+        res.header('Access-Control-Allow-Origin', origin);
+    } else {
+        res.header('Access-Control-Allow-Origin', '*');
+    }
+    
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS,PATCH');
+    res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With,Cache-Control,Pragma,Expires,Accept,Origin,X-CSRF-Token');
+    
+    if (req.method === 'OPTIONS') {
+        console.log('🔄 User route OPTIONS handled');
+        return res.sendStatus(200);
+    }
+    
+    next();
 });
 
 // Rutas
