@@ -64,6 +64,7 @@ const defaultOrigins = [
     'https://realestategozamadrid.com',
     'https://www.realestategozamadrid.com',
     'https://api.realestategozamadrid.com',
+    'https://blogs.realestategozamadrid.com',
     'https://nextjs-gozamadrid-qrfk.onrender.com'
 ];
 
