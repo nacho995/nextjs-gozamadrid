@@ -651,7 +651,7 @@ function SmartFloatingValoradorButton() {
           
           {/* Botón base con gradientes complejos */}
           <motion.a
-            href="https://valuation.lystos.com?clientId=cd55b10c-5ba6-4f65-854e-5c8adaf88a34"
+            href="https://betterplaceapp.com/valorar/personal-de-momento/u/34300?locale=es"
             target="_blank"
             rel="noopener noreferrer"
             className="relative flex items-center gap-3 px-6 py-4 rounded-full overflow-hidden shadow-2xl transform transition-all duration-500 group"

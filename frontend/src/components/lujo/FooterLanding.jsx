@@ -44,7 +44,7 @@ const FooterLanding = () => {
           {/* Enlaces y CTA */}
           <div className="text-center md:text-right">
             <a 
-              href="https://valuation.lystos.com?clientId=cd55b10c-5ba6-4f65-854e-5c8adaf88a34"
+              href="https://betterplaceapp.com/valorar/personal-de-momento/u/34300?locale=es"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block mb-6 bg-gradient-to-r from-yellow-500 to-yellow-700 text-black font-bold px-6 py-3 rounded-full hover:from-yellow-600 hover:to-yellow-800 transition-all duration-300 shadow-lg transform hover:scale-105"

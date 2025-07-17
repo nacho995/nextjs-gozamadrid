@@ -1393,7 +1393,7 @@ export default function DefaultPropertyContent({ property }) {
             
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between relative z-10">
               <div className="lg:mr-8">
-                <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight leading-tight" itemProp="name">{title}</h1>
+                <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight leading-tight" itemProp="name">{title}</h2>
                 <div className=" items-center mt-4 bg-black/30 backdrop-blur-md px-4 py-3 rounded-xl inline-block">
                   <div className="bg-amarillo p-2 rounded-lg mr-3">
                     <FaMapMarkerAlt className="text-black text-xl" />

@@ -5,7 +5,7 @@
  * una llamada a /api/config/properties durante la inicialización en _app.js
  */
 
-const SITE_URL = 'https://www.realestategozamadrid.com';
+const SITE_URL = 'https://blogs.realestategozamadrid.com';
 const WP_API_URL = 'https://wordpress.realestategozamadrid.com/wp-json/wp/v2';
 const WC_API_URL = 'https://wordpress.realestategozamadrid.com/wp-json/wc/v3';
 

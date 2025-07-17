@@ -143,7 +143,7 @@ const ImageSlider = ({ autoPlayInterval = 8000 }) => {
         {/* Botón de valoración */}
         <div className="absolute top-[60%] md:top-[65%] lg:top-[60%] xl:top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
           <a
-            href="https://valuation.lystos.com?clientId=cd55b10c-5ba6-4f65-854e-5c8adaf88a34"
+            href="https://betterplaceapp.com/valorar/personal-de-momento/u/34300?locale=es"
             className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-black/50 
               px-4 sm:px-6 lg:px-8 
               py-2 sm:py-2.5 lg:py-3 

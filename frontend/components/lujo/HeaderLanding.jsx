@@ -80,7 +80,7 @@ const HeaderLanding = () => {
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
             <motion.a
-              href="https://valuation.lystos.com?clientId=cd55b10c-5ba6-4f65-854e-5c8adaf88a34"
+              href="https://betterplaceapp.com/valorar/personal-de-momento/u/34300?locale=es"
               target="_blank"
               rel="noopener noreferrer"
               whileHover={{ scale: 1.05 }}
