@@ -64,8 +64,8 @@ const defaultOrigins = [
     'https://realestategozamadrid.com',
     'https://www.realestategozamadrid.com',
     'https://api.realestategozamadrid.com',
-    'https://blogs.realestategozamadrid.com',
-    'https://nextjs-gozamadrid-qrfk.onrender.com'
+    'https://nextjs-gozamadrid-qrfk.onrender.com',
+    'https://blogs.realestategozamadrid.com'
 ];
 
 const allowedOrigins = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : defaultOrigins;
@@ -86,7 +86,8 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Let cors middleware handle OPTIONS requests
+// Habilitar pre-flight para todas las rutas
+app.options('*', cors(corsOptions));
 
 // <<< LOG INICIAL >>>
 app.use((req, res, next) => {
