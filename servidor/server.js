@@ -63,31 +63,66 @@ const defaultOrigins = [
     'https://blogs.realestategozamadrid.com',
     'https://realestategozamadrid.com',
     'https://www.realestategozamadrid.com',
-    'https://api.realestategozamadrid.com',
-    'https://nextjs-gozamadrid-qrfk.onrender.com',
-    'https://blogs.realestategozamadrid.com'
+    'https://nextjs-gozamadrid-qrfk.onrender.com', // Backend en Render
+    'https://api.realestategozamadrid.com' // Mantener como fallback
 ];
 
 const allowedOrigins = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : defaultOrigins;
 
 const corsOptions = {
     origin: function (origin, callback) {
+        // Permitir requests sin origin (como desde aplicaciones móviles)
         if (!origin || allowedOrigins.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
             console.error(`CORS error: Origin ${origin} not allowed.`);
+            console.log('Allowed origins:', allowedOrigins);
             callback(new Error('Not allowed by CORS'));
         }
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Cache-Control', 'Pragma', 'Expires'],
-    exposedHeaders: ['Content-Type', 'Authorization', 'Cache-Control', 'Pragma', 'Expires']
+    allowedHeaders: [
+        'Content-Type', 
+        'Authorization', 
+        'X-Requested-With', 
+        'Cache-Control', 
+        'Pragma', 
+        'Expires',
+        'Accept',
+        'Origin',
+        'X-CSRF-Token'
+    ],
+    exposedHeaders: [
+        'Content-Type', 
+        'Authorization', 
+        'Cache-Control', 
+        'Pragma', 
+        'Expires',
+        'X-Total-Count'
+    ]
 };
 
 app.use(cors(corsOptions));
 // Habilitar pre-flight para todas las rutas
 app.options('*', cors(corsOptions));
+
+// Middleware adicional para manejar CORS manualmente si es necesario
+app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (origin && allowedOrigins.includes(origin)) {
+        res.header('Access-Control-Allow-Origin', origin);
+    }
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS,PATCH');
+    res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With,Cache-Control,Pragma,Expires,Accept,Origin,X-CSRF-Token');
+    
+    if (req.method === 'OPTIONS') {
+        res.sendStatus(200);
+    } else {
+        next();
+    }
+});
 
 // <<< LOG INICIAL >>>
 app.use((req, res, next) => {
