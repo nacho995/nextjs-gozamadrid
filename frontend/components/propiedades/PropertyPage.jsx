@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState, useRef, useCallback, useMemo } from "react";
+import { API_URLS } from '../../config/constants';
 import Link from "next/link";
 import { useRouter } from 'next/router';
 import { motion } from "framer-motion";
@@ -396,7 +397,7 @@ const extractLocations = (properties) => {
 const ITEMS_PER_PAGE = 100;
 const DEFAULT_PAGE = 1;
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://realestategozamadrid.com';
-const API_URL = process.env.NEXT_PUBLIC_API_MONGODB_URL || process.env.NEXT_PUBLIC_API_URL || 'https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com';
+const API_URL = API_URLS.MONGODB;
 
 // Función para validar y parsear respuestas JSON
 const safeJsonParse = (data) => {
