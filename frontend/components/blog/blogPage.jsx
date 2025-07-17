@@ -2,7 +2,8 @@
 
 import { getBlogPosts, getBlogById } from '@/services/api';
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from 'react';
+import { API_URLS } from '../../config/constants';
 import AnimatedOnScroll from "../AnimatedScroll";
 import { getBlogPostsFromServer } from "@/services/wpApi";
 import BlogImage from './BlogImage';
@@ -75,7 +76,7 @@ const processImageUrl = (image) => {
     if (image.startsWith('http') || image.startsWith('https')) {
       return { src: image, alt: 'Imagen del blog' };
     }
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://goza-madrid.onrender.com';
+    const baseUrl = API_URLS.MONGODB;
     return { 
       src: `${baseUrl}${image.startsWith('/') ? '' : '/'}${image}`,
       alt: 'Imagen del blog'
@@ -87,7 +88,7 @@ const processImageUrl = (image) => {
     if (image.src.startsWith('http') || image.src.startsWith('https')) {
       return image;
     }
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://goza-madrid.onrender.com';
+    const baseUrl = API_URLS.MONGODB;
     return {
       ...image,
       src: `${baseUrl}${image.src.startsWith('/') ? '' : '/'}${image.src}`
