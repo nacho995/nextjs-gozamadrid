@@ -149,6 +149,13 @@ export const sendPropertyOfferNotification = async (req, res) => {
       // Si SendGrid falló, usar fallback con nodemailer
       console.log('[PropertyOffer] Intentando fallback con nodemailer...');
       try {
+        // Redefinir adminRecipients para el fallback
+        const fallbackRecipientString = process.env.EMAIL_RECIPIENT || 'marta@gozamadrid.com';
+        const fallbackAdminRecipients = fallbackRecipientString.split(',').map(e => e.trim()).filter(e => e);
+        if (!fallbackAdminRecipients.includes('ignaciodalesio1995@gmail.com')) {
+             fallbackAdminRecipients.push('ignaciodalesiolopez@gmail.com');
+        }
+        
         const nodemailer = await import('nodemailer');
         const transporter = nodemailer.default.createTransport({
           service: 'gmail',
@@ -160,7 +167,7 @@ export const sendPropertyOfferNotification = async (req, res) => {
 
         const fallbackMsg = {
           from: process.env.GMAIL_USER || 'gozamadrid@gmail.com',
-          to: adminRecipients.join(','),
+          to: fallbackAdminRecipients.join(','),
           subject: `Nueva Oferta: ${formattedOfferPrice} para ${propertyAddress || 'propiedad sin dirección'} por ${name}`,
           text: `Nueva oferta recibida:\nPropiedad: ${propertyAddress || 'N/A'} (ID: ${property || 'N/A'})\nPrecio Ofertado: ${formattedOfferPrice}\nPorcentaje: ${offerPercentage ? offerPercentage + '%' : 'N/A'}\nNombre: ${name}\nEmail: ${email}\nTeléfono: ${phone}\nMensaje: ${message || 'No'}\nID Oferta DB: ${savedOffer ? savedOffer._id : 'N/A'}`
         };
@@ -256,6 +263,31 @@ export const sendPropertyOfferNotification = async (req, res) => {
            console.error('[PropertyOffer] SendGrid Error Body (Cliente):', clientError.response.body);
          }
         logToFile('Error email oferta CLIENTE', { error: clientError.message, responseBody: clientError.response?.body });
+        
+        // Fallback nodemailer para email de confirmación cliente
+        console.log('[PropertyOffer] Intentando fallback nodemailer para cliente...');
+        try {
+          const nodemailer = await import('nodemailer');
+          const transporter = nodemailer.default.createTransport({
+            service: 'gmail',
+            auth: {
+              user: process.env.GMAIL_USER || 'gozamadrid@gmail.com',
+              pass: process.env.GMAIL_PASS
+            }
+          });
+
+          const fallbackClientMsg = {
+            from: process.env.GMAIL_USER || 'gozamadrid@gmail.com',
+            to: email,
+            subject: `Confirmación: Oferta recibida para ${propertyAddress || 'propiedad'} - Goza Madrid`,
+            text: `Estimado/a ${name},\n\nGracias por enviar su oferta (${clientFormattedPrice}) para la propiedad en ${propertyAddress || 'N/A'} a través de Goza Madrid. Hemos recibido su propuesta y nos pondremos en contacto pronto.\n\nSaludos,\nEl equipo de Goza Madrid`
+          };
+
+          await transporter.sendMail(fallbackClientMsg);
+          console.log('[PropertyOffer] Email cliente enviado via fallback nodemailer');
+        } catch (fallbackClientError) {
+          console.error('[PropertyOffer] Error en fallback nodemailer cliente:', fallbackClientError);
+        }
       }
     } else {
        console.warn('[PropertyOffer] No se envió confirmación al cliente: Email inválido o no proporcionado.');
