@@ -231,11 +231,14 @@ ${message || 'Sin mensaje adicional.'}
           }
         });
 
+        // Redefinir parsedDate para el fallback
+        const fallbackParsedDate = date || 'Fecha no especificada';
+        
         const fallbackMsg = {
           from: process.env.GMAIL_USER || 'gozamadrid@gmail.com',
           to: fallbackAdminRecipients.join(','),
-          subject: `Solicitud de Visita: ${propertyAddress || 'Propiedad sin dirección'} por ${name}`,
-          text: `Nueva solicitud de visita:\nPropiedad: ${propertyAddress || 'N/A'} (ID: ${property || 'N/A'})\nFecha: ${parsedDate.toLocaleDateString('es-ES')}\nHora: ${parsedTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}\nNombre: ${name}\nEmail: ${email}\nTeléfono: ${phone}\nMensaje: ${message || 'No'}\nID Visita DB: ${savedVisit ? savedVisit._id : 'N/A'}`
+          subject: `Nueva Visita: ${propertyAddress || 'propiedad sin dirección'} - ${fallbackParsedDate} a las ${time} por ${name}`,
+          text: `Nueva solicitud de visita:\nPropiedad: ${propertyAddress || 'N/A'} (ID: ${property || 'N/A'})\nFecha: ${fallbackParsedDate}\nHora: ${time}\nNombre: ${name}\nEmail: ${email}\nTeléfono: ${phone}\nMensaje: ${message || 'No'}\nID Visita DB: ${savedVisit ? savedVisit._id : 'N/A'}`
         };
 
         await transporter.sendMail(fallbackMsg);
