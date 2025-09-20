@@ -105,38 +105,8 @@ export default async function handler(req, res) {
       
       console.log('[Contact Proxy] Enviando a FormSubmit:', formData);
       
-      // Intentar múltiples servicios de fallback
-      const services = [
-        'https://formsubmit.co/ajax/marta@gozamadrid.com',
-        'https://formsubmit.co/ajax/ignaciodalesio1995@gmail.com'
-      ];
-      
-      for (const serviceUrl of services) {
-        try {
-          console.log(`[Contact Proxy] Intentando servicio: ${serviceUrl}`);
-          const fallbackResponse = await fetch(serviceUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-            },
-            body: JSON.stringify(formData)
-          });
-          
-          const responseText = await fallbackResponse.text();
-          console.log(`[Contact Proxy] Respuesta de ${serviceUrl}:`, fallbackResponse.status, responseText);
-          
-          if (fallbackResponse.ok) {
-            return res.status(200).json({
-              success: true,
-              message: 'Email enviado correctamente via servicio externo',
-              service: serviceUrl
-            });
-          }
-        } catch (error) {
-          console.error(`[Contact Proxy] Error con ${serviceUrl}:`, error);
-        }
-      }
+      // El backend ya tiene nodemailer como fallback, no necesitamos servicios externos
+      console.log('[Contact Proxy] Backend falló, pero tiene su propio sistema de fallback con nodemailer');
       
       return res.status(500).json({
         error: 'No se pudo enviar el email',
