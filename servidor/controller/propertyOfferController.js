@@ -104,6 +104,9 @@ export const sendPropertyOfferNotification = async (req, res) => {
       
       // Formatear el precio para el correo
       const formattedOfferPrice = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(offerPrice);
+      
+      // Log para debug
+      console.log('[PropertyOffer] formattedOfferPrice:', formattedOfferPrice);
 
       // **PLANTILLA HTML ELEGANTE PARA OFERTA**
       const offerHtml = `
@@ -135,8 +138,40 @@ export const sendPropertyOfferNotification = async (req, res) => {
       if (emailError.response) {
         console.error('[PropertyOffer] SendGrid Error Body:', emailError.response.body);
       }
-      logToFile('Error enviando email oferta', { error: emailError.message, responseBody: emailError.response?.body });
-      // Continuamos para responder al cliente
+      logToFile('Error enviando email', { error: emailError.message, stack: emailError.stack });
+      
+      // Si es un error de SendGrid, mostrar detalles adicionales
+      if (emailError.response && emailError.response.body) {
+        console.log('[PropertyOffer] SendGrid Error Body:', emailError.response.body);
+        logToFile('SendGrid Error Body', emailError.response.body);
+      }
+      
+      // Si SendGrid falló, usar fallback con nodemailer
+      console.log('[PropertyOffer] Intentando fallback con nodemailer...');
+      try {
+        const nodemailer = require('nodemailer');
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: process.env.GMAIL_USER || 'gozamadrid@gmail.com',
+            pass: process.env.GMAIL_PASS
+          }
+        });
+
+        const fallbackMsg = {
+          from: process.env.GMAIL_USER || 'gozamadrid@gmail.com',
+          to: adminRecipients.join(','),
+          subject: `Nueva Oferta: ${formattedOfferPrice} para ${propertyAddress || 'propiedad sin dirección'} por ${name}`,
+          text: `Nueva oferta recibida:\nPropiedad: ${propertyAddress || 'N/A'} (ID: ${property || 'N/A'})\nPrecio Ofertado: ${formattedOfferPrice}\nPorcentaje: ${offerPercentage ? offerPercentage + '%' : 'N/A'}\nNombre: ${name}\nEmail: ${email}\nTeléfono: ${phone}\nMensaje: ${message || 'No'}\nID Oferta DB: ${savedOffer ? savedOffer._id : 'N/A'}`
+        };
+
+        await transporter.sendMail(fallbackMsg);
+        console.log('[PropertyOffer] Email enviado via fallback nodemailer');
+        emailSent = true;
+      } catch (fallbackError) {
+        console.error('[PropertyOffer] Error en fallback nodemailer:', fallbackError);
+        emailSent = false;
+      }
     }
     
     // --- Envío de Confirmación al Cliente --- 
