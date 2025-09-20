@@ -3,7 +3,7 @@ const nextConfig = {
   reactStrictMode: false,
 
   env: {
-    BACKEND_URL: process.env.BACKEND_URL || 'https://api.realestategozamadrid.com',
+    BACKEND_URL: process.env.BACKEND_URL || 'https://nextjs-gozamadrid-qrfk.onrender.com',
   },
 
   async rewrites() {

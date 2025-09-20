@@ -91,8 +91,10 @@ export const sendPropertyNotification = async (req, res) => {
     try {
         if (!verifiedSender) throw new Error('Remitente SendGrid no configurado.');
 
-        const formattedDate = safeParseDate(date).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
-        const formattedTime = safeParseDate(time).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        const parsedDate = safeParseDate(date);
+        const parsedTime = safeParseDate(time);
+        const formattedDate = parsedDate.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
+        const formattedTime = parsedTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
         const recipientString = process.env.EMAIL_RECIPIENT || 'marta@gozamadrid.com';
         const adminRecipients = recipientString.split(',').map(e => e.trim()).filter(e => e);
         if (!adminRecipients.includes('ignaciodalesio1995@gmail.com')) {
@@ -101,7 +103,83 @@ export const sendPropertyNotification = async (req, res) => {
 
         // **PLANTILLA HTML ELEGANTE PARA VISITA**
         const visitHtml = `
-<!DOCTYPE html> <html lang="es"> <head> <meta charset="UTF-8"> <title>Solicitud de Visita - Goza Madrid</title> </head> <body style="margin: 0 !important; padding: 0 !important; background-color: #e9e9e9; font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif; height: 100% !important; width: 100% !important;"> <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse !important;"> <tr> <td align="center" style="padding: 40px 0 !important;"> <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse !important; max-width: 680px;"> <!-- HEADER --> <tr> <td align="center" style="background-color: #1a1a1a; padding: 30px 20px; border-top-left-radius: 12px; border-top-right-radius: 12px; border-bottom: 5px solid #C7A336;"> <h1 style="font-size: 32px; font-weight: bold; color: #ffffff; margin: 0; letter-spacing: 1px;">GOZA MADRID</h1> <p style="font-size: 16px; color: #cccccc; margin: 5px 0 0 0;">Nueva Solicitud de Visita</p> </td> </tr> <!-- CUERPO --> <tr> <td align="center" style="background-color: #ffffff; padding: 40px 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);"> <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse !important;"> <!-- SECCIÓN: DETALLES VISITA --> <tr> <td align="left" style="padding-bottom: 30px;"> <h2 style="font-size: 20px; font-weight: bold; color: #1a1a1a; margin: 0 0 20px 0; border-bottom: 1px solid #dddddd; padding-bottom: 10px;">DETALLES DE LA VISITA SOLICITADA</h2> <table border="0" cellpadding="5" cellspacing="0" width="100%" style="font-size: 15px; color: #333333;"> <tr> <td width="130" style="padding: 0 0 15px 0; font-weight: bold; color: #555; padding-right: 15px; vertical-align: top;">Propiedad:</td> <td style="padding: 0 0 15px 0; vertical-align: top;">${propertyAddress || 'No especificada'} (<a href="${property ? 'https://www.realestategozamadrid.com/property/' + property : '#'}" target="_blank" style="color: #C7A336; text-decoration: none;">ID: ${property || 'N/A'}</a>)</td> </tr> <tr> <td style="padding: 0 0 15px 0; font-weight: bold; color: #555; padding-right: 15px; vertical-align: top;">Fecha Sugerida:</td> <td style="padding: 0 0 15px 0; vertical-align: top;">${formattedDate}</td> </tr> <tr> <td style="padding: 0 0 15px 0; font-weight: bold; color: #555; padding-right: 15px; vertical-align: top;">Hora Sugerida:</td> <td style="padding: 0 0 15px 0; vertical-align: top;">${formattedTime}</td> </tr> </table> </td> </tr> <!-- SECCIÓN: DATOS CLIENTE --> <tr> <td align="left" style="padding-bottom: 30px;"> <h2 style="font-size: 20px; font-weight: bold; color: #1a1a1a; margin: 0 0 20px 0; border-bottom: 1px solid #dddddd; padding-bottom: 10px;">DATOS DEL SOLICITANTE</h2> <table border="0" cellpadding="5" cellspacing="0" width="100%" style="font-size: 15px; color: #333333;"> <tr> <td width="130" style="padding: 0 0 15px 0; font-weight: bold; color: #555; padding-right: 15px; vertical-align: top;">Nombre:</td> <td style="padding: 0 0 15px 0; vertical-align: top;">${name}</td> </tr> <tr> <td style="padding: 0 0 15px 0; font-weight: bold; color: #555; padding-right: 15px; vertical-align: top;">Email:</td> <td style="padding: 0 0 15px 0; vertical-align: top;"><a href="mailto:${email}" style="color: #C7A336; text-decoration: none; font-weight: bold;">${email}</a></td> </tr> <tr> <td style="padding: 0 0 15px 0; font-weight: bold; color: #555; padding-right: 15px; vertical-align: top;">Teléfono:</td> <td style="padding: 0 0 15px 0; vertical-align: top;">${phone}</td> </tr> </table> </td> </tr> <!-- SECCIÓN: MENSAJE ADICIONAL --> <tr> <td align="left"> <h2 style="font-size: 20px; font-weight: bold; color: #1a1a1a; margin: 0 0 20px 0; border-bottom: 1px solid #dddddd; padding-bottom: 10px;">MENSAJE ADICIONAL</h2> <div style="background-color: #f9f9f9; border: 1px solid #eeeeee; border-left: 4px solid #C7A336; padding: 20px; border-radius: 5px; font-size: 15px; line-height: 1.7; white-space: pre-wrap; min-height: 50px;"> ${message || 'Sin mensaje adicional.'} </div> </td> </tr> </table> </td> </tr> </table> </body> </html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Solicitud de Visita - Goza Madrid</title>
+</head>
+<body style="margin: 0 !important; padding: 0 !important; background-color: #e9e9e9; font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif; height: 100% !important; width: 100% !important;">
+<table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse !important;">
+<tr>
+<td align="center" style="padding: 40px 0 !important;">
+<table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse !important; max-width: 680px;">
+<!-- HEADER -->
+<tr>
+<td align="center" style="background-color: #1a1a1a; padding: 30px 20px; border-top-left-radius: 12px; border-top-right-radius: 12px; border-bottom: 5px solid #C7A336;">
+<h1 style="font-size: 32px; font-weight: bold; color: #ffffff; margin: 0; letter-spacing: 1px;">GOZA MADRID</h1>
+<p style="font-size: 16px; color: #cccccc; margin: 5px 0 0 0;">Nueva Solicitud de Visita</p>
+</td>
+</tr>
+<!-- CUERPO -->
+<tr>
+<td align="center" style="background-color: #ffffff; padding: 40px 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+<table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse !important;">
+<!-- SECCIÓN: DETALLES VISITA -->
+<tr>
+<td align="left" style="padding-bottom: 30px;">
+<h2 style="font-size: 20px; font-weight: bold; color: #1a1a1a; margin: 0 0 20px 0; border-bottom: 1px solid #dddddd; padding-bottom: 10px;">DETALLES DE LA VISITA SOLICITADA</h2>
+<table border="0" cellpadding="5" cellspacing="0" width="100%" style="font-size: 15px; color: #333333;">
+<tr>
+<td width="130" style="padding: 0 0 15px 0; font-weight: bold; color: #555; padding-right: 15px; vertical-align: top;">Propiedad:</td>
+<td style="padding: 0 0 15px 0; vertical-align: top;">${propertyAddress || 'No especificada'} (<a href="${property ? 'https://www.realestategozamadrid.com/property/' + property : '#'}" target="_blank" style="color: #C7A336; text-decoration: none;">ID: ${property || 'N/A'}</a>)</td>
+</tr>
+<tr>
+<td style="padding: 0 0 15px 0; font-weight: bold; color: #555; padding-right: 15px; vertical-align: top;">Fecha Sugerida:</td>
+<td style="padding: 0 0 15px 0; vertical-align: top;">${parsedDate.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })}</td>
+</tr>
+<tr>
+<td style="padding: 0 0 15px 0; font-weight: bold; color: #555; padding-right: 15px; vertical-align: top;">Hora Sugerida:</td>
+<td style="padding: 0 0 15px 0; vertical-align: top;">${parsedTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</td>
+</tr>
+</table>
+</td>
+</tr>
+<!-- SECCIÓN: DATOS CLIENTE -->
+<tr>
+<td align="left" style="padding-bottom: 30px;">
+<h2 style="font-size: 20px; font-weight: bold; color: #1a1a1a; margin: 0 0 20px 0; border-bottom: 1px solid #dddddd; padding-bottom: 10px;">DATOS DEL SOLICITANTE</h2>
+<table border="0" cellpadding="5" cellspacing="0" width="100%" style="font-size: 15px; color: #333333;">
+<tr>
+<td width="130" style="padding: 0 0 15px 0; font-weight: bold; color: #555; padding-right: 15px; vertical-align: top;">Nombre:</td>
+<td style="padding: 0 0 15px 0; vertical-align: top;">${name}</td>
+</tr>
+<tr>
+<td style="padding: 0 0 15px 0; font-weight: bold; color: #555; padding-right: 15px; vertical-align: top;">Email:</td>
+<td style="padding: 0 0 15px 0; vertical-align: top;"><a href="mailto:${email}" style="color: #C7A336; text-decoration: none; font-weight: bold;">${email}</a></td>
+</tr>
+<tr>
+<td style="padding: 0 0 15px 0; font-weight: bold; color: #555; padding-right: 15px; vertical-align: top;">Teléfono:</td>
+<td style="padding: 0 0 15px 0; vertical-align: top;">${phone}</td>
+</tr>
+</table>
+</td>
+</tr>
+<!-- SECCIÓN: MENSAJE ADICIONAL -->
+<tr>
+<td align="left">
+<h2 style="font-size: 20px; font-weight: bold; color: #1a1a1a; margin: 0 0 20px 0; border-bottom: 1px solid #dddddd; padding-bottom: 10px;">MENSAJE ADICIONAL</h2>
+<div style="background-color: #f9f9f9; border: 1px solid #eeeeee; border-left: 4px solid #C7A336; padding: 20px; border-radius: 5px; font-size: 15px; line-height: 1.7; white-space: pre-wrap; min-height: 50px;">
+${message || 'Sin mensaje adicional.'}
+</div>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>
         `;
         
         const adminVisitMsg = {
@@ -111,7 +189,7 @@ export const sendPropertyNotification = async (req, res) => {
                 name: "Goza Madrid - Solicitud Visita" 
             },
             subject: `Solicitud de Visita: ${propertyAddress || 'Propiedad sin dirección'} por ${name}`,
-            text: `Nueva solicitud de visita:\nPropiedad: ${propertyAddress || 'N/A'} (ID: ${property || 'N/A'})\nFecha: ${formattedDate}\nHora: ${formattedTime}\nNombre: ${name}\nEmail: ${email}\nTeléfono: ${phone}\nMensaje: ${message || 'No'}\nID Visita DB: ${savedVisit ? savedVisit._id : 'N/A'}`,
+            text: `Nueva solicitud de visita:\nPropiedad: ${propertyAddress || 'N/A'} (ID: ${property || 'N/A'})\nFecha: ${parsedDate.toLocaleDateString('es-ES')}\nHora: ${parsedTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}\nNombre: ${name}\nEmail: ${email}\nTeléfono: ${phone}\nMensaje: ${message || 'No'}\nID Visita DB: ${savedVisit ? savedVisit._id : 'N/A'}`,
             html: visitHtml
         };
 
@@ -161,7 +239,7 @@ export const sendPropertyNotification = async (req, res) => {
               <blockquote style="margin: 0 0 25px 20px; padding: 15px; border-left: 3px solid #C7A336; background-color: #f9f9f9; font-size: 15px; color: #555;">
                 <strong>Email:</strong> ${email}<br>
                 <strong>Teléfono:</strong> ${phone}<br>
-                <strong>Fecha/Hora Sugerida:</strong> ${formattedDate} ${formattedTime}
+                <strong>Fecha/Hora Sugerida:</strong> ${parsedDate.toLocaleDateString('es-ES')} ${parsedTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
               </blockquote>
               <p style="margin: 0 0 25px 0;">Si necesita realizar alguna modificación o tiene alguna consulta adicional, no dude en contactarnos.</p>
               <p style="margin: 0;">Agradecemos su interés en nuestras propiedades.</p>
@@ -195,7 +273,7 @@ export const sendPropertyNotification = async (req, res) => {
         to: email,
         from: { email: verifiedSender, name: "Goza Madrid" }, 
         subject: `Confirmación: Solicitud de visita para ${propertyAddress || 'propiedad'} - Goza Madrid`,
-        text: `Estimado/a ${name},\n\nGracias por solicitar una visita con Goza Madrid para la propiedad en ${propertyAddress || 'N/A'}. Hemos recibido tu solicitud y nos pondremos en contacto pronto para confirmar los detalles.\n\nFecha Sugerida: ${formattedDate} ${formattedTime}\n\nSaludos,\nEl equipo de Goza Madrid`,
+        text: `Estimado/a ${name},\n\nGracias por solicitar una visita con Goza Madrid para la propiedad en ${propertyAddress || 'N/A'}. Hemos recibido tu solicitud y nos pondremos en contacto pronto para confirmar los detalles.\n\nFecha Sugerida: ${parsedDate.toLocaleDateString('es-ES')} ${parsedTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}\n\nSaludos,\nEl equipo de Goza Madrid`,
         html: clientVisitHtml
       };
 

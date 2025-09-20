@@ -261,6 +261,7 @@ app.use('/api/user', (req, res, next) => {
 app.use('/api/properties', propertyRoutes);
 app.use('/api', notificationRouter);
 app.use("/prefix", prefixRouter);
+app.use('/api', prefixRouter); // Agregar las rutas de property-notification directamente
 app.use("/api/blogs", blogRouter);
 app.use('/api/user', userRouter);
 app.use('/api/cloudinary', cloudinaryRouter);
