@@ -56,15 +56,12 @@ const PORT = process.env.PORT || 8081;
 
 // Configurar CORS con opciones avanzadas
 const defaultOrigins = [
-    'http://localhost:3000',
-    'http://localhost:5173',
-    'http://localhost:5174',
-    'http://localhost:5175',
     'https://blogs.realestategozamadrid.com',
     'https://realestategozamadrid.com',
     'https://www.realestategozamadrid.com',
-    'https://nextjs-gozamadrid-qrfk.onrender.com', // Backend en Render
-    'https://api.realestategozamadrid.com' // Mantener como fallback
+    'https://nextjs-gozamadrid-qrfk.onrender.com',
+    'https://api.realestategozamadrid.com',
+    'https://gozamadrid-frontend-dcwdehapw-nacho995s-projects.vercel.app'
 ];
 
 const allowedOrigins = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : defaultOrigins;
@@ -88,9 +85,16 @@ const corsOptions = {
             return;
         }
         
-        // Para debug en producción, permitir temporalmente todos los orígenes de realestategozamadrid
-        if (origin.includes('realestategozamadrid.com')) {
-            console.log(`✅ CORS: Origin ${origin} permitido (dominio realestategozamadrid)`);
+        // Verificar patrones de dominio (para subdominios dinámicos)
+        const isAllowed = allowedOrigins.some(allowedOrigin => {
+            return origin.includes('realestategozamadrid.com') || 
+                   origin.includes('vercel.app') ||
+                   origin.includes('onrender.com') ||
+                   origin.includes('gozamadrid-frontend');
+        });
+        
+        if (isAllowed) {
+            console.log(`✅ CORS: Origin ${origin} permitido por patrón`);
             callback(null, true);
             return;
         }

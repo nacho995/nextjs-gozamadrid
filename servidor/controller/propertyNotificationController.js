@@ -217,6 +217,10 @@ ${message || 'Sin mensaje adicional.'}
     
     // --- Envío de Confirmación al Cliente --- 
     if (email && /\S+@\S+\.\S+/.test(email)) {
+      // Asegurar que parsedDate y parsedTime estén disponibles aquí también
+      const clientParsedDate = safeParseDate(date);
+      const clientParsedTime = safeParseDate(time);
+      
       const clientVisitHtml = `
 <!DOCTYPE html>
 <html lang="es">
@@ -246,7 +250,7 @@ ${message || 'Sin mensaje adicional.'}
               <blockquote style="margin: 0 0 25px 20px; padding: 15px; border-left: 3px solid #C7A336; background-color: #f9f9f9; font-size: 15px; color: #555;">
                 <strong>Email:</strong> ${email}<br>
                 <strong>Teléfono:</strong> ${phone}<br>
-                <strong>Fecha/Hora Sugerida:</strong> ${parsedDate.toLocaleDateString('es-ES')} ${parsedTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                <strong>Fecha/Hora Sugerida:</strong> ${clientParsedDate.toLocaleDateString('es-ES')} ${clientParsedTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
               </blockquote>
               <p style="margin: 0 0 25px 0;">Si necesita realizar alguna modificación o tiene alguna consulta adicional, no dude en contactarnos.</p>
               <p style="margin: 0;">Agradecemos su interés en nuestras propiedades.</p>
@@ -280,7 +284,7 @@ ${message || 'Sin mensaje adicional.'}
         to: email,
         from: { email: verifiedSender, name: "Goza Madrid" }, 
         subject: `Confirmación: Solicitud de visita para ${propertyAddress || 'propiedad'} - Goza Madrid`,
-        text: `Estimado/a ${name},\n\nGracias por solicitar una visita con Goza Madrid para la propiedad en ${propertyAddress || 'N/A'}. Hemos recibido tu solicitud y nos pondremos en contacto pronto para confirmar los detalles.\n\nFecha Sugerida: ${parsedDate.toLocaleDateString('es-ES')} ${parsedTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}\n\nSaludos,\nEl equipo de Goza Madrid`,
+        text: `Estimado/a ${name},\n\nGracias por solicitar una visita con Goza Madrid para la propiedad en ${propertyAddress || 'N/A'}. Hemos recibido tu solicitud y nos pondremos en contacto pronto para confirmar los detalles.\n\nFecha Sugerida: ${clientParsedDate.toLocaleDateString('es-ES')} ${clientParsedTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}\n\nSaludos,\nEl equipo de Goza Madrid`,
         html: clientVisitHtml
       };
 
