@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Email FormSubmit</title>
+</head>
+<body>
+    <h1>Test Directo FormSubmit</h1>
+    
+    <form id="testForm">
+        <div>
+            <label>Nombre:</label>
+            <input type="text" id="name" value="Test Usuario" required>
+        </div>
+        <div>
+            <label>Email:</label>
+            <input type="email" id="email" value="test@example.com" required>
+        </div>
+        <div>
+            <label>Mensaje:</label>
+            <textarea id="message" required>Este es un mensaje de prueba para verificar que FormSubmit funciona correctamente.</textarea>
+        </div>
+        <button type="submit">Enviar Test</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('testForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                message: document.getElementById('message').value,
+                subject: 'Test Email FormSubmit',
+                _template: 'box'
+            };
+            
+            console.log('Enviando:', formData);
+            
+            try {
+                // Test a marta@gozamadrid.com
+                const response1 = await fetch('https://formsubmit.co/ajax/marta@gozamadrid.com', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result1 = await response1.text();
+                console.log('Respuesta marta@gozamadrid.com:', response1.status, result1);
+                
+                // Test a ignaciodalesio1995@gmail.com
+                const response2 = await fetch('https://formsubmit.co/ajax/ignaciodalesio1995@gmail.com', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result2 = await response2.text();
+                console.log('Respuesta ignaciodalesio1995@gmail.com:', response2.status, result2);
+                
+                document.getElementById('result').innerHTML = `
+                    <h3>Resultados:</h3>
+                    <p>marta@gozamadrid.com: ${response1.status} - ${result1}</p>
+                    <p>ignaciodalesio1995@gmail.com: ${response2.status} - ${result2}</p>
+                `;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>
