@@ -91,8 +91,15 @@ export const sendPropertyNotification = async (req, res) => {
     try {
         if (!verifiedSender) throw new Error('Remitente SendGrid no configurado.');
 
+        // Parsear fechas dentro del try-catch para capturar errores
         const parsedDate = safeParseDate(date);
         const parsedTime = safeParseDate(time);
+        
+        // Verificar que las fechas se parsearon correctamente
+        if (!parsedDate || !parsedTime) {
+            throw new Error('Error al parsear fecha o hora');
+        }
+        
         const formattedDate = parsedDate.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
         const formattedTime = parsedTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
         const recipientString = process.env.EMAIL_RECIPIENT || 'marta@gozamadrid.com';
