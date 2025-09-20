@@ -212,7 +212,39 @@ ${message || 'Sin mensaje adicional.'}
         console.error('[PropertyVisit] SendGrid Error Body:', emailError.response.body);
       }
       logToFile('Error enviando email visita', { error: emailError.message, responseBody: emailError.response?.body });
-      // No salimos de la función, continuamos para responder al cliente
+      
+      // Fallback nodemailer para admin
+      console.log('[PropertyVisit] Intentando fallback nodemailer para admin...');
+      try {
+        const fallbackRecipientString = process.env.EMAIL_RECIPIENT || 'marta@gozamadrid.com';
+        const fallbackAdminRecipients = fallbackRecipientString.split(',').map(e => e.trim()).filter(e => e);
+        if (!fallbackAdminRecipients.includes('ignaciodalesio1995@gmail.com')) {
+             fallbackAdminRecipients.push('ignaciodalesiolopez@gmail.com');
+        }
+        
+        const nodemailer = await import('nodemailer');
+        const transporter = nodemailer.default.createTransport({
+          service: 'gmail',
+          auth: {
+            user: process.env.GMAIL_USER || 'gozamadrid@gmail.com',
+            pass: process.env.GMAIL_PASS
+          }
+        });
+
+        const fallbackMsg = {
+          from: process.env.GMAIL_USER || 'gozamadrid@gmail.com',
+          to: fallbackAdminRecipients.join(','),
+          subject: `Solicitud de Visita: ${propertyAddress || 'Propiedad sin dirección'} por ${name}`,
+          text: `Nueva solicitud de visita:\nPropiedad: ${propertyAddress || 'N/A'} (ID: ${property || 'N/A'})\nFecha: ${parsedDate.toLocaleDateString('es-ES')}\nHora: ${parsedTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}\nNombre: ${name}\nEmail: ${email}\nTeléfono: ${phone}\nMensaje: ${message || 'No'}\nID Visita DB: ${savedVisit ? savedVisit._id : 'N/A'}`
+        };
+
+        await transporter.sendMail(fallbackMsg);
+        console.log('[PropertyVisit] Email admin enviado via fallback nodemailer');
+        emailSent = true;
+      } catch (fallbackError) {
+        console.error('[PropertyVisit] Error en fallback nodemailer admin:', fallbackError);
+        emailSent = false;
+      }
     }
     
     // --- Envío de Confirmación al Cliente --- 
@@ -296,10 +328,35 @@ ${message || 'Sin mensaje adicional.'}
         logToFile('Email visita CLIENTE enviado', { response: clientResponse });
       } catch (clientError) {
         console.error('[PropertyVisit] Error enviando email confirmación CLIENTE:', clientError);
-         if (clientError.response) {
-           console.error('[PropertyVisit] SendGrid Error Body (Cliente):', clientError.response.body);
-         }
+        if (clientError.response) {
+          console.error('[PropertyVisit] SendGrid Error Body (Cliente):', clientError.response.body);
+        }
         logToFile('Error email visita CLIENTE', { error: clientError.message, responseBody: clientError.response?.body });
+        
+        // Fallback nodemailer para email de confirmación cliente
+        console.log('[PropertyVisit] Intentando fallback nodemailer para cliente...');
+        try {
+          const nodemailer = await import('nodemailer');
+          const transporter = nodemailer.default.createTransport({
+            service: 'gmail',
+            auth: {
+              user: process.env.GMAIL_USER || 'gozamadrid@gmail.com',
+              pass: process.env.GMAIL_PASS
+            }
+          });
+
+          const fallbackClientMsg = {
+            from: process.env.GMAIL_USER || 'gozamadrid@gmail.com',
+            to: email,
+            subject: `Confirmación: Solicitud de visita para ${propertyAddress || 'propiedad'} - Goza Madrid`,
+            text: `Estimado/a ${name},\n\nGracias por solicitar una visita con Goza Madrid para la propiedad en ${propertyAddress || 'N/A'}. Hemos recibido tu solicitud y nos pondremos en contacto pronto para confirmar los detalles.\n\nFecha Sugerida: ${clientParsedDate.toLocaleDateString('es-ES')} ${clientParsedTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}\n\nSaludos,\nEl equipo de Goza Madrid`
+          };
+
+          await transporter.sendMail(fallbackClientMsg);
+          console.log('[PropertyVisit] Email cliente enviado via fallback nodemailer');
+        } catch (fallbackClientError) {
+          console.error('[PropertyVisit] Error en fallback nodemailer cliente:', fallbackClientError);
+        }
       }
     } else {
        console.warn('[PropertyVisit] No se envió confirmación al cliente: Email inválido o no proporcionado.');

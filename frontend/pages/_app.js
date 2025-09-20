@@ -79,7 +79,7 @@ function MyApp({ Component, pageProps }) {
               {/* Favicon links */}
               <link rel="icon" href={`${assetPrefix}/logopestana.png`} sizes="any" />
               <link rel="apple-touch-icon" href={`${assetPrefix}/logopestana.png`} sizes="180x180" />
-              <link rel="manifest" href={`${assetPrefix}/manifest.json`} />
+              <link rel="manifest" href="/manifest.json" />
 
               {/* Preconnect hints */}
               <link rel="preconnect" href="https://fonts.googleapis.com" />
