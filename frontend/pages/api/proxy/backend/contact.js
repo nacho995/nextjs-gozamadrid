@@ -27,14 +27,14 @@ export default async function handler(req, res) {
     }
 
     // URL del backend - ajustar según tu configuración
-    const backendUrl = process.env.BACKEND_URL || 'https://api.realestategozamadrid.com';
+    const backendUrl = process.env.BACKEND_URL || 'https://nextjs-gozamadrid-qrfk.onrender.com';
     let endpoint = '';
     
     // Determinar el endpoint según el tipo
     if (req.body.type === 'visit') {
-      endpoint = '/api/property-notification/visit';
+      endpoint = '/api/property-visit/create';
     } else if (req.body.type === 'offer') {
-      endpoint = '/api/property-notification/offer';
+      endpoint = '/api/property-offer/create';
     } else {
       endpoint = '/api/contact';
     }
@@ -61,13 +61,27 @@ export default async function handler(req, res) {
       });
     } else {
       console.log('[Contact Proxy] Error del backend, usando servicio de respaldo');
+      console.log('[Contact Proxy] Response status:', backendResponse.status);
       
       // Fallback a servicios externos si el backend falla
+      let subject = 'Nuevo contacto desde la web';
+      let messageBody = '';
+      
+      if (req.body.type === 'visit') {
+        subject = 'Nueva solicitud de visita de propiedad';
+        messageBody = `Nueva solicitud de visita\n\nPropiedad: ${req.body.propertyTitle || req.body.propertyAddress || 'No especificada'}\nID Propiedad: ${req.body.propertyId || req.body.property || 'No especificado'}\nFecha de visita: ${req.body.visitDate || req.body.date || 'No especificada'}\nHora de visita: ${req.body.visitTime || req.body.time || 'No especificada'}\nNombre: ${req.body.name || 'No especificado'}\nEmail: ${req.body.email}\nTeléfono: ${req.body.phone || 'No especificado'}\nMensaje: ${req.body.message || 'No especificado'}`;
+      } else if (req.body.type === 'offer') {
+        subject = 'Nueva oferta para propiedad';
+        messageBody = `Nueva oferta recibida\n\nPropiedad: ${req.body.propertyTitle || req.body.propertyAddress || 'No especificada'}\nID Propiedad: ${req.body.propertyId || req.body.property || 'No especificado'}\nOferta: ${req.body.offerAmount || req.body.offerPrice || 'No especificada'} ${req.body.offerLabel || req.body.offerPercentage || ''}\nNombre: ${req.body.name || 'No especificado'}\nEmail: ${req.body.email}\nTeléfono: ${req.body.phone || 'No especificado'}\nMensaje: ${req.body.message || 'No especificado'}`;
+      } else {
+        messageBody = `Nuevo mensaje de contacto\n\nNombre: ${req.body.name || 'No especificado'}\nEmail: ${req.body.email}\nTeléfono: ${req.body.phone || 'No especificado'}\nMensaje: ${req.body.message || 'No especificado'}`;
+      }
+      
       const formData = {
         name: req.body.name || 'Cliente Web',
         email: req.body.email,
-        message: `Tipo: ${req.body.type || 'contacto'}\nPropiedad: ${req.body.propertyTitle || 'N/A'}\nNombre: ${req.body.name || 'N/A'}\nEmail: ${req.body.email}\nTeléfono: ${req.body.phone || 'N/A'}\nMensaje: ${req.body.message || 'N/A'}`,
-        subject: req.body.type === 'visit' ? 'Nueva solicitud de visita' : req.body.type === 'offer' ? 'Nueva oferta' : 'Nuevo contacto',
+        message: messageBody,
+        subject: subject,
         _template: 'box'
       };
       
