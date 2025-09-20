@@ -165,11 +165,14 @@ export const sendPropertyOfferNotification = async (req, res) => {
           }
         });
 
+        // Redefinir formattedOfferPrice para el fallback
+        const fallbackFormattedPrice = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(offerPrice);
+        
         const fallbackMsg = {
           from: process.env.GMAIL_USER || 'gozamadrid@gmail.com',
           to: fallbackAdminRecipients.join(','),
-          subject: `Nueva Oferta: ${formattedOfferPrice} para ${propertyAddress || 'propiedad sin dirección'} por ${name}`,
-          text: `Nueva oferta recibida:\nPropiedad: ${propertyAddress || 'N/A'} (ID: ${property || 'N/A'})\nPrecio Ofertado: ${formattedOfferPrice}\nPorcentaje: ${offerPercentage ? offerPercentage + '%' : 'N/A'}\nNombre: ${name}\nEmail: ${email}\nTeléfono: ${phone}\nMensaje: ${message || 'No'}\nID Oferta DB: ${savedOffer ? savedOffer._id : 'N/A'}`
+          subject: `Nueva Oferta: ${fallbackFormattedPrice} para ${propertyAddress || 'propiedad sin dirección'} por ${name}`,
+          text: `Nueva oferta recibida:\nPropiedad: ${propertyAddress || 'N/A'} (ID: ${property || 'N/A'})\nPrecio Ofertado: ${fallbackFormattedPrice}\nPorcentaje: ${offerPercentage ? offerPercentage + '%' : 'N/A'}\nNombre: ${name}\nEmail: ${email}\nTeléfono: ${phone}\nMensaje: ${message || 'No'}\nID Oferta DB: ${savedOffer ? savedOffer._id : 'N/A'}`
         };
 
         await transporter.sendMail(fallbackMsg);
