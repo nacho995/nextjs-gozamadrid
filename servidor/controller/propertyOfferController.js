@@ -149,8 +149,8 @@ export const sendPropertyOfferNotification = async (req, res) => {
       // Si SendGrid falló, usar fallback con nodemailer
       console.log('[PropertyOffer] Intentando fallback con nodemailer...');
       try {
-        const nodemailer = require('nodemailer');
-        const transporter = nodemailer.createTransport({
+        const nodemailer = await import('nodemailer');
+        const transporter = nodemailer.default.createTransport({
           service: 'gmail',
           auth: {
             user: process.env.GMAIL_USER || 'gozamadrid@gmail.com',
@@ -176,6 +176,9 @@ export const sendPropertyOfferNotification = async (req, res) => {
     
     // --- Envío de Confirmación al Cliente --- 
     if (email && /\S+@\S+\.\S+/.test(email)) {
+      // Asegurar que formattedOfferPrice esté disponible aquí también
+      const clientFormattedPrice = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(offerPrice);
+      
       const clientOfferHtml = `
 <!DOCTYPE html>
 <html lang="es">
@@ -200,7 +203,7 @@ export const sendPropertyOfferNotification = async (req, res) => {
           <tr>
             <td align="left" style="padding: 35px 40px; font-size: 16px; line-height: 1.8;">
               <p style="margin: 0 0 25px 0;">Estimado/a ${name},</p>
-              <p style="margin: 0 0 25px 0;">Hemos recibido correctamente su oferta para la propiedad ubicada en <strong>${propertyAddress || 'Dirección no especificada'}</strong> por un importe de <strong>${formattedOfferPrice}</strong>.</p>
+              <p style="margin: 0 0 25px 0;">Hemos recibido correctamente su oferta para la propiedad ubicada en <strong>${propertyAddress || 'Dirección no especificada'}</strong> por un importe de <strong>${clientFormattedPrice}</strong>.</p>
               <p style="margin: 0 0 25px 0;">Su oferta está siendo procesada y nuestro equipo se pondrá en contacto con usted a la brevedad para informarle sobre los siguientes pasos, utilizando la información proporcionada:</p>
               <blockquote style="margin: 0 0 25px 20px; padding: 15px; border-left: 3px solid #C7A336; background-color: #f9f9f9; font-size: 15px; color: #555;">
                 <strong>Email:</strong> ${email}<br>
@@ -237,7 +240,7 @@ export const sendPropertyOfferNotification = async (req, res) => {
         to: email,
         from: { email: verifiedSender, name: "Goza Madrid" }, 
         subject: `Confirmación: Oferta recibida para ${propertyAddress || 'propiedad'} - Goza Madrid`,
-        text: `Estimado/a ${name},\n\nGracias por enviar su oferta (${formattedOfferPrice}) para la propiedad en ${propertyAddress || 'N/A'} a través de Goza Madrid. Hemos recibido su propuesta y nos pondremos en contacto pronto.\n\nSaludos,\nEl equipo de Goza Madrid`,
+        text: `Estimado/a ${name},\n\nGracias por enviar su oferta (${clientFormattedPrice}) para la propiedad en ${propertyAddress || 'N/A'} a través de Goza Madrid. Hemos recibido su propuesta y nos pondremos en contacto pronto.\n\nSaludos,\nEl equipo de Goza Madrid`,
         html: clientOfferHtml
       };
 
