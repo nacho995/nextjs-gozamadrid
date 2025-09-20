@@ -2,6 +2,10 @@
 const nextConfig = {
   reactStrictMode: false,
 
+  env: {
+    BACKEND_URL: process.env.BACKEND_URL || 'https://api.realestategozamadrid.com',
+  },
+
   async rewrites() {
     return [
       {

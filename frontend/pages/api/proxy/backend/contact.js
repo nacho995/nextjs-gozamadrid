@@ -1,4 +1,4 @@
-// Endpoint para gestionar el envío de contactos y visitas
+// Endpoint para gestionar el envío de contactos y visitas usando el backend
 export default async function handler(req, res) {
   // Configurar CORS adecuadamente
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -16,7 +16,6 @@ export default async function handler(req, res) {
   }
   
   try {
-    // Mostrar los datos recibidos para depuración
     console.log('[Contact Proxy] Datos recibidos:', req.body ? Object.keys(req.body) : 'Sin datos');
     
     // Verificar si tenemos datos válidos
@@ -26,111 +25,68 @@ export default async function handler(req, res) {
         message: 'El email es obligatorio'
       });
     }
+
+    // URL del backend - ajustar según tu configuración
+    const backendUrl = process.env.BACKEND_URL || 'https://api.realestategozamadrid.com';
+    let endpoint = '';
     
-    // Preparar contenido del email según el tipo
-    let subject = 'Nuevo contacto desde la web';
-    let body = '';
-    
-    // Si es una solicitud de visita
+    // Determinar el endpoint según el tipo
     if (req.body.type === 'visit') {
-      subject = 'Nueva solicitud de visita de propiedad';
-      body = `
-        Nueva solicitud de visita
-        
-        Propiedad: ${req.body.propertyTitle || 'No especificada'}
-        ID Propiedad: ${req.body.propertyId || 'No especificado'}
-        Fecha de visita: ${req.body.visitDate || 'No especificada'}
-        Hora de visita: ${req.body.visitTime || 'No especificada'}
-        Nombre: ${req.body.name || 'No especificado'}
-        Email: ${req.body.email}
-        Teléfono: ${req.body.phone || 'No especificado'}
-        Mensaje: ${req.body.message || 'No especificado'}
-      `;
-    } 
-    // Si es una oferta
-    else if (req.body.type === 'offer') {
-      subject = 'Nueva oferta para propiedad';
-      body = `
-        Nueva oferta recibida
-        
-        Propiedad: ${req.body.propertyTitle || 'No especificada'}
-        ID Propiedad: ${req.body.propertyId || 'No especificado'}
-        Oferta: ${req.body.offerAmount || 'No especificada'} ${req.body.offerLabel || ''}
-        Nombre: ${req.body.name || 'No especificado'}
-        Email: ${req.body.email}
-        Teléfono: ${req.body.phone || 'No especificado'}
-        Mensaje: ${req.body.message || 'No especificado'}
-      `;
+      endpoint = '/api/property-notification/visit';
+    } else if (req.body.type === 'offer') {
+      endpoint = '/api/property-notification/offer';
+    } else {
+      endpoint = '/api/contact';
     }
-    // Si es contacto general
-    else {
-      body = `
-        Nuevo mensaje de contacto
-        
-        Nombre: ${req.body.name || 'No especificado'}
-        Email: ${req.body.email}
-        Teléfono: ${req.body.phone || 'No especificado'}
-        Mensaje: ${req.body.message || 'No especificado'}
-      `;
-    }
+
+    console.log(`[Contact Proxy] Enviando al backend: ${backendUrl}${endpoint}`);
     
-    // Datos para formsubmit.co - servicio gratuito para procesamiento de formularios
-    const formData = {
-      name: req.body.name || 'Cliente Web',
-      email: req.body.email,
-      message: body,
-      subject: subject,
-      _template: 'box'
-    };
-    
-    console.log('[Contact Proxy] Enviando a formsubmit.co');
-    
-    // Enviar al servicio de formularios
-    const response = await fetch('https://formsubmit.co/ajax/marta@gozamadrid.com', {
+    // Enviar al backend
+    const backendResponse = await fetch(`${backendUrl}${endpoint}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      body: JSON.stringify(formData)
+      body: JSON.stringify(req.body)
     });
     
-    // Verificar respuesta del servicio
-    if (response.ok) {
-      const result = await response.json();
-      console.log('[Contact Proxy] Respuesta:', result);
+    if (backendResponse.ok) {
+      const result = await backendResponse.json();
+      console.log('[Contact Proxy] Respuesta del backend:', result);
       
       return res.status(200).json({
         success: true,
         message: 'Solicitud procesada correctamente'
       });
     } else {
-      // Si falla, intentar con un servicio alternativo
-      console.log('[Contact Proxy] Fallo en formsubmit, intentando con alternativa');
+      console.log('[Contact Proxy] Error del backend, usando servicio de respaldo');
       
-      // Intentar con Web3Forms como alternativa
-      const web3FormsResponse = await fetch('https://api.web3forms.com/submit', {
+      // Fallback a servicios externos si el backend falla
+      const formData = {
+        name: req.body.name || 'Cliente Web',
+        email: req.body.email,
+        message: `Tipo: ${req.body.type || 'contacto'}\nPropiedad: ${req.body.propertyTitle || 'N/A'}\nNombre: ${req.body.name || 'N/A'}\nEmail: ${req.body.email}\nTeléfono: ${req.body.phone || 'N/A'}\nMensaje: ${req.body.message || 'N/A'}`,
+        subject: req.body.type === 'visit' ? 'Nueva solicitud de visita' : req.body.type === 'offer' ? 'Nueva oferta' : 'Nuevo contacto',
+        _template: 'box'
+      };
+      
+      const fallbackResponse = await fetch('https://formsubmit.co/ajax/marta@gozamadrid.com', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
-        body: JSON.stringify({
-          access_key: '4b1ed8d4-53e7-4e8e-b9f2-f46a8513da87', // Clave pública de acceso
-          subject: subject,
-          from_name: req.body.name || 'Cliente Web',
-          email: req.body.email,
-          message: body
-        })
+        body: JSON.stringify(formData)
       });
       
-      if (web3FormsResponse.ok) {
+      if (fallbackResponse.ok) {
         return res.status(200).json({
           success: true,
-          message: 'Solicitud procesada con servicio alternativo'
+          message: 'Solicitud procesada con servicio de respaldo'
         });
       }
       
-      // Si nada funciona, devolver error
       return res.status(500).json({
         error: 'No se pudo procesar la solicitud',
         message: 'Intente más tarde o contacte directamente'
@@ -138,6 +94,36 @@ export default async function handler(req, res) {
     }
   } catch (error) {
     console.error('[Contact Proxy] Error general:', error);
+    
+    // Intentar servicio de respaldo en caso de error
+    try {
+      const formData = {
+        name: req.body.name || 'Cliente Web',
+        email: req.body.email,
+        message: `Error de conexión - Tipo: ${req.body.type || 'contacto'}\nNombre: ${req.body.name || 'N/A'}\nEmail: ${req.body.email}\nTeléfono: ${req.body.phone || 'N/A'}\nMensaje: ${req.body.message || 'N/A'}`,
+        subject: 'Formulario web (error de conexión)',
+        _template: 'box'
+      };
+      
+      const emergencyResponse = await fetch('https://formsubmit.co/ajax/marta@gozamadrid.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+      
+      if (emergencyResponse.ok) {
+        return res.status(200).json({
+          success: true,
+          message: 'Solicitud procesada con servicio de emergencia'
+        });
+      }
+    } catch (emergencyError) {
+      console.error('[Contact Proxy] Error en servicio de emergencia:', emergencyError);
+    }
+    
     return res.status(500).json({
       error: 'Error general al procesar la solicitud',
       message: 'Intente más tarde'
