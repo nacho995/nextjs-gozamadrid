@@ -696,7 +696,7 @@ const Video = () => {
                                                 </div>
 
                                                 <a
-                                                    href="https://betterplaceapp.com/valorar/personal-de-momento/u/34300?locale=es"
+                                                    href="https://es.statefox.com/mites/v/68a5a4c5e10bc5704c05f3f6"
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="inline-flex items-center gap-2 bg-amarillo hover:bg-amarillo/90 text-white font-medium px-6 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
@@ -720,7 +720,7 @@ const Video = () => {
                         className="fixed bottom-8 right-8 z-50"
                     >
                         <a
-                            href="https://betterplaceapp.com/valorar/personal-de-momento/u/34300?locale=es"
+                            href="https://es.statefox.com/mites/v/68a5a4c5e10bc5704c05f3f6"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="group bg-amarillo hover:bg-amarillo/90 text-white px-6 py-4 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 flex items-center gap-3 transform hover:scale-105"

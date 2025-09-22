@@ -63,7 +63,7 @@ export default function VenderPropiedad() {
                             </p>
                             <div className="mb-2">
                                 <a
-                                    href="https://betterplaceapp.com/valorar/personal-de-momento/u/34300?locale=es"
+                                    href="https://es.statefox.com/mites/v/68a5a4c5e10bc5704c05f3f6"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="block w-[80%] text-xs sm:text-sm md:w-1/2 lg:w-[15vw] mx-auto rounded-full bg-white text-black px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 font-bold hover:bg-black hover:text-white transition-colors"

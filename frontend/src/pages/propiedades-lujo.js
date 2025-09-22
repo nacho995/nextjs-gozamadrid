@@ -55,7 +55,7 @@ const PropiedadesLujo = () => {
   };
   
   // Enlace a la valoración
-  const valorationLink = "https://betterplaceapp.com/valorar/personal-de-momento/u/34300?locale=es";
+  const valorationLink = "https://es.statefox.com/mites/v/68a5a4c5e10bc5704c05f3f6";
   
   // Animación para el fadeIn de las secciones
   const fadeIn = {

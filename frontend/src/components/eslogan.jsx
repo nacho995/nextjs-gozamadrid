@@ -188,7 +188,7 @@ const Eslogan = () => {
                     className="mb-4"
                   >
                     <a
-                      href="https://betterplaceapp.com/valorar/personal-de-momento/u/34300?locale=es"
+                      href="https://es.statefox.com/mites/v/68a5a4c5e10bc5704c05f3f6"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="bg-gradient-to-r from-amarillo to-yellow-500 text-black font-bold px-8 py-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 inline-flex items-center text-lg border-2 border-yellow-600"
@@ -231,7 +231,7 @@ const Eslogan = () => {
                     whileTap={{ scale: 0.95 }}
                   >
                     <a
-                      href="https://betterplaceapp.com/valorar/personal-de-momento/u/34300?locale=es"
+                      href="https://es.statefox.com/mites/v/68a5a4c5e10bc5704c05f3f6"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="bg-gradient-to-r from-amarillo to-yellow-500 text-black font-bold px-8 py-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 inline-flex items-center text-lg border-2 border-yellow-600"
@@ -295,7 +295,7 @@ const Eslogan = () => {
             whileTap={{ scale: 0.95 }}
           >
             <a
-              href="https://betterplaceapp.com/valorar/personal-de-momento/u/34300?locale=es"
+              href="https://es.statefox.com/mites/v/68a5a4c5e10bc5704c05f3f6"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-amarillo text-black font-bold px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center text-lg"

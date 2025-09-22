@@ -19,7 +19,7 @@ import Agreements from "../components/Agreements";
 export default function Home() {
   
   // Enlace a la valoración
-  const valorationLink = "https://betterplaceapp.com/valorar/personal-de-momento/u/34300?locale=es";
+  const valorationLink = "https://es.statefox.com/mites/v/68a5a4c5e10bc5704c05f3f6";
 
   const gradientStyle = {
     backgroundImage: "url('/gozamadridwp.jpg')",

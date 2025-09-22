@@ -35,7 +35,7 @@ function Header() {
           </p>
           
           <motion.a
-            href="https://betterplaceapp.com/valorar/personal-de-momento/u/34300?locale=es"
+            href="https://es.statefox.com/mites/v/68a5a4c5e10bc5704c05f3f6"
             target="_blank"
             rel="noopener noreferrer"
             whileHover={{ scale: 1.05 }}
