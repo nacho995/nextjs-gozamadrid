@@ -275,17 +275,17 @@ function ControlMenu() {
 
         {/* Menú Principal Desktop - Mejorado para SEO y Accesibilidad */}
         <nav 
-          className={`${isHomePage ? 'mt-6 mb-0' : 'mb-6'} relative z-[9999] flex-col items-center px-24 p-4 w-max mx-auto rounded-full shadow-2xl hidden xl:flex backdrop-blur-xl border border-white/10 ${
+          className={`${isHomePage ? 'mt-6 mb-0' : 'mb-6'} relative z-[9999] flex-col items-center lg:px-8 xl:px-24 lg:py-3 p-4 w-max mx-auto rounded-full shadow-2xl hidden lg:flex backdrop-blur-xl border border-white/10 ${
             isHomePage ? 'bg-black/15' : 'bg-black/20'
           }`}
           role="navigation"
           aria-label="Menú principal de navegación"
         >
           {/* BOTÓN DESTACADO - COMPRAR PROPIEDADES */}
-          <div className="absolute left-6 top-1/2 transform -translate-y-1/2">
+          <div className="absolute lg:left-4 xl:left-6 top-1/2 transform -translate-y-1/2">
             <Link
               href="/vender/comprar"
-              className="bg-gradient-to-r from-amarillo to-yellow-400 hover:from-yellow-400 hover:to-amarillo text-black font-bold px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amarillo/50 text-lg border-2 border-yellow-300/50"
+              className="bg-gradient-to-r from-amarillo to-yellow-400 hover:from-yellow-400 hover:to-amarillo text-black font-bold lg:px-4 lg:py-2 xl:px-6 xl:py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amarillo/50 lg:text-sm xl:text-lg border-2 border-yellow-300/50"
               title="Comprar propiedades - Servicio destacado"
               aria-label="Acceso rápido para comprar propiedades"
             >
@@ -294,7 +294,7 @@ function ControlMenu() {
           </div>
 
           {/* Redes sociales y teléfono - Mejoradas para SEO */}
-          <div className="absolute top-5 right-10 flex space-x-4 mt-4 mr-4" role="complementary" aria-label="Información de contacto y redes sociales">
+          <div className="absolute top-5 right-10 flex lg:space-x-3 xl:space-x-4 mt-4 mr-4" role="complementary" aria-label="Información de contacto y redes sociales">
             <Link 
               href="https://www.facebook.com/MBLP66/" 
               target="_blank" 
@@ -303,7 +303,7 @@ function ControlMenu() {
               title="Facebook - Goza Madrid Inmobiliaria"
               className="hover:scale-110 transition-transform duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 rounded"
             >
-              <FaFacebook size={25} className="hover:text-gray-300 text-blue-600" aria-hidden="true" />
+              <FaFacebook size={22} className="hover:text-gray-300 text-blue-600" aria-hidden="true" />
             </Link>
             <Link 
               href="https://www.instagram.com/gozamadrid54/" 
@@ -313,7 +313,7 @@ function ControlMenu() {
               title="Instagram - Goza Madrid Inmobiliaria"
               className="hover:scale-110 transition-transform duration-200 focus:outline-none focus:ring-2 focus:ring-pink-500/50 rounded"
             >
-              <FaInstagram size={25} className="hover:text-gray-300 text-pink-600" aria-hidden="true" />
+              <FaInstagram size={22} className="hover:text-gray-300 text-pink-600" aria-hidden="true" />
             </Link>
             <a 
               href="tel:+34608136529" 
@@ -322,14 +322,14 @@ function ControlMenu() {
               title="Llamar ahora - Goza Madrid"
             >
               <FaPhone size={25} className="hover:text-gray-300 text-white" aria-hidden="true" />
-              <span className="hover:text-gray-300 text-white text-2xl">
+              <span className="hover:text-gray-300 text-white lg:text-base xl:text-2xl">
                 +34 608 136 529
               </span>
             </a>
           </div>
 
           {/* Logo - Optimizado para SEO */}
-          <div className="relative">
+          <div className="relative lg:scale-[0.85] xl:scale-100">
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-amarillo/20 rounded-3xl" aria-hidden="true"></div>
             <Link 
               href="/" 
@@ -340,8 +340,8 @@ function ControlMenu() {
               <Image 
                 src="/logonuevo.png"
                 alt="Goza Madrid - Agencia Inmobiliaria en Madrid, especialistas en compra, venta y alquiler de propiedades" 
-                width={120} 
-                height={120} 
+                width={110} 
+                height={110} 
                 layout="intrinsic"
                 className="relative z-10 m-0"
                 priority
@@ -351,7 +351,7 @@ function ControlMenu() {
           </div>
 
           {/* Enlaces de navegación principales - Todos visibles */}
-          <div className="text-white flex items-center space-x-12 mt-4 text-2xl font-bold" role="menubar">
+          <div className="text-white flex items-center lg:space-x-6 xl:space-x-12 mt-4 lg:text-lg xl:text-2xl font-bold" role="menubar">
             <Link 
               href="/" 
               className="text-white hover:text-gray-300 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200"

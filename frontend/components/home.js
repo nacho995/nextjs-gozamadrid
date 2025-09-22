@@ -28,22 +28,23 @@ export default function HomeComponent() {
 
         <div className="relative z-1">
           <div className="w-full 
-            mt-[130vh]                 /* móvil por defecto */
-            sm:mt-[130vh]              /* tablets pequeñas */
-            md:mt-[80vh]              /* tablets */
-            lg:mt-[100vh]             /* desktop */
-            sm:mb-[155vh] 
-            md:mb-[-60vh] 
-            lg:mb-[30vh] 
-            mb-[145vh]
+            mt-[110vh]                
+            sm:mt-[110vh]             
+            md:mt-[70vh]              
+            lg:mt-[85vh]              
+            xl:mt-[100vh]
+            sm:mb-[120vh] 
+            md:mb-[-40vh] 
+            lg:mb-[10vh] 
+            mb-[120vh]
             h-[50vh] 
-            md:h-[100vh] 
+            md:h-[90vh] 
             flex justify-center items-center"
           >
             <Cards />
           </div>
 
-          <div className="w-full h[100vh] lg:mt-[-30vh] md:mt-[100vh]">
+          <div className="w-full h[100vh] lg:mt-[-10vh] md:mt-[80vh]">
             <Eslogan />
           </div>
           <div className="w-full mb-4">
@@ -52,12 +53,12 @@ export default function HomeComponent() {
           <div className="w-full mb-4">
             <BlogHome />
           </div>
-          <div className="w-full h-[60vh] mb-4">
+          <div className="w-full h-[60vh] lg:h-[50vh] mb-4">
             <Guide />
           </div>
           <hr className="w-full border-t-1 border-b-1 border-amber-400 mb-4" />
           <hr className="w-full border-t-1 border-b-1 border-black mb-4" />
-          <div className="w-full p-4 max-w-full mt-[40vh] sm:mt-[40vh] md:mt-16 lg:mt-0">
+          <div className="w-full p-4 max-w-full mt-[30vh] sm:mt-[30vh] md:mt-12 lg:mt-0">
             <RegisterForm />
           </div>
         </div>
