@@ -275,7 +275,7 @@ function ControlMenu() {
 
         {/* Menú Principal Desktop - Mejorado para SEO y Accesibilidad */}
         <nav 
-          className={`${isHomePage ? 'mt-6 mb-0' : 'mb-6'} relative z-[9999] flex-col items-center lg:px-8 xl:px-24 lg:py-3 p-4 w-max mx-auto rounded-full shadow-2xl hidden lg:flex backdrop-blur-xl border border-white/10 ${
+          className={`${isHomePage ? 'mt-6 mb-0' : 'mb-6'} relative z-[9999] flex-col items-center lg:px-8 xl:px-24 lg:py-3 p-4 w-max mx-auto rounded-full shadow-2xl hidden lg:flex backdrop-blur-xl border border-white/10 lg:scale-90 xl:scale-100 ${
             isHomePage ? 'bg-black/15' : 'bg-black/20'
           }`}
           role="navigation"
@@ -351,7 +351,7 @@ function ControlMenu() {
           </div>
 
           {/* Enlaces de navegación principales - Todos visibles */}
-          <div className="text-white flex items-center lg:space-x-6 xl:space-x-12 mt-4 lg:text-lg xl:text-2xl font-bold" role="menubar">
+          <div className="text-white flex items-center lg:space-x-6 xl:space-x-12 mt-4 lg:text-base xl:text-2xl font-bold" role="menubar">
             <Link 
               href="/" 
               className="text-white hover:text-gray-300 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200"

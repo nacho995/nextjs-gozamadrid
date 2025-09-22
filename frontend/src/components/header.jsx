@@ -562,7 +562,7 @@ function ControlMenu() {
                       aria-label="Servicios de venta inmobiliaria"
                     >
                       <Link
-                        href="https://betterplaceapp.com/valorar/personal-de-momento/u/34300?locale=es"
+                        href="https://es.statefox.com/mites/v/68a5a4c5e10bc5704c05f3f6"
                         className="flex items-center px-8 py-5 text-yellow-200 hover:text-white hover:scale-105 focus:outline-none transition-all duration-300 rounded-xl mx-2 my-2"
                         role="menuitem"
                         title="Valoración gratuita de tu propiedad"
@@ -1121,7 +1121,7 @@ function ControlMenu() {
                 {dropdownVisible.vender && (
                   <div className="ml-4 mt-2" role="menu" aria-label="Opciones de venta">
                     <Link
-                      href="https://betterplaceapp.com/valorar/personal-de-momento/u/34300?locale=es"
+                      href="https://es.statefox.com/mites/v/68a5a4c5e10bc5704c05f3f6"
                       className="flex items-center px-4 py-3 text-white hover:bg-white/10 focus:bg-white/20 focus:outline-none transition-colors duration-200 rounded-lg"
                       role="menuitem"
                       title="Valoración gratuita de tu propiedad"

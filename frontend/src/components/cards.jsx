@@ -236,7 +236,7 @@ function CorporateCard({ card, index, cardId, onExpandChange }) {
                                     transition={{ delay: 0.3 }}
                                 >
                                     <a
-                                        href="https://betterplaceapp.com/valorar/personal-de-momento/u/34300?locale=es"
+                                        href="https://es.statefox.com/mites/v/68a5a4c5e10bc5704c05f3f6"
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="inline-flex items-center space-x-2 bg-amarillo hover:bg-yellow-600 text-black px-6 py-3 rounded-full font-bold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 border border-amarillo"
@@ -405,7 +405,7 @@ export function FloatingValoradorButton() {
           
           {/* Botón base con gradientes complejos */}
           <motion.a
-            href="https://betterplaceapp.com/valorar/personal-de-momento/u/34300?locale=es"
+            href="https://es.statefox.com/mites/v/68a5a4c5e10bc5704c05f3f6"
             target="_blank"
             rel="noopener noreferrer"
             className="relative flex items-center gap-4 px-8 py-5 rounded-full overflow-hidden shadow-2xl transform transition-all duration-500 group"
@@ -757,7 +757,7 @@ export default function Cards() {
                             whileTap={{ scale: 0.95 }}
                         >
                             <a
-                                href="https://betterplaceapp.com/valorar/personal-de-momento/u/34300?locale=es"
+                                href="https://es.statefox.com/mites/v/68a5a4c5e10bc5704c05f3f6"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center space-x-2 bg-amarillo hover:bg-yellow-600 text-black font-bold px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 text-lg"
