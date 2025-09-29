@@ -7,12 +7,18 @@ const nextConfig = {
   },
 
   async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: 'http://localhost:8081/api/:path*',
-      },
-    ];
+    const backendUrl = process.env.BACKEND_URL;
+    if (backendUrl) {
+      const normalized = backendUrl.replace(/\/$/, '');
+      return [
+        {
+          source: '/api/:path*',
+          destination: `${normalized}/api/:path*`,
+        },
+      ];
+    }
+    // Sin BACKEND_URL definido, no aplicar rewrites y dejar que el router de la plataforma enrute /api
+    return [];
   },
   
   // Configuración de imágenes
@@ -34,7 +40,10 @@ const nextConfig = {
   // Optimizaciones de compilación
   compiler: {
     removeConsole: false,
-  }
+  },
+
+  // Generar bundle standalone para contenedores
+  output: 'standalone',
 };
 
 module.exports = nextConfig; 
