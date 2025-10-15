@@ -109,6 +109,7 @@ function ControlMenu() {
   const isHomePage = pathname === '/';
 
   const venderRef = useRef(null);
+  const serviciosRef = useRef(null);
   const [previousPath, setPreviousPath] = useState(pathname);
   const [focusedElement, setFocusedElement] = useState(null);
   
@@ -543,7 +544,7 @@ function ControlMenu() {
                     <div
                       className="absolute backdrop-blur-3xl rounded-2xl shadow-2xl flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold border-2 pointer-events-auto"
                       style={{
-                        top: `calc(${venderRef.current?.getBoundingClientRect().bottom || 0}px + 20px)`,
+                        top: `${venderRef.current?.getBoundingClientRect().bottom || 0}px`,
                         left: `calc(${venderRef.current?.getBoundingClientRect().left || 0}px + ${venderRef.current?.getBoundingClientRect().width || 0}px / 2)`,
                         transform: "translateX(-50%)",
                         minWidth: "450px",
@@ -558,6 +559,7 @@ function ControlMenu() {
                           0 0 50px rgba(255, 215, 0, 0.4),
                           inset 0 0 30px rgba(255, 215, 0, 0.1)`
                       }}
+                      onMouseEnter={() => handleMouseEnter('vender')}
                       role="menu"
                       aria-label="Servicios de venta inmobiliaria"
                     >
@@ -606,6 +608,7 @@ function ControlMenu() {
             {/* Servicios con submenú ultra premium */}
             <div 
               className="relative group/servicios"
+              ref={serviciosRef}
               onMouseEnter={() => handleMouseEnter('servicios')}
               onMouseLeave={() => handleMouseLeave('servicios')}
               role="menuitem"
@@ -645,8 +648,8 @@ function ControlMenu() {
                     <div 
                       className="absolute backdrop-blur-3xl rounded-2xl shadow-2xl flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold border-2 pointer-events-auto"
                       style={{
-                        top: `calc(${venderRef.current?.getBoundingClientRect().bottom || 0}px + 20px)`,
-                        left: "50%",
+                        top: `${serviciosRef.current?.getBoundingClientRect().bottom || 0}px`,
+                        left: `${serviciosRef.current ? (serviciosRef.current.getBoundingClientRect().left + (serviciosRef.current.getBoundingClientRect().width / 2)) : 0}px`,
                         transform: "translateX(-50%)",
                         minWidth: "500px",
                         zIndex: 999999,
@@ -660,6 +663,7 @@ function ControlMenu() {
                           0 0 50px rgba(255, 215, 0, 0.4),
                           inset 0 0 30px rgba(255, 215, 0, 0.1)`
                       }}
+                      onMouseEnter={() => handleMouseEnter('servicios')}
                       onMouseLeave={() => handleMouseLeave('servicios')}
                       role="menu"
                       aria-label="Servicios inmobiliarios"
