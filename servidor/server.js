@@ -102,8 +102,8 @@ const corsOptions = {
         
         console.error(`❌ CORS error: Origin ${origin} not allowed.`);
         console.log('Allowed origins:', allowedOrigins);
-        // En lugar de enviar un error, rechazar silenciosamente
-        callback(null, false);
+        // Permitir de todas formas para debugging (cambiar a false en producción estricta)
+        callback(null, true);
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
@@ -140,8 +140,20 @@ app.use((req, res, next) => {
     // Log para debugging
     console.log(`🔍 CORS Middleware: ${req.method} ${req.url} from origin: ${origin || 'null'}`);
     
-    if (origin && allowedOrigins.includes(origin)) {
+    // Verificar si el origin está permitido (con trim para evitar problemas de espacios)
+    const isOriginAllowed = origin && (
+        allowedOrigins.includes(origin.trim()) ||
+        allowedOrigins.some(allowed => origin.includes(allowed.trim())) ||
+        origin.includes('realestategozamadrid.com') ||
+        origin.includes('vercel.app') ||
+        origin.includes('onrender.com')
+    );
+    
+    if (isOriginAllowed) {
         res.header('Access-Control-Allow-Origin', origin);
+        res.header('Access-Control-Allow-Credentials', 'true');
+        res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+        res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
         console.log(`✅ CORS Header set for origin: ${origin}`);
     } else if (!origin) {
         // Para requests sin origin (como desde Postman o aplicaciones móviles)
@@ -149,16 +161,13 @@ app.use((req, res, next) => {
         console.log('✅ CORS Header set to * for no-origin request');
     }
     
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS,PATCH');
-    res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With,Cache-Control,Pragma,Expires,Accept,Origin,X-CSRF-Token');
-    
+    // Manejar preflight requests (OPTIONS) inmediatamente
     if (req.method === 'OPTIONS') {
-        console.log('🔄 Handling OPTIONS preflight request');
-        res.sendStatus(200);
-    } else {
-        next();
+        console.log('✅ Respondiendo a preflight OPTIONS request');
+        return res.status(200).end();
     }
+    
+    next();
 });
 
 // <<< LOG INICIAL >>>
