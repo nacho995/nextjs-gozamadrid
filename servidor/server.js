@@ -31,7 +31,8 @@ import propertyOfferRoutes from './routes/propertyOfferRoutes.js';
 import healthRoutes from './routes/healthRoutes.js';
 import cloudinaryRouter from './routes/cloudinaryRouter.js';
 import authRoutes from './routes/authRoutes.js';
-import { sendContactEmail, testEmail } from './controller/contactController.js';
+import debugRoutes from './routes/debugRoutes.js';
+import { testEmail } from './controller/contactController.js';
 
 // <<< MANEJADORES GLOBALES DE ERRORES >>>
 process.on('uncaughtException', (err, origin) => {
@@ -283,6 +284,9 @@ app.use('/api/cloudinary', cloudinaryRouter);
 // Rutas de autenticación (recuperación de contraseña)
 app.use('/api/auth', authRoutes);
 
+// Rutas de debug temporal (ELIMINAR EN PRODUCCIÓN)
+app.use('/api/debug', debugRoutes);
+
 // Rutas específicas para ofertas y visitas de propiedades
 app.use('/api/property-visit', propertyVisitRoutes);
 app.use('/api/property-offer', propertyOfferRoutes);
@@ -290,7 +294,7 @@ app.use('/api/property-offer', propertyOfferRoutes);
 // Rutas para health check y monitoreo
 app.use('/api/health', healthRoutes);
 
-// Ruta de prueba para el formulario de contacto
+// Ruta de prueba para el formulario de contacto (solo para diagnóstico)
 app.post('/api/test-contact', (req, res) => {
   console.log('[TEST-CONTACT] Recibida petición de prueba');
   console.log('[TEST-CONTACT] Headers:', JSON.stringify(req.headers));
@@ -302,10 +306,8 @@ app.post('/api/test-contact', (req, res) => {
   });
 });
 
-// Ruta especial para el formulario de contacto
-app.post('/api/contact', sendContactEmail);
-// Añadir la misma ruta con barra final para manejar ambos casos
-app.post('/api/contact/', sendContactEmail);
+// NOTA: /api/contact está manejado por notificationRouter (línea 277)
+// No es necesario duplicar la ruta aquí
 
 // Ruta de prueba para el envío de correos
 app.post('/api/test-email', testEmail);
