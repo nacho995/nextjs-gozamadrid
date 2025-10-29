@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
@@ -65,6 +66,20 @@ userSchema.pre('save', function(next) {
 // Método para comparar contraseñas
 userSchema.methods.comparePassword = async function(candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
+};
+
+// Método para crear token de restablecimiento de contraseña
+userSchema.methods.createPasswordResetToken = function() {
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    
+    this.resetPasswordToken = crypto
+        .createHash('sha256')
+        .update(resetToken)
+        .digest('hex');
+    
+    this.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // 10 minutos
+    
+    return resetToken;
 };
 
 const User = mongoose.model('User', userSchema);

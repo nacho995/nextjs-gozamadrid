@@ -1,45 +1,72 @@
 import dotenv from 'dotenv';
-// import nodemailer from 'nodemailer'; // Eliminado
+import nodemailer from 'nodemailer';
 
 dotenv.config();
 
-/* Eliminado: Configuración del transporter de Nodemailer
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com', 
-    port: 587,
-    secure: false, // true for 465, false for other ports
+// Configurar transporter de Nodemailer
+const createTransporter = () => {
+  const config = {
+    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+    port: parseInt(process.env.EMAIL_PORT) || 587,
+    secure: process.env.EMAIL_SECURE === 'true' || false,
     auth: {
-        user: process.env.EMAIL_USER, // generated ethereal user
-        pass: process.env.EMAIL_PASSWORD, // generated ethereal password
-    },
-});
-*/
-
-/* Eliminado: Función sendEmail que usaba Nodemailer
-export const sendEmail = async (subject, text, html) => {
-    try {
-        const adminEmails = process.env.EMAIL_TO ? process.env.EMAIL_TO.split(',') : [];
-        if (adminEmails.length === 0) {
-            console.error('No admin email configured in EMAIL_TO');
-            return;
-        }
-        let info = await transporter.sendMail({
-            from: `"GozaMadrid" <${process.env.EMAIL_FROM}>`, // sender address
-            to: adminEmails.join(', '), // list of receivers
-            subject: subject, // Subject line
-            text: text, // plain text body
-            html: html, // html body
-        });
-        console.log('Message sent: %s', info.messageId);
-    } catch (error) {
-        console.error('Error sending email:', error);
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD
     }
+  };
+
+  console.log('[utils/email.js] Configurando transporter con:', {
+    host: config.host,
+    port: config.port,
+    secure: config.secure,
+    user: config.auth.user
+  });
+
+  return nodemailer.createTransport(config);
 };
-*/
 
-// Si hubiera otras funciones de utilidad no relacionadas con el envío directo
-// de Nodemailer, se mantendrían aquí. Por ahora, el archivo queda vacío 
-// o con comentarios indicando que su funcionalidad fue migrada a SendGrid
-// en los controladores respectivos.
+export const sendEmail = async ({ email, subject, html, text, sendCopyToAdmin = false }) => {
+  try {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+      throw new Error('EMAIL_USER y EMAIL_PASSWORD deben estar configurados');
+    }
 
-console.log('[utils/email.js] Lógica de Nodemailer eliminada. Usar SendGrid desde los controladores.'); 
+    const transporter = createTransporter();
+    const fromEmail = process.env.EMAIL_FROM || process.env.EMAIL_USER;
+
+    // Mensaje principal al usuario
+    const mailOptions = {
+      from: `"GozaMadrid" <${fromEmail}>`,
+      to: email,
+      subject: subject,
+      text: text || 'Por favor habilite HTML en su cliente de correo.',
+      html: html
+    };
+
+    console.log(`[SendEmail] Enviando email a: ${email}`);
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`[SendEmail] Email enviado exitosamente. MessageId: ${info.messageId}`);
+
+    // Enviar copia al admin si se solicita
+    if (sendCopyToAdmin && process.env.EMAIL_RECIPIENT) {
+      const adminMailOptions = {
+        from: `"GozaMadrid" <${fromEmail}>`,
+        to: process.env.EMAIL_RECIPIENT,
+        subject: `[COPIA ADMIN] ${subject}`,
+        text: text || 'Por favor habilite HTML en su cliente de correo.',
+        html: html + `<hr><p><small>Este es un email enviado a: ${email}</small></p>`
+      };
+
+      await transporter.sendMail(adminMailOptions);
+      console.log(`[SendEmail] Copia enviada al admin: ${process.env.EMAIL_RECIPIENT}`);
+    }
+
+    return info;
+
+  } catch (error) {
+    console.error('[SendEmail] Error al enviar email:', error);
+    throw error;
+  }
+};
+
+console.log('[utils/email.js] Configurado con Nodemailer.'); 
