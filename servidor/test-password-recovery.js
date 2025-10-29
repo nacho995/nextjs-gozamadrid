@@ -8,15 +8,13 @@ const testPasswordRecovery = async () => {
     console.log('=== Test de Recuperación de Contraseña ===\n');
     
     console.log('Variables de entorno configuradas:');
-    console.log('EMAIL_HOST:', process.env.EMAIL_HOST);
-    console.log('EMAIL_PORT:', process.env.EMAIL_PORT);
-    console.log('EMAIL_USER:', process.env.EMAIL_USER);
-    console.log('EMAIL_PASSWORD:', process.env.EMAIL_PASSWORD ? '***configurada***' : 'NO CONFIGURADA');
+    console.log('BREVO_API_KEY:', process.env.BREVO_API_KEY ? process.env.BREVO_API_KEY.substring(0, 20) + '...' : 'NO CONFIGURADA');
+    console.log('EMAIL_FROM:', process.env.EMAIL_FROM);
     console.log('FRONTEND_URL:', process.env.FRONTEND_URL);
     console.log('\n');
 
     const testToken = 'abc123test456token';
-    const testEmail = process.env.EMAIL_USER || 'test@example.com';
+    const testEmail = process.env.EMAIL_FROM || 'test@example.com';
     const resetURL = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password/${testToken}`;
 
     const message = `
@@ -63,10 +61,10 @@ const testPasswordRecovery = async () => {
     }
     
     console.log('\n🔍 Posibles soluciones:');
-    console.log('1. Verifica que EMAIL_USER y EMAIL_PASSWORD estén configuradas en .env');
-    console.log('2. Si usas Gmail, asegúrate de usar una App Password, no tu contraseña normal');
-    console.log('3. Habilita la verificación en dos pasos en tu cuenta de Google');
-    console.log('4. Si el error es de timeout, prueba con EMAIL_PORT=465 y EMAIL_SECURE=true');
+    console.log('1. Verifica que BREVO_API_KEY esté configurada en .env');
+    console.log('2. Obtén una API Key gratis en https://www.brevo.com/');
+    console.log('3. Ve a Settings → API Keys → Generate new API key');
+    console.log('4. Verifica que EMAIL_FROM esté configurado con un email válido');
   }
 };
 
