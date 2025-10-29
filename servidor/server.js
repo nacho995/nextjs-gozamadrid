@@ -31,7 +31,7 @@ import propertyOfferRoutes from './routes/propertyOfferRoutes.js';
 import healthRoutes from './routes/healthRoutes.js';
 import cloudinaryRouter from './routes/cloudinaryRouter.js';
 import authRoutes from './routes/authRoutes.js';
-import debugRoutes from './routes/debugRoutes.js';
+// import debugRoutes from './routes/debugRoutes.js'; // COMENTADO: Solo para desarrollo local
 import { testEmail } from './controller/contactController.js';
 
 // <<< MANEJADORES GLOBALES DE ERRORES >>>
@@ -284,8 +284,8 @@ app.use('/api/cloudinary', cloudinaryRouter);
 // Rutas de autenticación (recuperación de contraseña)
 app.use('/api/auth', authRoutes);
 
-// Rutas de debug temporal (ELIMINAR EN PRODUCCIÓN)
-app.use('/api/debug', debugRoutes);
+// Rutas de debug temporal (COMENTADO: Solo para desarrollo local)
+// app.use('/api/debug', debugRoutes);
 
 // Rutas específicas para ofertas y visitas de propiedades
 app.use('/api/property-visit', propertyVisitRoutes);
