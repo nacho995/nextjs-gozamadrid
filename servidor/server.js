@@ -30,6 +30,7 @@ import propertyRoutes from './routes/propertyRoutes.js';
 import propertyOfferRoutes from './routes/propertyOfferRoutes.js';
 import healthRoutes from './routes/healthRoutes.js';
 import cloudinaryRouter from './routes/cloudinaryRouter.js';
+import authRoutes from './routes/authRoutes.js';
 import { sendContactEmail, testEmail } from './controller/contactController.js';
 
 // <<< MANEJADORES GLOBALES DE ERRORES >>>
@@ -269,6 +270,9 @@ app.use('/api', prefixRouter); // Agregar las rutas de property-notification dir
 app.use("/api/blogs", blogRouter);
 app.use('/api/user', userRouter);
 app.use('/api/cloudinary', cloudinaryRouter);
+
+// Rutas de autenticación (recuperación de contraseña)
+app.use('/api/auth', authRoutes);
 
 // Rutas específicas para ofertas y visitas de propiedades
 app.use('/api/property-visit', propertyVisitRoutes);
