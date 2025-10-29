@@ -77,6 +77,8 @@ export const forgotPassword = async (req, res) => {
 
 export const resetPassword = async (req, res) => {
   try {
+    console.log('[authController] resetPassword - Token recibido:', req.params.token.substring(0, 10) + '...');
+    
     // 1) Obtener usuario basado en el token
     const hashedToken = crypto
       .createHash('sha256')
@@ -90,17 +92,23 @@ export const resetPassword = async (req, res) => {
 
     // 2) Si el token no ha expirado, y hay un usuario, establecer la nueva contraseña
     if (!user) {
+      console.log('[authController] resetPassword - Token inválido o expirado');
       return res.status(400).json({
         status: 'error',
         message: 'El token es inválido o ha expirado'
       });
     }
 
-    // 3) Actualizar la contraseña
+    console.log('[authController] resetPassword - Usuario encontrado:', user.email);
+    console.log('[authController] resetPassword - Actualizando contraseña...');
+
+    // 3) Actualizar la contraseña (el pre-save hook la hasheará automáticamente)
     user.password = req.body.password;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
     await user.save();
+
+    console.log('[authController] resetPassword - Contraseña actualizada exitosamente para:', user.email);
 
     // 4) Responder al cliente
     res.status(200).json({
@@ -109,7 +117,7 @@ export const resetPassword = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Error en resetPassword:', error);
+    console.error('[authController] Error en resetPassword:', error);
     res.status(500).json({
       status: 'error',
       message: 'Ocurrió un error al procesar su solicitud'

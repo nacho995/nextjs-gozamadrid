@@ -57,10 +57,23 @@ const userSchema = new Schema({
     }
 }, { timestamps: true });
 
-// Middleware para actualizar updatedAt antes de cada actualización
-userSchema.pre('save', function(next) {
-    this.updatedAt = new Date();
-    next();
+// Middleware para hashear la contraseña antes de guardar
+userSchema.pre('save', async function(next) {
+    // Solo hashear la contraseña si ha sido modificada (o es nueva)
+    if (!this.isModified('password')) {
+        this.updatedAt = new Date();
+        return next();
+    }
+    
+    try {
+        // Generar salt y hashear la contraseña
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+        this.updatedAt = new Date();
+        next();
+    } catch (error) {
+        next(error);
+    }
 });
 
 // Método para comparar contraseñas
