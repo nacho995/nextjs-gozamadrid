@@ -19,7 +19,8 @@ import {
   FaChartLine,
   FaEllipsisH,
  
-  FaCalculator
+  FaCalculator,
+  FaCamera
 } from "react-icons/fa";
 
 // Componente para renderizar iconos - Con nombre explícito para Fast Refresh
@@ -314,7 +315,7 @@ function ControlMenu() {
 
         {/* Menú Principal Desktop - Diseño Ultra Premium con Backdrop Blur */}
         <nav 
-          className={`${isHomePage ? 'mt-8 mb-0' : 'mb-8'} relative flex-col items-center px-16 py-8 w-max mx-auto rounded-2xl shadow-2xl hidden xl:flex backdrop-blur-2xl border-2 ${
+          className={`${isHomePage ? 'mt-6 mb-0' : 'mb-6'} relative flex-col items-center px-8 py-4 w-max mx-auto rounded-2xl shadow-2xl hidden xl:flex backdrop-blur-2xl border-2 ${
             isHomePage 
               ? 'shadow-xl' 
               : 'shadow-2xl'
@@ -369,7 +370,7 @@ function ControlMenu() {
           ></div>
 
           {/* Redes sociales y teléfono - Ultra Premium */}
-          <div className="absolute top-8 right-16 flex space-x-8 mt-2 mr-2" role="complementary" aria-label="Información de contacto y redes sociales">
+          <div className="absolute top-4 right-8 flex space-x-4 mt-1 mr-1" role="complementary" aria-label="Información de contacto y redes sociales">
             <Link 
               href="https://www.facebook.com/MBLP66/" 
               target="_blank" 
@@ -382,7 +383,7 @@ function ControlMenu() {
                 boxShadow: '0 0 20px rgba(59, 130, 246, 0.3)'
               }}
             >
-              <FaFacebook size={32} className="text-blue-400 hover:text-blue-300 drop-shadow-xl" aria-hidden="true" />
+              <FaFacebook size={24} className="text-blue-400 hover:text-blue-300 drop-shadow-xl" aria-hidden="true" />
             </Link>
             <Link 
               href="https://www.instagram.com/gozamadrid54/" 
@@ -396,7 +397,7 @@ function ControlMenu() {
                 boxShadow: '0 0 20px rgba(236, 72, 153, 0.3)'
               }}
             >
-              <FaInstagram size={32} className="text-pink-400 hover:text-pink-300 drop-shadow-xl" aria-hidden="true" />
+              <FaInstagram size={24} className="text-pink-400 hover:text-pink-300 drop-shadow-xl" aria-hidden="true" />
             </Link>
             <a 
               href="tel:+34608136529" 
@@ -413,9 +414,9 @@ function ControlMenu() {
                   inset 0 0 20px rgba(255, 215, 0, 0.1)`
               }}
             >
-              <FaPhone size={28} className="text-yellow-400 hover:text-yellow-300 drop-shadow-xl" aria-hidden="true" />
+              <FaPhone size={20} className="text-yellow-400 hover:text-yellow-300 drop-shadow-xl" aria-hidden="true" />
               <span 
-                className="text-yellow-100 hover:text-white text-2xl font-bold tracking-wide"
+                className="text-yellow-100 hover:text-white text-lg font-bold tracking-wide"
                 style={{
                   textShadow: '0 0 15px rgba(255, 215, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.8)'
                 }}
@@ -426,7 +427,7 @@ function ControlMenu() {
           </div>
 
           {/* Logo - Marco dorado ultra premium */}
-          <div className="relative mb-6">
+          <div className="relative mb-4">
             <div 
               className="absolute inset-0 rounded-full border-4 shadow-2xl"
               style={{
@@ -452,8 +453,8 @@ function ControlMenu() {
               <Image 
                 src="/logonuevo.png" 
                 alt="Goza Madrid - Agencia Inmobiliaria en Madrid, especialistas en compra, venta y alquiler de propiedades" 
-                width={160} 
-                height={160} 
+                width={120} 
+                height={120} 
                 layout="intrinsic"
                 className="relative z-10 m-0 drop-shadow-2xl hover:scale-105 transition-transform duration-500"
                 priority
@@ -464,7 +465,7 @@ function ControlMenu() {
 
           {/* Enlaces de navegación principales - Texto ultra legible */}
           <div 
-            className="flex items-center space-x-12 text-2xl font-bold tracking-wide" 
+            className="flex items-center space-x-6 text-xl font-bold tracking-wide" 
             role="menubar"
             style={{
               fontFamily: 'system-ui, -apple-system, sans-serif'
@@ -472,7 +473,7 @@ function ControlMenu() {
           >
             <Link 
               href="/" 
-              className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-4 py-3 transition-all duration-300 hover:scale-110 relative"
+              className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-3 py-2 transition-all duration-300 hover:scale-110 relative"
               role="menuitem"
               title="Página principal - Goza Madrid"
               style={{
@@ -489,7 +490,7 @@ function ControlMenu() {
 
             <Link 
               href="/vender/comprar" 
-              className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-4 py-3 transition-all duration-300 hover:scale-110 relative"
+              className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-3 py-2 transition-all duration-300 hover:scale-110 relative"
               role="menuitem"
               title="Catálogo de propiedades en Madrid"
               style={{
@@ -517,7 +518,7 @@ function ControlMenu() {
             >
               <Link 
                 href="/vender" 
-                className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-4 py-3 transition-all duration-300 hover:scale-110 relative flex items-center gap-3"
+                className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-3 py-2 transition-all duration-300 hover:scale-110 relative flex items-center gap-2"
                 title="Servicios de venta de propiedades"
                 style={{
                   textShadow: '0 0 20px rgba(255, 215, 0, 0.8), 0 2px 6px rgba(0, 0, 0, 0.9)',
@@ -547,7 +548,7 @@ function ControlMenu() {
                         top: `${venderRef.current?.getBoundingClientRect().bottom || 0}px`,
                         left: `calc(${venderRef.current?.getBoundingClientRect().left || 0}px + ${venderRef.current?.getBoundingClientRect().width || 0}px / 2)`,
                         transform: "translateX(-50%)",
-                        minWidth: "450px",
+                        minWidth: "350px",
                         zIndex: 999999,
                         background: `linear-gradient(135deg, 
                           rgba(0, 0, 0, 0.98) 0%, 
@@ -565,7 +566,7 @@ function ControlMenu() {
                     >
                       <Link
                         href="https://es.statefox.com/mites/v/68a5a4c5e10bc5704c05f3f6"
-                        className="flex items-center px-8 py-5 text-yellow-200 hover:text-white hover:scale-105 focus:outline-none transition-all duration-300 rounded-xl mx-2 my-2"
+                        className="flex items-center px-6 py-4 text-yellow-200 hover:text-white hover:scale-105 focus:outline-none transition-all duration-300 rounded-xl mx-2 my-2"
                         role="menuitem"
                         title="Valoración gratuita de tu propiedad"
                         target="_blank"
@@ -579,7 +580,7 @@ function ControlMenu() {
                           boxShadow: '0 0 20px rgba(255, 215, 0, 0.2)'
                         }}
                       >
-                        <MenuIcon icon={FaCalculator} className="mr-4 text-yellow-400 text-3xl drop-shadow-xl" aria-hidden="true" />
+                        <MenuIcon icon={FaCalculator} className="mr-3 text-yellow-400 text-2xl drop-shadow-xl" aria-hidden="true" />
                         Valoración gratuita
                       </Link>
                     </div>
@@ -589,8 +590,26 @@ function ControlMenu() {
             </div>
 
             <Link 
+              href="/metodo360" 
+              className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-3 py-2 transition-all duration-300 hover:scale-110 relative whitespace-nowrap flex items-center gap-2"
+              role="menuitem"
+              title="Método 360° - Vende tu inmueble de forma económica y transparente"
+              style={{
+                textShadow: '0 0 20px rgba(255, 215, 0, 0.8), 0 2px 6px rgba(0, 0, 0, 0.9)',
+                background: `linear-gradient(135deg, 
+                  rgba(255, 215, 0, 0.15) 0%, 
+                  rgba(255, 140, 0, 0.1) 100%)`,
+                border: '2px solid rgba(255, 140, 0, 0.5)',
+                boxShadow: '0 0 25px rgba(255, 140, 0, 0.4), inset 0 0 15px rgba(255, 215, 0, 0.1)'
+              }}
+            >
+              <FaCamera className="text-orange-400 text-xl drop-shadow-xl" aria-hidden="true" />
+              Método 360°
+            </Link>
+
+            <Link 
               href="/reformas" 
-              className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-4 py-3 transition-all duration-300 hover:scale-110 relative whitespace-nowrap"
+              className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-3 py-2 transition-all duration-300 hover:scale-110 relative whitespace-nowrap"
               role="menuitem"
               title="Servicios de reformas inmobiliarias"
               style={{
@@ -619,7 +638,7 @@ function ControlMenu() {
               <div className="flex items-center gap-3">
                 <Link
                   href="/servicios"
-                  className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-4 py-3 transition-all duration-300 hover:scale-110 relative"
+                  className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-3 py-2 transition-all duration-300 hover:scale-110 relative"
                   onClick={(e) => e.stopPropagation()}
                   title="Servicios inmobiliarios especializados"
                   style={{
@@ -651,7 +670,7 @@ function ControlMenu() {
                         top: `${serviciosRef.current?.getBoundingClientRect().bottom || 0}px`,
                         left: `${serviciosRef.current ? (serviciosRef.current.getBoundingClientRect().left + (serviciosRef.current.getBoundingClientRect().width / 2)) : 0}px`,
                         transform: "translateX(-50%)",
-                        minWidth: "500px",
+                        minWidth: "400px",
                         zIndex: 999999,
                         background: `linear-gradient(135deg, 
                           rgba(0, 0, 0, 0.98) 0%, 
@@ -671,7 +690,7 @@ function ControlMenu() {
                       <div className="relative group/espana">
                         <Link
                           href={ROUTES.residentes_espana}
-                          className="w-full flex items-center justify-between px-8 py-5 text-yellow-200 hover:text-white hover:scale-105 transition-all duration-300 border-b border-yellow-400/30 rounded-t-xl mx-2 mt-2"
+                          className="w-full flex items-center justify-between px-6 py-4 text-yellow-200 hover:text-white hover:scale-105 transition-all duration-300 border-b border-yellow-400/30 rounded-t-xl mx-2 mt-2"
                           style={{
                             textShadow: '0 0 15px rgba(255, 215, 0, 0.7), 0 2px 4px rgba(0, 0, 0, 0.8)',
                             background: `linear-gradient(135deg, 
@@ -682,7 +701,7 @@ function ControlMenu() {
                           }}
                         >
                           <div className="flex items-center">
-                            <MenuIcon icon={FaHandshake} className="mr-4 text-yellow-400 text-3xl drop-shadow-xl" />
+                            <MenuIcon icon={FaHandshake} className="mr-3 text-yellow-400 text-2xl drop-shadow-xl" />
                             Residentes en España
                           </div>
                           <MenuIcon icon={FaChevronRight} className="ml-3 group-hover/espana:rotate-90 transition-transform duration-200 text-yellow-400 drop-shadow-lg" />
@@ -704,7 +723,7 @@ function ControlMenu() {
                           >
                             <Link
                               href={ROUTES.residentes_espana_alquiler}
-                              className="flex items-center px-6 py-4 text-yellow-200 hover:text-white hover:scale-105 transition-all duration-300 border-b border-yellow-400/30 rounded-t-xl mx-1 mt-1"
+                              className="flex items-center px-5 py-3 text-yellow-200 hover:text-white hover:scale-105 transition-all duration-300 border-b border-yellow-400/30 rounded-t-xl mx-1 mt-1"
                               style={{
                                 textShadow: '0 0 12px rgba(255, 215, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.8)',
                                 background: `linear-gradient(135deg, 
@@ -714,12 +733,12 @@ function ControlMenu() {
                                 boxShadow: '0 0 15px rgba(255, 215, 0, 0.15)'
                               }}
                             >
-                              <MenuIcon icon={FaHome} className="mr-3 text-yellow-400 text-2xl drop-shadow-lg" />
+                              <MenuIcon icon={FaHome} className="mr-2 text-yellow-400 text-xl drop-shadow-lg" />
                               Alquiler
                             </Link>
                             <Link
                               href={ROUTES.residentes_espana_guia}
-                              className="flex items-center px-6 py-4 text-yellow-200 hover:text-white hover:scale-105 transition-all duration-300 rounded-b-xl mx-1 mb-1"
+                              className="flex items-center px-5 py-3 text-yellow-200 hover:text-white hover:scale-105 transition-all duration-300 rounded-b-xl mx-1 mb-1"
                               style={{
                                 textShadow: '0 0 12px rgba(255, 215, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.8)',
                                 background: `linear-gradient(135deg, 
@@ -729,7 +748,7 @@ function ControlMenu() {
                                 boxShadow: '0 0 15px rgba(255, 215, 0, 0.15)'
                               }}
                             >
-                              <MenuIcon icon={FaHandshake} className="mr-3 text-yellow-400 text-2xl drop-shadow-lg" />
+                              <MenuIcon icon={FaHandshake} className="mr-2 text-yellow-400 text-xl drop-shadow-lg" />
                               Guía de compra
                             </Link>
                           </div>
@@ -739,7 +758,7 @@ function ControlMenu() {
                       <div className="relative group/extranjero">
                         <Link
                           href={ROUTES.residentes_extranjero}
-                          className="w-full flex items-center justify-between px-8 py-5 text-yellow-200 hover:text-white hover:scale-105 transition-all duration-300 rounded-b-xl mx-2 mb-2"
+                          className="w-full flex items-center justify-between px-6 py-4 text-yellow-200 hover:text-white hover:scale-105 transition-all duration-300 rounded-b-xl mx-2 mb-2"
                           style={{
                             textShadow: '0 0 15px rgba(255, 215, 0, 0.7), 0 2px 4px rgba(0, 0, 0, 0.8)',
                             background: `linear-gradient(135deg, 
@@ -750,7 +769,7 @@ function ControlMenu() {
                           }}
                         >
                           <div className="flex items-center">
-                            <MenuIcon icon={FaChartLine} className="mr-4 text-yellow-400 text-3xl drop-shadow-xl" />
+                            <MenuIcon icon={FaChartLine} className="mr-3 text-yellow-400 text-2xl drop-shadow-xl" />
                             Residentes en el extranjero
                           </div>
                           <MenuIcon icon={FaChevronRight} className="ml-3 group-hover/extranjero:rotate-90 transition-transform duration-200 text-yellow-400 drop-shadow-lg" />
@@ -772,7 +791,7 @@ function ControlMenu() {
                           >
                             <Link
                               href={ROUTES.residentes_extranjero_impuesto}
-                              className="flex items-center px-6 py-4 text-yellow-200 hover:text-white hover:scale-105 transition-all duration-300 border-b border-yellow-400/30 rounded-t-xl mx-1 mt-1"
+                              className="flex items-center px-5 py-3 text-yellow-200 hover:text-white hover:scale-105 transition-all duration-300 border-b border-yellow-400/30 rounded-t-xl mx-1 mt-1"
                               style={{
                                 textShadow: '0 0 12px rgba(255, 215, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.8)',
                                 background: `linear-gradient(135deg, 
@@ -782,12 +801,12 @@ function ControlMenu() {
                                 boxShadow: '0 0 15px rgba(255, 215, 0, 0.15)'
                               }}
                             >
-                              <MenuIcon icon={FaChartLine} className="mr-3 text-yellow-400 text-2xl drop-shadow-lg" />
+                              <MenuIcon icon={FaChartLine} className="mr-2 text-yellow-400 text-xl drop-shadow-lg" />
                               Impuesto no residentes
                             </Link>
                             <Link
                               href={ROUTES.residentes_extranjero_guia}
-                              className="flex items-center px-6 py-4 text-yellow-200 hover:text-white hover:scale-105 transition-all duration-300 rounded-b-xl mx-1 mb-1"
+                              className="flex items-center px-5 py-3 text-yellow-200 hover:text-white hover:scale-105 transition-all duration-300 rounded-b-xl mx-1 mb-1"
                               style={{
                                 textShadow: '0 0 12px rgba(255, 215, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.8)',
                                 background: `linear-gradient(135deg, 
@@ -797,7 +816,7 @@ function ControlMenu() {
                                 boxShadow: '0 0 15px rgba(255, 215, 0, 0.15)'
                               }}
                             >
-                              <MenuIcon icon={FaHandshake} className="mr-3 text-yellow-400 text-2xl drop-shadow-lg" />
+                              <MenuIcon icon={FaHandshake} className="mr-2 text-yellow-400 text-xl drop-shadow-lg" />
                               Guía de compra
                             </Link>
                           </div>
@@ -811,7 +830,7 @@ function ControlMenu() {
 
             <Link 
               href="/contacto" 
-              className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-4 py-3 transition-all duration-300 hover:scale-110 relative" 
+              className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-3 py-2 transition-all duration-300 hover:scale-110 relative" 
               role="menuitem" 
               title="Contacto - Goza Madrid Inmobiliaria"
               style={{
@@ -828,7 +847,7 @@ function ControlMenu() {
 
             <Link 
               href="/blog" 
-              className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-4 py-3 transition-all duration-300 hover:scale-110 relative"
+              className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-3 py-2 transition-all duration-300 hover:scale-110 relative"
               role="menuitem"
               title="Blog inmobiliario - Consejos y noticias"
               style={{
@@ -1154,6 +1173,25 @@ function ControlMenu() {
               </Link>
               */}
               
+              <Link 
+                href="/metodo360" 
+                className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-6 py-4 transition-all duration-300 hover:scale-105 flex items-center gap-3"
+                role="menuitem"
+                title="Método 360° - Vende tu inmueble"
+                onClick={() => toggleMenu()}
+                style={{
+                  textShadow: '0 0 15px rgba(255, 215, 0, 0.7), 0 2px 4px rgba(0, 0, 0, 0.8)',
+                  background: `linear-gradient(135deg, 
+                    rgba(255, 215, 0, 0.15) 0%, 
+                    rgba(255, 140, 0, 0.1) 100%)`,
+                  border: '2px solid rgba(255, 140, 0, 0.5)',
+                  boxShadow: '0 0 25px rgba(255, 140, 0, 0.3)'
+                }}
+              >
+                <FaCamera className="text-orange-400 text-xl drop-shadow-xl" aria-hidden="true" />
+                Método 360°
+              </Link>
+
               <Link 
                 href="/reformas" 
                 className="text-white hover:text-gray-700 focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 rounded px-2 py-1 transition-all duration-200"
