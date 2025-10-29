@@ -60,7 +60,7 @@ const FormContact = () => {
         email: email,
         prefix: prefix,
         telefono: phone,
-        mensaje: message
+        message: message
       });
       
       const response = await fetch(apiUrl, {
@@ -71,10 +71,8 @@ const FormContact = () => {
           email: email,
           prefix: prefix,
           telefono: phone,
-          mensaje: message,
-          // Campos adicionales requeridos por el servidor
-          subject: 'Nuevo mensaje de contacto desde el formulario web',
-          htmlContent: message
+          message: message,
+          subject: `Nuevo contacto de ${name}`
         })
       });
 
