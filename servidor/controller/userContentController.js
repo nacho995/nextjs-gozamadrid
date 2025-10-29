@@ -73,9 +73,10 @@ const userController = {
     addUser: async (req, res) => {
         try {
             const { name, email, password } = req.body;
-            const hashedPassword = await bcrypt.hash(password, 10);
-            const user = new User({ name, email, password: hashedPassword });
+            // NO hashear manualmente - el hook pre('save') lo hace automáticamente
+            const user = new User({ name, email, password });
             await user.save();
+            console.log('[addUser] Usuario registrado:', email);
             res.status(201).json({ message: "Usuario registrado exitosamente" });
         } catch (error) {
             res.status(500).json({ message: error.message });
@@ -112,7 +113,14 @@ const userController = {
             if (!user) {
                 return res.status(400).json({ message: "Usuario no encontrado" });
             }
+            
+            console.log('[loginUser] Comparando contraseñas para:', user.email);
+            console.log('[loginUser] Password hash en DB:', user.password.substring(0, 20) + '...');
+            
             const validPassword = await bcrypt.compare(password, user.password);
+            
+            console.log('[loginUser] Resultado de comparación:', validPassword ? '✅ VÁLIDA' : '❌ INCORRECTA');
+            
             if (!validPassword) {
                 return res.status(400).json({ message: "Contraseña incorrecta" });
             }
@@ -188,9 +196,10 @@ const userController = {
             if (!user) {
                 return res.status(404).json({ message: "Usuario no encontrado" });
             }
-            const hashedPassword = await bcrypt.hash(newPassword, 10);
-            user.password = hashedPassword;
+            // NO hashear manualmente - el hook pre('save') lo hace automáticamente
+            user.password = newPassword;
             await user.save();
+            console.log('[executePasswordReset] Contraseña actualizada para:', user.email);
             res.json({
                 success: true,
                 message: "Contraseña actualizada correctamente",
