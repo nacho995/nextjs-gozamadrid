@@ -4,6 +4,22 @@
 node_modules/
 **/node_modules/
 
+# Next.js build outputs y cache
+.next/
+**/.next/
+out/
+**/out/
+.next/cache/
+**/.next/cache/
+
+# Next.js SWC binaries (archivos binarios grandes)
+**/node_modules/@next/swc-*/*.node
+**/node_modules/.cache/
+
+# Webpack cache
+**/.next/cache/webpack/
+**/webpack/
+
 # Logs
 *.log
 npm-debug.log*
