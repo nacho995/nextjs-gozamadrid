@@ -15,7 +15,8 @@ export const sendEmail = async ({ email, subject, html, text, sendCopyToAdmin = 
     const fromEmail = process.env.EMAIL_FROM || process.env.EMAIL_USER || 'noreply@gozamadrid.com';
     const fromName = process.env.EMAIL_FROM_NAME || 'GozaMadrid';
 
-    console.log(`[SendEmail Brevo] Enviando email a: ${email}`);
+    console.log(`[SendEmail Brevo] 📧 Enviando email PRINCIPAL a: ${email}`);
+    console.log(`[SendEmail Brevo] 📧 Asunto: ${subject}`);
     console.log(`[SendEmail Brevo] Usando API Key: ${BREVO_API_KEY.substring(0, 20)}...`);
 
     // Preparar el payload para Brevo API
@@ -53,11 +54,13 @@ export const sendEmail = async ({ email, subject, html, text, sendCopyToAdmin = 
     }
 
     const result = await response.json();
-    console.log(`[SendEmail Brevo] Email enviado exitosamente. MessageId: ${result.messageId}`);
+    console.log(`[SendEmail Brevo] ✅ Email PRINCIPAL enviado exitosamente a: ${email}`);
+    console.log(`[SendEmail Brevo] MessageId: ${result.messageId}`);
 
     // Enviar copia al admin si se solicita
     if (sendCopyToAdmin && process.env.EMAIL_RECIPIENT) {
       const adminEmails = process.env.EMAIL_RECIPIENT.split(',').map(e => e.trim());
+      console.log(`[SendEmail Brevo] 📋 Enviando copia a admin(es): ${adminEmails.join(', ')}`);
       
       const adminPayload = {
         sender: {
@@ -73,7 +76,7 @@ export const sendEmail = async ({ email, subject, html, text, sendCopyToAdmin = 
         textContent: text || 'Por favor habilite HTML en su cliente de correo.'
       };
 
-      await fetch(BREVO_API_URL, {
+      const adminResponse = await fetch(BREVO_API_URL, {
         method: 'POST',
         headers: {
           'accept': 'application/json',
@@ -83,7 +86,14 @@ export const sendEmail = async ({ email, subject, html, text, sendCopyToAdmin = 
         body: JSON.stringify(adminPayload)
       });
 
-      console.log(`[SendEmail Brevo] Copia enviada al admin: ${process.env.EMAIL_RECIPIENT}`);
+      if (adminResponse.ok) {
+        const adminResult = await adminResponse.json();
+        console.log(`[SendEmail Brevo] ✅ Copia enviada al admin. MessageId: ${adminResult.messageId}`);
+      } else {
+        console.error(`[SendEmail Brevo] ❌ Error al enviar copia al admin: ${adminResponse.statusText}`);
+      }
+    } else {
+      console.log(`[SendEmail Brevo] ℹ️ No se enviará copia a admin (sendCopyToAdmin: ${sendCopyToAdmin})`);
     }
 
     return result;

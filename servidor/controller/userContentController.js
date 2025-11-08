@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
 import mongoose from 'mongoose';
+import crypto from 'crypto';
 
 const userController = {
     getUser: async (req, res) => {
@@ -188,26 +189,81 @@ const userController = {
     },
 
     // Ejecuta el reinicio de la contraseña
+    // Soporta tanto tokens JWT (sistema antiguo) como tokens hasheados SHA-256 (sistema moderno)
     executePasswordReset: async (req, res) => {
-        const { token, newPassword } = req.body;
+        const { token, newPassword, password } = req.body;
+        const passwordToUse = newPassword || password; // Acepta ambos nombres
+        
+        if (!token || !passwordToUse) {
+            return res.status(400).json({
+                success: false,
+                message: "Token y contraseña son requeridos"
+            });
+        }
+
         try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            const user = await User.findById(decoded.id);
-            if (!user) {
-                return res.status(404).json({ message: "Usuario no encontrado" });
+            // Detectar tipo de token:
+            // - JWT tiene formato: xxxxx.xxxxx.xxxxx (tiene puntos)
+            // - Hash SHA-256 es hexadecimal de 64 caracteres
+            const isJWT = token.includes('.') && token.split('.').length === 3;
+            
+            let user;
+            
+            if (isJWT) {
+                // Sistema antiguo: token JWT
+                console.log('[executePasswordReset] Usando sistema JWT');
+                try {
+                    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                    user = await User.findById(decoded.id);
+                    if (!user) {
+                        return res.status(404).json({ message: "Usuario no encontrado" });
+                    }
+                } catch (jwtError) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Token no válido o caducado",
+                        error: jwtError.message,
+                    });
+                }
+            } else {
+                // Sistema moderno: token hasheado SHA-256
+                console.log('[executePasswordReset] Usando sistema de tokens hasheados');
+                const hashedToken = crypto
+                    .createHash('sha256')
+                    .update(token)
+                    .digest('hex');
+
+                user = await User.findOne({
+                    resetPasswordToken: hashedToken,
+                    resetPasswordExpires: { $gt: Date.now() }
+                });
+
+                if (!user) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Token no válido o caducado"
+                    });
+                }
+                
+                // Limpiar el token después de usarlo
+                user.resetPasswordToken = undefined;
+                user.resetPasswordExpires = undefined;
             }
-            // NO hashear manualmente - el hook pre('save') lo hace automáticamente
-            user.password = newPassword;
+
+            // Actualizar la contraseña (el hook pre('save') la hasheará automáticamente)
+            user.password = passwordToUse;
             await user.save();
+            
             console.log('[executePasswordReset] Contraseña actualizada para:', user.email);
             res.json({
                 success: true,
                 message: "Contraseña actualizada correctamente",
             });
         } catch (error) {
-            res.status(400).json({
+            console.error('[executePasswordReset] Error:', error);
+            res.status(500).json({
                 success: false,
-                message: "Token no válido o caducado",
+                message: "Error al procesar la solicitud",
                 error: error.message,
             });
         }

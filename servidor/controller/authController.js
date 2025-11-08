@@ -41,14 +41,18 @@ export const forgotPassword = async (req, res) => {
     `;
 
     try {
+      console.log(`[forgotPassword] Enviando email de recuperación a: ${user.email}`);
+      console.log(`[forgotPassword] Token generado (primeros 10 chars): ${resetToken.substring(0, 10)}...`);
+      console.log(`[forgotPassword] URL de reset: ${resetURL}`);
+      
       await sendEmail({
         email: user.email,
         subject: 'Restablecimiento de contraseña (válido por 10 min)',
         html: message,
-        sendCopyToAdmin: true
+        sendCopyToAdmin: false // No enviar copia a admin por privacidad en recuperación de contraseña
       });
 
-      console.log(`Email de recuperación enviado a: ${user.email}`);
+      console.log(`[forgotPassword] ✅ Email de recuperación enviado exitosamente a: ${user.email}`);
 
       res.status(200).json({
         status: 'success',
