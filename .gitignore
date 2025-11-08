@@ -35,3 +35,7 @@ Thumbs.db
 .env
 .env.local
 .env*.local
+
+# BlogPropiedades - No debe estar en el repositorio
+BlogPropiedades/
+**/BlogPropiedades/
