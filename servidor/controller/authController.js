@@ -28,7 +28,17 @@ export const forgotPassword = async (req, res) => {
 
     // 2) Generar token de restablecimiento aleatorio
     const resetToken = user.createPasswordResetToken();
+    console.log(`[forgotPassword] Token generado (primeros 10 chars): ${resetToken.substring(0, 10)}...`);
+    console.log(`[forgotPassword] Token generado (longitud): ${resetToken.length}`);
+    console.log(`[forgotPassword] Token hasheado guardado (primeros 10 chars): ${user.resetPasswordToken.substring(0, 10)}...`);
+    console.log(`[forgotPassword] Token expira en: ${new Date(user.resetPasswordExpires).toISOString()}`);
+    
     await user.save({ validateBeforeSave: false });
+    
+    // Verificar que se guardó correctamente
+    const savedUser = await User.findById(user._id);
+    console.log(`[forgotPassword] ✅ Token guardado en DB: ${savedUser.resetPasswordToken ? 'Sí' : 'No'}`);
+    console.log(`[forgotPassword] ✅ Expiración guardada: ${savedUser.resetPasswordExpires ? new Date(savedUser.resetPasswordExpires).toISOString() : 'No'}`);
 
     // 3) Enviar por email
     const resetURL = `${frontendURL}/reset-password/${resetToken}`;
@@ -41,9 +51,8 @@ export const forgotPassword = async (req, res) => {
     `;
 
     try {
-      console.log(`[forgotPassword] Enviando email de recuperación a: ${user.email}`);
-      console.log(`[forgotPassword] Token generado (primeros 10 chars): ${resetToken.substring(0, 10)}...`);
-      console.log(`[forgotPassword] URL de reset: ${resetURL}`);
+      console.log(`[forgotPassword] 📧 Enviando email de recuperación a: ${user.email}`);
+      console.log(`[forgotPassword] 🔗 URL de reset: ${resetURL}`);
       
       await sendEmail({
         email: user.email,

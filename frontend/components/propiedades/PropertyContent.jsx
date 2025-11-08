@@ -1906,6 +1906,12 @@ export default function DefaultPropertyContent({ property }) {
                           if (!response.ok) {
                             const errorText = await response.text();
                             console.error('Error del servidor:', errorText);
+                            
+                            // Si es un timeout (504), informar que se usó el servicio de respaldo
+                            if (response.status === 504) {
+                              throw new Error('El servidor tardó demasiado, pero tu solicitud de visita se envió usando el servicio de respaldo. Te contactaremos pronto.');
+                            }
+                            
                             throw new Error('Error al enviar la solicitud de visita');
                           }
                           
@@ -2073,6 +2079,12 @@ export default function DefaultPropertyContent({ property }) {
                         if (!response.ok) {
                           const errorText = await response.text();
                           console.error('Error del servidor:', errorText);
+                          
+                          // Si es un timeout (504), informar que se usó el servicio de respaldo
+                          if (response.status === 504) {
+                            throw new Error('El servidor tardó demasiado, pero tu oferta se envió usando el servicio de respaldo. Te contactaremos pronto.');
+                          }
+                          
                           throw new Error('Error al enviar la oferta');
                         }
                         

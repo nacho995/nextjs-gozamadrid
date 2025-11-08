@@ -191,10 +191,18 @@ const userController = {
     // Ejecuta el reinicio de la contraseña
     // Soporta tanto tokens JWT (sistema antiguo) como tokens hasheados SHA-256 (sistema moderno)
     executePasswordReset: async (req, res) => {
-        const { token, newPassword, password } = req.body;
+        console.log('[executePasswordReset] ========== INICIO ==========');
+        console.log('[executePasswordReset] Body recibido:', JSON.stringify(req.body));
+        console.log('[executePasswordReset] Headers:', JSON.stringify(req.headers));
+        
+        const { token, newPassword, password, passwordConfirm } = req.body;
         const passwordToUse = newPassword || password; // Acepta ambos nombres
         
+        console.log('[executePasswordReset] Token extraído:', token ? token.substring(0, 10) + '...' : 'NO HAY TOKEN');
+        console.log('[executePasswordReset] Password extraída:', passwordToUse ? 'Sí (longitud: ' + passwordToUse.length + ')' : 'NO HAY PASSWORD');
+        
         if (!token || !passwordToUse) {
+            console.log('[executePasswordReset] ❌ Faltan parámetros requeridos');
             return res.status(400).json({
                 success: false,
                 message: "Token y contraseña son requeridos"
@@ -206,6 +214,7 @@ const userController = {
             // - JWT tiene formato: xxxxx.xxxxx.xxxxx (tiene puntos)
             // - Hash SHA-256 es hexadecimal de 64 caracteres
             const isJWT = token.includes('.') && token.split('.').length === 3;
+            console.log('[executePasswordReset] Tipo de token detectado:', isJWT ? 'JWT' : 'Hash SHA-256');
             
             let user;
             
@@ -228,10 +237,17 @@ const userController = {
             } else {
                 // Sistema moderno: token hasheado SHA-256
                 console.log('[executePasswordReset] Usando sistema de tokens hasheados');
+                console.log('[executePasswordReset] Token recibido (primeros 10 chars):', token.substring(0, 10) + '...');
+                console.log('[executePasswordReset] Token recibido (longitud):', token.length);
+                
                 const hashedToken = crypto
                     .createHash('sha256')
                     .update(token)
                     .digest('hex');
+                
+                console.log('[executePasswordReset] Token hasheado (primeros 10 chars):', hashedToken.substring(0, 10) + '...');
+                console.log('[executePasswordReset] Buscando usuario con token hasheado...');
+                console.log('[executePasswordReset] Tiempo actual:', new Date(Date.now()).toISOString());
 
                 user = await User.findOne({
                     resetPasswordToken: hashedToken,
@@ -239,11 +255,35 @@ const userController = {
                 });
 
                 if (!user) {
+                    // Intentar encontrar el usuario sin verificar expiración para debug
+                    const userWithoutExpiry = await User.findOne({
+                        resetPasswordToken: hashedToken
+                    });
+                    
+                    if (userWithoutExpiry) {
+                        console.log('[executePasswordReset] ⚠️ Usuario encontrado pero token expirado');
+                        console.log('[executePasswordReset] Token expira en:', new Date(userWithoutExpiry.resetPasswordExpires).toISOString());
+                        console.log('[executePasswordReset] Tiempo actual:', new Date(Date.now()).toISOString());
+                        console.log('[executePasswordReset] Diferencia:', Date.now() - userWithoutExpiry.resetPasswordExpires, 'ms');
+                    } else {
+                        console.log('[executePasswordReset] ❌ No se encontró usuario con ese token hasheado');
+                        // Buscar todos los usuarios con tokens para debug (solo en desarrollo)
+                        if (process.env.NODE_ENV !== 'production') {
+                            const usersWithTokens = await User.find({ 
+                                resetPasswordToken: { $exists: true, $ne: null } 
+                            }).select('email resetPasswordExpires');
+                            console.log('[executePasswordReset] Usuarios con tokens activos:', usersWithTokens.length);
+                        }
+                    }
+                    
                     return res.status(400).json({
                         success: false,
                         message: "Token no válido o caducado"
                     });
                 }
+                
+                console.log('[executePasswordReset] ✅ Usuario encontrado:', user.email);
+                console.log('[executePasswordReset] Token expira en:', new Date(user.resetPasswordExpires).toISOString());
                 
                 // Limpiar el token después de usarlo
                 user.resetPasswordToken = undefined;

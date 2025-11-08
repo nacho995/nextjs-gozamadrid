@@ -73,40 +73,76 @@ export default async function handler(req, res) {
 
     console.log(`[Contact Proxy] Enviando al backend: ${backendUrl}${endpoint}`);
     
-    // Enviar al backend
-    const backendResponse = await fetch(`${backendUrl}${endpoint}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(req.body)
-    });
+    // Crear un AbortController para timeout
+    // Vercel tiene límite de 10s en plan gratuito, así que usamos 8s para dar tiempo al fallback
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 segundos timeout (antes del límite de Vercel)
     
-    if (backendResponse.ok) {
-      const result = await backendResponse.json();
-      console.log('[Contact Proxy] Respuesta del backend:', result);
-      
-      return res.status(200).json({
-        success: true,
-        message: 'Solicitud procesada correctamente'
+    try {
+      // Enviar al backend con timeout
+      const backendResponse = await fetch(`${backendUrl}${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(req.body),
+        signal: controller.signal
       });
-    } else {
-      console.log('[Contact Proxy] Error del backend, usando servicio de respaldo');
       
-      // Fallback a servicios externos si el backend falla
+      clearTimeout(timeoutId);
+      
+      if (backendResponse.ok) {
+        const result = await backendResponse.json();
+        console.log('[Contact Proxy] Respuesta del backend:', result);
+        
+        return res.status(200).json({
+          success: true,
+          message: 'Solicitud procesada correctamente'
+        });
+      } else {
+        clearTimeout(timeoutId);
+        throw new Error(`Backend responded with status ${backendResponse.status}`);
+      }
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      
+      if (fetchError.name === 'AbortError') {
+        console.error('[Contact Proxy] Timeout al conectar con el backend (8s) - usando fallback');
+      } else {
+        console.error('[Contact Proxy] Error al conectar con el backend:', fetchError);
+      }
+      
+      // Fallback a servicios externos si el backend falla o hay timeout
+      console.log('[Contact Proxy] Usando servicio de respaldo (FormSubmit)');
+      
       const formData = {
         name: req.body.name || 'Cliente Web',
         email: req.body.email,
-        message: `Tipo: ${req.body.type || 'contacto'}\nPropiedad: ${req.body.propertyTitle || 'N/A'}\nNombre: ${req.body.name || 'N/A'}\nEmail: ${req.body.email}\nTeléfono: ${req.body.phone || 'N/A'}\nMensaje: ${req.body.message || 'N/A'}`,
+        message: `Tipo: ${req.body.type || 'contacto'}\nPropiedad: ${req.body.propertyTitle || 'N/A'}\nNombre: ${req.body.name || 'N/A'}\nEmail: ${req.body.email}\nTeléfono: ${req.body.phone || 'N/A'}\nFecha: ${req.body.visitDate || 'N/A'}\nHora: ${req.body.visitTime || 'N/A'}\nMensaje: ${req.body.message || 'N/A'}`,
         subject: req.body.type === 'visit' ? 'Nueva solicitud de visita' : req.body.type === 'offer' ? 'Nueva oferta' : 'Nuevo contacto',
         _template: 'box'
       };
       
-      console.log('[Contact Proxy] Enviando a FormSubmit:', formData);
-      
-      // El backend ya tiene nodemailer como fallback, no necesitamos servicios externos
-      console.log('[Contact Proxy] Backend falló, pero tiene su propio sistema de fallback con nodemailer');
+      try {
+        const fallbackResponse = await fetch('https://formsubmit.co/ajax/marta@gozamadrid.com', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+        
+        if (fallbackResponse.ok) {
+          return res.status(200).json({
+            success: true,
+            message: 'Solicitud procesada con servicio de respaldo'
+          });
+        }
+      } catch (fallbackError) {
+        console.error('[Contact Proxy] Error en servicio de respaldo:', fallbackError);
+      }
       
       return res.status(500).json({
         error: 'No se pudo enviar el email',

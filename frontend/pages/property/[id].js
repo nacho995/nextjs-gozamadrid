@@ -124,26 +124,27 @@ export default function PropertyDetail({ propertyData, error, source }) {
         <meta property="twitter:description" content={metaDescription} />
         <meta property="twitter:image" content={imageUrl} />
         {/* Schema.org para Productos */}
-        <script type="application/ld+json">
-          {`
-            {
+        <script 
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
               "@context": "https://schema.org/",
               "@type": "Product",
-              "name": "${normalizedProperty.title || 'Propiedad'}",
-              "image": "${imageUrl}",
-              "description": "${metaDescription}",
-              "sku": "${normalizedProperty.id}",
+              "name": normalizedProperty.title || 'Propiedad',
+              "image": imageUrl,
+              "description": metaDescription,
+              "sku": normalizedProperty.id,
               "offers": {
                 "@type": "Offer",
-                "url": "https://www.realestategozamadrid.com/property/${normalizedProperty.id}?source=${source}",
+                "url": `https://www.realestategozamadrid.com/property/${normalizedProperty.id}?source=${source}`,
                 "priceCurrency": "EUR",
-                "price": "${normalizedProperty.price || '0'}",
+                "price": normalizedProperty.price || '0',
                 "availability": "https://schema.org/InStock",
                 "itemCondition": "https://schema.org/UsedCondition"
               }
-            }
-          `}
-        </script>
+            })
+          }}
+        />
       </Head>
       <DefaultPropertyContent property={normalizedProperty} source={source} />
     </>
