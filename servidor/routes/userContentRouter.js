@@ -1,5 +1,6 @@
 import express from 'express';
 import userController from '../controller/userContentController.js';
+import { forgotPassword } from '../controller/authController.js';
 import upload from '../config/multer.js';
 import { verifyToken, isAdmin } from '../middlewares/auth.js';
 import cloudinary from 'cloudinary';
@@ -19,6 +20,7 @@ userRouter.get("/sync-profile-image", verifyToken, userController.syncProfileIma
 userRouter.post("/register", userController.addUser);
 userRouter.post("/login", userController.loginUser);
 userRouter.post("/request-reset", userController.requestPasswordReset);
+userRouter.post("/request-password-reset", forgotPassword); // Usa el controlador moderno que envía emails
 userRouter.post("/reset-password", userController.executePasswordReset);
 
 // Rutas con parámetros después (estas son más genéricas)
