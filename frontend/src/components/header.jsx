@@ -880,6 +880,23 @@ function ControlMenu() {
             >
               Blog
             </Link>
+
+            <Link 
+              href="/unete" 
+              className="text-yellow-200 hover:text-white focus:text-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 rounded-lg px-3 py-2 transition-all duration-300 hover:scale-110 relative"
+              role="menuitem"
+              title="Únete a Goza Madrid - Trabaja con nosotros"
+              style={{
+                textShadow: '0 0 20px rgba(255, 215, 0, 0.8), 0 2px 6px rgba(0, 0, 0, 0.9)',
+                background: `linear-gradient(135deg, 
+                  rgba(255, 215, 0, 0.1) 0%, 
+                  rgba(255, 223, 0, 0.05) 100%)`,
+                border: '1px solid rgba(255, 215, 0, 0.3)',
+                boxShadow: '0 0 15px rgba(255, 215, 0, 0.2)'
+              }}
+            >
+              Únete
+            </Link>
           </div>
         </nav>
 
