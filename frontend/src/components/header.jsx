@@ -280,15 +280,21 @@ function ControlMenu() {
         role="banner"
         aria-label="Navegación principal de Goza Madrid"
       >
-        {/* Gradiente de integración más sutil para mostrar el video */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-transparent pointer-events-none" aria-hidden="true"></div>
+        {/* Gradiente de integración más sutil para mostrar el video - solo en homepage */}
+        {isHomePage && (
+          <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-transparent pointer-events-none" aria-hidden="true"></div>
+        )}
         
         {/* Botón de menú para móviles - Mejorado para accesibilidad */}
         {!menuVisible && (
-          <div className="xl:hidden fixed right-4 top-4 z-[9999] text-white">
+          <div className="xl:hidden fixed right-4 top-4 z-[9999]">
             <button 
               onClick={toggleMenu} 
-              className="group relative text-white hover:text-amarillo focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 flex items-center justify-center bg-black/40 backdrop-blur-md p-4 rounded-2xl shadow-xl hover:shadow-amarillo/30 transition-all duration-300 border border-white/20 hover:border-amarillo/40 hover:scale-105"
+              className={`group relative hover:text-amarillo focus:text-amarillo focus:outline-none focus:ring-2 focus:ring-amarillo/50 flex items-center justify-center backdrop-blur-md p-4 rounded-2xl shadow-xl hover:shadow-amarillo/30 transition-all duration-300 border hover:border-amarillo/40 hover:scale-105 ${
+                isHomePage 
+                  ? 'text-white bg-black/40 border-white/20' 
+                  : 'text-gray-800 bg-white/80 border-gray-300'
+              }`}
               aria-expanded={menuVisible}
               aria-controls="mobile-menu"
               aria-label={menuVisible ? "Cerrar menú de navegación" : "Abrir menú de navegación"}
@@ -296,9 +302,15 @@ function ControlMenu() {
             >
               {/* Icono del menú hamburger animado */}
               <div className="relative w-6 h-6 flex flex-col justify-center items-center">
-                <div className={`w-6 h-0.5 bg-white group-hover:bg-amarillo transition-all duration-300 rounded-full ${menuVisible ? 'rotate-45 translate-y-2' : ''}`}></div>
-                <div className={`w-6 h-0.5 bg-white group-hover:bg-amarillo transition-all duration-300 rounded-full my-1 ${menuVisible ? 'opacity-0' : ''}`}></div>
-                <div className={`w-6 h-0.5 bg-white group-hover:bg-amarillo transition-all duration-300 rounded-full ${menuVisible ? '-rotate-45 -translate-y-2' : ''}`}></div>
+                <div className={`w-6 h-0.5 group-hover:bg-amarillo transition-all duration-300 rounded-full ${
+                  isHomePage ? 'bg-white' : 'bg-gray-800'
+                } ${menuVisible ? 'rotate-45 translate-y-2' : ''}`}></div>
+                <div className={`w-6 h-0.5 group-hover:bg-amarillo transition-all duration-300 rounded-full my-1 ${
+                  isHomePage ? 'bg-white' : 'bg-gray-800'
+                } ${menuVisible ? 'opacity-0' : ''}`}></div>
+                <div className={`w-6 h-0.5 group-hover:bg-amarillo transition-all duration-300 rounded-full ${
+                  isHomePage ? 'bg-white' : 'bg-gray-800'
+                } ${menuVisible ? '-rotate-45 -translate-y-2' : ''}`}></div>
               </div>
               
               {/* Etiqueta animada "MENÚ" */}
@@ -315,7 +327,7 @@ function ControlMenu() {
 
         {/* Menú Principal Desktop - Diseño Ultra Premium con Backdrop Blur */}
         <nav 
-          className={`${isHomePage ? 'mt-6 mb-0' : 'mb-6'} relative flex-col items-center px-8 py-4 w-max mx-auto rounded-2xl shadow-2xl hidden xl:flex backdrop-blur-2xl border-2 ${
+          className={`${isHomePage ? 'mt-6 mb-0' : 'mt-4 mb-6'} relative flex-col items-center px-8 py-4 w-max mx-auto rounded-2xl shadow-2xl hidden xl:flex backdrop-blur-2xl border-2 ${
             isHomePage 
               ? 'shadow-xl' 
               : 'shadow-2xl'
@@ -324,12 +336,19 @@ function ControlMenu() {
           aria-label="Menú principal de navegación"
           style={{
             zIndex: 50,
-            background: `linear-gradient(135deg, 
-              rgba(0, 0, 0, 0.4) 0%, 
-              rgba(30, 30, 30, 0.5) 25%,
-              rgba(45, 45, 45, 0.4) 50%, 
-              rgba(30, 30, 30, 0.5) 75%,
-              rgba(0, 0, 0, 0.4) 100%)`,
+            background: isHomePage 
+              ? `linear-gradient(135deg, 
+                  rgba(0, 0, 0, 0.4) 0%, 
+                  rgba(30, 30, 30, 0.5) 25%,
+                  rgba(45, 45, 45, 0.4) 50%, 
+                  rgba(30, 30, 30, 0.5) 75%,
+                  rgba(0, 0, 0, 0.4) 100%)`
+              : `linear-gradient(135deg, 
+                  rgba(0, 0, 0, 0.95) 0%, 
+                  rgba(20, 20, 20, 0.98) 25%,
+                  rgba(30, 30, 30, 0.95) 50%, 
+                  rgba(20, 20, 20, 0.98) 75%,
+                  rgba(0, 0, 0, 0.95) 100%)`,
             borderColor: 'rgba(255, 215, 0, 0.8)',
             borderWidth: '3px',
             borderStyle: 'solid',

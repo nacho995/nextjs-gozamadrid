@@ -39,10 +39,10 @@ const nextConfig = {
   
   // Optimizaciones de compilación
   compiler: {
-    removeConsole: false,
+    removeConsole: process.env.NODE_ENV === 'production',
   },
 
-  // Generar bundle standalone para contenedores
+  // Output standalone para producción (contenedores)
   output: 'standalone',
 };
 
