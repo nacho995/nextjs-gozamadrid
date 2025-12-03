@@ -1,15 +1,14 @@
 # Archivos y directorios a ignorar en Vercel
-node_modules/
-.next/
 .git/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Directorios de desarrollo
-frontend/
+# Directorios que NO queremos en producción
 servidor/
+BlogPropiedades/
+BlogsyPropiedades/
 
 # Archivos de backup
 *.backup
@@ -29,9 +28,7 @@ Thumbs.db
 .env.test.local
 .env.production.local
 
-# Ignorar archivos y carpetas no necesarios para el despliegue
+# Scripts y configuraciones de desarrollo
 worker-api/
 scripts/
-.github/
-.DS_Store
-npm-debug.log 
+.github/ 
