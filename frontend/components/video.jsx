@@ -517,7 +517,7 @@ const Video = () => {
                                                     <SmartLocationSearch
                                                         value={searchFilters.location}
                                                         onChange={(value) => handleFilterChange('location', value)}
-                                                        properties={allProperties}
+                                                        properties={allProperties || []}
                                                         placeholder="Ubicación (ej. Malasaña, Salamanca...)"
                                                         className="w-full px-4 py-4 border border-white/30 rounded-xl focus:ring-2 focus:ring-amarillo focus:border-amarillo text-white placeholder-white/70 bg-white/10 backdrop-blur-sm"
                                                     />
