@@ -80,7 +80,7 @@ const Layout = ({ children }) => {
 
     <div className="flex flex-col min-h-screen bg-transparent">
       {/* Solo mostrar el Header y Footer en páginas diferentes a propiedades-lujo */}
-      {!isLuxuryPropertiesPage && router.pathname !== '/' && (
+      {!isLuxuryPropertiesPage && (
         <header className="relative z-50">
           <ControlMenu/>
         </header>

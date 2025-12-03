@@ -7,7 +7,6 @@ import Image from "next/legacy/image";
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaSearch, FaMapMarkerAlt, FaBed, FaBath, FaRuler, FaEuroSign, FaFilter, FaCalculator, FaTimes, FaHome, FaArrowRight, FaEye } from 'react-icons/fa';
 import { normalizeProperty, filterProperties } from '../utils/properties';
-import ControlMenu from './header';
 import { useProperties } from '../hooks/useProperties';
 import SmartLocationSearch from './smart-location-search';
 
@@ -397,13 +396,6 @@ const Video = () => {
 
     return (
         <>
-            {/* Header superpuesto solo en la página home */}
-            {isHomePage && (
-                <div className="absolute top-0 left-0 right-0 z-[9999]">
-                    <ControlMenu />
-                </div>
-            )}
-            
             <AnimatedOnScroll>
                 <section 
                     className="relative min-h-[120vh]"
