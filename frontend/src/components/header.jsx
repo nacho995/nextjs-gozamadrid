@@ -556,19 +556,12 @@ function ControlMenu() {
               </Link>
               {dropdownVisible.vender && (
                 <>
-                  {/* Portal para el dropdown que aparece fuera del contenedor */}
                   <div 
-                    className="fixed inset-0 pointer-events-none"
-                    style={{ zIndex: 999999 }}
-                  >
-                    <div
-                      className="absolute backdrop-blur-3xl rounded-2xl shadow-2xl flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold border-2 pointer-events-auto"
-                      style={{
-                        top: `${(venderRef.current?.getBoundingClientRect().bottom || 0) + 10}px`,
-                        left: `${venderRef.current?.getBoundingClientRect().left || 0}px`,
-                        transform: "none",
-                        minWidth: "350px",
-                        zIndex: 999999,
+                    className="absolute left-0 mt-2 backdrop-blur-3xl rounded-2xl shadow-2xl flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold border-2 pointer-events-auto"
+                    style={{
+                      top: '100%',
+                      minWidth: "350px",
+                      zIndex: 999999,
                         background: `linear-gradient(135deg, 
                           rgba(0, 0, 0, 0.98) 0%, 
                           rgba(30, 30, 30, 0.99) 50%,
@@ -603,7 +596,6 @@ function ControlMenu() {
                         Valoración gratuita
                       </Link>
                     </div>
-                  </div>
                 </>
               )}
             </div>
@@ -678,19 +670,12 @@ function ControlMenu() {
               </div>
               {dropdownVisible.servicios && (
                 <>
-                  {/* Portal para el dropdown que aparece fuera del contenedor */}
                   <div 
-                    className="fixed inset-0 pointer-events-none"
-                    style={{ zIndex: 999999 }}
-                  >
-                    <div 
-                      className="absolute backdrop-blur-3xl rounded-2xl shadow-2xl flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold border-2 pointer-events-auto"
-                      style={{
-                        top: `${(serviciosRef.current?.getBoundingClientRect().bottom || 0) + 10}px`,
-                        left: `${serviciosRef.current?.getBoundingClientRect().left || 0}px`,
-                        transform: "none",
-                        minWidth: "400px",
-                        zIndex: 999999,
+                    className="absolute left-0 mt-2 backdrop-blur-3xl rounded-2xl shadow-2xl flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold border-2 pointer-events-auto"
+                    style={{
+                      top: '100%',
+                      minWidth: "400px",
+                      zIndex: 999999,
                         background: `linear-gradient(135deg, 
                           rgba(0, 0, 0, 0.98) 0%, 
                           rgba(30, 30, 30, 0.99) 50%,
@@ -842,7 +827,6 @@ function ControlMenu() {
                         </div>
                       </div>
                     </div>
-                  </div>
                 </>
               )}
             </div>
