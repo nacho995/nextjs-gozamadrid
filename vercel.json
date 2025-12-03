@@ -1,18 +1,27 @@
 {
   "version": 2,
-  "buildCommand": "cd BlogPropiedades && npm ci && npm run build",
-  "outputDirectory": "BlogPropiedades/dist",
-  "installCommand": "cd BlogPropiedades && npm install",
-  "framework": null,
+  "buildCommand": "cd frontend && npm run build",
+  "outputDirectory": "frontend/.next",
+  "installCommand": "cd frontend && npm install",
+  "framework": "nextjs",
   "rewrites": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "source": "/api/:path*",
+      "destination": "https://nextjs-gozamadrid-qrfk.onrender.com/api/:path*"
     }
   ],
   "headers": [
     {
-      "source": "/assets/(.*)",
+      "source": "/_next/static/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/static/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
