@@ -564,8 +564,8 @@ function ControlMenu() {
                     <div
                       className="absolute backdrop-blur-3xl rounded-2xl shadow-2xl flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold border-2 pointer-events-auto"
                       style={{
-                        top: `${(venderRef.current?.getBoundingClientRect().bottom || 0) + 5}px`,
-                        left: `${((venderRef.current?.getBoundingClientRect().left || 0) + (venderRef.current?.getBoundingClientRect().width || 0) / 2) - 175}px`,
+                        top: `${(venderRef.current?.getBoundingClientRect().bottom || 0) + 10}px`,
+                        left: `${venderRef.current?.getBoundingClientRect().left || 0}px`,
                         transform: "none",
                         minWidth: "350px",
                         zIndex: 999999,
@@ -686,8 +686,8 @@ function ControlMenu() {
                     <div 
                       className="absolute backdrop-blur-3xl rounded-2xl shadow-2xl flex flex-col transition-all duration-300 ease-in-out text-2xl font-bold border-2 pointer-events-auto"
                       style={{
-                        top: `${(serviciosRef.current?.getBoundingClientRect().bottom || 0) + 5}px`,
-                        left: `${((serviciosRef.current?.getBoundingClientRect().left || 0) + (serviciosRef.current?.getBoundingClientRect().width || 0) / 2) - 200}px`,
+                        top: `${(serviciosRef.current?.getBoundingClientRect().bottom || 0) + 10}px`,
+                        left: `${serviciosRef.current?.getBoundingClientRect().left || 0}px`,
                         transform: "none",
                         minWidth: "400px",
                         zIndex: 999999,
