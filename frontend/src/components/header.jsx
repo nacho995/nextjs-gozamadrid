@@ -51,7 +51,7 @@ const ORGANIZATION_SCHEMA = {
     "addressCountry": "ES"
   },
   "telephone": ["+34608136529", "+34919012103"],
-  "email": "info@realestategozamadrid.com",
+  "email": "marta@gozamadrid.com",
   "description": "Agencia inmobiliaria especializada en Madrid, ofreciendo servicios profesionales de compra, venta y alquiler de propiedades residenciales y comerciales.",
   "areaServed": [
     {

@@ -180,11 +180,11 @@ export default function UnetePage() {
               
               <div className="flex flex-col md:flex-row items-center justify-center gap-4">
                 <a
-                  href="mailto:info@realestategozamadrid.com?subject=Solicitud de Empleo - Únete a Goza Madrid"
+                  href="mailto:marta@gozamadrid.com?subject=Solicitud de Empleo - Únete a Goza Madrid"
                   className="inline-flex items-center gap-2 bg-gray-900 text-white px-8 py-4 rounded-xl font-semibold hover:bg-gray-800 transition-all hover:scale-105 shadow-lg"
                 >
                   <FaEnvelope />
-                  info@realestategozamadrid.com
+                  marta@gozamadrid.com
                 </a>
                 <a
                   href="tel:+34608136529"
