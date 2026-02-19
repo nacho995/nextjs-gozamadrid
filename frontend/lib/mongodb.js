@@ -27,12 +27,12 @@ export async function connectToDatabase() {
   if (!cached.promise) {
     // Opciones de conexión actualizadas para driver moderno de MongoDB
     const opts = {
-      serverSelectionTimeoutMS: 30000,
-      connectTimeoutMS: 30000,
-      socketTimeoutMS: 30000,
+      serverSelectionTimeoutMS: 5000,
+      connectTimeoutMS: 5000,
+      socketTimeoutMS: 8000,
       maxPoolSize: 10,
-      minPoolSize: 5,
-      maxIdleTimeMS: 30000,
+      minPoolSize: 1,
+      maxIdleTimeMS: 10000,
       retryWrites: true,
       w: 'majority'
     };

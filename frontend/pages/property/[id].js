@@ -4,7 +4,7 @@ import Head from 'next/head';
 import DefaultPropertyContent from '@/components/propiedades/PropertyContent';
 import LoadingScreen from '@/components/LoadingScreen';
 import Link from 'next/link';
-import axios from 'axios'; // Necesario para getServerSideProps
+// axios ya no es necesario - acceso directo a MongoDB
 
 // Función auxiliar simplificada para detectar el tipo de propiedad por ID
 const detectSourceFromId = (id) => {
@@ -168,254 +168,117 @@ const PropertyNotFound = ({ message = "Propiedad no encontrada o error al cargar
 
 
 // --- getServerSideProps ---
+// OPTIMIZADO: Acceso directo a MongoDB sin self-calls HTTP para evitar
+// deadlocks y timeouts en Vercel serverless functions (límite 10s en free tier)
 export async function getServerSideProps(context) {
   const { id } = context.params;
-  const sourceQuery = context.query.source; // Obtener source de la query si existe
-
-  // Determinar la fuente (si no viene en query, intentar detectarla o default a mongodb)
+  const sourceQuery = context.query.source;
   const source = sourceQuery || detectSourceFromId(id) || 'mongodb';
 
   console.log(`[getServerSideProps] Obteniendo propiedad ID: ${id}, Fuente: ${source}`);
 
-  // Importando directamente la conexión a MongoDB para acceso directo en caso de fallo de la API
-  // Nota: Estos módulos solo se cargan en el servidor
   const { getPropertiesCollection } = require('../../lib/mongodb');
   const { ObjectId } = require('mongodb');
-  
-  // Función para intentar obtener la propiedad directamente desde MongoDB
-  const getPropertyDirectlyFromDb = async (id) => {
-    try {
-      console.log(`[getServerSideProps] Intentando acceso directo a MongoDB para ID: ${id}`);
-      const collection = await getPropertiesCollection();
-      
-      let property = null;
-      
-      // Intentar varias estrategias de búsqueda
-      if (ObjectId.isValid(id)) {
-        property = await collection.findOne({ _id: new ObjectId(id) });
-        if (property) {
-          console.log(`[getServerSideProps] Propiedad encontrada por ObjectId: ${property.title || 'Sin título'}`);
-        }
-      }
-      
-      // Si no se encuentra por ObjectId, buscar por campo id
-      if (!property) {
-        property = await collection.findOne({ id: id });
-        if (property) {
-          console.log(`[getServerSideProps] Propiedad encontrada por campo id: ${property.title || 'Sin título'}`);
-        }
-      }
-      
-      // Si todavía no se encuentra, buscar por slug
-      if (!property) {
-        property = await collection.findOne({ slug: id });
-        if (property) {
-          console.log(`[getServerSideProps] Propiedad encontrada por slug: ${property.title || 'Sin título'}`);
-        }
-      }
-      
-      return property;
-    } catch (error) {
-      console.error(`[getServerSideProps] Error al acceder directamente a MongoDB:`, error.message);
-      return null;
+
+  // Función para serializar un documento MongoDB (convertir ObjectId a string, etc.)
+  const serializeProperty = (doc) => {
+    if (!doc) return null;
+    const serialized = { ...doc };
+    // Convertir _id de ObjectId a string
+    if (serialized._id) {
+      serialized._id = serialized._id.toString();
     }
-  };
-  
-  // Función para crear datos mínimos de la propiedad cuando hay error
-  const createFallbackProperty = (id) => {
-    return {
-      _id: id,
-      id: id,
-      title: 'Propiedad en Madrid',
-      description: 'Detalles completos de esta propiedad no disponibles en este momento. Por favor, contacta con nosotros para más información.',
-      price: 'Contactar',
-      location: 'Madrid',
-      address: 'Madrid',
-      bedrooms: '0',
-      bathrooms: '0',
-      area: '0',
-      propertyType: 'Propiedad',
-      status: 'Disponible',
-      images: [],
-      source: 'fallback',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
+    // Asegurar que id esté definido
+    serialized.id = serialized._id || id;
+    // Convertir dates a ISO strings
+    if (serialized.createdAt instanceof Date) serialized.createdAt = serialized.createdAt.toISOString();
+    if (serialized.updatedAt instanceof Date) serialized.updatedAt = serialized.updatedAt.toISOString();
+    // Serializar _id dentro de imágenes si existe
+    if (Array.isArray(serialized.images)) {
+      serialized.images = serialized.images.map(img => {
+        if (typeof img === 'string') return { src: img, url: img, alt: '' };
+        if (typeof img === 'object' && img !== null) {
+          const clean = { ...img };
+          if (clean._id) clean._id = clean._id.toString();
+          // Asegurar que src esté definido
+          clean.src = clean.src || clean.url || '';
+          clean.url = clean.url || clean.src || '';
+          return clean;
+        }
+        return null;
+      }).filter(Boolean);
+    }
+    return serialized;
   };
 
-  // Obtener la URL base correcta para el entorno actual
-  const isProduction = process.env.NODE_ENV === 'production';
-  let API_BASE_URL;
-  
-  if (isProduction) {
-    // En producción intentamos ambas opciones
-    // 1. URL base fija conocida
-    API_BASE_URL = 'https://www.realestategozamadrid.com';
-    
-    // 2. URL basada en el encabezado host (como respaldo)
-    const host = context.req?.headers?.host;
-    if (host) {
-      const protocol = 'https';
-      const hostApiUrl = `${protocol}://${host}`;
-      console.log(`[getServerSideProps] URL alternativa disponible: ${hostApiUrl}`);
-    }
-  } else {
-    // En desarrollo, usar localhost
-    API_BASE_URL = 'http://localhost:3000';
-  }
-  
-  const TIMEOUT = 15000;
-  
-  console.log(`[getServerSideProps] Usando API base: ${API_BASE_URL}`);
-
-  // Función para intentar obtener datos de la API
-  const fetchFromApi = async (baseUrl) => {
-    const apiUrl = `${baseUrl}/api/properties/${id}`;
-    console.log(`[getServerSideProps] Intentando obtener datos desde: ${apiUrl}`);
-    
-    try {
-      const response = await axios.get(apiUrl, {
-        timeout: TIMEOUT,
-        headers: { 'Accept': 'application/json' }
-      });
-      
-      if (response.status === 200 && response.data.success && response.data.property) {
-        console.log(`[getServerSideProps] Datos obtenidos correctamente de: ${apiUrl}`);
-        return {
-          success: true,
-          data: response.data.property
-        };
-      }
-      
-      console.log(`[getServerSideProps] Respuesta inválida de: ${apiUrl}`, response.status);
-      return { success: false };
-    } catch (error) {
-      console.error(`[getServerSideProps] Error al obtener datos de: ${apiUrl}`, error.message);
-      return { success: false };
-    }
-  };
-
-  // Intentar obtener datos de la API principal
-  const primaryResult = await fetchFromApi(API_BASE_URL);
-  
-  // Si tuvimos éxito con la API principal
-  if (primaryResult.success) {
-    return {
-      props: {
-        propertyData: primaryResult.data,
-        error: null,
-        source: source,
-      },
-    };
-  }
-  
-  // Si la API principal falló y estamos en producción, intentar con una URL alternativa
-  if (isProduction) {
-    const host = context.req?.headers?.host;
-    if (host) {
-      const alternativeUrl = `https://${host}`;
-      console.log(`[getServerSideProps] Intentando URL alternativa: ${alternativeUrl}`);
-      
-      const alternativeResult = await fetchFromApi(alternativeUrl);
-      
-      if (alternativeResult.success) {
-        return {
-          props: {
-            propertyData: alternativeResult.data,
-            error: null,
-            source: source,
-          },
-        };
-      }
-    }
-  }
-  
-  // Si las APIs fallaron, intentar acceso directo a la base de datos
-  console.log('[getServerSideProps] Las APIs fallaron, intentando acceso directo a MongoDB');
-  
   try {
-    const dbProperty = await getPropertyDirectlyFromDb(id);
-    
-    if (dbProperty) {
-      console.log(`[getServerSideProps] Propiedad recuperada directamente de MongoDB: ${dbProperty.title || 'Sin título'}`);
-      
-      // Procesar el precio para evitar problemas de formato
-      let propertyPrice = dbProperty.price;
-      let priceNumeric = null;
-      
-      // Intentar extraer valor numérico del precio
-      if (propertyPrice !== undefined && propertyPrice !== null) {
-        // Si ya es un número, guardarlo directamente
-        if (typeof propertyPrice === 'number') {
-          priceNumeric = propertyPrice;
-          propertyPrice = String(propertyPrice); // Convertir a string para consistencia
-        } 
-        // Si es string, intentar extraer el valor numérico
-        else if (typeof propertyPrice === 'string') {
-          // Limpiar el string de precio de caracteres no numéricos
-          const cleanPrice = propertyPrice.replace(/[^\d.-]/g, '');
-          if (cleanPrice) {
-            priceNumeric = parseFloat(cleanPrice);
-          }
-        }
-      }
-      
-      console.log(`[getServerSideProps] Precio procesado: original=${dbProperty.price}, numérico=${priceNumeric}`);
-      
-      // Normalizar los datos según el formato que espera la aplicación
-      const normalizedProperty = {
-        _id: dbProperty._id?.toString() || id,
-        id: dbProperty._id?.toString() || dbProperty.id || id,
-        title: dbProperty.title || dbProperty.name || 'Propiedad sin título',
-        description: dbProperty.description || '',
-        price: propertyPrice || 'Consultar',
-        priceNumeric: priceNumeric, // Añadir el precio numérico para facilitar el formato correcto
-        location: dbProperty.location || dbProperty.address || 'Madrid',
-        address: dbProperty.address || dbProperty.location || 'Madrid',
-        coordinates: dbProperty.coordinates || null,
-        bedrooms: dbProperty.bedrooms || dbProperty.rooms || '0',
-        bathrooms: dbProperty.bathrooms || dbProperty.wc || '0',
-        area: dbProperty.area || dbProperty.m2 || '0',
-        propertyType: dbProperty.propertyType || dbProperty.typeProperty || 'Propiedad',
-        status: dbProperty.status || 'Disponible',
-        images: Array.isArray(dbProperty.images) ? 
-          dbProperty.images.map((img, index) => {
-            if (typeof img === 'string') {
-              return { url: img, src: img, alt: `${dbProperty.title || 'Propiedad'} - Imagen ${index + 1}` };
-            } else if (typeof img === 'object') {
-              return { 
-                url: img.url || img.src || '', 
-                src: img.url || img.src || '',
-                alt: img.alt || `${dbProperty.title || 'Propiedad'} - Imagen ${index + 1}`
-              };
-            }
-            return null;
-          }).filter(Boolean) : [],
-        source: 'mongodb_direct',
-        createdAt: dbProperty.createdAt || new Date().toISOString(),
-        updatedAt: dbProperty.updatedAt || new Date().toISOString()
-      };
-      
+    // ACCESO DIRECTO a MongoDB - sin HTTP self-calls
+    const collection = await getPropertiesCollection();
+    let property = null;
+
+    // Buscar por ObjectId
+    if (ObjectId.isValid(id)) {
+      property = await collection.findOne({ _id: new ObjectId(id) });
+    }
+    // Buscar por campo id
+    if (!property) {
+      property = await collection.findOne({ id: id });
+    }
+    // Buscar por slug
+    if (!property) {
+      property = await collection.findOne({ slug: id });
+    }
+
+    if (property) {
+      console.log(`[getServerSideProps] Propiedad encontrada: ${property.title || 'Sin título'}`);
+      const serialized = serializeProperty(property);
+
       return {
         props: {
-          propertyData: normalizedProperty,
+          propertyData: serialized,
           error: null,
-          source: 'mongodb_direct',
+          source: source,
         },
       };
     }
+
+    // No se encontró la propiedad
+    console.warn(`[getServerSideProps] Propiedad no encontrada: ${id}`);
+    return {
+      props: {
+        propertyData: null,
+        error: 'Propiedad no encontrada',
+        source: source,
+      },
+    };
+
   } catch (error) {
-    console.error('[getServerSideProps] Error al acceder directamente a MongoDB:', error);
+    console.error('[getServerSideProps] Error al acceder a MongoDB:', error.message);
+
+    // Devolver datos de fallback en caso de error de conexión
+    return {
+      props: {
+        propertyData: {
+          _id: id,
+          id: id,
+          title: 'Propiedad en Madrid',
+          description: 'Detalles no disponibles temporalmente. Contacta con nosotros para más información.',
+          price: 'Contactar',
+          location: 'Madrid',
+          address: 'Madrid',
+          bedrooms: '0',
+          bathrooms: '0',
+          area: '0',
+          propertyType: 'Propiedad',
+          status: 'Disponible',
+          images: [],
+          source: 'fallback',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        },
+        error: 'Error temporal al cargar la propiedad. Inténtalo de nuevo.',
+        source: 'fallback',
+      },
+    };
   }
-  
-  // Si todo lo anterior falla, usar datos de respaldo
-  console.warn(`[getServerSideProps] Todos los intentos fallaron, usando datos de respaldo`);
-  
-  return {
-    props: {
-      propertyData: createFallbackProperty(id),
-      error: "La información completa de esta propiedad no está disponible en este momento.",
-      source: 'fallback',
-    },
-  };
 }
