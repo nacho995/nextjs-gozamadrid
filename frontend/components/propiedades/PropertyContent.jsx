@@ -329,19 +329,29 @@ export default function DefaultPropertyContent({ property }) {
   const [imageLoading, setImageLoading] = useState(false);
   const [loadedImages, setLoadedImages] = useState({});
   const [imageTimeout, setImageTimeout] = useState(null);
-  const [propertyData, setPropertyData] = useState({
-    livingArea: 0,
-    bedrooms: 0,
-    bathrooms: 0,
-    floor: 0
-  });
+  const [propertyDataFromEffect, setPropertyData] = useState(null);
   
   // Nuevo estado para guardar la propiedad actualizada desde MongoDB
   const [propertyState, setPropertyState] = useState(property);
   
   // Añadir dentro del componente principal cerca de otros useState
-  const [mapLocation, setMapLocation] = useState({ lat: 40.4167, lng: -3.7037 }); // Coordenadas por defecto de Madrid
-  const [formattedAddress, setFormattedAddress] = useState(""); // Estado para guardar la dirección formateada
+  const [mapLocation, setMapLocation] = useState(() => {
+    // Calcular coordenadas iniciales para SSR
+    if (property?.coordinates?.lat && property?.coordinates?.lng) {
+      return { lat: parseFloat(property.coordinates.lat), lng: parseFloat(property.coordinates.lng) };
+    }
+    return { lat: 40.4167, lng: -3.7037 };
+  }); // Coordenadas por defecto de Madrid
+  const [formattedAddress, setFormattedAddress] = useState(() => {
+    // Calcular dirección inicial para SSR (evitar mapa vacío)
+    if (!property) return "Madrid, España";
+    const addr = property.address || property.location || property.name || property.title || "";
+    if (!addr) return "Madrid, España";
+    let result = typeof addr === 'string' ? addr : (addr?.toString() || "Madrid, España");
+    if (!result.toLowerCase().includes("madrid")) result += ", Madrid";
+    if (!result.toLowerCase().includes("españa")) result += ", España";
+    return result;
+  }); // Estado para guardar la dirección formateada
   
   // Evento para recibir datos de MongoDB a través del script de integración
   useEffect(() => {
@@ -381,13 +391,27 @@ export default function DefaultPropertyContent({ property }) {
     return processPropertyImages(propertyState);
   }, [propertyState]);
 
-  // Extraer y procesar los datos de la propiedad con useMemo
+  // Extraer y procesar los datos de la propiedad con useEffect (para actualizaciones del cliente)
   useEffect(() => {
     if (propertyState) {
       const data = extractPropertyData(propertyState);
       setPropertyData(data);
     }
   }, [propertyState]);
+  
+  // useMemo que calcula propertyData tanto en SSR como en cliente
+  // Usa propertyDataFromEffect si está disponible (después de hidratación), sino calcula directamente
+  const propertyData = useMemo(() => {
+    if (propertyDataFromEffect) return propertyDataFromEffect;
+    // Cálculo directo para SSR (extractPropertyData puede fallar en SSR por acceso a window)
+    const p = propertyState || property;
+    if (!p) return { livingArea: 0, bedrooms: 0, bathrooms: 0, floor: 0 };
+    const livingArea = parseInt(p.m2, 10) || parseInt(p.area, 10) || parseInt(p.livingArea, 10) || parseInt(p.size, 10) || (p.features && parseInt(p.features?.area, 10)) || 0;
+    const bedrooms = parseInt(p.bedrooms, 10) || parseInt(p.rooms, 10) || (p.features && parseInt(p.features?.bedrooms, 10)) || 0;
+    const bathrooms = parseInt(p.bathrooms, 10) || parseInt(p.wc, 10) || (p.features && parseInt(p.features?.bathrooms, 10)) || 0;
+    const floor = parseInt(p.piso, 10) || parseInt(p.floor, 10) || (p.features && parseInt(p.features?.floor, 10)) || 0;
+    return { livingArea, bedrooms, bathrooms, floor };
+  }, [propertyState, property, propertyDataFromEffect]);
 
   // Función para limpiar el contenido de WordPress
   useEffect(() => {
@@ -1227,6 +1251,8 @@ export default function DefaultPropertyContent({ property }) {
   
   // Valor formateado por defecto si no hay precio
   let formattedPrice = 'Consultar precio';
+  // Variable para almacenar el precio numérico limpio (scope amplio para uso en JSX)
+  let price;
   
   // Log detallado del valor inicial
   console.log('PropertyContent - Precio original procesado:', { 
@@ -1237,8 +1263,6 @@ export default function DefaultPropertyContent({ property }) {
   
   // Procesamiento robusto del precio - REFORMULADO PARA COMPATIBILIDAD TOTAL
   if (priceValue !== undefined && priceValue !== null && priceValue !== '') {
-    // Variable para almacenar el precio numérico limpio
-    let price;
     
     // Manejar según el tipo de dato
     if (typeof priceValue === 'number') {
@@ -1552,6 +1576,15 @@ export default function DefaultPropertyContent({ property }) {
           </section>
 
           {/* Características premium */}
+          {(() => {
+            // Calcular valores de render directamente para garantizar SSR correcto
+            const p = propertyState || property;
+            const displayArea = propertyData?.livingArea || parseInt(p?.m2, 10) || parseInt(p?.area, 10) || parseInt(p?.size, 10) || (p?.features && parseInt(p?.features?.area, 10)) || 0;
+            const displayBedrooms = propertyData?.bedrooms || parseInt(p?.bedrooms, 10) || parseInt(p?.rooms, 10) || (p?.features && parseInt(p?.features?.bedrooms, 10)) || 0;
+            const displayBathrooms = propertyData?.bathrooms || parseInt(p?.bathrooms, 10) || parseInt(p?.wc, 10) || (p?.features && parseInt(p?.features?.bathrooms, 10)) || 0;
+            const displayFloor = propertyData?.floor || parseInt(p?.piso, 10) || parseInt(p?.floor, 10) || (p?.features && parseInt(p?.features?.floor, 10)) || 0;
+            
+            return (
           <div className="mt-12 mb-16 bg-black/80 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-amarillo/20 overflow-hidden">
             <div className="p-8 border-b border-amarillo/20 flex items-center">
               <HiMiniSquare3Stack3D className="text-amarillo mr-4 text-4xl" />
@@ -1559,49 +1592,49 @@ export default function DefaultPropertyContent({ property }) {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 p-10">
-              {propertyData?.livingArea > 0 && (
+              {displayArea > 0 && (
                 <div className="bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-xl rounded-2xl shadow-2xl transition-transform hover:scale-105 border border-amarillo/20 overflow-hidden group">
                   <div className="bg-gradient-to-r from-amarillo to-amarillo/90 p-6 flex justify-center">
                     <FaRuler className="text-3xl text-black" />
                   </div>
                   <div className="p-6 flex flex-col items-center">
-                    <p className="text-4xl font-bold text-white mb-2">{propertyData.livingArea} m²</p>
+                    <p className="text-4xl font-bold text-white mb-2">{displayArea} m²</p>
                     <p className="text-lg text-gray-300 group-hover:text-amarillo transition-colors">Superficie</p>
                   </div>
                 </div>
               )}
               
-              {propertyData?.bedrooms !== undefined && (
+              {displayBedrooms > 0 && (
                 <div className="bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-xl rounded-2xl shadow-2xl transition-transform hover:scale-105 border border-amarillo/20 overflow-hidden group">
                   <div className="bg-gradient-to-r from-amarillo to-amarillo/90 p-6 flex justify-center">
                     <FaBed className="text-3xl text-black" />
                   </div>
                   <div className="p-6 flex flex-col items-center">
-                    <p className="text-4xl font-bold text-white mb-2">{propertyData.bedrooms}</p>
+                    <p className="text-4xl font-bold text-white mb-2">{displayBedrooms}</p>
                     <p className="text-lg text-gray-300 group-hover:text-amarillo transition-colors">Habitaciones</p>
                   </div>
                 </div>
               )}
               
-              {propertyData?.bathrooms !== undefined && (
+              {displayBathrooms > 0 && (
                 <div className="bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-xl rounded-2xl shadow-2xl transition-transform hover:scale-105 border border-amarillo/20 overflow-hidden group">
                   <div className="bg-gradient-to-r from-amarillo to-amarillo/90 p-6 flex justify-center">
                     <FaBath className="text-3xl text-black" />
                   </div>
                   <div className="p-6 flex flex-col items-center">
-                    <p className="text-4xl font-bold text-white mb-2">{propertyData.bathrooms}</p>
+                    <p className="text-4xl font-bold text-white mb-2">{displayBathrooms}</p>
                     <p className="text-lg text-gray-300 group-hover:text-amarillo transition-colors">Baños</p>
                   </div>
                 </div>
               )}
               
-              {propertyData?.floor > 0 && (
+              {displayFloor > 0 && (
                 <div className="bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-xl rounded-2xl shadow-2xl transition-transform hover:scale-105 border border-amarillo/20 overflow-hidden group">
                   <div className="bg-gradient-to-r from-amarillo to-amarillo/90 p-6 flex justify-center">
                     <FaBuilding className="text-3xl text-black" />
                   </div>
                   <div className="p-6 flex flex-col items-center">
-                    <p className="text-4xl font-bold text-white mb-2">{propertyData.floor}ª</p>
+                    <p className="text-4xl font-bold text-white mb-2">{displayFloor}ª</p>
                     <p className="text-lg text-gray-300 group-hover:text-amarillo transition-colors">Planta</p>
                   </div>
                 </div>
@@ -1609,6 +1642,8 @@ export default function DefaultPropertyContent({ property }) {
                           
             </div>
           </div>
+            );
+          })()}
 
           {/* Mapa de Ubicación con manejo robusto de errores */}
           <div className="mt-12 mb-16 bg-black/80 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-amarillo/20 overflow-hidden">

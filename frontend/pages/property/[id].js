@@ -83,7 +83,11 @@ export default function PropertyDetail({ propertyData, error, source }) {
   //     ? normalizeMongoData(propertyData)
   //     : normalizeWooCommerceData(propertyData);
   // O simplemente pasar propertyData si la estructura ya es la esperada por DefaultPropertyContent
-  const normalizedProperty = propertyData;
+  const normalizedProperty = {
+    ...propertyData,
+    // Asegurar que id siempre esté definido
+    id: propertyData.id || propertyData._id || router.query.id,
+  };
 
 
   if (!normalizedProperty) {

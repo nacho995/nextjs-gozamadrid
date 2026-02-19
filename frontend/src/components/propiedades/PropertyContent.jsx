@@ -333,8 +333,23 @@ export default function DefaultPropertyContent({ property }) {
   const [propertyState, setPropertyState] = useState(property);
   
   // Añadir dentro del componente principal cerca de otros useState
-  const [mapLocation, setMapLocation] = useState({ lat: 40.4167, lng: -3.7037 }); // Coordenadas por defecto de Madrid
-  const [formattedAddress, setFormattedAddress] = useState(""); // Estado para guardar la dirección formateada
+  const [mapLocation, setMapLocation] = useState(() => {
+    // Calcular coordenadas iniciales para SSR
+    if (property?.coordinates?.lat && property?.coordinates?.lng) {
+      return { lat: parseFloat(property.coordinates.lat), lng: parseFloat(property.coordinates.lng) };
+    }
+    return { lat: 40.4167, lng: -3.7037 };
+  }); // Coordenadas por defecto de Madrid
+  const [formattedAddress, setFormattedAddress] = useState(() => {
+    // Calcular dirección inicial para SSR (evitar mapa vacío)
+    if (!property) return "Madrid, España";
+    const addr = property.address || property.location || property.name || property.title || "";
+    if (!addr) return "Madrid, España";
+    let result = typeof addr === 'string' ? addr : (addr?.toString() || "Madrid, España");
+    if (!result.toLowerCase().includes("madrid")) result += ", Madrid";
+    if (!result.toLowerCase().includes("españa")) result += ", España";
+    return result;
+  }); // Estado para guardar la dirección formateada
   
   // Evento para recibir datos de MongoDB a través del script de integración
   useEffect(() => {
@@ -1546,56 +1561,67 @@ export default function DefaultPropertyContent({ property }) {
               <h2 className="text-3xl font-bold  tracking-wide !text-amarillo">Características Premium</h2>
             </div>
             
+            {(() => {
+              // Calcular valores directamente desde propertyState para garantizar SSR correcto
+              // propertyData se establece via useEffect que no se ejecuta en SSR
+              const p = propertyState || property;
+              const displayArea = propertyData?.livingArea || parseInt(p?.m2, 10) || parseInt(p?.area, 10) || parseInt(p?.size, 10) || (p?.features && parseInt(p?.features?.area, 10)) || 0;
+              const displayBedrooms = propertyData?.bedrooms || parseInt(p?.bedrooms, 10) || parseInt(p?.rooms, 10) || (p?.features && parseInt(p?.features?.bedrooms, 10)) || 0;
+              const displayBathrooms = propertyData?.bathrooms || parseInt(p?.bathrooms, 10) || parseInt(p?.wc, 10) || (p?.features && parseInt(p?.features?.bathrooms, 10)) || 0;
+              const displayFloor = propertyData?.floor || parseInt(p?.piso, 10) || parseInt(p?.floor, 10) || (p?.features && parseInt(p?.features?.floor, 10)) || 0;
+              return (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 p-10">
-              {propertyData?.livingArea > 0 && (
+              {displayArea > 0 && (
                 <div className="bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-xl rounded-2xl shadow-2xl transition-transform hover:scale-105 border border-amarillo/20 overflow-hidden group">
                   <div className="bg-gradient-to-r from-amarillo to-amarillo/90 p-6 flex justify-center">
                     <FaRuler className="text-3xl text-black" />
                   </div>
                   <div className="p-6 flex flex-col items-center">
-                    <p className="text-4xl font-bold text-white mb-2">{propertyData.livingArea} m²</p>
+                    <p className="text-4xl font-bold text-white mb-2">{displayArea} m²</p>
                     <p className="text-lg text-gray-300 group-hover:text-amarillo transition-colors">Superficie</p>
                   </div>
                 </div>
               )}
               
-              {propertyData?.bedrooms !== undefined && (
+              {displayBedrooms > 0 && (
                 <div className="bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-xl rounded-2xl shadow-2xl transition-transform hover:scale-105 border border-amarillo/20 overflow-hidden group">
                   <div className="bg-gradient-to-r from-amarillo to-amarillo/90 p-6 flex justify-center">
                     <FaBed className="text-3xl text-black" />
                   </div>
                   <div className="p-6 flex flex-col items-center">
-                    <p className="text-4xl font-bold text-white mb-2">{propertyData.bedrooms}</p>
+                    <p className="text-4xl font-bold text-white mb-2">{displayBedrooms}</p>
                     <p className="text-lg text-gray-300 group-hover:text-amarillo transition-colors">Habitaciones</p>
                   </div>
                 </div>
               )}
               
-              {propertyData?.bathrooms !== undefined && (
+              {displayBathrooms > 0 && (
                 <div className="bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-xl rounded-2xl shadow-2xl transition-transform hover:scale-105 border border-amarillo/20 overflow-hidden group">
                   <div className="bg-gradient-to-r from-amarillo to-amarillo/90 p-6 flex justify-center">
                     <FaBath className="text-3xl text-black" />
                   </div>
                   <div className="p-6 flex flex-col items-center">
-                    <p className="text-4xl font-bold text-white mb-2">{propertyData.bathrooms}</p>
+                    <p className="text-4xl font-bold text-white mb-2">{displayBathrooms}</p>
                     <p className="text-lg text-gray-300 group-hover:text-amarillo transition-colors">Baños</p>
                   </div>
                 </div>
               )}
               
-              {propertyData?.floor > 0 && (
+              {displayFloor > 0 && (
                 <div className="bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-xl rounded-2xl shadow-2xl transition-transform hover:scale-105 border border-amarillo/20 overflow-hidden group">
                   <div className="bg-gradient-to-r from-amarillo to-amarillo/90 p-6 flex justify-center">
                     <FaBuilding className="text-3xl text-black" />
                   </div>
                   <div className="p-6 flex flex-col items-center">
-                    <p className="text-4xl font-bold text-white mb-2">{propertyData.floor}ª</p>
+                    <p className="text-4xl font-bold text-white mb-2">{displayFloor}ª</p>
                     <p className="text-lg text-gray-300 group-hover:text-amarillo transition-colors">Planta</p>
                   </div>
                 </div>
               )}
                           
             </div>
+              );
+            })()}
           </div>
 
           {/* Mapa de Ubicación con manejo robusto de errores */}
