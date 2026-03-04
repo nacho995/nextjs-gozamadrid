@@ -165,7 +165,7 @@ export default async function handler(req, res) {
       // Intentar enviar al backend como método adicional (tanto HTTP como HTTPS)
       // Primero intento HTTPS
       promises.push(
-        fetch('https://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api/contact', {
+        fetch('https://nextjs-gozamadrid.fly.dev/api/contact', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -183,27 +183,7 @@ export default async function handler(req, res) {
         })
       );
       
-      // Segundo intento HTTP (por si acaso)
-      promises.push(
-        fetch('http://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com/api/contact', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({
-            nombre: normalizedData.nombre,
-            email: normalizedData.email, 
-            telefono: normalizedData.telefono,
-            prefix: normalizedData.prefix,
-            mensaje: normalizedData.mensaje,
-            asunto: normalizedData.asunto,
-            ccEmail: 'ignaciodalesio1995@gmail.com,marta@gozamadrid.com'
-          })
-        })
-      );
-      
-      console.log('[Direct Contact] Agregados intentos de backend (HTTP y HTTPS)');
+      console.log('[Direct Contact] Agregado intento de backend Fly.io');
     } catch (backendError) {
       console.error('[Direct Contact] Error preparando envío al backend (ignorado):', backendError);
     }

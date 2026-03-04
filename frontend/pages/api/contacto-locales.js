@@ -8,8 +8,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    await dbConnect();
-
     const { nombre, telefono, email, localInteres, mensaje } = req.body;
 
     // Validacion basica
@@ -18,19 +16,25 @@ export default async function handler(req, res) {
     }
 
     // Configurar transporte de nodemailer
+    const emailUser = process.env.EMAIL_USER || 'ignaciodalesiolopez@gmail.com';
+    const emailPass = process.env.EMAIL_PASSWORD || 'tjlt deip zhwe mkzm';
+
     const transporter = nodemailer.createTransport({
       host: process.env.EMAIL_HOST || 'smtp.gmail.com',
       port: parseInt(process.env.EMAIL_PORT || '587'),
       secure: process.env.EMAIL_SECURE === 'true',
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD,
+        user: emailUser,
+        pass: emailPass,
+      },
+      tls: {
+        rejectUnauthorized: false,
       },
     });
 
     // Contenido del email
     const mailOptions = {
-      from: `"Landing Locales en Venta" <${process.env.EMAIL_USER}>`,
+      from: `"Landing Locales en Venta" <${emailUser}>`,
       to: 'marta@gozamadrid.com',
       subject: `[LOCALES] Nueva consulta de ${nombre} - ${localInteres || 'Informacion general'}`,
       text: `
@@ -101,29 +105,34 @@ Este email ha sido enviado desde la landing page de Locales en Venta.
     // Enviar email
     await transporter.sendMail(mailOptions);
 
-    // Guardar o actualizar contacto en la base de datos
-    try {
-      let contact = await Contact.findOne({ email });
+    // Guardar o actualizar contacto en la base de datos (solo si MONGODB_URI esta configurado)
+    if (process.env.MONGODB_URI) {
+      try {
+        await dbConnect();
+        let contact = await Contact.findOne({ email });
 
-      if (contact) {
-        contact.nombre = nombre;
-        contact.telefono = telefono;
-        if (localInteres) contact.localInteres = localInteres;
-        contact.ultimoContacto = new Date();
-        await contact.save();
-      } else {
-        await Contact.create({
-          nombre,
-          email,
-          telefono,
-          localInteres,
-          intereses: ['locales-venta'],
-          estado: 'activo',
-        });
+        if (contact) {
+          contact.nombre = nombre;
+          contact.telefono = telefono;
+          if (localInteres) contact.localInteres = localInteres;
+          contact.ultimoContacto = new Date();
+          await contact.save();
+        } else {
+          await Contact.create({
+            nombre,
+            email,
+            telefono,
+            localInteres,
+            intereses: ['locales-venta'],
+            estado: 'activo',
+          });
+        }
+      } catch (dbError) {
+        console.error('Error al guardar contacto en la base de datos:', dbError);
+        // No fallamos la solicitud si hay un error en la BD, el email ya se envio
       }
-    } catch (dbError) {
-      console.error('Error al guardar contacto en la base de datos:', dbError);
-      // No fallamos la solicitud si hay un error en la BD, el email ya se envio
+    } else {
+      console.warn('MONGODB_URI no configurado, omitiendo guardado en base de datos');
     }
 
     return res.status(200).json({ success: true, message: 'Email enviado correctamente' });
