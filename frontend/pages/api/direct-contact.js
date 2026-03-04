@@ -80,7 +80,7 @@ export default async function handler(req, res) {
         secure: false,
         auth: {
           user: 'ignaciodalesiolopez@gmail.com',
-          pass: 'tjlt deip zhwe mkzm' // Contraseña correcta confirmada
+          pass: 'htko euiv bjhf iplk' // App Password actualizada
         },
         tls: {
           rejectUnauthorized: false
