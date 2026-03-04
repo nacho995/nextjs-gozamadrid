@@ -191,7 +191,7 @@ export async function onRequest(context) {
   } 
   else if (service === 'mongodb') {
     // Implementación para MongoDB API
-    const MONGODB_API_URL = env.MONGODB_API_URL || 'https://goza-madrid.onrender.com';
+    const MONGODB_API_URL = env.MONGODB_API_URL || 'https://nextjs-gozamadrid.fly.dev';
     
     // Construir URL de MongoDB
     baseUrl = MONGODB_API_URL;

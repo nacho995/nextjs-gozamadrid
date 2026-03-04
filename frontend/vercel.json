@@ -1,10 +1,4 @@
 {
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "https://nextjs-gozamadrid-qrfk.onrender.com/api/:path*"
-    }
-  ],
   "headers": [
     {
       "source": "/_next/static/(.*)",

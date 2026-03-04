@@ -27,7 +27,7 @@ export default async function handler(req, res) {
     }
 
     // URL del backend - ajustar según tu configuración
-    const backendUrl = process.env.BACKEND_URL || 'https://nextjs-gozamadrid-qrfk.onrender.com';
+    const backendUrl = process.env.BACKEND_URL || 'https://nextjs-gozamadrid.fly.dev';
     let endpoint = '';
     
     // Determinar el endpoint según el tipo

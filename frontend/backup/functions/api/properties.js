@@ -17,7 +17,7 @@ export async function onRequest(context) {
     console.log('Ejecutando API para obtener propiedades' + (propertyId ? ` con ID: ${propertyId}` : ''));
     
     // URLs de las APIs - usar env o config centralizado
-    const mongodbUrl = env.MONGODB_API_URL || config.MONGODB_API_URL || 'https://goza-madrid.onrender.com';
+    const mongodbUrl = env.MONGODB_API_URL || config.MONGODB_API_URL || 'https://nextjs-gozamadrid.fly.dev';
     const wcApiUrl = env.WC_API_URL || config.WC_API_URL;
     const wooCommerceKey = env.WOO_COMMERCE_KEY || config.WOO_COMMERCE_KEY;
     const wooCommerceSecret = env.WOO_COMMERCE_SECRET || config.WOO_COMMERCE_SECRET;

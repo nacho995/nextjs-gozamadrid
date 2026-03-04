@@ -124,7 +124,7 @@ export async function onRequest(context) {
       }
     } else {
       // MongoDB
-      const mongodbUrl = env.MONGODB_API_URL || config.MONGODB_API_URL || 'https://goza-madrid.onrender.com';
+      const mongodbUrl = env.MONGODB_API_URL || config.MONGODB_API_URL || 'https://nextjs-gozamadrid.fly.dev';
       const mongoUrl = `${mongodbUrl}/property/${propertyId}`;
       
       try {

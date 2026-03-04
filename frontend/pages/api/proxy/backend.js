@@ -14,7 +14,7 @@ export default async function handler(req, res) {
   // Obtener la ruta relativa (todo lo que viene después de /api/proxy/backend)
   const path = req.url.replace(/^\/api\/proxy\/backend\/?/, '');
   // Usar HTTP que será redirigido a HTTPS por el backend
-  const targetUrl = `${config.BACKEND_API_URL || 'https://nextjs-gozamadrid-qrfk.onrender.com'}/${path}`;
+  const targetUrl = `${config.BACKEND_API_URL || 'https://nextjs-gozamadrid.fly.dev'}/${path}`;
   
   console.log(`[Proxy Backend] Redirigiendo a: ${targetUrl}`);
   

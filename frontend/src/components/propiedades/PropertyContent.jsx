@@ -15,7 +15,7 @@ import Head from "next/head";
 import Image from "next/legacy/image";
 import CountryPrefix from "../CountryPrefix";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://goza-madrid.onrender.com';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://nextjs-gozamadrid.fly.dev';
 
 // Al inicio del archivo, agregar esta constante para controlar logs
 const isDev = process.env.NODE_ENV === 'development';

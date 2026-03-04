@@ -1,7 +1,7 @@
 // URLs base para las APIs
 export const API_URLS = {
   WORDPRESS: process.env.NEXT_PUBLIC_WP_API_URL || 'https://realestategozamadrid.com/wp-json/wp/v2',
-  MONGODB: process.env.NEXT_PUBLIC_API_URL || 'https://nextjs-gozamadrid-qrfk.onrender.com',
+  MONGODB: process.env.NEXT_PUBLIC_API_URL || 'https://nextjs-gozamadrid.fly.dev',
   SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || 'https://blogs.realestategozamadrid.com'
 };
 

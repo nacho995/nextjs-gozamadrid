@@ -122,7 +122,7 @@ export async function onRequest(context) {
       }
     } else {
       // Asumir que es un ID de MongoDB
-      const mongoUrl = `https://goza-madrid.onrender.com/blog/${blogId}`;
+      const mongoUrl = `https://nextjs-gozamadrid.fly.dev/blog/${blogId}`;
       
       try {
         const mongoResponse = await fetch(mongoUrl, {

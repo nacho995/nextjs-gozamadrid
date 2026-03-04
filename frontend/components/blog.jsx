@@ -95,7 +95,7 @@ const processImageUrl = (image) => {
       return { src: image, alt: 'Imagen del blog' };
     }
     const baseUrl = process.env.NODE_ENV === 'production'
-      ? 'https://goza-madrid.onrender.com'
+      ? 'https://nextjs-gozamadrid.fly.dev'
       : 'http://localhost:3000';
     return { 
       src: `${baseUrl}${image.startsWith('/') ? '' : '/'}${image}`,
@@ -109,7 +109,7 @@ const processImageUrl = (image) => {
       return image;
     }
     const baseUrl = process.env.NODE_ENV === 'production'
-      ? 'https://goza-madrid.onrender.com'
+      ? 'https://nextjs-gozamadrid.fly.dev'
       : 'http://localhost:3000';
     return {
       ...image,
@@ -145,14 +145,14 @@ const BlogCard = ({ blog, index }) => {
     
     if (typeof blog.image === 'string') {
       const baseUrl = process.env.NODE_ENV === 'production'
-        ? 'https://goza-madrid.onrender.com'
+        ? 'https://nextjs-gozamadrid.fly.dev'
         : 'http://localhost:3000';
       return blog.image.startsWith('http') ? blog.image : `${baseUrl}${blog.image}`;
     }
     
     if (blog.image.src) {
       const baseUrl = process.env.NODE_ENV === 'production'
-        ? 'https://goza-madrid.onrender.com'
+        ? 'https://nextjs-gozamadrid.fly.dev'
         : 'http://localhost:3000';
       return blog.image.src.startsWith('http') ? blog.image.src : `${baseUrl}${blog.image.src}`;
     }

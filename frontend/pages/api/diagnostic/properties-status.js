@@ -34,7 +34,7 @@ export default async function handler(req, res) {
   const MONGO_URLS = [
     'http://gozamadrid-api-prod.eba-adypnjgx.eu-west-3.elasticbeanstalk.com', // URL que funciona
     process.env.NEXT_PUBLIC_API_URL,
-    'https://nextjs-gozamadrid-qrfk.onrender.com', // URL del backend en Render
+    'https://nextjs-gozamadrid.fly.dev', // URL del backend en Render
     'http://localhost:8081'
   ].filter(Boolean);
 

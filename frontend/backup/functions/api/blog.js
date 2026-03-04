@@ -17,7 +17,7 @@ export async function onRequest(context) {
     console.log('Ejecutando API para obtener blogs' + (blogId ? ` con ID: ${blogId}` : ''));
     
     // URLs de las APIs - usar env o config centralizado
-    const mongodbUrl = env.MONGODB_API_URL || config.MONGODB_API_URL || 'https://goza-madrid.onrender.com';
+    const mongodbUrl = env.MONGODB_API_URL || config.MONGODB_API_URL || 'https://nextjs-gozamadrid.fly.dev';
     const wpApiUrl = env.WP_API_URL || config.WP_API_URL;
     
     // Construir URLs específicas
