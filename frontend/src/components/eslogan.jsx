@@ -188,9 +188,7 @@ const Eslogan = () => {
                     className="mb-4"
                   >
                     <a
-                      href="https://es.statefox.com/mites/v/68a5a4c5e10bc5704c05f3f6"
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      href="/valoracion"
                       className="bg-gradient-to-r from-amarillo to-yellow-500 text-black font-bold px-8 py-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 inline-flex items-center text-lg border-2 border-yellow-600"
                     >
                       💰 ¿Cuánto vale mi propiedad? - Valoración Gratuita
@@ -231,9 +229,7 @@ const Eslogan = () => {
                     whileTap={{ scale: 0.95 }}
                   >
                     <a
-                      href="https://es.statefox.com/mites/v/68a5a4c5e10bc5704c05f3f6"
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      href="/valoracion"
                       className="bg-gradient-to-r from-amarillo to-yellow-500 text-black font-bold px-8 py-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 inline-flex items-center text-lg border-2 border-yellow-600"
                     >
                       🔍 Valora propiedades antes de comprar - Servicio Gratuito
@@ -295,9 +291,7 @@ const Eslogan = () => {
             whileTap={{ scale: 0.95 }}
           >
             <a
-              href="https://es.statefox.com/mites/v/68a5a4c5e10bc5704c05f3f6"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/valoracion"
               className="bg-amarillo text-black font-bold px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center text-lg"
             >
               🏠 Valorador Gratuito - ¡Conoce el valor real de tu propiedad!

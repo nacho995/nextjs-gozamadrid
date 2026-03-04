@@ -19,7 +19,7 @@ import Agreements from "@/components/Agreements";
 export default function Home() {
   
   // Enlace a la valoración
-  const valorationLink = "https://app.com/valorar/personal-de-momento/u/34300?locale=es";
+  const valorationLink = "/valoracion";
 
   const gradientStyle = {
     backgroundImage: "url('/gozamadridwp.jpg')",

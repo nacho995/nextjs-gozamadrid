@@ -143,15 +143,13 @@ const ImageSlider = ({ autoPlayInterval = 8000 }) => {
         {/* Botón de valoración */}
         <div className="absolute top-[60%] md:top-[65%] lg:top-[60%] xl:top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
           <a
-            href="https://es.statefox.com/mites/v/68a5a4c5e10bc5704c05f3f6"
+            href="/valoracion"
             className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-black/50 
               px-4 sm:px-6 lg:px-8 
               py-2 sm:py-2.5 lg:py-3 
               transition-all duration-300 hover:bg-black/70 backdrop-blur-sm
               max-w-[90%] sm:max-w-[80%] lg:max-w-none"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Valora el precio de tu propiedad - Abre en una nueva ventana"
+            aria-label="Valora el precio de tu propiedad"
           >
             <span className="relative text-sm sm:text-base lg:text-lg font-semibold text-white whitespace-normal text-center">
               Valora el precio de tu propiedad

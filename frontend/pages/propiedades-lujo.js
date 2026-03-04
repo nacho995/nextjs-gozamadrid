@@ -55,7 +55,7 @@ const PropiedadesLujo = () => {
   };
   
   // Enlace a la valoración
-  const valorationLink = "https://es.statefox.com/mites/v/68a5a4c5e10bc5704c05f3f6";
+  const valorationLink = "/valoracion";
   
   // Animación para el fadeIn de las secciones
   const fadeIn = {
@@ -122,8 +122,6 @@ const PropiedadesLujo = () => {
             <p className="text-black/80 mb-6 max-w-2xl mx-auto">Nuestros expertos realizarán una valoración detallada basada en el mercado actual y las características únicas de su propiedad</p>
             <a 
               href={valorationLink}
-              target="_blank"
-              rel="noopener noreferrer"
               className="inline-block bg-black text-white px-8 py-4 rounded-full font-bold hover:bg-gray-900 transition-all duration-300 shadow-lg transform hover:scale-105"
             >
               Solicite su Valoración Gratuita Ahora
@@ -151,8 +149,6 @@ const PropiedadesLujo = () => {
               <p className="text-gray-700 mb-5 text-lg">Nuestros clientes confían en nuestras valoraciones profesionales y servicio personalizado</p>
               <a 
                 href={valorationLink}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="inline-block bg-gradient-to-r from-yellow-500 to-yellow-700 text-black px-8 py-3 rounded-full font-semibold hover:from-yellow-600 hover:to-yellow-800 transition-all duration-300 shadow-md transform hover:scale-105"
               >
                 Solicitar Valoración Gratuita
@@ -228,8 +224,6 @@ const PropiedadesLujo = () => {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a 
                 href={valorationLink}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="inline-block bg-gradient-to-r from-yellow-500 to-yellow-700 text-black px-8 py-4 rounded-full font-bold hover:from-yellow-600 hover:to-yellow-800 transition-all duration-300 shadow-lg transform hover:scale-105 text-lg"
               >
                 Solicitar Valoración Gratuita
@@ -253,8 +247,6 @@ const PropiedadesLujo = () => {
           {showFloatingButton && (
             <motion.a
               href={valorationLink}
-              target="_blank"
-              rel="noopener noreferrer"
               className="fixed bottom-8 right-8 z-50 bg-gradient-to-r from-yellow-500 to-yellow-700 text-black px-5 py-3 rounded-full shadow-xl flex items-center space-x-2 border-2 border-yellow-400/30"
               initial={{ y: 100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}

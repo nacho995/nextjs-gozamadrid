@@ -35,9 +35,7 @@ function Header() {
           </p>
           
           <motion.a
-            href="https://betterplaceapp.com/valorar/personal-de-momento/u/34300?locale=es"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/valoracion"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="rounded-md bg-gradient-to-r from-yellow-400 to-yellow-700 px-8 py-4 text-lg font-semibold text-black shadow-lg transition duration-300 hover:from-yellow-500 hover:to-yellow-800 inline-block"

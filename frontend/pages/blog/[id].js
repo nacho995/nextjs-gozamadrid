@@ -651,9 +651,7 @@ function SmartFloatingValoradorButton() {
           
           {/* Botón base con gradientes complejos */}
           <motion.a
-            href="https://es.statefox.com/mites/v/68a5a4c5e10bc5704c05f3f6"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/valoracion"
             className="relative flex items-center gap-3 px-6 py-4 rounded-full overflow-hidden shadow-2xl transform transition-all duration-500 group"
             style={{
               background: `linear-gradient(135deg, 

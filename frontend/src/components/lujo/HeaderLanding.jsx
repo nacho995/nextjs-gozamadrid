@@ -80,9 +80,7 @@ const HeaderLanding = () => {
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
             <motion.a
-              href="https://es.statefox.com/mites/v/68a5a4c5e10bc5704c05f3f6"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/valoracion"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="rounded-full bg-gradient-to-r from-yellow-500 to-yellow-700 px-8 py-4 text-lg font-bold text-black shadow-xl transition duration-300 hover:from-yellow-600 hover:to-yellow-800 inline-block border-2 border-yellow-400/30"

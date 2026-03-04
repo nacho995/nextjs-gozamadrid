@@ -4,7 +4,7 @@ import Head from 'next/head';
 import ControlMenu from './header';
 import Footer3 from './footer';
 import CookieConsent from './CookieConsent';
-import { SmartFloatingValoradorButton } from './cards';
+import { FloatingValoradorButton } from './cards';
 import { useRouter } from 'next/router';
 
 // Schema.org para la estructura del sitio
@@ -99,7 +99,7 @@ const Layout = ({ children }) => {
       <CookieConsent />
       
       {/* Botón flotante del valorador inteligente - Global */}
-      <SmartFloatingValoradorButton />
+      <FloatingValoradorButton />
     </div>
   </>
 );
