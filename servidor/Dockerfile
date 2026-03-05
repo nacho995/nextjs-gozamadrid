@@ -9,12 +9,11 @@ RUN npm ci --omit=dev
 
 FROM base AS runner
 ENV NODE_ENV=production
-ENV PORT=8080
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-EXPOSE 8080
+EXPOSE 10000
 CMD ["node", "server.js"]
 
 
