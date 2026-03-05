@@ -364,25 +364,29 @@ app.get('/', (req, res) => {
   res.status(200).json({ message: 'Servidor funcionando correctamente' });
 });
 
-// Conexión a MongoDB
+// ─── START HTTP SERVER IMMEDIATELY ──────────────────────────────────────────
+// Fly.io needs the port open ASAP or it will mark the machine as unreachable.
+// MongoDB connection happens in the background after the server is listening.
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Servidor corriendo en puerto ${PORT} en todas las interfaces`);
+});
+
+// ─── CONNECT TO MONGODB (background) ───────────────────────────────────────
 const connectDB = async () => {
   const mongoUri = process.env.MONGODB_URI;
   if (!mongoUri) {
     console.error('Error: MONGODB_URI no está definida en las variables de entorno.');
-    process.exit(1);
+    // Don't exit — the HTTP server is already running and can serve health checks
+    return;
   }
 
-  // Opciones de conexión actualizadas para Mongoose 8.x
   const options = {
-    serverSelectionTimeoutMS: 5000, // Timeout si no se puede seleccionar servidor
-    socketTimeoutMS: 45000, // Cerrar sockets después de 45 segundos de inactividad
-    // keepAlive y keepAliveInitialDelay ya no son compatibles con Mongoose 8.x
+    serverSelectionTimeoutMS: 10000,
+    socketTimeoutMS: 45000,
   };
 
-  // Manejadores de eventos de conexión de Mongoose
   mongoose.connection.on('connected', () => {
     console.log('Mongoose conectado a la DB');
-    // Imprimir información sobre la conexión
     console.log(`MongoDB conectado a: ${mongoose.connection.host}`);
   });
 
@@ -391,11 +395,7 @@ const connectDB = async () => {
   });
 
   mongoose.connection.on('disconnected', () => {
-    console.log('Mongoose desconectado');
-    // Intentar reconectar automáticamente después de una desconexión
-    console.log('Intentando reconectar a MongoDB...');
-    
-    // Evitar múltiples intentos de reconexión simultáneos
+    console.log('Mongoose desconectado. Intentando reconectar...');
     if (!mongoose.connection.readyState) {
       setTimeout(async () => {
         try {
@@ -404,33 +404,24 @@ const connectDB = async () => {
         } catch (err) {
           console.error('Error al intentar reconectar a MongoDB:', err);
         }
-      }, 5000); // Intentar reconectar después de 5 segundos
+      }, 5000);
     }
   });
-  
+
   mongoose.connection.on('close', () => {
-     console.log('Conexión de Mongoose cerrada');
+    console.log('Conexión de Mongoose cerrada');
   });
 
   try {
     console.log('Intentando conectar a MongoDB...');
     await mongoose.connect(mongoUri, options);
-    // La conexión fue exitosa si llegamos aquí (el evento 'connected' también se disparará)
-    
-    // Iniciar el servidor solo después de conectar a la base de datos
-    app.listen(PORT, '0.0.0.0', () => {
-      console.log(`Servidor corriendo en puerto ${PORT} en todas las interfaces`);
-    });
-
   } catch (err) {
     console.error('Error inicial al conectar a MongoDB:', err);
-    // Salir del proceso si la conexión inicial falla
-    // Damos un pequeño margen antes de salir por si es un error temporal
-    setTimeout(() => process.exit(1), 1000);
+    // Retry after 5 seconds instead of crashing
+    setTimeout(() => connectDB(), 5000);
   }
 };
 
-// Llamar a la función para conectar a la base de datos e iniciar el servidor
 connectDB();
 
 // Middleware para logging de errores
