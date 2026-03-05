@@ -6,12 +6,12 @@ import { toast } from 'sonner';
 import SEOMetadata from '../components/SEOMetadata';
 
 // ─── OPCIONES DEL FORMULARIO ────────────────────────────────────────────────
-const TIPOS_PROPIEDAD = ['Piso', 'Atico', 'Chalet', 'Villa', 'Duplex', 'Adosado', 'Estudio', 'Local comercial', 'Oficina', 'Otro'];
+const TIPOS_PROPIEDAD = ['Piso', 'Ático', 'Chalet', 'Villa', 'Dúplex', 'Adosado', 'Estudio', 'Local comercial', 'Oficina', 'Otro'];
 const ESTADOS_CONSERVACION = ['A estrenar', 'Muy bueno', 'Bueno', 'Necesita reforma parcial', 'Necesita reforma integral'];
 const OPCIONES_HABITACIONES = ['Estudio', '1', '2', '3', '4', '5+'];
 const OPCIONES_BANOS = ['1', '2', '3', '4+'];
-const OPCIONES_PLANTA = ['Bajo', '1', '2', '3', '4', '5', '6+', 'Atico', 'No aplica'];
-const EXTRAS = ['Terraza', 'Balcon', 'Jardin', 'Piscina', 'Aire acondicionado', 'Calefaccion central', 'Suelo radiante', 'Armarios empotrados', 'Cocina equipada', 'Vistas despejadas', 'Luminoso', 'Reformado recientemente'];
+const OPCIONES_PLANTA = ['Bajo', '1', '2', '3', '4', '5', '6+', 'Ático', 'No aplica'];
+const EXTRAS = ['Terraza', 'Balcón', 'Jardín', 'Piscina', 'Aire acondicionado', 'Calefacción central', 'Suelo radiante', 'Armarios empotrados', 'Cocina equipada', 'Vistas despejadas', 'Luminoso', 'Reformado recientemente'];
 
 const Valoracion = () => {
   const [step, setStep] = useState(1);
@@ -77,7 +77,7 @@ const Valoracion = () => {
       return;
     }
     if (step === 2 && !formData.direccion) {
-      toast.error('Introduzca la direccion de la propiedad');
+      toast.error('Introduzca la dirección de la propiedad');
       return;
     }
     setStep(prev => Math.min(prev + 1, totalSteps));
@@ -89,11 +89,11 @@ const Valoracion = () => {
     if (e) e.preventDefault();
 
     if (!formData.nombre || !formData.telefono || !formData.email) {
-      toast.error('Complete los campos de contacto (nombre, telefono y email)');
+      toast.error('Complete los campos de contacto (nombre, teléfono y email)');
       return;
     }
     if (!formData.aceptaPrivacidad) {
-      toast.error('Debe aceptar la politica de privacidad');
+      toast.error('Debe aceptar la política de privacidad');
       return;
     }
 
@@ -112,9 +112,9 @@ const Valoracion = () => {
       }
 
       setEnviado(true);
-      toast.success('Solicitud enviada. Marta se pondra en contacto con usted pronto.');
+      toast.success('Solicitud enviada. Marta se pondrá en contacto con usted pronto.');
     } catch (err) {
-      toast.error(err.message || 'Error al enviar. Intentelo de nuevo.');
+      toast.error(err.message || 'Error al enviar. Inténtelo de nuevo.');
     } finally {
       setLoading(false);
     }
@@ -151,13 +151,13 @@ const Valoracion = () => {
   return (
     <>
       <SEOMetadata
-        title="Valoracion Gratuita de tu Propiedad en Madrid | Goza Madrid"
-        description="Solicita una valoracion gratuita y sin compromiso de tu propiedad en Madrid. Nuestros expertos inmobiliarios te daran un precio estimado basado en el mercado actual."
-        keywords="valoracion propiedad Madrid, valorar piso Madrid, precio vivienda Madrid, tasacion gratuita Madrid, valoracion inmobiliaria"
+        title="Valoración Gratuita de tu Propiedad en Madrid | Goza Madrid"
+        description="Solicita una valoración gratuita y sin compromiso de tu propiedad en Madrid. Nuestros expertos inmobiliarios te darán un precio estimado basado en el mercado actual."
+        keywords="valoración propiedad Madrid, valorar piso Madrid, precio vivienda Madrid, tasación gratuita Madrid, valoración inmobiliaria"
         ogType="website"
         ogImage="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1200&q=80"
-        ogImageAlt="Valoracion de propiedades en Madrid - Goza Madrid"
-        author="Marta Lopez - Goza Madrid"
+        ogImageAlt="Valoración de propiedades en Madrid - Goza Madrid"
+        author="Marta López - Goza Madrid"
       />
       <Head>
         <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -211,7 +211,7 @@ const Valoracion = () => {
               <span className="block">de su <span className="text-yellow-500">Propiedad</span></span>
             </h1>
             <p className="text-lg md:text-xl text-white/90 mb-10 max-w-3xl mx-auto">
-              Nuestros expertos inmobiliarios analizaran su propiedad y le proporcionaran una valoracion personalizada basada en el mercado actual de Madrid.
+              Nuestros expertos inmobiliarios analizarán su propiedad y le proporcionarán una valoración personalizada basada en el mercado actual de Madrid.
             </p>
             <motion.a
               href="#formulario"
@@ -219,7 +219,7 @@ const Valoracion = () => {
               whileTap={{ scale: 0.95 }}
               className="rounded-full bg-gradient-to-r from-yellow-500 to-yellow-700 px-8 py-4 text-lg font-bold text-black shadow-xl transition duration-300 hover:from-yellow-600 hover:to-yellow-800 inline-block border-2 border-yellow-400/30"
             >
-              Solicitar Valoracion Gratuita
+              Solicitar Valoración Gratuita
             </motion.a>
           </motion.div>
         </section>
@@ -228,10 +228,10 @@ const Valoracion = () => {
         <section className="py-20 px-4 bg-gradient-to-b from-black to-gray-950">
           <div className="container mx-auto max-w-6xl">
             <motion.h2 variants={fadeIn} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-3xl md:text-4xl font-bold text-center mb-4">
-              Por que valorar con <span className="text-yellow-500">Goza Madrid</span>
+              Por qué valorar con <span className="text-yellow-500">Goza Madrid</span>
             </motion.h2>
             <motion.p variants={fadeIn} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-white/60 text-center mb-14 max-w-2xl mx-auto">
-              Mas de 15 anos de experiencia en el mercado inmobiliario madrileno nos avalan
+              Más de 15 años de experiencia en el mercado inmobiliario madrileño nos avalan
             </motion.p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -240,22 +240,22 @@ const Valoracion = () => {
                   icon: (
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                   ),
-                  title: 'Valoracion Profesional',
-                  desc: 'Analisis detallado del mercado, comparables recientes y tendencias de la zona para determinar el precio optimo.',
+                  title: 'Valoración Profesional',
+                  desc: 'Análisis detallado del mercado, comparables recientes y tendencias de la zona para determinar el precio óptimo.',
                 },
                 {
                   icon: (
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   ),
                   title: 'Respuesta en 24-48h',
-                  desc: 'Marta Lopez, nuestra experta, le contactara personalmente con una estimacion en menos de 48 horas.',
+                  desc: 'Marta López, nuestra experta, le contactará personalmente con una estimación en menos de 48 horas.',
                 },
                 {
                   icon: (
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
                   ),
                   title: 'Conocimiento Local',
-                  desc: 'Especializados en Madrid: Salamanca, Chamberi, Chamartin, Retiro, Centro y las mejores zonas de la capital.',
+                  desc: 'Especializados en Madrid: Salamanca, Chamberí, Chamartín, Retiro, Centro y las mejores zonas de la capital.',
                 },
               ].map((item, i) => (
                 <motion.div
@@ -283,17 +283,17 @@ const Valoracion = () => {
           <div className="container mx-auto max-w-3xl">
             <motion.div variants={fadeIn} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Solicite su <span className="text-yellow-500">Valoracion Gratuita</span>
+                Solicite su <span className="text-yellow-500">Valoración Gratuita</span>
               </h2>
               <p className="text-white/60 max-w-xl mx-auto">
-                Complete el formulario con los datos de su propiedad. Cuanta mas informacion nos proporcione, mas precisa sera nuestra valoracion.
+                Complete el formulario con los datos de su propiedad. Cuanta más información nos proporcione, más precisa será nuestra valoración.
               </p>
             </motion.div>
 
             {/* Progress bar */}
             <div className="mb-10">
               <div className="flex justify-between mb-2">
-                {['Tipo', 'Ubicacion', 'Detalles', 'Contacto'].map((label, i) => (
+                {['Tipo', 'Ubicación', 'Detalles', 'Contacto'].map((label, i) => (
                   <span key={i} className={`text-xs font-semibold tracking-wider uppercase ${step > i ? 'text-yellow-500' : step === i + 1 ? 'text-white' : 'text-white/30'}`}>
                     {label}
                   </span>
@@ -327,7 +327,7 @@ const Valoracion = () => {
                   </div>
                   <h3 className="text-2xl font-bold mb-3">Solicitud Enviada</h3>
                   <p className="text-white/60 mb-8 max-w-md mx-auto">
-                    Hemos recibido los datos de su propiedad. Marta Lopez se pondra en contacto con usted en las proximas 24-48 horas con una valoracion personalizada.
+                    Hemos recibido los datos de su propiedad. Marta López se pondrá en contacto con usted en las próximas 24-48 horas con una valoración personalizada.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Link href="/" className="rounded-full bg-gradient-to-r from-yellow-500 to-yellow-700 px-6 py-3 text-black font-bold shadow-lg hover:from-yellow-600 hover:to-yellow-800 transition-all duration-300">
@@ -345,7 +345,7 @@ const Valoracion = () => {
                     {/* STEP 1: Tipo de propiedad */}
                     {step === 1 && (
                       <motion.div key="step1" variants={slideVariant} initial="enter" animate="center" exit="exit">
-                        <h3 className="text-xl font-bold mb-2">Que tipo de propiedad desea valorar?</h3>
+                        <h3 className="text-xl font-bold mb-2">¿Qué tipo de propiedad desea valorar?</h3>
                         <p className="text-white/50 text-sm mb-6">Seleccione el tipo que mejor describa su inmueble</p>
                         <div className="flex flex-wrap gap-3 mb-8">
                           {TIPOS_PROPIEDAD.map(tipo => (
@@ -358,11 +358,11 @@ const Valoracion = () => {
                     {/* STEP 2: Ubicacion */}
                     {step === 2 && (
                       <motion.div key="step2" variants={slideVariant} initial="enter" animate="center" exit="exit">
-                        <h3 className="text-xl font-bold mb-2">Donde esta la propiedad?</h3>
-                        <p className="text-white/50 text-sm mb-6">Estos datos son esenciales para una valoracion precisa</p>
+                        <h3 className="text-xl font-bold mb-2">¿Dónde está la propiedad?</h3>
+                        <p className="text-white/50 text-sm mb-6">Estos datos son esenciales para una valoración precisa</p>
                         <div className="space-y-5">
                           <div>
-                            <label className="block text-sm font-semibold text-white/80 mb-1">Direccion completa *</label>
+                            <label className="block text-sm font-semibold text-white/80 mb-1">Dirección completa *</label>
                             <input
                               type="text"
                               name="direccion"
@@ -374,7 +374,7 @@ const Valoracion = () => {
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-semibold text-white/80 mb-1">Codigo Postal</label>
+                            <label className="block text-sm font-semibold text-white/80 mb-1">Código Postal</label>
                             <input
                               type="text"
                               name="codigoPostal"
@@ -393,11 +393,11 @@ const Valoracion = () => {
                     {step === 3 && (
                       <motion.div key="step3" variants={slideVariant} initial="enter" animate="center" exit="exit">
                         <h3 className="text-xl font-bold mb-2">Detalles de la propiedad</h3>
-                        <p className="text-white/50 text-sm mb-6">Cuantos mas detalles, mejor sera la valoracion</p>
+                        <p className="text-white/50 text-sm mb-6">Cuantos más detalles, mejor será la valoración</p>
                         <div className="space-y-6">
                           {/* Superficie */}
                           <div>
-                            <label className="block text-sm font-semibold text-white/80 mb-1">Superficie (m2)</label>
+                            <label className="block text-sm font-semibold text-white/80 mb-1">Superficie (m²)</label>
                             <input
                               type="number"
                               name="superficie"
@@ -421,7 +421,7 @@ const Valoracion = () => {
 
                           {/* Banos */}
                           <div>
-                            <label className="block text-sm font-semibold text-white/80 mb-2">Banos</label>
+                            <label className="block text-sm font-semibold text-white/80 mb-2">Baños</label>
                             <div className="flex flex-wrap gap-2">
                               {OPCIONES_BANOS.map(b => (
                                 <PillButton key={b} label={b} selected={formData.banos === b} onClick={() => handleOptionSelect('banos', b)} />
@@ -449,16 +449,16 @@ const Valoracion = () => {
                               <div key={name}>
                                 <label className="block text-sm font-semibold text-white/80 mb-2">{label}</label>
                                 <div className="flex gap-2">
-                                  <PillButton label="Si" selected={formData[name] === 'Si'} onClick={() => handleOptionSelect(name, 'Si')} />
+                                  <PillButton label="Sí" selected={formData[name] === 'Sí'} onClick={() => handleOptionSelect(name, 'Sí')} />
                                   <PillButton label="No" selected={formData[name] === 'No'} onClick={() => handleOptionSelect(name, 'No')} />
                                 </div>
                               </div>
                             ))}
                           </div>
 
-                          {/* Estado de conservacion */}
+                          {/* Estado de conservación */}
                           <div>
-                            <label className="block text-sm font-semibold text-white/80 mb-2">Estado de conservacion</label>
+                            <label className="block text-sm font-semibold text-white/80 mb-2">Estado de conservación</label>
                             <div className="flex flex-wrap gap-2">
                               {ESTADOS_CONSERVACION.map(e => (
                                 <PillButton key={e} label={e} selected={formData.estadoConservacion === e} onClick={() => handleOptionSelect('estadoConservacion', e)} />
@@ -468,7 +468,7 @@ const Valoracion = () => {
 
                           {/* Ano de construccion */}
                           <div>
-                            <label className="block text-sm font-semibold text-white/80 mb-1">Ano de construccion (aprox.)</label>
+                            <label className="block text-sm font-semibold text-white/80 mb-1">Año de construcción (aprox.)</label>
                             <input
                               type="text"
                               name="anosConstruccion"
@@ -482,7 +482,7 @@ const Valoracion = () => {
 
                           {/* Extras */}
                           <div>
-                            <label className="block text-sm font-semibold text-white/80 mb-2">Extras y caracteristicas</label>
+                            <label className="block text-sm font-semibold text-white/80 mb-2">Extras y características</label>
                             <div className="flex flex-wrap gap-2">
                               {EXTRAS.map(extra => (
                                 <PillButton key={extra} label={extra} selected={formData.extras.includes(extra)} onClick={() => handleExtraToggle(extra)} />
@@ -497,14 +497,14 @@ const Valoracion = () => {
                     {step === 4 && (
                       <motion.div key="step4" variants={slideVariant} initial="enter" animate="center" exit="exit">
                         <h3 className="text-xl font-bold mb-2">Sus datos de contacto</h3>
-                        <p className="text-white/50 text-sm mb-6">Le enviaremos la valoracion a traves de estos medios</p>
+                        <p className="text-white/50 text-sm mb-6">Le enviaremos la valoración a través de estos medios</p>
 
                         {/* Marta's photo + trust message */}
                         <div className="flex items-center gap-4 mb-8 p-4 rounded-2xl bg-white/5 border border-white/10">
-                          <img src="/marta.jpeg" alt="Marta Lopez" className="w-14 h-14 rounded-full object-cover border-2 border-yellow-500/50" />
+                          <img src="/marta.jpeg" alt="Marta López" className="w-14 h-14 rounded-full object-cover border-2 border-yellow-500/50" />
                           <div>
-                            <p className="font-bold text-sm">Marta Lopez</p>
-                            <p className="text-white/50 text-xs">Experta inmobiliaria - Le contactara personalmente con la valoracion de su propiedad</p>
+                            <p className="font-bold text-sm">Marta López</p>
+                            <p className="text-white/50 text-xs">Experta inmobiliaria - Le contactará personalmente con la valoración de su propiedad</p>
                           </div>
                         </div>
 
@@ -522,7 +522,7 @@ const Valoracion = () => {
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-semibold text-white/80 mb-1">Telefono *</label>
+                            <label className="block text-sm font-semibold text-white/80 mb-1">Teléfono *</label>
                             <input
                               type="tel"
                               name="telefono"
@@ -569,9 +569,9 @@ const Valoracion = () => {
                             <span className="text-xs text-white/50 group-hover:text-white/70 transition-colors">
                               Acepto la{' '}
                               <Link href="/politica-privacidad" className="text-yellow-500 underline hover:text-yellow-400" target="_blank">
-                                politica de privacidad
+                                política de privacidad
                               </Link>{' '}
-                              y consiento el tratamiento de mis datos personales para recibir la valoracion solicitada.
+                              y consiento el tratamiento de mis datos personales para recibir la valoración solicitada.
                             </span>
                           </label>
                         </div>
@@ -612,7 +612,7 @@ const Valoracion = () => {
                           </>
                         ) : (
                           <>
-                            Solicitar Valoracion
+                            Solicitar Valoración
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                           </>
                         )}
@@ -630,9 +630,9 @@ const Valoracion = () => {
                 <div className="flex flex-wrap gap-x-6 gap-y-1">
                   {formData.tipoPropiedad && <span>Tipo: <strong className="text-yellow-500">{formData.tipoPropiedad}</strong></span>}
                   {formData.direccion && <span>Dir: <strong className="text-white/80">{formData.direccion}</strong></span>}
-                  {formData.superficie && <span>{formData.superficie} m2</span>}
+                  {formData.superficie && <span>{formData.superficie} m²</span>}
                   {formData.habitaciones && <span>{formData.habitaciones} hab.</span>}
-                  {formData.banos && <span>{formData.banos} banos</span>}
+                  {formData.banos && <span>{formData.banos} baños</span>}
                   {formData.estadoConservacion && <span>{formData.estadoConservacion}</span>}
                 </div>
               </motion.div>
@@ -644,12 +644,12 @@ const Valoracion = () => {
         <section className="py-16 px-4 bg-gradient-to-b from-black to-gray-950">
           <div className="container mx-auto max-w-4xl">
             <motion.div variants={fadeIn} initial="hidden" whileInView="visible" viewport={{ once: true }} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
-              <img src="/marta.jpeg" alt="Marta Lopez - Goza Madrid" className="w-32 h-32 rounded-full object-cover border-4 border-yellow-500/40 shadow-2xl" />
+              <img src="/marta.jpeg" alt="Marta López - Goza Madrid" className="w-32 h-32 rounded-full object-cover border-4 border-yellow-500/40 shadow-2xl" />
               <div className="text-center md:text-left">
-                <h3 className="text-2xl font-bold mb-2">Marta Lopez</h3>
+                <h3 className="text-2xl font-bold mb-2">Marta López</h3>
                 <p className="text-yellow-500 font-semibold mb-3">Directora Comercial - Goza Madrid</p>
                 <p className="text-white/60 mb-5 max-w-lg">
-                  Con amplia experiencia en el sector inmobiliario de Madrid, Marta le atendera personalmente para proporcionarle una valoracion precisa y asesoramiento profesional sobre la venta de su propiedad.
+                  Con amplia experiencia en el sector inmobiliario de Madrid, Marta le atenderá personalmente para proporcionarle una valoración precisa y asesoramiento profesional sobre la venta de su propiedad.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
                   <a href="tel:+34608136529" className="flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-500 to-yellow-700 text-black px-5 py-2.5 rounded-full font-bold text-sm shadow-lg hover:from-yellow-600 hover:to-yellow-800 transition-all duration-300">
@@ -680,17 +680,17 @@ const Valoracion = () => {
                   </div>
                 </Link>
                 <p className="text-sm text-white max-w-md leading-relaxed mt-4">
-                  Expertos en valoracion y venta de propiedades en Madrid. Asesoramiento personalizado y profesional para maximizar el valor de su inmueble.
+                  Expertos en valoración y venta de propiedades en Madrid. Asesoramiento personalizado y profesional para maximizar el valor de su inmueble.
                 </p>
               </div>
               <div className="text-center md:text-right">
                 <a href="#formulario" className="inline-block mb-6 bg-gradient-to-r from-yellow-500 to-yellow-700 text-black font-bold px-6 py-3 rounded-full hover:from-yellow-600 hover:to-yellow-800 transition-all duration-300 shadow-lg transform hover:scale-105">
-                  Solicitar Valoracion Gratuita
+                  Solicitar Valoración Gratuita
                 </a>
                 <div className="flex flex-wrap justify-center md:justify-end gap-4 mb-4">
                   <Link href="/aviso-legal" className="text-sm text-white hover:text-gray-400 transition-colors">Aviso Legal</Link>
-                  <Link href="/politica-privacidad" className="text-sm text-white hover:text-gray-400 transition-colors">Politica de Privacidad</Link>
-                  <Link href="/politica-cookies" className="text-sm text-white hover:text-gray-400 transition-colors">Politica de Cookies</Link>
+                  <Link href="/politica-privacidad" className="text-sm text-white hover:text-gray-400 transition-colors">Política de Privacidad</Link>
+                  <Link href="/politica-cookies" className="text-sm text-white hover:text-gray-400 transition-colors">Política de Cookies</Link>
                 </div>
                 <p className="text-xs text-white">&copy; {new Date().getFullYear()} Real Estate Goza Madrid. Todos los derechos reservados.</p>
               </div>

@@ -4,7 +4,7 @@ import Contact from '../../models/Contact';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Metodo no permitido' });
+    return res.status(405).json({ error: 'Método no permitido' });
   }
 
   try {
@@ -12,7 +12,7 @@ export default async function handler(req, res) {
 
     // Validacion basica
     if (!nombre || !telefono || !email) {
-      return res.status(400).json({ error: 'Faltan campos requeridos (nombre, telefono, email)' });
+      return res.status(400).json({ error: 'Faltan campos requeridos (nombre, teléfono, email)' });
     }
 
     // Configurar transporte de nodemailer
@@ -36,15 +36,15 @@ export default async function handler(req, res) {
     const mailOptions = {
       from: `"Landing Locales en Venta" <${emailUser}>`,
       to: 'marta@gozamadrid.com',
-      subject: `[LOCALES] Nueva consulta de ${nombre} - ${localInteres || 'Informacion general'}`,
+      subject: `[LOCALES] Nueva consulta de ${nombre} - ${localInteres || 'Información general'}`,
       text: `
 NUEVA CONSULTA SOBRE LOCALES EN VENTA
 ======================================
 
 Nombre: ${nombre}
-Telefono: ${telefono}
+Teléfono: ${telefono}
 Email: ${email}
-Local de interes: ${localInteres || 'No especificado'}
+Local de interés: ${localInteres || 'No especificado'}
 
 Mensaje:
 ${mensaje || 'No hay mensaje adicional'}
@@ -68,7 +68,7 @@ Este email ha sido enviado desde la landing page de Locales en Venta.
                 <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0; color: #555;">${nombre}</td>
               </tr>
               <tr>
-                <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0; font-weight: bold; color: #333;">Telefono:</td>
+                <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0; font-weight: bold; color: #333;">Teléfono:</td>
                 <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0;">
                   <a href="tel:${telefono}" style="color: #C7A336; text-decoration: none; font-weight: bold;">${telefono}</a>
                 </td>
@@ -80,7 +80,7 @@ Este email ha sido enviado desde la landing page de Locales en Venta.
                 </td>
               </tr>
               <tr>
-                <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0; font-weight: bold; color: #333;">Local de interes:</td>
+                <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0; font-weight: bold; color: #333;">Local de interés:</td>
                 <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0;">
                   <span style="background: #FEF3C7; color: #92400E; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 13px;">${localInteres || 'No especificado'}</span>
                 </td>
@@ -95,7 +95,7 @@ Este email ha sido enviado desde la landing page de Locales en Venta.
           
           <div style="background: #f8f8f8; padding: 15px 30px; border-radius: 0 0 12px 12px; border: 1px solid #eee; border-top: none;">
             <p style="margin: 0; font-size: 12px; color: #999; text-align: center;">
-              Este email ha sido enviado automaticamente desde la landing page de Locales en Venta de Goza Madrid.
+              Este email ha sido enviado automáticamente desde la landing page de Locales en Venta de Goza Madrid.
             </p>
           </div>
         </div>

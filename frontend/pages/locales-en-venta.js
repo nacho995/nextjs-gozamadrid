@@ -55,7 +55,7 @@ function getImagen(nombre, index) {
 
 // ─── CATEGORIAS ─────────────────────────────────────────────────────────────
 const CATEGORIAS = {
-  HOSTELERIA_ALQUILER: 'Hosteleria en Alquiler',
+  HOSTELERIA_ALQUILER: 'Hostelería en Alquiler',
   COMERCIAL_ALQUILER: 'Comercial en Alquiler',
   VENTA_SIN_RENTABILIDAD: 'Venta sin Rentabilidad',
   VENTA_CON_RENTABILIDAD: 'Venta con Rentabilidad',
@@ -67,47 +67,47 @@ const todosLosLocales = [
   // HOSTELERIA EN ALQUILER
   // ═══════════════════════════════════════════════════════════════════════════
   { id: 'ha-1', nombre: 'Restaurante | Chamberi', direccion: 'Francisco de Sales 17, Chamberi, Madrid', zona: 'Chamberi', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '256 m2', traspaso: '250.000', alquiler: '3.500', precio: null, rentabilidad: null },
-  { id: 'ha-2', nombre: 'Restaurante | Chamartin', direccion: 'Costa Rica 15, Chamartin, Madrid', zona: 'Chamartin', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '280 m2', traspaso: '170.000', alquiler: '7.700', precio: null, rentabilidad: null },
-  { id: 'ha-3', nombre: 'Cafeteria-Meson Degustacion | Malasana', direccion: 'Corredera Baja de San Pablo 47, Malasana, Madrid', zona: 'Malasana', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '80 m2', traspaso: '60.000', alquiler: '3.000', precio: null, rentabilidad: null },
+  { id: 'ha-2', nombre: 'Restaurante | Chamartín', direccion: 'Costa Rica 15, Chamartín, Madrid', zona: 'Chamartín', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '280 m2', traspaso: '170.000', alquiler: '7.700', precio: null, rentabilidad: null },
+  { id: 'ha-3', nombre: 'Cafetería-Mesón Degustación | Malasaña', direccion: 'Corredera Baja de San Pablo 47, Malasaña, Madrid', zona: 'Malasaña', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '80 m2', traspaso: '60.000', alquiler: '3.000', precio: null, rentabilidad: null },
   { id: 'ha-4', nombre: 'Restaurante | Centro', direccion: 'Calle Mayor 73, Centro, Madrid', zona: 'Centro', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '320 m2', traspaso: null, alquiler: '9.500', precio: null, rentabilidad: null },
   { id: 'ha-5', nombre: 'Restaurante | Chamberi', direccion: 'Calle Sandoval 16, Chamberi, Madrid', zona: 'Chamberi', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '450 m2', traspaso: '150.000', alquiler: '7.400', precio: null, rentabilidad: null },
   { id: 'ha-6', nombre: 'Restaurante | Chueca', direccion: 'Calle Hortaleza 52, Chueca, Madrid', zona: 'Chueca', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '281 m2', traspaso: null, alquiler: '13.900', precio: null, rentabilidad: null },
-  { id: 'ha-7', nombre: 'Cafeteria-Comercio | La Latina', direccion: 'Calle San Millan 2, La Latina, Madrid', zona: 'La Latina', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '65 m2', traspaso: null, alquiler: '4.100', precio: null, rentabilidad: null },
-  { id: 'ha-8', nombre: 'Restaurante | Chamartin', direccion: 'Plaza de Valparaiso 3, Chamartin, Madrid', zona: 'Chamartin', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '190 m2', traspaso: '120.000', alquiler: '4.600', precio: null, rentabilidad: null },
+  { id: 'ha-7', nombre: 'Cafetería-Comercio | La Latina', direccion: 'Calle San Millan 2, La Latina, Madrid', zona: 'La Latina', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '65 m2', traspaso: null, alquiler: '4.100', precio: null, rentabilidad: null },
+  { id: 'ha-8', nombre: 'Restaurante | Chamartín', direccion: 'Plaza de Valparaiso 3, Chamartín, Madrid', zona: 'Chamartín', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '190 m2', traspaso: '120.000', alquiler: '4.600', precio: null, rentabilidad: null },
   { id: 'ha-9', nombre: 'Restaurante | Chueca', direccion: 'Calle Barbieri 6, Chueca, Madrid', zona: 'Chueca', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '300 m2', traspaso: null, alquiler: '14.000', precio: null, rentabilidad: null },
-  { id: 'ha-10', nombre: 'Restaurante | Chamartin', direccion: 'Corazon de Maria 48, Chamartin, Madrid', zona: 'Chamartin', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '378 m2', traspaso: null, alquiler: '4.000 - 8.000', precio: null, rentabilidad: null },
+  { id: 'ha-10', nombre: 'Restaurante | Chamartín', direccion: 'Corazón de María 48, Chamartín, Madrid', zona: 'Chamartín', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '378 m2', traspaso: null, alquiler: '4.000 - 8.000', precio: null, rentabilidad: null },
   { id: 'ha-11', nombre: 'Restaurante | Centro', direccion: 'Ribera Curtidores 43, Centro, Madrid', zona: 'Centro', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '130 m2', traspaso: '120.000', alquiler: '4.100', precio: null, rentabilidad: null },
-  { id: 'ha-12', nombre: 'Cafeteria | Barrio Salamanca', direccion: 'Lopez de Hoyos 10, Barrio Salamanca, Madrid', zona: 'Salamanca', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '120 m2', traspaso: null, alquiler: '6.900', precio: null, rentabilidad: null },
-  { id: 'ha-13', nombre: 'Restaurante | Chamartin', direccion: 'Doctor Fleming 43, Chamartin, Madrid', zona: 'Chamartin', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '300 m2', traspaso: null, alquiler: '8.000', precio: null, rentabilidad: null },
+  { id: 'ha-12', nombre: 'Cafetería | Barrio Salamanca', direccion: 'López de Hoyos 10, Barrio Salamanca, Madrid', zona: 'Salamanca', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '120 m2', traspaso: null, alquiler: '6.900', precio: null, rentabilidad: null },
+  { id: 'ha-13', nombre: 'Restaurante | Chamartín', direccion: 'Doctor Fleming 43, Chamartín, Madrid', zona: 'Chamartín', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '300 m2', traspaso: null, alquiler: '8.000', precio: null, rentabilidad: null },
   { id: 'ha-14', nombre: 'Restaurante | Cuzco', direccion: 'Calle Pensamiento 28, Cuzco, Madrid', zona: 'Cuzco', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '220 m2', traspaso: null, alquiler: '9.000', precio: null, rentabilidad: null },
   { id: 'ha-15', nombre: 'Restaurante | Arganzuela', direccion: 'Mercado Guillermo de Osma, Arganzuela, Madrid', zona: 'Arganzuela', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '40 m2', traspaso: '50.000', alquiler: '1.500', precio: null, rentabilidad: null },
-  { id: 'ha-16', nombre: 'Restaurante | Torrejon de Ardoz', direccion: 'Centro Comercial OASIZ, Torrejon de Ardoz, Madrid', zona: 'Torrejon', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '120 m2', traspaso: '140.000', alquiler: '5.000', precio: null, rentabilidad: null },
+  { id: 'ha-16', nombre: 'Restaurante | Torrejón de Ardoz', direccion: 'Centro Comercial OASIZ, Torrejón de Ardoz, Madrid', zona: 'Torrejón', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '120 m2', traspaso: '140.000', alquiler: '5.000', precio: null, rentabilidad: null },
   { id: 'ha-17', nombre: 'Restaurante | Montecarmelo', direccion: 'Monasterio del Escorial 26, Montecarmelo, Madrid', zona: 'Montecarmelo', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '110 m2', traspaso: '50.000', alquiler: '3.000', precio: null, rentabilidad: null },
   { id: 'ha-18', nombre: 'Restaurante | Castellana', direccion: 'Poeta Joan Maragall 16, Castellana, Madrid', zona: 'Castellana', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '200 m2', traspaso: '180.000', alquiler: '6.000', precio: null, rentabilidad: null },
-  { id: 'ha-19', nombre: 'Restaurante | Tetuan', direccion: 'Bravo Murillo 238, Tetuan, Madrid', zona: 'Tetuan', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '130 m2', traspaso: '90.000', alquiler: '4.000', precio: null, rentabilidad: null },
+  { id: 'ha-19', nombre: 'Restaurante | Tetuán', direccion: 'Bravo Murillo 238, Tetuán, Madrid', zona: 'Tetuán', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '130 m2', traspaso: '90.000', alquiler: '4.000', precio: null, rentabilidad: null },
   { id: 'ha-20', nombre: 'Restaurante-Discoteca | Alcobendas', direccion: 'Av. Olimpica, Alcobendas-La Moraleja', zona: 'Alcobendas', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '3.000 m2', traspaso: '1.500.000', alquiler: '9.000', precio: null, rentabilidad: null },
   { id: 'ha-21', nombre: 'Restaurante | Centro', direccion: 'Calle Hortaleza 72, Centro, Madrid', zona: 'Centro', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '90 m2', traspaso: '140.000', alquiler: '4.250', precio: null, rentabilidad: null },
   { id: 'ha-22', nombre: 'Restaurante | Retiro', direccion: 'Calle Jorge Juan 50, Retiro, Madrid', zona: 'Retiro', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '240 m2', traspaso: '490.000', alquiler: '9.000', precio: null, rentabilidad: null },
-  { id: 'ha-23', nombre: 'Restaurante | Tetuan', direccion: 'Av. Brasil 28, Tetuan, Madrid', zona: 'Tetuan', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '300 m2', traspaso: '120.000', alquiler: '4.200', precio: null, rentabilidad: null },
+  { id: 'ha-23', nombre: 'Restaurante | Tetuán', direccion: 'Av. Brasil 28, Tetuán, Madrid', zona: 'Tetuán', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '300 m2', traspaso: '120.000', alquiler: '4.200', precio: null, rentabilidad: null },
   { id: 'ha-24', nombre: 'Restaurante | San Fernando de Henares', direccion: 'P. Empresarial KUDOS, San Fernando Henares, Madrid', zona: 'San Fernando', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '180 m2', traspaso: '50.000', alquiler: '3.000', precio: null, rentabilidad: null },
   { id: 'ha-25', nombre: 'Restaurante | Moncloa', direccion: 'Calle Quintana 30, Moncloa, Madrid', zona: 'Moncloa', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '200 m2', traspaso: '180.000', alquiler: '5.800', precio: null, rentabilidad: null },
-  { id: 'ha-26', nombre: 'Restaurante | San Sebastian de los Reyes', direccion: 'Calle Teide 4, San Sebastian de los Reyes, Madrid', zona: 'SS Reyes', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '356 m2', traspaso: '170.000', alquiler: '3.500', precio: null, rentabilidad: null },
+  { id: 'ha-26', nombre: 'Restaurante | San Sebastián de los Reyes', direccion: 'Calle Teide 4, San Sebastián de los Reyes, Madrid', zona: 'SS Reyes', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '356 m2', traspaso: '170.000', alquiler: '3.500', precio: null, rentabilidad: null },
   { id: 'ha-27', nombre: 'Restaurante-Bar de Copas | Ciudad Lineal', direccion: 'Calle Alcala 259, Ciudad Lineal, Madrid', zona: 'Ciudad Lineal', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '440 m2', traspaso: '290.000', alquiler: '6.500', precio: null, rentabilidad: null },
   { id: 'ha-28', nombre: 'Restaurante | Montecarmelo', direccion: 'Santuario de Valverde 2, Montecarmelo, Madrid', zona: 'Montecarmelo', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '170 m2', traspaso: null, alquiler: '6.500', precio: null, rentabilidad: null },
   { id: 'ha-29', nombre: 'Bar-Taberna | Guindalera', direccion: 'Calle de Azcona 66, Guindalera, Madrid', zona: 'Guindalera', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '80 m2', traspaso: 'Negociable', alquiler: '1.600', precio: null, rentabilidad: null },
-  { id: 'ha-30', nombre: 'Shisha Lounge Bar | Torrejon de Ardoz', direccion: 'Calle Asturias 22, Torrejon de Ardoz, Madrid', zona: 'Torrejon', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '150 m2', traspaso: '90.000', alquiler: '1.300', precio: null, rentabilidad: null },
-  { id: 'ha-31', nombre: 'Bar-Cafeteria | Cava Baja, La Latina', direccion: 'Cava Baja 24, La Latina, Madrid', zona: 'La Latina', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '130 m2', traspaso: '100.000', alquiler: '4.000', precio: null, rentabilidad: null },
+  { id: 'ha-30', nombre: 'Shisha Lounge Bar | Torrejón de Ardoz', direccion: 'Calle Asturias 22, Torrejón de Ardoz, Madrid', zona: 'Torrejón', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '150 m2', traspaso: '90.000', alquiler: '1.300', precio: null, rentabilidad: null },
+  { id: 'ha-31', nombre: 'Bar-Cafetería | Cava Baja, La Latina', direccion: 'Cava Baja 24, La Latina, Madrid', zona: 'La Latina', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '130 m2', traspaso: '100.000', alquiler: '4.000', precio: null, rentabilidad: null },
   { id: 'ha-32', nombre: 'Restaurante | Chamberi', direccion: 'Santa Engracia 70, Chamberi, Madrid', zona: 'Chamberi', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '270 m2', traspaso: '270.000', alquiler: '12.000', precio: null, rentabilidad: null },
   { id: 'ha-33', nombre: 'Restaurante | Mercado Ibiza', direccion: 'Mercado Municipal Ibiza, Calle Ibiza 8, Madrid', zona: 'Retiro', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '30 m2', traspaso: '30.000', alquiler: '430', precio: null, rentabilidad: null },
   { id: 'ha-34', nombre: 'Restaurante | Alcobendas', direccion: 'La Granja 9, Alcobendas', zona: 'Alcobendas', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '600 m2', traspaso: '70.000', alquiler: '4.300', precio: null, rentabilidad: null },
   { id: 'ha-35', nombre: 'Restaurante | Montecarmelo', direccion: 'Monasterio del Escorial 30, Montecarmelo, Madrid', zona: 'Montecarmelo', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '170 m2', traspaso: '100.000', alquiler: '3.600', precio: null, rentabilidad: null },
-  { id: 'ha-36', nombre: 'Cafeteria | Chamartin', direccion: 'Carlos Maurras 4, Chamartin, Madrid', zona: 'Chamartin', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '140 m2', traspaso: '55.000', alquiler: '4.300', precio: null, rentabilidad: null },
-  { id: 'ha-37', nombre: 'Bar Cafeteria | Arguelles', direccion: 'Pintor Rosales 36, Arguelles, Madrid', zona: 'Arguelles', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '260 m2', traspaso: '245.000', alquiler: '5.700', precio: null, rentabilidad: null },
-  { id: 'ha-38', nombre: 'Bar-Cafeteria | El Pardo', direccion: 'Calle Carboneros 4, El Pardo, Madrid', zona: 'El Pardo', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '67 m2', traspaso: '60.000', alquiler: '60', precio: null, rentabilidad: null },
-  { id: 'ha-39', nombre: 'Restaurante | Malasana', direccion: 'Corredera Baja San Pablo 17, Malasana, Madrid', zona: 'Malasana', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '240 m2', traspaso: '160.000', alquiler: '3.500', precio: null, rentabilidad: null },
+  { id: 'ha-36', nombre: 'Cafetería | Chamartín', direccion: 'Carlos Maurras 4, Chamartín, Madrid', zona: 'Chamartín', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '140 m2', traspaso: '55.000', alquiler: '4.300', precio: null, rentabilidad: null },
+  { id: 'ha-37', nombre: 'Bar Cafetería | Argüelles', direccion: 'Pintor Rosales 36, Argüelles, Madrid', zona: 'Argüelles', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '260 m2', traspaso: '245.000', alquiler: '5.700', precio: null, rentabilidad: null },
+  { id: 'ha-38', nombre: 'Bar-Cafetería | El Pardo', direccion: 'Calle Carboneros 4, El Pardo, Madrid', zona: 'El Pardo', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '67 m2', traspaso: '60.000', alquiler: '60', precio: null, rentabilidad: null },
+  { id: 'ha-39', nombre: 'Restaurante | Malasaña', direccion: 'Corredera Baja San Pablo 17, Malasaña, Madrid', zona: 'Malasaña', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '240 m2', traspaso: '160.000', alquiler: '3.500', precio: null, rentabilidad: null },
   { id: 'ha-40', nombre: 'Restaurante | Chueca', direccion: 'Calle Pelayo 2, Chueca, Madrid', zona: 'Chueca', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '55 m2', traspaso: '100.000', alquiler: '2.300', precio: null, rentabilidad: null },
-  { id: 'ha-41', nombre: 'Restaurante | Tetuan', direccion: 'Rosario Pino 14, Tetuan, Madrid', zona: 'Tetuan', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '730 m2', traspaso: null, alquiler: '26.000', precio: null, rentabilidad: null },
-  { id: 'ha-42', nombre: 'Restaurante | Malasana', direccion: 'Conde Duque 3, Malasana, Madrid', zona: 'Malasana', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '170 m2', traspaso: '250.000', alquiler: '5.000', precio: null, rentabilidad: null },
+  { id: 'ha-41', nombre: 'Restaurante | Tetuán', direccion: 'Rosario Pino 14, Tetuán, Madrid', zona: 'Tetuán', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '730 m2', traspaso: null, alquiler: '26.000', precio: null, rentabilidad: null },
+  { id: 'ha-42', nombre: 'Restaurante | Malasaña', direccion: 'Conde Duque 3, Malasaña, Madrid', zona: 'Malasaña', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '170 m2', traspaso: '250.000', alquiler: '5.000', precio: null, rentabilidad: null },
   { id: 'ha-43', nombre: 'Restaurante | Centro', direccion: 'Plaza Puerta Cerrada 3, Centro, Madrid', zona: 'Centro', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '120 m2', traspaso: '100.000', alquiler: '4.000', precio: null, rentabilidad: null },
   { id: 'ha-44', nombre: 'Restaurante | Chamberi', direccion: 'Alberto Aguilera 6, Chamberi, Madrid', zona: 'Chamberi', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '180 m2', traspaso: '170.000', alquiler: '3.300', precio: null, rentabilidad: null },
   { id: 'ha-45', nombre: 'Restaurante | Arganzuela', direccion: 'Paseo Los Olmos 8, Arganzuela, Madrid', zona: 'Arganzuela', categoria: CATEGORIAS.HOSTELERIA_ALQUILER, superficie: '350 m2', traspaso: 'A convenir', alquiler: '7.500', precio: null, rentabilidad: null },
@@ -119,27 +119,27 @@ const todosLosLocales = [
   // ═══════════════════════════════════════════════════════════════════════════
   { id: 'ca-1', nombre: 'Local Comercial | Retiro', direccion: 'Paseo de la Reina Cristina 18, Retiro, Madrid', zona: 'Retiro', categoria: CATEGORIAS.COMERCIAL_ALQUILER, superficie: '108 m2', traspaso: null, alquiler: '2.900', precio: null, rentabilidad: null },
   { id: 'ca-2', nombre: 'Local Comercial | Centro', direccion: 'Calle Carretas 29, Centro, Madrid', zona: 'Centro', categoria: CATEGORIAS.COMERCIAL_ALQUILER, superficie: '85 m2', traspaso: null, alquiler: '9.900', precio: null, rentabilidad: null },
-  { id: 'ca-3', nombre: 'Local Comercial | Lavapies', direccion: 'Calvario 15, Lavapies, Madrid', zona: 'Lavapies', categoria: CATEGORIAS.COMERCIAL_ALQUILER, superficie: '70 m2', traspaso: null, alquiler: '1.650', precio: null, rentabilidad: null },
-  { id: 'ca-4', nombre: 'Local Comercial | Malasana', direccion: 'Calle La Palma 39, Malasana, Madrid', zona: 'Malasana', categoria: CATEGORIAS.COMERCIAL_ALQUILER, superficie: '70 m2', traspaso: null, alquiler: '3.200', precio: null, rentabilidad: null },
-  { id: 'ca-5', nombre: 'Pasteleria | Retiro', direccion: 'Narvaez 72, Retiro, Madrid', zona: 'Retiro', categoria: CATEGORIAS.COMERCIAL_ALQUILER, superficie: '30 m2', traspaso: null, alquiler: '2.700', precio: null, rentabilidad: null },
-  { id: 'ca-6', nombre: 'Local Comercial | Chamartin', direccion: 'Alberto Alcocer 48, Chamartin, Madrid', zona: 'Chamartin', categoria: CATEGORIAS.COMERCIAL_ALQUILER, superficie: '400 m2', traspaso: null, alquiler: '8.200', precio: null, rentabilidad: null },
+  { id: 'ca-3', nombre: 'Local Comercial | Lavapiés', direccion: 'Calvario 15, Lavapiés, Madrid', zona: 'Lavapiés', categoria: CATEGORIAS.COMERCIAL_ALQUILER, superficie: '70 m2', traspaso: null, alquiler: '1.650', precio: null, rentabilidad: null },
+  { id: 'ca-4', nombre: 'Local Comercial | Malasaña', direccion: 'Calle La Palma 39, Malasaña, Madrid', zona: 'Malasaña', categoria: CATEGORIAS.COMERCIAL_ALQUILER, superficie: '70 m2', traspaso: null, alquiler: '3.200', precio: null, rentabilidad: null },
+  { id: 'ca-5', nombre: 'Pastelería | Retiro', direccion: 'Narváez 72, Retiro, Madrid', zona: 'Retiro', categoria: CATEGORIAS.COMERCIAL_ALQUILER, superficie: '30 m2', traspaso: null, alquiler: '2.700', precio: null, rentabilidad: null },
+  { id: 'ca-6', nombre: 'Local Comercial | Chamartín', direccion: 'Alberto Alcocer 48, Chamartín, Madrid', zona: 'Chamartín', categoria: CATEGORIAS.COMERCIAL_ALQUILER, superficie: '400 m2', traspaso: null, alquiler: '8.200', precio: null, rentabilidad: null },
   { id: 'ca-7', nombre: 'Local Comercial | La Latina', direccion: 'Calle Toledo 58, La Latina, Madrid', zona: 'La Latina', categoria: CATEGORIAS.COMERCIAL_ALQUILER, superficie: '380 m2', traspaso: null, alquiler: '8.000', precio: null, rentabilidad: null },
-  { id: 'ca-8', nombre: 'Obrador-Pasteleria | Vallecas', direccion: 'Sierra Vieja 56, Vallecas, Madrid', zona: 'Vallecas', categoria: CATEGORIAS.COMERCIAL_ALQUILER, superficie: '90 m2', traspaso: '45.000', alquiler: '500', precio: null, rentabilidad: null },
+  { id: 'ca-8', nombre: 'Obrador-Pastelería | Vallecas', direccion: 'Sierra Vieja 56, Vallecas, Madrid', zona: 'Vallecas', categoria: CATEGORIAS.COMERCIAL_ALQUILER, superficie: '90 m2', traspaso: '45.000', alquiler: '500', precio: null, rentabilidad: null },
   { id: 'ca-9', nombre: 'Local Comercial | Pza. Carlos V', direccion: 'Plaza Emperador Carlos V, Centro, Madrid', zona: 'Centro', categoria: CATEGORIAS.COMERCIAL_ALQUILER, superficie: '500 m2', traspaso: null, alquiler: '37.000', precio: null, rentabilidad: null },
   { id: 'ca-10', nombre: 'Local Comercial | O\'Donnell', direccion: 'Calle O\'Donnell 34, Retiro, Madrid', zona: 'Retiro', categoria: CATEGORIAS.COMERCIAL_ALQUILER, superficie: '40 m2', traspaso: null, alquiler: '2.300', precio: null, rentabilidad: null },
 
   // ═══════════════════════════════════════════════════════════════════════════
   // VENTA SIN RENTABILIDAD
   // ═══════════════════════════════════════════════════════════════════════════
-  { id: 'vs-1', nombre: 'Piso | Barrio Salamanca', direccion: 'Calle Maldonado 55, Madrid', zona: 'Salamanca', categoria: CATEGORIAS.VENTA_SIN_RENTABILIDAD, superficie: '102 m2 (85 utiles)', traspaso: null, alquiler: null, precio: 'Consultar', rentabilidad: null },
+  { id: 'vs-1', nombre: 'Piso | Barrio Salamanca', direccion: 'Calle Maldonado 55, Madrid', zona: 'Salamanca', categoria: CATEGORIAS.VENTA_SIN_RENTABILIDAD, superficie: '102 m2 (85 útiles)', traspaso: null, alquiler: null, precio: 'Consultar', rentabilidad: null },
   { id: 'vs-2', nombre: 'Hotel El Campello | Alicante', direccion: 'El Campello, Alicante', zona: 'Alicante', categoria: CATEGORIAS.VENTA_SIN_RENTABILIDAD, superficie: '745 m2', traspaso: null, alquiler: null, precio: '1.280.000', rentabilidad: null },
   { id: 'vs-3', nombre: 'Hostal en reforma | Centro', direccion: 'Calle Los Jardines 8, Centro, Madrid', zona: 'Centro', categoria: CATEGORIAS.VENTA_SIN_RENTABILIDAD, superficie: '338 m2', traspaso: null, alquiler: null, precio: '850.000', rentabilidad: null },
   { id: 'vs-4', nombre: 'Restaurante | Ventas', direccion: 'Calle Albacete 2, Ventas, Madrid', zona: 'Ventas', categoria: CATEGORIAS.VENTA_SIN_RENTABILIDAD, superficie: '200 m2', traspaso: null, alquiler: null, precio: '750.000', rentabilidad: null },
   { id: 'vs-5', nombre: 'Edificio Empresarial | San Fernando de Henares', direccion: 'Sierra de Guadarrama 2, San Fernando de Henares, Madrid', zona: 'San Fernando', categoria: CATEGORIAS.VENTA_SIN_RENTABILIDAD, superficie: '2.377 m2 (parcela 4.744 m2)', traspaso: null, alquiler: null, precio: '3.650.000', rentabilidad: null },
-  { id: 'vs-6', nombre: 'Restaurante | Tetuan', direccion: 'Calle Orense 39, Tetuan, Madrid', zona: 'Tetuan', categoria: CATEGORIAS.VENTA_SIN_RENTABILIDAD, superficie: '1.250 m2', traspaso: null, alquiler: null, precio: '2.200.000', rentabilidad: null },
+  { id: 'vs-6', nombre: 'Restaurante | Tetuán', direccion: 'Calle Orense 39, Tetuán, Madrid', zona: 'Tetuán', categoria: CATEGORIAS.VENTA_SIN_RENTABILIDAD, superficie: '1.250 m2', traspaso: null, alquiler: null, precio: '2.200.000', rentabilidad: null },
   { id: 'vs-7', nombre: 'Local Comercial | Barrio Salamanca', direccion: 'Calle Padilla 4, Barrio Salamanca, Madrid', zona: 'Salamanca', categoria: CATEGORIAS.VENTA_SIN_RENTABILIDAD, superficie: '190 m2', traspaso: null, alquiler: null, precio: '1.950.000', rentabilidad: null },
   { id: 'vs-8', nombre: 'Restaurante | Centro', direccion: 'Calle Ballesta 18, Centro, Madrid', zona: 'Centro', categoria: CATEGORIAS.VENTA_SIN_RENTABILIDAD, superficie: '200 m2', traspaso: null, alquiler: null, precio: '900.000', rentabilidad: null },
-  { id: 'vs-9', nombre: 'Restaurante | Pozuelo', direccion: 'Via de las Dos Castillas 6, Pozuelo de Alarcon, Madrid', zona: 'Pozuelo', categoria: CATEGORIAS.VENTA_SIN_RENTABILIDAD, superficie: '1.200 m2 + 200 m2 terraza', traspaso: null, alquiler: null, precio: '5.000.000', rentabilidad: null },
+  { id: 'vs-9', nombre: 'Restaurante | Pozuelo', direccion: 'Via de las Dos Castillas 6, Pozuelo de Alarcón, Madrid', zona: 'Pozuelo', categoria: CATEGORIAS.VENTA_SIN_RENTABILIDAD, superficie: '1.200 m2 + 200 m2 terraza', traspaso: null, alquiler: null, precio: '5.000.000', rentabilidad: null },
   { id: 'vs-10', nombre: 'Edificio Comercial | Centro', direccion: 'Calle Carretas 6, Centro, Madrid', zona: 'Centro', categoria: CATEGORIAS.VENTA_SIN_RENTABILIDAD, superficie: '2.453 m2', traspaso: null, alquiler: null, precio: '34.606.000', rentabilidad: null },
   { id: 'vs-11', nombre: 'Restaurante | Prosperidad', direccion: 'Calle Pechuan 6, Prosperidad, Madrid', zona: 'Prosperidad', categoria: CATEGORIAS.VENTA_SIN_RENTABILIDAD, superficie: '144 m2', traspaso: null, alquiler: null, precio: '580.000', rentabilidad: null },
   { id: 'vs-12', nombre: 'Suelo Comercial-Industrial | Ponferrada', direccion: 'Calle Canal 17, Columbrianos, Ponferrada', zona: 'Ponferrada', categoria: CATEGORIAS.VENTA_SIN_RENTABILIDAD, superficie: '3.022 m2', traspaso: null, alquiler: null, precio: '900.000', rentabilidad: null },
@@ -149,27 +149,27 @@ const todosLosLocales = [
   // VENTA CON RENTABILIDAD
   // ═══════════════════════════════════════════════════════════════════════════
   { id: 'vr-1', nombre: 'Restaurante | Delicias', direccion: 'Calle Embajadores 165, Centro, Madrid', zona: 'Centro', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '60 m2', traspaso: null, alquiler: '3.000', precio: '550.000', rentabilidad: '6,30%' },
-  { id: 'vr-2', nombre: 'Cafe-Espectaculo | Barrio de las Letras', direccion: 'Calle Huertas 35, Barrio de las Letras, Madrid', zona: 'Centro', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '227 m2', traspaso: null, alquiler: '8.200', precio: '2.010.000', rentabilidad: '4,90%' },
-  { id: 'vr-3', nombre: 'Panaderia | Barrio Salamanca', direccion: 'Calle Diego de Leon 40, Barrio Salamanca, Madrid', zona: 'Salamanca', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '120 m2', traspaso: null, alquiler: '5.530', precio: '1.160.000', rentabilidad: '5,50%' },
+  { id: 'vr-2', nombre: 'Café-Espectáculo | Barrio de las Letras', direccion: 'Calle Huertas 35, Barrio de las Letras, Madrid', zona: 'Centro', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '227 m2', traspaso: null, alquiler: '8.200', precio: '2.010.000', rentabilidad: '4,90%' },
+  { id: 'vr-3', nombre: 'Panadería | Barrio Salamanca', direccion: 'Calle Diego de León 40, Barrio Salamanca, Madrid', zona: 'Salamanca', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '120 m2', traspaso: null, alquiler: '5.530', precio: '1.160.000', rentabilidad: '5,50%' },
   { id: 'vr-4', nombre: 'Restaurante | Centro', direccion: 'Calle Mayor 76, Centro, Madrid', zona: 'Centro', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '200 m2', traspaso: null, alquiler: '8.900', precio: '1.900.000', rentabilidad: '5,50%' },
-  { id: 'vr-5', nombre: 'Restaurante | Chamartin', direccion: 'Calle Costa Rica 20, Chamartin, Madrid', zona: 'Chamartin', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '65 m2', traspaso: null, alquiler: '3.500', precio: '822.000', rentabilidad: '5,00%' },
-  { id: 'vr-6', nombre: 'Restaurante | Tetuan', direccion: 'Pintor Juan Gris 5, Tetuan, Madrid', zona: 'Tetuan', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: null, traspaso: null, alquiler: '2.350', precio: '564.000', rentabilidad: '5,00%' },
-  { id: 'vr-7', nombre: 'Hosteleria | Retiro', direccion: 'Calle Narvaez 72, Retiro, Madrid', zona: 'Retiro', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '28 m2', traspaso: null, alquiler: '2.750', precio: '653.000', rentabilidad: '5,00%' },
+  { id: 'vr-5', nombre: 'Restaurante | Chamartín', direccion: 'Calle Costa Rica 20, Chamartín, Madrid', zona: 'Chamartín', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '65 m2', traspaso: null, alquiler: '3.500', precio: '822.000', rentabilidad: '5,00%' },
+  { id: 'vr-6', nombre: 'Restaurante | Tetuán', direccion: 'Pintor Juan Gris 5, Tetuán, Madrid', zona: 'Tetuán', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: null, traspaso: null, alquiler: '2.350', precio: '564.000', rentabilidad: '5,00%' },
+  { id: 'vr-7', nombre: 'Hostelería | Retiro', direccion: 'Calle Narváez 72, Retiro, Madrid', zona: 'Retiro', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '28 m2', traspaso: null, alquiler: '2.750', precio: '653.000', rentabilidad: '5,00%' },
   { id: 'vr-8', nombre: 'Local Comercial | Retiro', direccion: 'Calle O\'Donnell 34, Retiro, Madrid', zona: 'Retiro', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '38 m2', traspaso: null, alquiler: '2.200', precio: '528.000', rentabilidad: '4,75%' },
   { id: 'vr-9', nombre: 'Restaurante | Bailen, Centro', direccion: 'Calle Bailen 33, Centro, Madrid', zona: 'Centro', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '280 m2', traspaso: null, alquiler: null, precio: '1.355.000', rentabilidad: '5,50%' },
   { id: 'vr-10', nombre: 'Sala de Fiestas | Almendro', direccion: 'Almendro 22, Centro, Madrid', zona: 'Centro', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '236 m2', traspaso: null, alquiler: '7.588', precio: '1.688.000', rentabilidad: '5,40%' },
   { id: 'vr-11', nombre: 'Local Comercial | Puerta del Sol', direccion: 'Cadiz 10, Puerta del Sol, Madrid', zona: 'Centro', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '123 m2', traspaso: null, alquiler: '3.099', precio: '818.000', rentabilidad: '4,50%' },
-  { id: 'vr-12', nombre: 'Local Comercial | Malasana', direccion: 'Fuencarral 88, Malasana, Madrid', zona: 'Malasana', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '83 m2', traspaso: null, alquiler: null, precio: '1.290.000', rentabilidad: '4,20%' },
-  { id: 'vr-13', nombre: 'Restaurante-Cafeteria | San Sebastian', direccion: 'Pedro Egana 10, San Sebastian', zona: 'San Sebastian', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '200 m2', traspaso: null, alquiler: '5.500', precio: null, rentabilidad: '5,94%' },
-  { id: 'vr-14', nombre: 'Sala de Fiestas | Malasana', direccion: 'Barco 34, Malasana, Madrid', zona: 'Malasana', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '197 m2', traspaso: null, alquiler: '12.000', precio: '2.500.000', rentabilidad: '5,76%' },
+  { id: 'vr-12', nombre: 'Local Comercial | Malasaña', direccion: 'Fuencarral 88, Malasaña, Madrid', zona: 'Malasaña', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '83 m2', traspaso: null, alquiler: null, precio: '1.290.000', rentabilidad: '4,20%' },
+  { id: 'vr-13', nombre: 'Restaurante-Cafetería | San Sebastián', direccion: 'Pedro Egaña 10, San Sebastián', zona: 'San Sebastián', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '200 m2', traspaso: null, alquiler: '5.500', precio: null, rentabilidad: '5,94%' },
+  { id: 'vr-14', nombre: 'Sala de Fiestas | Malasaña', direccion: 'Barco 34, Malasaña, Madrid', zona: 'Malasaña', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '197 m2', traspaso: null, alquiler: '12.000', precio: '2.500.000', rentabilidad: '5,76%' },
   { id: 'vr-15', nombre: 'Local Comercial | Atocha', direccion: 'Embajadores 78, Atocha, Madrid', zona: 'Atocha', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '260 m2', traspaso: null, alquiler: '5.000', precio: '1.140.000', rentabilidad: '5,26%' },
   { id: 'vr-16', nombre: 'Restaurante | Pueblo Nuevo', direccion: 'Emilio Ferrari 78, Pueblo Nuevo, Madrid', zona: 'Pueblo Nuevo', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '160 m2', traspaso: null, alquiler: '2.250', precio: '360.000', rentabilidad: '7,30%' },
   { id: 'vr-17', nombre: 'Restaurante | Corralejos', direccion: 'Bahia de Almeria 11, Corralejos, Madrid', zona: 'Corralejos', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '123 m2', traspaso: null, alquiler: '1.200', precio: '280.000', rentabilidad: '5,30%' },
   { id: 'vr-18', nombre: 'Local Comercial | Gran Via Bilbao', direccion: 'Gran Via 83, Bilbao', zona: 'Bilbao', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '2.453 m2', traspaso: null, alquiler: '31.500', precio: '7.265.000', rentabilidad: '4,40%' },
   { id: 'vr-19', nombre: 'Local Comercial | Jerez', direccion: 'Lenceria 25, Jerez', zona: 'Jerez', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '116 m2', traspaso: null, alquiler: '4.700', precio: null, rentabilidad: '6,20%' },
-  { id: 'vr-20', nombre: 'Local Comercial | San Sebastian', direccion: 'Miracruz 13, San Sebastian', zona: 'San Sebastian', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '203 m2', traspaso: null, alquiler: '3.613', precio: '940.000', rentabilidad: '4,60%' },
-  { id: 'vr-21', nombre: 'Restaurante | Cordoba', direccion: 'Ronda de los Tejares 38, Cordoba', zona: 'Cordoba', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '341 m2', traspaso: null, alquiler: null, precio: '1.805.000', rentabilidad: '4,50%' },
-  { id: 'vr-22', nombre: 'Local Comercial | San Sebastian', direccion: 'Hernani 1, San Sebastian', zona: 'San Sebastian', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '62 m2', traspaso: null, alquiler: '3.446', precio: null, rentabilidad: '4,50%' },
+  { id: 'vr-20', nombre: 'Local Comercial | San Sebastián', direccion: 'Miracruz 13, San Sebastián', zona: 'San Sebastián', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '203 m2', traspaso: null, alquiler: '3.613', precio: '940.000', rentabilidad: '4,60%' },
+  { id: 'vr-21', nombre: 'Restaurante | Córdoba', direccion: 'Ronda de los Tejares 38, Córdoba', zona: 'Córdoba', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '341 m2', traspaso: null, alquiler: null, precio: '1.805.000', rentabilidad: '4,50%' },
+  { id: 'vr-22', nombre: 'Local Comercial | San Sebastián', direccion: 'Hernani 1, San Sebastián', zona: 'San Sebastián', categoria: CATEGORIAS.VENTA_CON_RENTABILIDAD, superficie: '62 m2', traspaso: null, alquiler: '3.446', precio: null, rentabilidad: '4,50%' },
 ];
 
 // ─── Componente de tarjeta de local ─────────────────────────────────────────
@@ -270,7 +270,7 @@ function FormularioLocales({ localSeleccionado, onClearLocal }) {
       setFormData((prev) => ({
         ...prev,
         localInteres: localSeleccionado.nombre,
-        mensaje: `Hola, estoy interesado/a en el local "${localSeleccionado.nombre}" ubicado en ${localSeleccionado.direccion}. Me gustaria recibir mas informacion.`,
+        mensaje: `Hola, estoy interesado/a en el local "${localSeleccionado.nombre}" ubicado en ${localSeleccionado.direccion}. Me gustaría recibir más información.`,
       }));
     }
   }, [localSeleccionado]);
@@ -287,7 +287,7 @@ function FormularioLocales({ localSeleccionado, onClearLocal }) {
       return;
     }
     if (!formData.aceptaTerminos) {
-      toast.error('Debe aceptar la politica de privacidad');
+      toast.error('Debe aceptar la política de privacidad');
       return;
     }
     try {
@@ -299,10 +299,10 @@ function FormularioLocales({ localSeleccionado, onClearLocal }) {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Error al enviar');
-      toast.success('Solicitud enviada. Marta Lopez se pondra en contacto con usted.');
+      toast.success('Solicitud enviada. Marta López se pondrá en contacto con usted.');
       setEnviado(true);
     } catch (error) {
-      toast.error('Error al enviar. Intentelo de nuevo o llamenos directamente.');
+      toast.error('Error al enviar. Inténtelo de nuevo o llámenos directamente.');
       console.error(error);
     } finally {
       setLoading(false);
@@ -316,11 +316,11 @@ function FormularioLocales({ localSeleccionado, onClearLocal }) {
           <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
         </div>
         <h3 className="text-2xl font-bold text-gray-900 mb-3">Solicitud enviada</h3>
-        <p className="text-gray-600 mb-6 max-w-md mx-auto">Marta Lopez se pondra en contacto con usted en las proximas 24 horas.</p>
+        <p className="text-gray-600 mb-6 max-w-md mx-auto">Marta López se pondrá en contacto con usted en las próximas 24 horas.</p>
         <div className="flex items-center justify-center gap-4 mb-8">
-          <img src="/marta.jpeg" alt="Marta Lopez" width={80} height={80} className="rounded-full object-cover border-4 border-yellow-500/30" />
+          <img src="/marta.jpeg" alt="Marta López" width={80} height={80} className="rounded-full object-cover border-4 border-yellow-500/30" />
           <div className="text-left">
-            <p className="font-bold text-gray-900">Marta Lopez</p>
+            <p className="font-bold text-gray-900">Marta López</p>
             <p className="text-gray-600 text-sm">Asesora Inmobiliaria</p>
             <a href="tel:+34608136529" className="text-yellow-700 text-sm font-semibold">+34 608 136 529</a>
           </div>
@@ -351,7 +351,7 @@ function FormularioLocales({ localSeleccionado, onClearLocal }) {
           <input type="text" id="nombre" name="nombre" value={formData.nombre} onChange={handleChange} required className="w-full rounded-xl border border-gray-300 p-3 shadow-sm focus:border-yellow-600 focus:outline-none focus:ring-1 focus:ring-yellow-600" placeholder="Su nombre" />
         </div>
         <div>
-          <label htmlFor="telefono" className="mb-1.5 block text-sm font-medium text-gray-900">Telefono *</label>
+          <label htmlFor="telefono" className="mb-1.5 block text-sm font-medium text-gray-900">Teléfono *</label>
           <input type="tel" id="telefono" name="telefono" value={formData.telefono} onChange={handleChange} required className="w-full rounded-xl border border-gray-300 p-3 shadow-sm focus:border-yellow-600 focus:outline-none focus:ring-1 focus:ring-yellow-600" placeholder="+34 600 000 000" />
         </div>
       </div>
@@ -361,17 +361,17 @@ function FormularioLocales({ localSeleccionado, onClearLocal }) {
       </div>
       <div>
         <label htmlFor="mensaje" className="mb-1.5 block text-sm font-medium text-gray-900">Mensaje</label>
-        <textarea id="mensaje" name="mensaje" value={formData.mensaje} onChange={handleChange} rows={3} className="w-full rounded-xl border border-gray-300 p-3 shadow-sm focus:border-yellow-600 focus:outline-none focus:ring-1 focus:ring-yellow-600" placeholder="Cuentenos que busca..." />
+        <textarea id="mensaje" name="mensaje" value={formData.mensaje} onChange={handleChange} rows={3} className="w-full rounded-xl border border-gray-300 p-3 shadow-sm focus:border-yellow-600 focus:outline-none focus:ring-1 focus:ring-yellow-600" placeholder="Cuéntenos qué busca..." />
       </div>
       <div className="flex items-start">
         <input id="aceptaTerminos" name="aceptaTerminos" type="checkbox" checked={formData.aceptaTerminos} onChange={handleChange} className="h-4 w-4 mt-1 rounded border-gray-300 text-yellow-600 focus:ring-yellow-600" />
-        <label htmlFor="aceptaTerminos" className="ml-3 text-sm text-gray-700">Acepto la <Link href="/politica-privacidad" className="text-yellow-700 hover:underline">politica de privacidad</Link>. *</label>
+        <label htmlFor="aceptaTerminos" className="ml-3 text-sm text-gray-700">Acepto la <Link href="/politica-privacidad" className="text-yellow-700 hover:underline">política de privacidad</Link>. *</label>
       </div>
       <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-yellow-500 to-yellow-700 text-black font-bold py-4 rounded-xl hover:from-yellow-600 hover:to-yellow-800 transition-all duration-300 shadow-lg disabled:opacity-70 disabled:cursor-not-allowed text-lg">
-        {loading ? (<span className="flex items-center justify-center"><svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Enviando...</span>) : 'Solicitar informacion'}
+        {loading ? (<span className="flex items-center justify-center"><svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Enviando...</span>) : 'Solicitar información'}
       </button>
       <div className="text-center">
-        <p className="text-gray-500 text-sm mb-1">O llamenos directamente:</p>
+        <p className="text-gray-500 text-sm mb-1">O llámenos directamente:</p>
         <a href="tel:+34608136529" className="inline-flex items-center gap-2 text-yellow-700 font-bold text-lg hover:text-yellow-800">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
           +34 608 136 529
@@ -420,11 +420,11 @@ const LocalesEnVenta = () => {
     <>
       <SEOMetadata
         title="Locales en Venta, Alquiler y Traspaso en Madrid | Goza Madrid Real Estate"
-        description="Mas de 90 locales comerciales, restaurantes y negocios de hosteleria en venta, alquiler y traspaso en Madrid. Salamanca, Chamartin, Centro, Retiro y mas. Contacta con Marta Lopez."
-        keywords="locales en venta Madrid, traspaso local Madrid, local hosteleria Madrid, restaurante en venta Madrid, alquiler local comercial Madrid"
+        description="Más de 90 locales comerciales, restaurantes y negocios de hostelería en venta, alquiler y traspaso en Madrid. Salamanca, Chamartín, Centro, Retiro y más. Contacta con Marta López."
+        keywords="locales en venta Madrid, traspaso local Madrid, local hostelería Madrid, restaurante en venta Madrid, alquiler local comercial Madrid"
         ogType="website"
         ogImage="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80"
-        author="Marta Lopez - Goza Madrid"
+        author="Marta López - Goza Madrid"
       />
 
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -460,10 +460,10 @@ const LocalesEnVenta = () => {
                 <span className="block"><span className="text-yellow-500">Venta</span>, <span className="text-yellow-500">Alquiler</span></span>
                 <span className="block text-3xl sm:text-4xl md:text-5xl mt-2">y <span className="text-yellow-500">Traspaso</span> en Madrid</span>
               </h1>
-              <p className="text-lg sm:text-xl text-white/90 mb-8 max-w-3xl mx-auto">Restaurantes, cafeterias, locales comerciales y negocios de hosteleria en las mejores zonas de Madrid y toda Espana.</p>
+              <p className="text-lg sm:text-xl text-white/90 mb-8 max-w-3xl mx-auto">Restaurantes, cafeterías, locales comerciales y negocios de hostelería en las mejores zonas de Madrid y toda España.</p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <motion.a href="#locales" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="rounded-full bg-gradient-to-r from-yellow-500 to-yellow-700 px-8 py-4 text-lg font-bold text-black shadow-xl transition duration-300 hover:from-yellow-600 hover:to-yellow-800 border-2 border-yellow-400/30">Ver Locales Disponibles</motion.a>
-                <motion.a href="tel:+34608136529" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="rounded-full bg-black/80 backdrop-blur-md px-8 py-4 text-lg font-semibold text-white border border-yellow-600/30 shadow-lg hover:bg-black transition duration-300">Llamar a Marta Lopez</motion.a>
+                <motion.a href="tel:+34608136529" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="rounded-full bg-black/80 backdrop-blur-md px-8 py-4 text-lg font-semibold text-white border border-yellow-600/30 shadow-lg hover:bg-black transition duration-300">Llamar a Marta López</motion.a>
               </div>
             </motion.div>
             <motion.div className="absolute bottom-8 left-1/2 transform -translate-x-1/2" animate={{ y: [0, 10, 0] }} transition={{ repeat: Infinity, duration: 2 }}>
@@ -478,7 +478,7 @@ const LocalesEnVenta = () => {
             {[
               { num: todosLosLocales.length + '+', label: 'Locales disponibles' },
               { num: '40+', label: 'Zonas en Madrid' },
-              { num: '15', label: 'Anos de experiencia' },
+              { num: '15', label: 'Años de experiencia' },
               { num: '500+', label: 'Clientes satisfechos' },
             ].map((s, i) => (
               <div key={i}>
@@ -493,9 +493,9 @@ const LocalesEnVenta = () => {
         <section id="locales" className="py-12 px-4">
           <div className="container mx-auto max-w-7xl">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeIn} className="text-center mb-8">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Catalogo de <span className="text-yellow-600">Locales</span></h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Catálogo de <span className="text-yellow-600">Locales</span></h2>
               <div className="h-1 w-24 bg-gradient-to-r from-yellow-400 to-yellow-700 mx-auto mb-4"></div>
-              <p className="text-gray-600 max-w-2xl mx-auto">Seleccione una categoria y encuentre el local perfecto para su negocio o inversion.</p>
+              <p className="text-gray-600 max-w-2xl mx-auto">Seleccione una categoría y encuentre el local perfecto para su negocio o inversión.</p>
             </motion.div>
 
             {/* Filtros */}
@@ -544,8 +544,8 @@ const LocalesEnVenta = () => {
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="bg-gradient-to-r from-yellow-500 to-yellow-700 py-10 px-4 text-center shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-10"><div className="absolute -top-16 -left-16 w-64 h-64 rounded-full bg-white"></div><div className="absolute -bottom-16 -right-16 w-64 h-64 rounded-full bg-white"></div></div>
           <div className="container mx-auto relative z-10">
-            <h3 className="text-black text-2xl md:text-3xl font-bold mb-4">No encuentra lo que busca?</h3>
-            <p className="text-black/80 mb-6 max-w-2xl mx-auto">Llame a Marta Lopez y cuentele que tipo de local necesita. Tenemos acceso a locales que aun no estan publicados.</p>
+            <h3 className="text-black text-2xl md:text-3xl font-bold mb-4">¿No encuentra lo que busca?</h3>
+            <p className="text-black/80 mb-6 max-w-2xl mx-auto">Llame a Marta López y cuéntele qué tipo de local necesita. Tenemos acceso a locales que aún no están publicados.</p>
             <a href="tel:+34608136529" className="inline-block bg-black text-white px-8 py-4 rounded-full font-bold hover:bg-gray-900 transition-all duration-300 shadow-lg transform hover:scale-105">Llamar ahora: +34 608 136 529</a>
           </div>
         </motion.div>
@@ -560,10 +560,10 @@ const LocalesEnVenta = () => {
                 <div className="text-center md:text-left">
                   <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Contacte con Nosotros</h2>
                   <div className="h-1 w-24 bg-gradient-to-r from-yellow-400 to-yellow-700 md:mx-0 mx-auto"></div>
-                  <p className="mt-4 text-lg text-gray-600 max-w-md">Marta Lopez le atendera personalmente para resolver todas sus dudas.</p>
+                  <p className="mt-4 text-lg text-gray-600 max-w-md">Marta López le atenderá personalmente para resolver todas sus dudas.</p>
                 </div>
                 <div className="relative rounded-full overflow-hidden border-4 border-yellow-500/30 shadow-xl flex-shrink-0">
-                  <img src="/marta.jpeg" alt="Marta Lopez" width={150} height={150} className="object-cover w-[150px] h-[150px]" />
+                  <img src="/marta.jpeg" alt="Marta López" width={150} height={150} className="object-cover w-[150px] h-[150px]" />
                 </div>
               </div>
               <div className="relative z-10">
@@ -580,14 +580,14 @@ const LocalesEnVenta = () => {
             <div className="flex flex-col md:flex-row justify-between items-center gap-8">
               <div className="mb-6 md:mb-0 text-center md:text-left text-white">
                 <Link href="/" className="relative z-10"><div className="flex items-center justify-center md:justify-start" style={{ maxHeight: '8rem' }}><img src="/logonuevo.png" alt="Real Estate Goza Madrid" width={150} height={200} style={{ maxHeight: '200px', width: 'auto' }} loading="lazy" /></div></Link>
-                <p className="text-sm text-white max-w-md leading-relaxed mt-4">Locales comerciales en venta, alquiler y traspaso en las mejores zonas de Madrid. Asesoramiento profesional con Marta Lopez.</p>
+                <p className="text-sm text-white max-w-md leading-relaxed mt-4">Locales comerciales en venta, alquiler y traspaso en las mejores zonas de Madrid. Asesoramiento profesional con Marta López.</p>
               </div>
               <div className="text-center md:text-right">
-                <a href="#contacto" className="inline-block mb-6 bg-gradient-to-r from-yellow-500 to-yellow-700 text-black font-bold px-6 py-3 rounded-full hover:from-yellow-600 hover:to-yellow-800 transition-all duration-300 shadow-lg transform hover:scale-105">Solicitar Informacion</a>
+                <a href="#contacto" className="inline-block mb-6 bg-gradient-to-r from-yellow-500 to-yellow-700 text-black font-bold px-6 py-3 rounded-full hover:from-yellow-600 hover:to-yellow-800 transition-all duration-300 shadow-lg transform hover:scale-105">Solicitar Información</a>
                 <div className="flex flex-wrap justify-center md:justify-end gap-4 mb-4">
                   <Link href="/aviso-legal" className="text-sm text-white hover:text-gray-400 transition-colors">Aviso Legal</Link>
-                  <Link href="/politica-privacidad" className="text-sm text-white hover:text-gray-400 transition-colors">Politica de Privacidad</Link>
-                  <Link href="/politica-cookies" className="text-sm text-white hover:text-gray-400 transition-colors">Politica de Cookies</Link>
+                  <Link href="/politica-privacidad" className="text-sm text-white hover:text-gray-400 transition-colors">Política de Privacidad</Link>
+                  <Link href="/politica-cookies" className="text-sm text-white hover:text-gray-400 transition-colors">Política de Cookies</Link>
                 </div>
                 <p className="text-xs text-white">&copy; {new Date().getFullYear()} Real Estate Goza Madrid. Todos los derechos reservados.</p>
               </div>

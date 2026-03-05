@@ -54,7 +54,7 @@ process.on('unhandledRejection', (reason, promise) => {
 // <<< FIN MANEJADORES GLOBALES DE ERRORES >>>
 
 const app = express();
-const PORT = process.env.PORT || 8081;
+const PORT = process.env.PORT || 8080;
 
 // Configurar CORS con opciones avanzadas
 const defaultOrigins = [

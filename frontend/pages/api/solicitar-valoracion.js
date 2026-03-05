@@ -4,7 +4,7 @@ import Contact from '../../models/Contact';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Metodo no permitido' });
+    return res.status(405).json({ error: 'Método no permitido' });
   }
 
   try {
@@ -30,7 +30,7 @@ export default async function handler(req, res) {
 
     // Validacion basica
     if (!nombre || !telefono || !email || !tipoPropiedad || !direccion) {
-      return res.status(400).json({ error: 'Faltan campos requeridos (nombre, telefono, email, tipo de propiedad, direccion)' });
+      return res.status(400).json({ error: 'Faltan campos requeridos (nombre, teléfono, email, tipo de propiedad, dirección)' });
     }
 
     // Configurar transporte de nodemailer
@@ -55,33 +55,33 @@ export default async function handler(req, res) {
 
     // Contenido del email
     const mailOptions = {
-      from: `"Valoracion Web GozaMadrid" <${emailUser}>`,
+      from: `"Valoración Web GozaMadrid" <${emailUser}>`,
       to: 'marta@gozamadrid.com',
-      subject: `[VALORACION] Solicitud de ${nombre} - ${tipoPropiedad} en ${direccion}`,
+      subject: `[VALORACIÓN] Solicitud de ${nombre} - ${tipoPropiedad} en ${direccion}`,
       text: `
-SOLICITUD DE VALORACION DE PROPIEDAD
+SOLICITUD DE VALORACIÓN DE PROPIEDAD
 ======================================
 
 DATOS DEL PROPIETARIO
 ---------------------
 Nombre: ${nombre}
-Telefono: ${telefono}
+Teléfono: ${telefono}
 Email: ${email}
 
 DATOS DE LA PROPIEDAD
 ---------------------
 Tipo: ${tipoPropiedad}
-Direccion: ${direccion}
-Codigo Postal: ${codigoPostal || 'No especificado'}
-Superficie: ${superficie ? superficie + ' m2' : 'No especificada'}
+Dirección: ${direccion}
+Código Postal: ${codigoPostal || 'No especificado'}
+Superficie: ${superficie ? superficie + ' m²' : 'No especificada'}
 Habitaciones: ${habitaciones || 'No especificado'}
-Banos: ${banos || 'No especificado'}
+Baños: ${banos || 'No especificado'}
 Planta: ${planta || 'No especificada'}
 Ascensor: ${ascensor || 'No especificado'}
 Garaje: ${garaje || 'No especificado'}
 Trastero: ${trastero || 'No especificado'}
-Estado de conservacion: ${estadoConservacion || 'No especificado'}
-Ano de construccion: ${anosConstruccion || 'No especificado'}
+Estado de conservación: ${estadoConservacion || 'No especificado'}
+Año de construcción: ${anosConstruccion || 'No especificado'}
 Extras: ${extrasText}
 
 MENSAJE ADICIONAL
@@ -89,13 +89,13 @@ MENSAJE ADICIONAL
 ${mensaje || 'Sin mensaje adicional'}
 
 ---
-Este email ha sido enviado desde la pagina de Valoracion Gratuita de gozamadrid.com
+Este email ha sido enviado desde la página de Valoración Gratuita de gozamadrid.com
       `,
       html: `
         <div style="font-family: Arial, sans-serif; padding: 0; max-width: 650px; margin: 0 auto; background: #fafafa;">
           <!-- Header -->
           <div style="background: linear-gradient(135deg, #000 0%, #1a1a1a 60%, #C7A336 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
-            <h1 style="color: #fff; margin: 0; font-size: 24px; font-weight: bold; letter-spacing: 1px;">Solicitud de Valoracion</h1>
+            <h1 style="color: #fff; margin: 0; font-size: 24px; font-weight: bold; letter-spacing: 1px;">Solicitud de Valoración</h1>
             <p style="color: #C7A336; margin: 8px 0 0; font-size: 14px; letter-spacing: 2px; text-transform: uppercase;">Goza Madrid Real Estate</p>
           </div>
           
@@ -108,7 +108,7 @@ Este email ha sido enviado desde la pagina de Valoracion Gratuita de gozamadrid.
                 <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0; color: #555;">${nombre}</td>
               </tr>
               <tr>
-                <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0; font-weight: bold; color: #333;">Telefono:</td>
+                <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0; font-weight: bold; color: #333;">Teléfono:</td>
                 <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0;">
                   <a href="tel:${telefono}" style="color: #C7A336; text-decoration: none; font-weight: bold;">${telefono}</a>
                 </td>
@@ -131,11 +131,11 @@ Este email ha sido enviado desde la pagina de Valoracion Gratuita de gozamadrid.
                 </td>
               </tr>
               <tr>
-                <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0; font-weight: bold; color: #333;">Direccion:</td>
+                <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0; font-weight: bold; color: #333;">Dirección:</td>
                 <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0; color: #555;">${direccion}</td>
               </tr>
               <tr>
-                <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0; font-weight: bold; color: #333;">Codigo Postal:</td>
+                <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0; font-weight: bold; color: #333;">Código Postal:</td>
                 <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0; color: #555;">${codigoPostal || 'No especificado'}</td>
               </tr>
               <tr>
@@ -147,7 +147,7 @@ Este email ha sido enviado desde la pagina de Valoracion Gratuita de gozamadrid.
                 <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0; color: #555;">${habitaciones || 'No especificado'}</td>
               </tr>
               <tr>
-                <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0; font-weight: bold; color: #333;">Banos:</td>
+                <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0; font-weight: bold; color: #333;">Baños:</td>
                 <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0; color: #555;">${banos || 'No especificado'}</td>
               </tr>
               <tr>
@@ -167,11 +167,11 @@ Este email ha sido enviado desde la pagina de Valoracion Gratuita de gozamadrid.
                 <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0; color: #555;">${trastero || 'No especificado'}</td>
               </tr>
               <tr>
-                <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0; font-weight: bold; color: #333;">Conservacion:</td>
+                <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0; font-weight: bold; color: #333;">Conservación:</td>
                 <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0; color: #555;">${estadoConservacion || 'No especificado'}</td>
               </tr>
               <tr>
-                <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0; font-weight: bold; color: #333;">Ano construccion:</td>
+                <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0; font-weight: bold; color: #333;">Año de construcción:</td>
                 <td style="padding: 12px 10px; border-bottom: 1px solid #f0f0f0; color: #555;">${anosConstruccion || 'No especificado'}</td>
               </tr>
               <tr>
@@ -190,7 +190,7 @@ Este email ha sido enviado desde la pagina de Valoracion Gratuita de gozamadrid.
           <!-- Footer -->
           <div style="background: #f0f0f0; padding: 15px 30px; border-radius: 0 0 12px 12px; border: 1px solid #eee; border-top: none; text-align: center;">
             <p style="margin: 0; font-size: 12px; color: #999;">
-              Este email ha sido enviado automaticamente desde la pagina de Valoracion Gratuita de gozamadrid.com
+              Este email ha sido enviado automáticamente desde la página de Valoración Gratuita de gozamadrid.com
             </p>
           </div>
         </div>
@@ -231,7 +231,7 @@ Este email ha sido enviado desde la pagina de Valoracion Gratuita de gozamadrid.
       console.warn('MONGODB_URI no configurado, omitiendo guardado en base de datos');
     }
 
-    return res.status(200).json({ success: true, message: 'Solicitud de valoracion enviada correctamente' });
+    return res.status(200).json({ success: true, message: 'Solicitud de valoración enviada correctamente' });
   } catch (error) {
     console.error('Error al enviar solicitud de valoracion:', error);
     return res.status(500).json({ error: 'Error al enviar la solicitud', details: error.message });
